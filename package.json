@@ -1,10 +1,24 @@
 {
   "name": "files-and-folders-2",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Files and Folders project with Angular and NestJS",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pnpm-i": "pnpm i -f",
+    "start:fnf": "pnpm --filter fnf start",
+    "start:fnf-api": "pnpm --filter fnf-api start",
+    "build:fnf": "pnpm --filter fnf build",
+    "build:fnf-api": "pnpm --filter fnf-api build",
+    "build:fnf-data": "pnpm --filter fnf-data build",
+    "build": "pnpm build:fnf-data && pnpm build:fnf && pnpm build:fnf-api",
+    "test:fnf": "pnpm --filter fnf test",
+    "test:fnf-api": "pnpm --filter fnf-api test",
+    "test:fnf-data": "pnpm --filter fnf-data test",
+    "test": "pnpm test:fnf-data && pnpm test:fnf && pnpm test:fnf-api",
+    "install:all": "pnpm install && pnpm --filter fnf-data install && pnpm --filter fnf install && pnpm --filter fnf-api install"
   },
-  "private": true
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
 }
