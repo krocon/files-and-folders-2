@@ -34,7 +34,4 @@
     grid-template-columns: 350px 350px;
     grid-gap: 12px;
 
-    /*.border-left {*/
-    /*    border-left: 1px solid var(--fnf-table-border-color);*/
-    /*}*/
 }

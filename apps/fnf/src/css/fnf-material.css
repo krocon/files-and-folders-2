@@ -25,6 +25,9 @@ html {
     font-weight: bold;
 }
 
+.mat-mdc-dialog-content{
+    max-height: 100vh !important;
+}
 
 fnf-root {
 

@@ -9,7 +9,6 @@ import {
 import {MatButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {ShortcutService} from "../../service/shortcut.service";
-import {JsonPipe} from "@angular/common";
 import {actionIds} from "../../domain/action/fnf-action.enum";
 import {ActionIdLabelShortcut} from "./action-id-label-shortcut";
 import {FnfActionLabels} from "../../domain/action/fnf-action-labels";
@@ -26,7 +25,6 @@ import {ShortcutComponent} from "../main/footer/buttonpanel/shortcut/shortcut.co
     MatIconModule,
     MatButton,
     MatDialogActions,
-    JsonPipe,
     ShortcutComponent,
   ],
 })
@@ -41,13 +39,15 @@ export class ShortcutDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.actionIdLabelShortcuts = actionIds.map(
-      id => new ActionIdLabelShortcut(
-        id,
-        FnfActionLabels.actionIdLabelMap[id],
-        this.shortcutService.getShortcutsByAction(id)
+    this.actionIdLabelShortcuts = actionIds
+      .filter(id => id !== 'DO_NOTHING')
+      .map(
+        id => new ActionIdLabelShortcut(
+          id,
+          FnfActionLabels.actionIdLabelMap[id],
+          this.shortcutService.getShortcutsByAction(id)
+        )
       )
-    )
   }
 
 

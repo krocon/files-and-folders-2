@@ -4,13 +4,43 @@
     grid-template-rows: auto auto auto auto;
     grid-gap: 24px;
     align-items: center;
+}
 
-    .shortcut-row{
-        display: grid;
-        grid-template-columns: auto 1fr auto;
-        grid-gap: 12px;
-        align-items: center;
-    }
+.shortcut-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.shortcut-row {
+    vertical-align: middle;
+}
+
+.shortcut-cell {
+    padding: 6px;
+}
+
+.shortcut-row.header .shortcut-cell {
+    font-weight: bold;
+}
+
+/* Maintain the column widths similar to the grid layout */
+.shortcut-table tr td:nth-child(1),
+.shortcut-table tr th:nth-child(1) {
+    width: auto;
+    text-align: left;
+}
+
+.shortcut-table tr td:nth-child(2),
+.shortcut-table tr th:nth-child(2) {
+    width: 100%;
+    text-align: left;
+}
+
+.shortcut-table tr td:nth-child(3),
+.shortcut-table tr th:nth-child(3) {
+    width: auto;
+    text-align: right;
 }
 
 
@@ -23,3 +53,6 @@
 }
 
 
+.shortcut-cell {
+    border-bottom: 1px solid currentColor;
+}

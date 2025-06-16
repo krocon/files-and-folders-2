@@ -4,24 +4,29 @@
 
 <mat-dialog-content>
   <div class="dlg-content-div">
-    <div class="shortcut-table">
-      <div class="shortcut-row header">
-        <div class="shortcut-cell">Action</div>
-        <div class="shortcut-cell">Description</div>
-        <div class="shortcut-cell">Shortcuts</div>
-      </div>
-      @for (item of actionIdLabelShortcuts; track item) {
-        <div class="shortcut-row">
-          <div class="shortcut-cell">{{ item.actionId }}</div>
-          <div class="shortcut-cell">{{ item.label }}</div>
-          <div class="shortcut-cell">
-            @for (shortcut of item.shortcuts; track shortcut) {
-              <fnf-shortcut [keys]="shortcut.split(' ')"></fnf-shortcut>
-            }
-          </div>
-        </div>
-      }
-    </div>
+
+    <table class="shortcut-table">
+      <thead>
+      <tr class="shortcut-row header">
+        <th class="shortcut-cell">Action</th>
+        <th class="shortcut-cell">Description</th>
+        <th class="shortcut-cell">Shortcuts</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (item of actionIdLabelShortcuts; track item) {
+          <tr class="shortcut-row">
+            <td class="shortcut-cell">{{ item.actionId }}</td>
+            <td class="shortcut-cell">{{ item.label }}</td>
+            <td class="shortcut-cell">
+              @for (shortcut of item.shortcuts; track shortcut) {
+                <fnf-shortcut [keys]="shortcut.split(' ')"></fnf-shortcut>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
 
   </div>
 </mat-dialog-content>
