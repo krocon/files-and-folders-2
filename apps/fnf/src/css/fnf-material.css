@@ -5,7 +5,7 @@ html {
 }
 
 .mat-mdc-menu-panel {
-    max-width: 350px !important;
+    max-width: 750px !important;
 }
 
 .cdk-overlay-pane:has(.fnf-file-menu) {

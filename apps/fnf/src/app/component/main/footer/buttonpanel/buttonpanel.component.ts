@@ -11,6 +11,7 @@ import {ActionId} from "../../../../domain/action/fnf-action.enum";
 import {MatBottomSheet} from "@angular/material/bottom-sheet";
 import {TaskList} from "../../../task/task-list/task-list";
 import {ButtonEnableStates, buttonEnableStatesKey} from "@fnf/fnf-data";
+import {MatList} from "@angular/material/list";
 
 @Component({
   selector: 'app-button-panel',
@@ -24,6 +25,7 @@ import {ButtonEnableStates, buttonEnableStatesKey} from "@fnf/fnf-data";
     ShortcutComponent,
     MatMenuItem,
     MatDivider,
+    MatList,
   ],
   templateUrl: './buttonpanel.component.html',
   styleUrls: ['./buttonpanel.component.css']
@@ -126,5 +128,9 @@ export class ButtonPanelComponent {
 
   setTheme(theme: Theme) {
     this.appService.setTheme(theme);
+  }
+
+  openShortcutDlg(evt: MouseEvent) {
+    this.triggerAction('OPEN_SHORTCUT_DLG');
   }
 }

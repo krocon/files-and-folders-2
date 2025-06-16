@@ -66,6 +66,10 @@ export class ShortcutService {
     return ret;
   }
 
+  getActiveShortcuts(): ShortcutActionMapping {
+    return this.activeShortcuts;
+  }
+
   private async fetchShortcutMappings(): Promise<ShortcutActionMapping | undefined> {
     return await this.httpClient
       .get<ShortcutActionMapping>(ShortcutService.config.getShortcutActionMappingUrl)

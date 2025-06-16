@@ -35,6 +35,7 @@ import {FileOperationParams} from "./domain/cmd/file-operation-params";
 import {MkdirDialogService} from "./component/cmd/mkdir/mkdir-dialog.service";
 import {MkdirDialogData} from "./component/cmd/mkdir/mkdir-dialog.data";
 import {MkdirDialogResultData} from "./component/cmd/mkdir/mkdir-dialog-result.data";
+import {ShortcutDialogService} from "./component/shortcut/shortcut-dialog.service";
 
 @Injectable({
   providedIn: "root"
@@ -79,6 +80,7 @@ export class AppService {
     private readonly renameDialogService: RenameDialogService,
     private readonly mkdirDialogService: MkdirDialogService,
     private readonly commandService: CommandService,
+    private readonly shortcutDialogService: ShortcutDialogService,
   ) {
     // Set config to services:
     ConfigService.forRoot(environment.config);
@@ -333,6 +335,8 @@ export class AppService {
 
     } else if (id === "OPEN_MKDIR_DLG") {
       this.mkdir();
+    } else if (id === "OPEN_SHORTCUT_DLG") {
+      this.shortcutDialogService.open();
 
       // } else if (id === "RELOAD_DIR") {
       //   this.filePageData.update(v=> this.clone(v));

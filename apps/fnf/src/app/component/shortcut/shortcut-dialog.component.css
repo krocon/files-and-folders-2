@@ -1,0 +1,25 @@
+
+.dlg-content-div {
+    display: grid;
+    grid-template-rows: auto auto auto auto;
+    grid-gap: 24px;
+    align-items: center;
+
+    .shortcut-row{
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-gap: 12px;
+        align-items: center;
+    }
+}
+
+
+.mat-mdc-dialog-actions {
+    justify-content: flex-end;
+
+    .mdc-button {
+        min-width: 200px;
+    }
+}
+
+

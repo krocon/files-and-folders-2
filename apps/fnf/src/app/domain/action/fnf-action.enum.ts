@@ -53,6 +53,7 @@ export const actionIds = [
   "OPEN_COPY_DLG",
 
   "TOGGLE_FILTER",
+  "OPEN_SHORTCUT_DLG",
 
   "DO_NOTHING"
 ] as const;

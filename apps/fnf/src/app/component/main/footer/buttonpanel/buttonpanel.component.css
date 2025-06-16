@@ -13,8 +13,12 @@
 }
 
 .panel-button {
-    min-width: 50px;
+    min-width: 30px;
     margin: 5px;
+    &.icon-only {
+        padding-left: 13px;
+        padding-right: 5px;
+    }
 }
 
 .panel-button mat-icon {
@@ -23,4 +27,14 @@
 
 .mdc-button.mat-mdc-button-disabled {
     opacity: 0.3;
+}
+
+.menu-container {
+    display: grid;
+    grid-template-columns: 350px 350px;
+    grid-gap: 12px;
+
+    /*.border-left {*/
+    /*    border-left: 1px solid var(--fnf-table-border-color);*/
+    /*}*/
 }
