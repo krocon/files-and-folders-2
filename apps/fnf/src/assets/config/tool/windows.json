@@ -1,0 +1,29 @@
+{
+  "replaceDefaults": true,
+  "tools": [
+    {
+      "id": "EDIT_FILE",
+      "label": "Edit",
+      "shortcut": "f4",
+      "cmd": "\"C:\\local\\kronmar\\Programme\\Sublime Text Build 3065 x64\\sublime_text.exe\"",
+      "fileLimit": 4,
+      "para": " $file ",
+      "local": true
+    },
+    {
+      "id": "7ZIP",
+      "label": "7z",
+      "shortcut": "control shift z",
+      "cmd": "c:\\local\\Programme\\totalcmd\\7-ZipPortable\\7-ZipPortable.exe",
+      "local": true
+    },
+    {
+      "id": "CMD_SHELL",
+      "label": "CMD Shell",
+      "shortcut": "control alt c",
+      "cmd": "$clidir\\cmd.bat",
+      "para": " $dir ",
+      "local": true
+    }
+  ]
+}

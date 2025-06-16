@@ -1,0 +1,11 @@
+### findfolders
+POST http://localhost:3333/api/findfolders
+Content-Type: application/json
+
+{
+  "startDirs": [
+    "/Users/marckronberg/WebstormProjects/2025/files-and-folders"
+  ],
+  "pattern": "fr",
+  "folderDeep": 5
+}

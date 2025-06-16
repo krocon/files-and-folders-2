@@ -1,0 +1,32 @@
+@import "fnf-css-custom-properties.css";
+
+html {
+    --mat-dialog-actions-padding: 20px;
+}
+
+.mat-mdc-menu-panel {
+    max-width: 350px !important;
+}
+
+.cdk-overlay-pane:has(.fnf-file-menu) {
+    width: calc(100vw - 24px) !important;
+}
+
+.mat-mdc-menu-panel.fnf-file-menu {
+    max-width: calc(100vw - 24px) !important;
+    width: calc(100vw - 24px);
+}
+
+
+.fnf-menu-label {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    padding-left: 16px;
+    font-weight: bold;
+}
+
+
+fnf-root {
+
+
+}

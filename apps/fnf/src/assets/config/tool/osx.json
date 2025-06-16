@@ -1,0 +1,30 @@
+{
+  "replaceDefaults": true,
+  "tools": [
+    {
+      "id": "EDIT_FILE",
+      "label": "Edit",
+      "shortcut": "control 4",
+      "cmd": "sublime",
+      "fileLimit": 4,
+      "para": " $file ",
+      "local": true
+    },
+    {
+      "id": "CMD_SHELL",
+      "label": "CMD Shell",
+      "shortcut": "control 0",
+      "cmd": "open -a Terminal ",
+      "para": " $dir ",
+      "local": true
+    },
+    {
+      "id": "CMD_REVEAL_IN_FINDER",
+      "label": "Reveal in Finder",
+      "shortcut": "control shift f",
+      "cmd": "open ",
+      "para": " $dir ",
+      "local": true
+    }
+  ]
+}

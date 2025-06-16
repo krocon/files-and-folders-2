@@ -1,0 +1,28 @@
+### drives
+GET http://localhost:3333/api/drives
+
+### exists
+POST http://localhost:3333/api/exists
+Content-Type: application/json
+
+{
+  "path": "d:/repos/biue-import-service/aws/abc/xyz/123"
+}
+
+
+### checkpath
+POST http://localhost:3333/api/checkpath
+Content-Type: application/json
+
+{
+  "path": "d:/repos/biue-import-service/aws/abc/xyz/123"
+}
+
+
+### checkpath
+POST http://localhost:3333/api/checkpath
+Content-Type: application/json
+
+{
+  "path": "c:/"
+}

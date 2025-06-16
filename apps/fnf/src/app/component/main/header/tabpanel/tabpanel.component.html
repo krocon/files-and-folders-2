@@ -1,0 +1,76 @@
+<div class="tabpanel-div">
+
+  <div class="fnf-border-bottom">
+    <fnf-fav-menu
+        #favMenu
+        [dockerRoot]="dockerRoot"
+        [favs]="favs"
+        [latest]="latest"
+        [panelIndex]="panelIndex"
+        [winDrives]="winDrives"></fnf-fav-menu>
+  </div>
+
+  <mat-tab-group
+      (selectedIndexChange)="onSelectedIndexChanged($event)"
+      [@.disabled]="true"
+      [disablePagination]="false"
+      [selectedIndex]="tabsPanelData?.selectedTabIndex"
+      animationDuration="0ms"
+      style="max-width: calc(100% - 200px)">
+    @for (tab of tabsPanelData?.tabs; track tab.id; let i = $index) {
+      <mat-tab>
+        <ng-template mat-tab-label>
+          @if (tabsPanelData) {
+            <app-tab
+                [activeAndSelected]="selected && i === tabsPanelData.selectedTabIndex"
+                [class.active]="i === tabsPanelData.selectedTabIndex"
+                [panelIndex]="panelIndex"
+                [tab]="tab"></app-tab>
+          }
+        </ng-template>
+      </mat-tab>
+    }
+  </mat-tab-group>
+
+  <div class="fnf-border-bottom display-flex">
+    <button
+        (click)="onAddTabClicked($event)"
+        [matTooltip]="'ADD_NEW_TAB' | fnfShortcut"
+        class="icon-only-button fix-padding"
+        mat-button>
+      <mat-icon class="fnf-header-fg-color">add_circle_outline</mat-icon>
+    </button>
+    <button
+        (click)="onRemoveTabClicked($event)"
+        [matTooltip]="'REMOVE_TAB' | fnfShortcut"
+        class="icon-only-button fix-padding"
+        mat-button>
+      <mat-icon class="fnf-header-fg-color">remove_circle_outline</mat-icon>
+    </button>
+  </div>
+
+  <div class="fnf-border-bottom filter-div">
+    @if (tabsPanelData) {
+      <button
+          [matTooltip]="'TOGGLE_FILTER' | fnfShortcut"
+          class="icon-only-button float-right"
+          (click)="toggleFilterInput()"
+          mat-button>
+        <mat-icon class="fnf-header-fg-color">filter_alt</mat-icon>
+      </button><input
+          matTooltip="Double click to clear"
+          (change)="onFilterChangedByUser()"
+          (keyup)="onFilterChangedByUser()"
+          (dblclick)="clearFilter()"
+          [(ngModel)]="tabsPanelData.tabs[tabsPanelData.selectedTabIndex].filterText"
+          [class]="{
+          'hidden' : !tabsPanelData.tabs[tabsPanelData.selectedTabIndex].filterActive,
+          'panelIndex0' : panelIndex === 0
+          }"
+          autofocus="autofocus"
+          class="filter border-0 float-right mr-1"
+          matInput
+          placeholder="Filter">
+    }
+  </div>
+</div>

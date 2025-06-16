@@ -1,0 +1,54 @@
+<h2
+    data-test-id="page-subtitle-h2"
+    mat-dialog-title>Rename</h2>
+
+<mat-dialog-content>
+  <div class="dlg-content-div">
+
+
+    <form
+        [formGroup]="formGroup"
+        autocomplete="off">
+      <mat-form-field>
+        <input
+            formControlName="source"
+            matInput
+            [matTooltip]="sourceTooltip"
+            placeholder="Current name"/>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input
+            (keydown.enter)="onOkClicked()"
+            [fnfAutofocus]="true"
+            formControlName="target"
+            matInput
+            placeholder="New name"/>
+      </mat-form-field>
+
+      <div>
+        <mat-error>{{ errorMessage }}&nbsp;</mat-error>
+      </div>
+    </form>
+
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button
+      (click)="onCancelClicked()"
+      data-test-id="dialog-cancel-button"
+      mat-raised-button>
+    Cancel
+  </button>
+
+  <button
+      (click)="onOkClicked()"
+      [disabled]="!formGroup.valid"
+      color="primary"
+      data-test-id="dialog-ok-button"
+      mat-raised-button>
+    Rename
+  </button>
+</mat-dialog-actions>

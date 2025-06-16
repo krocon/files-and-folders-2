@@ -1,0 +1,91 @@
+<div
+    [className]="data.cssClass"
+    data-test-id="confirm-dialog-div">
+  @if (data && data.title) {
+    <div mat-dialog-title>
+      <button
+          (click)="onCloseClicked()"
+          class="fnf-float-right"
+          mat-icon-button>
+        &#x2716;
+      </button>
+      <h4>{{ data.title }}</h4>
+    </div>
+  }
+
+  <div mat-dialog-content>
+    @if (data.phrases) {
+      @for (phrase of data.phrases; track phrase) {
+        <p>{{ phrase }}</p>
+      }
+    }
+
+    @if (data.inputs && data.inputs.length) {
+      <div class="inputs-div">
+        <form>
+          @for (input of data.inputs; track input) {
+            <div>
+              @if (input.type === 'text') {
+                <mat-form-field class="fnf-full-width">
+                  <input
+                      [(ngModel)]="data.inputModel[input.key]"
+                      [attr.name]="input.key"
+                      [attr.placeholder]="input.label"
+                      [maxLength]="50"
+                      autocapitalize="off"
+                      autocomplete="off"
+                      matInput
+                      spellcheck="false"/>
+                </mat-form-field>
+              }
+              @if (input.type === 'checkbox') {
+                <mat-checkbox
+                    [(ngModel)]="data.inputModel[input.key]"
+                    name="{{ input.key }}">{{ input.label }}
+                </mat-checkbox>
+              }
+            </div>
+          }
+        </form>
+      </div>
+    }
+  </div>
+
+  @if (vertical) {
+    <div
+        align="end"
+        class="buttons-vertical-div"
+        layout-align="vertical">
+      @for (btn of data.buttons; track btn; let i = $index) {
+        <button
+            (click)="onButtonClicked(btn)"
+            [attr.data-test-id]="'confirm-dialog-button-v-' + i"
+            [color]="btn.color"
+            [class]="{ 'fnf-full-width': vertical }"
+            class="display-inline-block"
+            mat-flat-button>
+          {{ btn.label }}
+        </button>
+      }
+    </div>
+  }
+  @if (!vertical) {
+    <div
+        align="end"
+        class="buttons-horizontal-div">
+      @if (data.buttons) {
+        @for (btn of data.buttons; track btn; let i = $index) {
+          <button
+              (click)="onButtonClicked(btn)"
+              [attr.data-test-id]="'confirm-dialog-button-h-' + i"
+              [color]="btn.color"
+              [class]="{ 'fnf-full-width': vertical }"
+              class="display-inline-block"
+              mat-flat-button>
+            {{ btn.label }}
+          </button>
+        }
+      }
+    </div>
+  }
+</div>

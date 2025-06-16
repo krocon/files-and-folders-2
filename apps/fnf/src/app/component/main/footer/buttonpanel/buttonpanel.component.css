@@ -1,0 +1,26 @@
+.button-panel-container {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 10px;
+}
+
+.button-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+.panel-button {
+    min-width: 50px;
+    margin: 5px;
+}
+
+.panel-button mat-icon {
+    margin-right: 5px;
+}
+
+.mdc-button.mat-mdc-button-disabled {
+    opacity: 0.3;
+}

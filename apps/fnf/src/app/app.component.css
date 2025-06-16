@@ -1,0 +1,78 @@
+
+.fnf-main-div {
+    --viewport-width: 100%;
+    --split-panel-left-width: calc(50vW - 4px);
+    --split-panel-right-width: calc(50vW - 4px);
+    --split-panel-separator-width: 8px;
+    --split-panel-bg-dragging-color: rgba(0, 247, 255, 0.3);
+
+    width: 100%;
+    height: 100%;
+    overflow: clip;
+
+    display: grid;
+    grid-template-rows: auto auto 1fr auto auto;
+
+
+    &:has(.split-div.resizing) {
+        user-select: none;
+
+        & .split-div {
+            .panel-separator {
+                background-color: var(--split-panel-bg-dragging-color);
+            }
+        }
+    }
+
+    .split-div {
+        width: var(--viewport-width) !important;
+        max-width: var(--viewport-width) !important;
+        display: grid;
+        grid-template-columns: calc(var(--split-panel-left-width)) var(--split-panel-separator-width) 1fr;
+
+        & > div {
+            overflow-x: clip;
+        }
+
+        &:nth-child(0),
+        &:nth-child(1) {
+
+        }
+
+        .panel-left {
+            max-width: var(--split-panel-left-width);
+        }
+
+        .panel-right {
+            max-width: var(--split-panel-right-width);
+        }
+
+        & > .panel-separator {
+            cursor: col-resize;
+            /*background-color: chartreuse;*/
+
+            &:hover {
+                background: var(--split-panel-bg-dragging-color);
+            }
+
+        }
+    }
+
+}
+
+.ellipsis-start {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    direction: rtl;
+    text-align: left;
+}
+
+.ellipsis-end {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+}

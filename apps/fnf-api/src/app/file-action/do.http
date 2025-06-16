@@ -1,0 +1,136 @@
+### unpack
+POST http://localhost:3333/api/do
+Content-Type: application/json
+
+{
+  "source": {
+    "dir": "test",
+    "base": "demo.zip",
+    "ext": "zip",
+    "isDir": false
+  },
+  "target": {
+    "dir": "test",
+    "base": "",
+    "ext": "",
+    "isDir": true
+  },
+  "cmd": "unpack"
+}
+
+### mkdir
+POST http://localhost:3333/api/do
+Content-Type: application/json
+
+{
+  "target": {
+    "dir": "test/demo",
+    "base": "mkdir1",
+    "ext": "",
+    "isDir": true
+  },
+  "cmd": "mkdir"
+}
+
+
+### move folder
+POST http://localhost:3333/api/do
+Content-Type: application/json
+
+{
+  "source": {
+    "dir": "test/demo",
+    "base": "a1",
+    "ext": "",
+    "isDir": true
+  },
+  "target": {
+    "dir": "test/demo/mkdir1/a1",
+    "base": "",
+    "ext": "",
+    "isDir": true
+  },
+  "cmd": "move"
+}
+
+
+### move file
+POST http://localhost:3333/api/do
+Content-Type: application/json
+
+{
+  "source": {
+    "dir": "test/demo/mkdir1/a1/b3",
+    "base": "c3.txt",
+    "ext": "txt",
+    "isDir": false
+  },
+  "target": {
+    "dir": "test/demo",
+    "base": "",
+    "ext": "",
+    "isDir": true
+  },
+  "cmd": "move"
+}
+
+
+### copy
+POST http://localhost:3333/api/do
+Content-Type: application/json
+
+{
+  "source": {
+    "dir": "test/demo",
+    "base": "a4.txt",
+    "ext": "txt",
+    "isDir": false
+  },
+  "target": {
+    "dir": "test/demo/mkdir1",
+    "base": "copy-a4.txt",
+    "isDir": false
+  },
+  "cmd": "copy"
+}
+
+### rmdir
+POST http://localhost:3333/api/do
+Content-Type: application/json
+
+{
+  "source": {
+    "dir": "test",
+    "base": "demo",
+    "ext": "",
+    "isDir": true
+  },
+  "cmd": "rmdir"
+}
+
+### unpacklist
+POST http://localhost:3333/api/do/unpacklist
+Content-Type: application/json
+
+{
+  "source": {
+    "dir": "test",
+    "base": "demo.zip",
+    "ext": "zip",
+    "isDir": false
+  },
+  "cmd": "unpacklist"
+}
+
+### do/walkdir
+POST http://localhost:3333/api/do/walkdir
+Content-Type: application/json
+
+{
+  "files": [
+    "test",
+    "node_modules"
+  ],
+  "emmitDataKey": "",
+  "emmitCancelKey": ""
+}

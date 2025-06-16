@@ -1,0 +1,70 @@
+<button
+    #clickHoverMenuTrigger="matMenuTrigger"
+    [fnfAutofocus]="panelIndex===0"
+    [matMenuTriggerFor]="menuFavs"
+    mat-flat-button>
+  <mat-icon class="fnf-header-fg-color">expand_more</mat-icon>
+</button>
+
+<mat-menu
+    #menuFavs="matMenu"
+    class="fnf-file-menu">
+
+  @if (dockerRoot) {
+    <button
+        (click)="onItemClicked(dockerRoot)"
+        mat-menu-item>
+      <mat-icon>home</mat-icon>
+      <span>root</span>
+    </button>
+  }
+
+  @if (winDrives.length) {
+    <mat-list-item>
+      <div class="fnf-menu-label">Windows Drives:</div>
+    </mat-list-item>
+  }
+  @for (drv of winDrives; track drv) {
+    <button
+        (click)="onItemClicked(drv)"
+        mat-menu-item>
+      <mat-icon>save</mat-icon>
+      <span [innerText]="drv | deleteDockerRoot"></span>
+    </button>
+  }
+
+  @if (winDrives.length && favs.length) {
+    <mat-divider></mat-divider>
+  }
+  @if (favs.length) {
+    <mat-list-item>
+      <div class="fnf-menu-label">Favs:</div>
+    </mat-list-item>
+  }
+  @for (fav of favs; track fav) {
+    <button
+        (click)="onItemClicked(fav)"
+        mat-menu-item>
+      <mat-icon>star</mat-icon>
+      <span [innerText]="fav | deleteDockerRoot"></span>
+    </button>
+  }
+
+  @if (favs.length && latest.length) {
+    <mat-divider></mat-divider>
+  }
+  @if (latest.length) {
+    <mat-list-item>
+      <div class="fnf-menu-label">Latest:</div>
+    </mat-list-item>
+  }
+  @for (latestItem of latest; track latestItem) {
+    <button
+        (click)="onItemClicked(latestItem)"
+        mat-menu-item>
+      <mat-icon>schedule</mat-icon>
+      <span [innerText]="latestItem | deleteDockerRoot"></span>
+    </button>
+  }
+
+</mat-menu>

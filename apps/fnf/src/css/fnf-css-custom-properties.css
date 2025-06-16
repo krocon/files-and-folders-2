@@ -1,0 +1,53 @@
+
+:root {
+    --fnf-activepanel-header-bg-color: var(--fnf-header-bg-color);
+    --fnf-activepanel-header-border-color: var(--fnf-material-primary-color);
+    --fnf-activepanel-header-selected-tab-bg-color: var(--fnf-header-selected-tab-bg-color);
+    --fnf-activepanel-header-selected-tab-fg-color: var(--fnf-material-primary-color);
+    --fnf-activepanel-table-header-bg-color: #fff;
+    --fnf-activepanel-table-selected-row-bg-color: var(--fnf-table-bg-color);
+    --fnf-activepanel-table-selected-row-fg-color: #e00034;
+    --fnf-activepanel-table-bg-color: #fff;
+    --fnf-activepanel-table-border-color: var(--fnf-table-bg-color);
+    --fnf-activepanel-table-fg-color: #000;
+    --fnf-footer-bg-color: var(--fnf-header-bg-color);
+    --fnf-footer-button-bg-color: #fefefe;
+    --fnf-footer-button-border-color: #dadada;
+    --fnf-footer-button-fg-color: #000;
+    --fnf-footer-fg-color: var(--fnf-header-fg-color);
+    --fnf-footer-shortcut-bg-color: #444;
+    --fnf-footer-shortcut-fg-color: #eee;
+    --fnf-header-bg-color: #f3f3f3;
+    --fnf-header-border-color: #d2d2d2;
+    --fnf-header-fg-color: #000;
+    --fnf-header-input-background-color: #fff;
+    --fnf-header-input-border: solid 1px #aaa;
+    --fnf-header-input-color: #222;
+    --fnf-header-input-foreground-color: var(--fnf-header-input-color);
+    --fnf-header-selected-tab-bg-color: #fff;
+    --fnf-header-selected-tab-fg-color: #333;
+    --fnf-header-link-selected-color: var(--fnf-activepanel-table-selected-row-fg-color); /* TODO ? */
+    --fnf-material-accent-color: #4be20b;
+    --fnf-material-primary-color: #0098db;
+    --fnf-material-secondary-color: #0149ff;
+    --fnf-material-warn-color: #e00034;
+    --fnf-scrollbar-thumb-active-bg-color: #888;
+    --fnf-scrollbar-thumb-bg-color: #d2d2d2;
+    --fnf-scrollbar-thumb-border-color: #fff;
+    --fnf-scrollbar-track-bg-color: #fff;
+    --fnf-table-bg-color: #fff;
+    --fnf-table-border-color: var(--fnf-table-bg-color);
+    --fnf-table-fg-color: #333;
+    --fnf-table-focused-row-bg-color: var(--fnf-material-primary-color);
+    --fnf-table-focused-row-fg-color: var(--fnf-table-bg-color);
+    --fnf-table-font-size: 13px;
+    --fnf-table-header-bg-color: #fff;
+    --fnf-table-hover-row-bg-color: var(--fnf-activepanel-header-bg-color);
+    --fnf-table-selected-row-bg-color: var(--fnf-table-bg-color);
+    --fnf-table-selected-row-fg-color: #e00034;
+    --fnf-tooltip-background-color: rgba(0, 0, 0, 0.75);
+    --fnf-tooltip-background-input-color: #fff;
+    --fnf-tooltip-color: #fff;
+    --fnf-tooltip-input-color: #000;
+
+}

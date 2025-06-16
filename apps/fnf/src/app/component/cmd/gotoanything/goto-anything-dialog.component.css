@@ -1,0 +1,19 @@
+
+.mat-mdc-form-field {
+    width: 100%;
+}
+
+.mat-mdc-dialog-actions {
+    justify-content: flex-end;
+
+    .mdc-button {
+        min-width: 200px;
+    }
+}
+
+.option-div {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-gap: 12px;
+    /*align-items: center;*/
+}

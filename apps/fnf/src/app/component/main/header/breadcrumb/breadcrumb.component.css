@@ -1,0 +1,27 @@
+
+.breadcrumb-div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    /*justify-content: flex-start;*/
+    width: 100%;
+    gap: 0;
+
+    padding: 4px 0 4px 16px;
+
+    .file-item-div {
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .file-item-div.w-100 {
+        cursor: none;
+        width: 100%;
+        min-width: 20px;
+    }
+
+    .file-item-div:hover {
+        text-decoration: underline;
+    }
+}

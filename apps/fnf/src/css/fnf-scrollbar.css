@@ -1,0 +1,41 @@
+@import "fnf-css-custom-properties.css";
+
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+
+::-webkit-scrollbar-button {
+    display: none;
+}
+
+::-webkit-scrollbar-track {
+}
+
+::-webkit-scrollbar-thumb {
+    min-height: 10px;
+    background-clip: padding-box;
+    border: 3px solid #fff;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:active {
+    border-width: 2px;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--fnf-scrollbar-track-bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--fnf-scrollbar-thumb-bg-color);
+    border-color: var(--fnf-scrollbar-thumb-border-color);
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: var(--fnf-scrollbar-thumb-active-bg-color);
+}

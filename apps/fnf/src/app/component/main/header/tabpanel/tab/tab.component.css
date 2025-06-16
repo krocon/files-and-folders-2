@@ -1,0 +1,7 @@
+:host {
+    display: inline;
+}
+
+.not-selectable {
+    -webkit-user-select: none;
+}

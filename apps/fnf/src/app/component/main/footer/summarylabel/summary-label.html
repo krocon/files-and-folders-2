@@ -1,0 +1,24 @@
+<div class="summary-div">
+  <span
+      [class]="{'fnf-active-fg-color':selected}"
+      [matTooltip]="selectionEvent.selectedSize|number">
+  {{ selectionEvent.selectionLabelData.selectedSizeSumText }}
+  </span>
+  /
+  <span
+      [matTooltip]="selectionEvent.allSize|number">
+    {{ selectionEvent.selectionLabelData.sizeSumText }}
+  </span>
+
+  &nbsp;in&nbsp; <span [class]="{'fnf-active-fg-color':selected}">
+  {{ selectionEvent.selectionLabelData.selectedFileCount }}
+  </span>
+  /
+  {{ selectionEvent.selectionLabelData.fileCount }} Files,&nbsp;
+
+  <span [class]="{'fnf-active-fg-color':selected}">
+  {{ selectionEvent.selectionLabelData.selectedFolderCount }}
+  </span>
+  /
+  {{ selectionEvent.selectionLabelData.folderCount }} Folders
+</div>

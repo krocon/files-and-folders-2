@@ -1,0 +1,52 @@
+@import "fnf-css-custom-properties.css";
+
+
+html, body {
+    background: var(--fnf-header-bg-color);
+    color: var(--fnf-header-fg-color);
+}
+
+fnf-root {
+
+    .fnf-border-right {
+        border-right: solid 1px var(--fnf-header-border-color);
+    }
+
+    .fnf-border-bottom {
+        border-bottom: solid 1px var(--fnf-header-border-color);
+    }
+
+    .fnf-active-panel {
+        .fnf-border-right {
+            border-right: solid 1px var(--fnf-activepanel-header-border-color);
+        }
+
+        .fnf-border-bottom {
+            border-bottom: solid 1px var(--fnf-activepanel-header-border-color);
+        }
+    }
+
+
+    .fnf-selected-row {
+        color: var(--fnf-table-selected-row-fg-color);
+        background-color: var(--fnf-table-selected-row-bg-color);
+    }
+
+    .fnf-active-panel {
+        .fnf-selected-row {
+            color: var(--fnf-activepanel-table-selected-row-fg-color);
+            background-color: var(--fnf-activepanel-table-selected-row-bg-color);
+        }
+    }
+
+    .fnf-active-panel {
+        .fnf-focused-row {
+            color: var(--fnf-table-focused-row-fg-color);
+            background-color: var(--fnf-table-focused-row-bg-color);
+        }
+
+        .fnf-focused-row.fnf-selected-row {
+            color: var(--fnf-activepanel-table-selected-row-fg-color);
+        }
+    }
+}

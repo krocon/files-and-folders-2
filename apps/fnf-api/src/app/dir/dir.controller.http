@@ -1,0 +1,19 @@
+### readdir test
+POST http://localhost:3333/api/readdir
+Content-Type: application/json
+
+{
+  "path": "./",
+  "rid": 123,
+  "nocache": true
+}
+
+###
+POST http://localhost:3333/api/readdir
+Content-Type: application/json
+
+{
+  "path": "f:/leeching",
+  "rid": 124,
+  "nocache": true
+}

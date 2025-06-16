@@ -1,0 +1,15 @@
+@import "fnf-css-custom-properties.css";
+
+fnf-root .footer-bottom-div {
+
+    button.mdc-button {
+        border-color: var(--fnf-footer-button-border-color);
+        background-color: var(--fnf-footer-button-bg-color);
+        color: var(--fnf-footer-button-fg-color);
+
+        &.mat-button-disabled {
+            opacity: 0.3;
+        }
+    }
+
+}

@@ -1,0 +1,36 @@
+
+.tabpanel-div {
+    padding: 4px 10px 0 10px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+}
+
+.display-flex {
+    display: flex;
+}
+
+.float-right {
+    float: right;
+}
+
+.filter-div {
+    display: flex;
+    width: 100%;
+    flex-direction: row-reverse
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.icon-only-button {
+    min-width: 48px;
+    width: 48px;
+
+    &.fix-padding {
+        padding-left: 12px;
+        padding-right: 4px;
+    }
+}

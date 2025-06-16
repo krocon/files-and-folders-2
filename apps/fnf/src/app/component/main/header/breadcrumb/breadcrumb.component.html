@@ -1,0 +1,11 @@
+<div class="breadcrumb-div">
+  /
+  @for (item of fileItems; track item) {
+    <div
+        (click)="onPathClicked(item)"
+        class="file-item-div">{{ item.base }}/
+    </div>
+  }
+  <div class="file-item-div w-100">&nbsp;</div>
+
+</div>

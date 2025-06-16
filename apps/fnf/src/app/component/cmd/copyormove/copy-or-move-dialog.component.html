@@ -1,0 +1,69 @@
+<h2
+    [innerText]="title"
+    data-test-id="page-subtitle-h2"
+    mat-dialog-title></h2>
+
+<mat-dialog-content>
+  <div class="dlg-content-div">
+
+    <div>
+      {{ source }}
+    </div>
+
+    <div>
+      Implicit:
+      <b>{{ walkData.folderCount }}</b> (sub)folders,
+      <b>{{ walkData.fileCount }}</b> files,
+      <b>{{ walkData.sizeSum | fnfFileSize }}</b>
+    </div>
+
+    @if (!deleteMode) {
+
+      <div>
+        <mat-icon>arrow_downward</mat-icon>
+      </div>
+
+      <form
+          [formGroup]="formGroup"
+          autocomplete="off">
+        <mat-form-field>
+          <input
+              (keydown.enter)="onOkClicked()"
+              [fnfAutofocus]="focusOnTarget"
+              data-test-id="target-input"
+              formControlName="target"
+              matInput
+              placeholder="Target"/>
+          <mat-error>
+            Please enter a valid folder name
+          </mat-error>
+        </mat-form-field>
+
+        <div>
+          @if (hasError) {
+            <mat-error [innerText]="errorMesasage"></mat-error>
+          }
+        </div>
+      </form>
+    }
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button
+      (click)="onCancelClicked()"
+      data-test-id="dialog-cancel-button"
+      mat-raised-button>
+    Cancel
+  </button>
+
+  <button
+      (click)="onOkClicked()"
+      [disabled]="!formGroup.valid"
+      color="primary"
+      data-test-id="dialog-ok-button"
+      mat-raised-button>
+    <span [innerText]="title"></span>
+  </button>
+</mat-dialog-actions>

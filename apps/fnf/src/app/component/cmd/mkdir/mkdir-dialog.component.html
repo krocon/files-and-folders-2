@@ -1,0 +1,50 @@
+<h2
+    data-test-id="page-subtitle-h2"
+    mat-dialog-title>Create Folder</h2>
+
+<mat-dialog-content>
+  <div class="dlg-content-div">
+
+
+    <label>Current dir:</label>
+    <div>{{ data.source }}</div>
+
+    <form
+        [formGroup]="formGroup"
+        autocomplete="off">
+
+      <mat-form-field>
+        <input
+            (keydown.enter)="onOkClicked()"
+            [fnfAutofocus]="true"
+            formControlName="target"
+            matInput
+            placeholder="New folder name"/>
+      </mat-form-field>
+
+      <div>
+        <mat-error>{{ errorMessage }}&nbsp;</mat-error>
+      </div>
+    </form>
+
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button
+      (click)="onCancelClicked()"
+      data-test-id="dialog-cancel-button"
+      mat-raised-button>
+    Cancel
+  </button>
+
+  <button
+      (click)="onOkClicked()"
+      [disabled]="!formGroup.valid"
+      color="primary"
+      data-test-id="dialog-ok-button"
+      mat-raised-button>
+    Create
+  </button>
+</mat-dialog-actions>

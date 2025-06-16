@@ -1,0 +1,11 @@
+### unpack
+POST http://localhost:3333/api/do/unpacklist
+Content-Type: application/json
+
+{
+  "path": "test/demo.zip",
+  "rid": "123",
+  "nocache": true
+}
+
+###

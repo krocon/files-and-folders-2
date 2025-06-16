@@ -1,0 +1,92 @@
+@import "fnf-css-custom-properties.css";
+
+html guiexpert-table,
+html[data-theme=light] guiexpert-table {
+    --ge-table-bg: #fff;
+    --ge-table-header-west-bg: var(--fnf-table-header-bg-color);
+    --ge-table-header-center-bg: var(--fnf-table-header-bg-color);
+    --ge-table-header-east-bg: var(--fnf-table-header-bg-color);
+    --ge-table-header-west-text: var(--fnf-table-fg-color);
+    --ge-table-header-center-text: var(--fnf-table-fg-color);
+    --ge-table-header-east-text: var(--fnf-table-fg-color);
+
+    --ge-table-header-west-horizontal-border: transparent;
+    --ge-table-header-west-vertical-border: transparent;
+    --ge-table-header-center-horizontal-border: transparent;
+    --ge-table-header-center-vertical-border: transparent;
+    --ge-table-header-east-horizontal-border: transparent;
+    --ge-table-header-east-vertical-border: transparent;
+
+
+    --ge-table-body-west-bg: var(--fnf-table-bg-color);
+    --ge-table-body-center-bg: var(--fnf-table-bg-color);
+    --ge-table-body-east-bg: var(--fnf-table-bg-color);
+
+    --ge-table-body-west-text: var(--fnf-table-fg-color);
+    --ge-table-body-center-text: var(--fnf-table-fg-color);
+    --ge-table-body-east-text: var(--fnf-table-fg-color);
+
+    --ge-table-body-west-horizontal-border: var(--fnf-table-bg-color);
+    --ge-table-body-west-vertical-border: var(--fnf-table-bg-color);
+    --ge-table-body-center-horizontal-border: var(--fnf-table-bg-color);
+    --ge-table-body-center-vertical-border: var(--fnf-table-bg-color);
+    --ge-table-body-east-horizontal-border: var(--fnf-table-bg-color);
+    --ge-table-body-east-vertical-border: var(--fnf-table-bg-color);;
+
+
+    --ge-table-footer-west-bg: var(--fnf-table-header-bg-color);
+    --ge-table-footer-center-bg: var(--fnf-table-header-bg-color);
+    --ge-table-footer-east-bg: var(--fnf-table-header-bg-color);
+
+    --ge-table-footer-west-text: var(--fnf-table-fg-color);
+    --ge-table-footer-center-text: var(--fnf-table-fg-color);
+    --ge-table-footer-east-text: var(--fnf-table-fg-color);
+
+    --ge-table-footer-west-horizontal-border: transparent;
+    --ge-table-footer-west-vertical-border: transparent;
+    --ge-table-footer-center-horizontal-border: transparent;
+    --ge-table-footer-center-vertical-border: transparent;
+    --ge-table-footer-east-horizontal-border: transparent;
+    --ge-table-footer-east-vertical-border: transparent;
+
+
+    --ge-table-body-west-selected-range-bg: rgba(0, 152, 219, 0.4);
+    --ge-table-body-center-selected-range-bg: rgba(0, 152, 219, 0.4);
+    --ge-table-body-east-selected-range-bg: rgba(0, 152, 219, 0.4);
+    --ge-table-body-west-selected-range-text: #000;
+    --ge-table-body-center-selected-range-text: #000;
+    --ge-table-body-east-selected-range-text: #000;
+
+
+    --ge-table-border: var(--fnf-table-bg-color);
+
+    --ge-table-row-odd-bg: transparent;
+    --ge-table-row-even-bg: transparent;
+    --ge-table-column-odd-bg: transparent;
+    --ge-table-column-even-bg: transparent;
+
+    --ge-table-hover-column-bg: rgba(0, 224, 255, 0.27);
+    --ge-table-hover-row-bg: rgba(0, 224, 255, 0.27);
+    --ge-table-focus-border: rgb(0, 0, 255);
+
+    --ge-table-color-error-text: #e00034;
+    --ge-table-tree-arrow-collapsed-color: #e00034;
+    --ge-table-column-resize-handle-border: rgba(0, 255, 255, 50%);
+
+    --ge-table-dragged-col-div-bg: lightcyan;
+    --ge-table-drop-zone-bg: rgba(244, 255, 242, 0.6);
+
+    --ge-table-color-col-resize-handle-hover-bg: cyan;
+    --ge-table-color-dragged-col-div-bg: #fafafa;
+    --ge-table-color-drop-zone-bg: #fafafa;
+    --ge-table-color-drop-zone: #fafafa;
+    --ge-table-color-tree-arrow-collapsed-color: var(--ge-table-body-west-text);
+
+    --ge-table-color-star-rating: #fcb515;
+    --ge-table-color-progress-bar: #36BB6C;
+
+}
+
+.ge-table-scroll-viewport {
+    background-color: var(--fnf-table-bg-color);
+}

@@ -1,0 +1,68 @@
+<h2
+    data-test-id="page-subtitle-h2"
+    mat-dialog-title>Go to anything</h2>
+
+<mat-dialog-content>
+  <div class="dlg-content-div">
+
+
+    <form
+        [formGroup]="formGroup">
+
+      <mat-form-field class="example-full-width">
+        <input
+            type="text"
+            placeholder="Enter command OR a directory (CD)"
+            aria-label="Number"
+            matInput
+            (keyup)="onKeyup($event)"
+            (keydown.enter)="onOkClicked()"
+            [fnfAutofocus]="true"
+            formControlName="target"
+            [matAutocomplete]="auto">
+
+        <mat-autocomplete
+            autoActiveFirstOption
+            #auto="matAutocomplete"
+            [autoSelectActiveOption]="auto"
+            (optionSelected)="onOptionSelected($event)"
+            [displayWith]="displayFn">
+          @for (option of filteredOptions(); track option.cmd + option.value) {
+            <mat-option [value]="option">
+              <div class="option-div">
+                <b>{{ option.cmd|uppercase }}</b>&nbsp;{{ option.value }}
+              </div>
+            </mat-option>
+          }
+        </mat-autocomplete>
+
+      </mat-form-field>
+
+      <div>
+        @if (hasError) {
+          <mat-error [innerText]="errorMesasage"></mat-error>
+        }
+      </div>
+    </form>
+
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button
+      (click)="onCancelClicked()"
+      data-test-id="dialog-cancel-button"
+      mat-raised-button>
+    Cancel
+  </button>
+
+  <button
+      (click)="onOkClicked()"
+      [disabled]="!formGroup.valid"
+      color="primary"
+      data-test-id="dialog-ok-button"
+      mat-raised-button>
+    Go to
+  </button>
+</mat-dialog-actions>

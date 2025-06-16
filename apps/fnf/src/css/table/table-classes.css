@@ -1,0 +1,124 @@
+.ge-table {
+    display: block;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.ge-table-col-div {
+    text-align: center;
+    line-height: 2.5;
+    user-select: none;
+}
+
+.ge-table-label-div {
+    padding: 0;
+    display: block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+
+.ge-table-label-div .ge-table-label {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.ge-table-text-align-left {
+    text-align: left;
+}
+
+.ge-table-text-align-right {
+    text-align: right;
+}
+
+.ge-table-text-align-center {
+    text-align: center;
+}
+
+/* Row checkbox */
+.ge-table-row-checkbox-div {
+    padding-left: 14px;
+}
+
+.ge-table-body-east {
+    z-index: 999;
+}
+
+
+.ge-table-crud-object-view {
+    border-radius: 8px;
+
+    width: 50%;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+
+    .ge-table-dialog-header {
+        font-weight: bold;
+        font-size: larger;
+    }
+
+    .ge-table-dialog-content {
+        overflow-y: auto;
+
+        table th,
+        table td {
+            text-align: left;
+
+            &:nth-child(2) {
+                padding-left: 12px;
+            }
+
+            &.ge-table-crud-object-view-object-child {
+                font-weight: bold;
+            }
+        }
+    }
+
+    .ge-table-dialog-footer {
+        display: flex;
+        justify-content: flex-end;
+        column-gap: 16px;
+        padding-top: 16px;
+    }
+}
+
+
+.ge-table-crud-object-edit {
+    border-radius: 8px;
+
+    width: 50%;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+
+    .ge-table-dialog-header {
+        font-weight: bold;
+        font-size: larger;
+    }
+
+    .ge-table-dialog-content {
+        overflow-y: auto;
+
+        .form-field {
+            margin-bottom: 6px;
+            display: grid;
+            grid-template-columns: 0.6fr 1fr;
+            gap: 16px;
+            justify-items: stretch;
+
+            label {
+                align-self: end;
+                text-align: right;
+                line-height: 2;
+            }
+        }
+    }
+
+    .ge-table-dialog-footer {
+        display: flex;
+        justify-content: flex-end;
+        column-gap: 16px;
+        padding-top: 16px;
+    }
+}
+
