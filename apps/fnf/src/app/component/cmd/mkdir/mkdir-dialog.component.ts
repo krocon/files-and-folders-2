@@ -22,6 +22,7 @@ import {MatIconModule} from "@angular/material/icon";
 import {FnfAutofocusDirective} from "../../../common/fnf-autofocus.directive";
 import {MkdirDialogResultData} from "./mkdir-dialog-result.data";
 import {FileItem} from "@fnf/fnf-data";
+import {FnfFilenameValidation} from "../../../common/fnf-filename-validation";
 
 @Component({
   selector: "fnf-mkdir-dialog",
@@ -68,25 +69,11 @@ export class MkdirDialogComponent {
                 }
                 return null;
               },
-              (control: AbstractControl): ValidationErrors | null => {
-                if (control.value === '..') {
-                  return {
-                    "invalid_name": true
-                  };
-                }
-                return null;
-              },
-              (control: AbstractControl): ValidationErrors | null => {
-                // Check for invalid characters in file name
-                // Allow letters, numbers, spaces, and common special characters like ._-()[]{}
-                const validFilenameRegex = /^[a-zA-Z0-9\s._\-()[\]{}]+$/;
-                if (!validFilenameRegex.test(control.value)) {
-                  return {
-                    "invalid_chars": true
-                  };
-                }
-                return null;
-              },
+              FnfFilenameValidation.validateSpecialNames,
+              FnfFilenameValidation.validateChars,
+              FnfFilenameValidation.validateReservedNames,
+              FnfFilenameValidation.validateStartEndChars,
+              FnfFilenameValidation.checkSpacesUnderscores,
             ]
           })
       }
@@ -98,26 +85,8 @@ export class MkdirDialogComponent {
     const targetControl = this.formGroup.get('target');
     if (!targetControl || !targetControl.errors) return '';
 
-    if (targetControl.errors['required']) {
-      return 'Folder name is required';
-    }
-    if (targetControl.errors['minlength']) {
-      return 'Folder name must be at least 2 characters long';
-    }
-    if (targetControl.errors['maxlength']) {
-      return 'Folder name cannot exceed 255 characters';
-    }
-    if (targetControl.errors['is_same']) {
-      return 'The new folder name must be different';
-    }
-    if (targetControl.errors['invalid_chars']) {
-      return 'Folder name contains invalid characters. Use only letters, numbers, spaces, and ._-()[]{}';
-    }
-    if (targetControl.errors['invalid_name']) {
-      return 'Folder name contains an invalid name';
-    }
-
-    return 'Invalid folder name';
+    // Use the common error message function - this is always a folder
+    return FnfFilenameValidation.getErrorMessage(targetControl.errors, true);
   }
 
 

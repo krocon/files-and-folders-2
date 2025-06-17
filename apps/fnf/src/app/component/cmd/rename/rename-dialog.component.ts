@@ -22,6 +22,7 @@ import {MatIconModule} from "@angular/material/icon";
 import {FnfAutofocusDirective} from "../../../common/fnf-autofocus.directive";
 import {MatTooltip} from "@angular/material/tooltip";
 import {RenameDialogResultData} from "./rename-dialog-result.data";
+import {FnfFilenameValidation} from "../../../common/fnf-filename-validation";
 
 @Component({
   selector: "fnf-rename-dialog",
@@ -75,25 +76,11 @@ export class RenameDialogComponent {
                 }
                 return null;
               },
-              (control: AbstractControl): ValidationErrors | null => {
-                if (control.value === '..') {
-                  return {
-                    "invalid_name": true
-                  };
-                }
-                return null;
-              },
-              (control: AbstractControl): ValidationErrors | null => {
-                // Check for invalid characters in file name
-                // Allow letters, numbers, spaces, and common special characters like ._-()[]{}
-                const validFilenameRegex = /^[a-zA-Z0-9\s._\-()[\]{}]+$/;
-                if (!validFilenameRegex.test(control.value)) {
-                  return {
-                    "invalid_chars": true
-                  };
-                }
-                return null;
-              },
+              FnfFilenameValidation.validateSpecialNames,
+              FnfFilenameValidation.validateChars,
+              FnfFilenameValidation.validateReservedNames,
+              FnfFilenameValidation.validateStartEndChars,
+              FnfFilenameValidation.checkSpacesUnderscores,
             ]
           })
       }
@@ -105,25 +92,9 @@ export class RenameDialogComponent {
     const targetControl = this.formGroup.get('target');
     if (!targetControl || !targetControl.errors) return '';
 
-    if (targetControl.errors['required']) {
-      return 'Filename is required';
-    }
-    if (targetControl.errors['minlength']) {
-      return 'Filename must be at least 2 characters long';
-    }
-    if (targetControl.errors['maxlength']) {
-      return 'Filename cannot exceed 255 characters';
-    }
-    if (targetControl.errors['is_same']) {
-      return 'The new filename must be different from the original';
-    }
-    if (targetControl.errors['invalid_chars']) {
-      return 'Filename contains invalid characters. Use only letters, numbers, spaces, and ._-()[]{}';
-    }
-    if (targetControl.errors['invalid_name']) {
-      return 'Folder name contains an invalid name';
-    }
-    return 'Invalid filename';
+    // Use the common error message function
+    const isFolder = this.data.source.isDir;
+    return FnfFilenameValidation.getErrorMessage(targetControl.errors, isFolder);
   }
 
 
