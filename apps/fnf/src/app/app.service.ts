@@ -635,12 +635,6 @@ export class AppService {
     return [activeTab.path];
   }
 
-  // public selectedOrFocussedData: [FileItemIf[], FileItemIf[]]=[[],[]];
-  //
-  // setSelectedOrFocussedData(panelIndex: PanelIndex, selectedOrFocussed: FileItemIf[]) {
-  //   this.selectedOrFocussedData[panelIndex] = selectedOrFocussed;
-  //   console.info(JSON.stringify(this.selectedOrFocussedData, null, 4));
-  // }
 
   private clone<T>(o: T): T {
     return JSON.parse(JSON.stringify(o));

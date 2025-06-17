@@ -309,10 +309,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
   onMouseClicked(evt: GeMouseEvent) {
-    if (evt.clickCount === 2) {
-      this.tableApi?.recalcColumnWidths();
-    }
-
     if (evt.clickCount === 2 && evt.areaIdent === 'body' && this.tableModel) {
       const fileItem: FileItemIf = this.bodyAreaModel.getRowByIndex(evt.rowIndex);
       this.changeDir(fileItem);
@@ -340,6 +336,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
   handleDirEvent(dirEvents: DirEventIf[]): void {
+
     if (this.tableApi && dirEvents && this.dirPara) {
       for (let i = 0; i < dirEvents.length; i++) {
         const dirEvent = dirEvents[i];
@@ -372,11 +369,14 @@ export class FileTableComponent implements OnInit, OnDestroy {
                 );
               this.selectionChanged.next(selectionLabelData);
             }
-            this.tableApi?.recalcColumnWidths();
+            console.info('handleDirEvent ' + this.panelIndex, dirEvents);
+            if (dirEvent.end) {
+              this.appService.resetFocusRowCriterea();
+            }
+
 
           } else if (dirEvent.action === "add" || dirEvent.action === "addDir") {
             this.checkAndAddItems(dirEvent.items);
-            this.tableApi?.recalcColumnWidths();
 
           } else if (dirEvent.action === "unlink" || dirEvent.action === "unlinkDir") {
             this.checkAndRemoveItems(dirEvent.items);
@@ -529,6 +529,8 @@ export class FileTableComponent implements OnInit, OnDestroy {
     }
   }
 
+
+
   private setRows(fileItems: FileItemIf[]): void {
     if (this.tableApi) {
       this.tableApi.setRows(fileItems);
@@ -550,7 +552,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
       if (this.bodyAreaModel.focusedRowIndex >= this.bodyAreaModel.getRowCount()) {
         this.bodyAreaModel.focusedRowIndex = Math.max(0, this.bodyAreaModel.getRowCount() - 1);
       }
-      this.tableApi.recalcColumnWidths();
       this.tableApi.repaintHard();
     }
   }
