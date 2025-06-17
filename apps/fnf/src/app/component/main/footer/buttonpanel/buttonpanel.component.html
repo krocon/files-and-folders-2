@@ -28,19 +28,13 @@
     }
 
 
-    <button
-        (click)="openButtonSheet()"
-        class="panel-button main-menu-fab fnf-active-background-color mat-mini-fab mat-button-base"
-        mat-stroked-button>
-      Tasks
-      <mat-icon>menu</mat-icon>
-    </button>
+
 
     <button
         [matMenuTriggerFor]="menuAction"
         class="panel-button"
         mat-stroked-button>
-      Action
+      Actions
       <mat-icon>keyboard_arrow_up</mat-icon>
     </button>
 
@@ -254,153 +248,21 @@
 
     </mat-menu>
 
-<!--
+
     <button
-        (click)="triggerAction('TOGGLE_SELECTION_CURRENT_ROW')"
-        [matMenuTriggerFor]="menuSelect"
-        class="panel-button"
+        (click)="openButtonSheet()"
+        class="panel-button main-menu-fab fnf-active-background-color mat-mini-fab mat-button-base"
         mat-stroked-button>
-      Select
-      <mat-icon>keyboard_arrow_up</mat-icon>
+      Tasks
+      <mat-icon>menu</mat-icon>
     </button>
-    <mat-menu #menuSelect="matMenu">
-      <button
-          (click)="triggerAction('ENHANCE_SELECTION')"
-          mat-menu-item>
-        Enhance Selection...
-        <span class="float-right">
-          <fnf-shortcut [keys]="['num', '+']"></fnf-shortcut>
-        </span>
-      </button>
-      <button
-          (click)="triggerAction('REDUCE_SELECTION')"
-          mat-menu-item>
-        Reduce Selection...
-        <span class="float-right">
-          <fnf-shortcut [keys]="['num', '-']"></fnf-shortcut>
-        </span>
-      </button>
-      <button
-          (click)="triggerAction('TOGGLE_SELECTION')"
-          mat-menu-item>
-        Toggle Selection...
-        <span class="float-right">
-          <fnf-shortcut [keys]="['num', '*']"></fnf-shortcut>
-        </span>
-      </button>
-
-      <button
-          (click)="triggerAction('SELECT_ALL')"
-          mat-menu-item>
-        Select All
-        <span class="float-right">
-          <fnf-shortcut [keys]="['^', 'num', '+']"></fnf-shortcut>
-        </span>
-      </button>
-      <button
-          (click)="triggerAction('DESELECT_ALL')"
-          mat-menu-item>
-        Deselect All
-        <span class="float-right">
-          <fnf-shortcut [keys]="['^', 'num', '-']"></fnf-shortcut>
-        </span>
-      </button>
-
-      <mat-divider></mat-divider>
-
-      <button
-          (click)="triggerAction('NAVIGATE_LEVEL_DOWN')"
-          mat-menu-item>
-        Parent Dir
-        <span class="float-right">
-          <fnf-shortcut [keys]="['⇧', 'PAGEUP']"></fnf-shortcut>
-        </span>
-      </button>
-      <button
-          (click)="triggerAction('NAVIGATE_BACK')"
-          mat-menu-item>
-        History Back
-        <span class="float-right">
-          <fnf-shortcut [keys]="['⇧', 'PAGEDOWN']"></fnf-shortcut>
-        </span>
-      </button>
-      <mat-divider></mat-divider>
-
-      <button
-          (click)="triggerAction('SELECT_LEFT_PANEL')"
-          mat-menu-item>
-        Left Panel
-        <span class="float-right">
-          <fnf-shortcut [keys]="['alt', '1']"></fnf-shortcut>
-        </span>
-      </button>
-      <button
-          (click)="triggerAction('SELECT_RIGHT_PANEL')"
-          mat-menu-item>
-        Right Panel
-        <span class="float-right">
-          <fnf-shortcut [keys]="['alt', '2']"></fnf-shortcut>
-        </span>
-      </button>
-      <button
-          (click)="triggerAction('TOGGLE_PANEL')"
-          mat-menu-item>
-        Toggle Panel
-        <span class="float-right">
-          <fnf-shortcut [keys]="['TAB']"></fnf-shortcut>
-        </span>
-      </button>
-      <mat-divider></mat-divider>
-
-      <button
-          (click)="onAddTabClicked()"
-          mat-menu-item>
-        Add Tab
-        <span class="float-right">
-          <fnf-shortcut [keys]="['alt', 'T']"></fnf-shortcut>
-        </span>
-      </button>
-      <button
-          (click)="onRemoveTabClicked()"
-          mat-menu-item>
-        Remove Tab
-        <span class="float-right">
-          <fnf-shortcut [keys]="['⇧','T']"></fnf-shortcut>
-        </span>
-      </button>
-
-    </mat-menu>
--->
-
-    <!--button class="panel-button" mat-stroked-button [matMenuTriggerFor]="menuTools">
-      Tools <mat-icon>keyboard_arrow_up</mat-icon>
-    </button>
-    <mat-menu #menuTools="matMenu">
-      <button mat-menu-item>
-        Edit...
-        <span class="float-right">
-          <fnf-shortcut [keys]="['F4']"></fnf-shortcut>
-        </span>
-      </button>
-      <button mat-menu-item>
-        7z...
-        <span class="float-right">
-          <fnf-shortcut [keys]="['^','⇧', 'Z']"></fnf-shortcut>
-        </span>
-      </button>
-      <button mat-menu-item>
-        CMD Shell...
-        <fnf-shortcut [keys]="['^', 'alt', 'C']"></fnf-shortcut>
-      </button>
-    </mat-menu-->
 
 
     <button
         [matMenuTriggerFor]="menuSettings"
-        class="panel-button"
+        class="panel-button icon-only"
         mat-stroked-button>
       <mat-icon>palette</mat-icon>
-      <mat-icon>keyboard_arrow_up</mat-icon>
     </button>
     <mat-menu #menuSettings="matMenu">
       @for (th of themes; track th) {
@@ -421,7 +283,7 @@
         (click)="openShortcutDlg($event)"
         class="panel-button icon-only"
         mat-stroked-button>
-      <mat-icon>help</mat-icon>
+      <mat-icon>keyboard</mat-icon>
     </button>
 
     <button
