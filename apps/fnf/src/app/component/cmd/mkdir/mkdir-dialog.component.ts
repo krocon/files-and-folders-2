@@ -69,6 +69,14 @@ export class MkdirDialogComponent {
                 return null;
               },
               (control: AbstractControl): ValidationErrors | null => {
+                if (control.value === '..') {
+                  return {
+                    "invalid_name": true
+                  };
+                }
+                return null;
+              },
+              (control: AbstractControl): ValidationErrors | null => {
                 // Check for invalid characters in file name
                 // Allow letters, numbers, spaces, and common special characters like ._-()[]{}
                 const validFilenameRegex = /^[a-zA-Z0-9\s._\-()[\]{}]+$/;
@@ -104,6 +112,9 @@ export class MkdirDialogComponent {
     }
     if (targetControl.errors['invalid_chars']) {
       return 'Folder name contains invalid characters. Use only letters, numbers, spaces, and ._-()[]{}';
+    }
+    if (targetControl.errors['invalid_name']) {
+      return 'Folder name contains an invalid name';
     }
 
     return 'Invalid folder name';

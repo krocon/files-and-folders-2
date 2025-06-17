@@ -61,7 +61,7 @@ export class ShortcutDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.allActionIdLabelShortcuts = actionIds
-      .filter(id => id !== 'DO_NOTHING')
+      .filter(id => !['DUMMY_ACTION', 'DO_NOTHING', 'OPEN_SHORTCUT_DLG'].includes(id))
       .map(
         id => new ActionIdLabelShortcut(
           id,
