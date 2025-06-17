@@ -19,7 +19,8 @@ export class ShortcutDialogService {
     let subscription = this.dialog
       .open<ShortcutDialogComponent>(ShortcutDialogComponent, {
         height: 'calc(100vH - 100px)',
-        minWidth: 'calc(100vW - 100px)'
+        width: 'calc(100vW - 100px)',
+        maxWidth:'850px'
       })
       .afterClosed()
       .subscribe(item => {
