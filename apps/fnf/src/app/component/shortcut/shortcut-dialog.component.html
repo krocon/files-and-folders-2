@@ -5,6 +5,26 @@
 <mat-dialog-content>
   <div class="dlg-content-div">
 
+    <div class="filter-container">
+      <mat-form-field
+          appearance="outline"
+          class="filter-input">
+        <input
+            matInput
+            [(ngModel)]="filterText"
+            (keyup)="onFilterChange($event)"
+            placeholder="Type to filter...">
+        <button
+            matSuffix
+            mat-icon-button
+            (click)="resetFilter()"
+            class="reset-button"
+            aria-label="Reset filter">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+
     <table class="shortcut-table">
       <thead>
       <tr class="shortcut-row header">

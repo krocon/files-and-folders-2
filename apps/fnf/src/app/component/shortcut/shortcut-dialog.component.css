@@ -6,6 +6,21 @@
     align-items: center;
 }
 
+.filter-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.filter-input {
+    flex: 1;
+    margin-right: 8px;
+}
+
+.reset-button {
+    margin-top: 4px;
+}
+
 .shortcut-table {
     width: 100%;
     border-collapse: separate;
