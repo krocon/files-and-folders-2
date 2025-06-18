@@ -27,7 +27,7 @@ import {NameCellRendererComponent} from "./renderer/name-cell-renderer.component
 import {DateCellRendererComponent} from "./renderer/date-cell-renderer.component";
 import {SizeCellRendererComponent} from "./renderer/size-cell-renderer.component";
 import {
-  ButtonEnableStates, DirEvent,
+  ButtonEnableStates,
   DirEventIf,
   DirPara,
   DOT_DOT,
@@ -78,14 +78,11 @@ import {NotifyEventIf} from "../../../../domain/cmd/notify-event.if";
 })
 export class FileTableComponent implements OnInit, OnDestroy {
 
-  private readonly rowHeight = 34;
-
   @Input() selected: boolean = false;
-
   @Output() selectionChanged = new Subject<SelectionEvent>();
   @Output() buttonStatesChanged = new Subject<ButtonEnableStates>();
-
   tableModel?: TableModelIf;
+  private readonly rowHeight = 34;
   private readonly columnDefs = [
     ColumnDef.create({
       property: "base",
@@ -138,7 +135,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
   private selectionLocalStorage: SelectionLocalStorage<FileItemIf> | undefined;
   private tableApi: TableApi | undefined;
   private alive = true;
-  private rowData: FileItemIf[] = [];
+  // private rowData: FileItemIf[] = [];
   private injector = inject(Injector);
   private filterText = "";
   private filterActive = false;
@@ -217,10 +214,8 @@ export class FileTableComponent implements OnInit, OnDestroy {
     this.filterActive = selectedTabData.filterActive ?? false;
 
     if (!this.dirPara || this.dirPara?.path !== selectedTabData.path) {
-      this.rowData = [];
-
       if (this.tableApi) {
-        this.tableApi.setRows(this.rowData);
+        this.tableApi.setRows([]);
         this.repaintTable();
       }
 
@@ -236,9 +231,8 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
   reload() {
-    this.rowData = [];
     if (this.tableApi) {
-      this.tableApi.setRows(this.rowData);
+      this.tableApi.setRows([]);
       this.repaintTable();
     }
     this.requestRows();
@@ -272,7 +266,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
         const selectionLabelData: SelectionEvent = this.gridSelectionCountService
           .getSelectionCountData(
             selectedRows,
-            this.rowData
+            this.bodyAreaModel?.getFilteredRows() ?? []
           );
         this.selectionChanged.next(selectionLabelData);
 
@@ -309,7 +303,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
       .valueChanges()
       .subscribe(
         (evt: NotifyEventIf) => {
-          if (Array.isArray(evt.data)){
+          if (Array.isArray(evt.data)) {
             const arr = evt.data as Array<DirEventIf>;
             this.handleDirEvent(arr);
           }
@@ -349,21 +343,33 @@ export class FileTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  test(){
+  test() {
     this.handleDirEvent(
       [
-        {"dir":"/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak",
-          "items":[
-            {"dir":"/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak","base":"README.md","ext":".md","date":"2025-05-31T20:12:12.282Z","error":"","size":1546,"isDir":false,"abs":false,"selected":true}
+        {
+          "dir": "/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak",
+          "items": [
+            {
+              "dir": "/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak",
+              "base": "README.md",
+              "ext": ".md",
+              "date": "2025-05-31T20:12:12.282Z",
+              "error": "",
+              "size": 1546,
+              "isDir": false,
+              "abs": false,
+              "selected": true
+            }
           ],
-          "begin":false,"end":false,"size":1,"error":"",
-          "action":"unselect","panelIndex":0}
+          "begin": false, "end": false, "size": 1, "error": "",
+          "action": "unselect", "panelIndex": 0
+        }
       ]
     )
   }
 
   handleDirEvent(dirEvents: DirEventIf[]): void {
-    console.info('handleDirEvent ',dirEvents); // TODO del handleDirEvent
+    console.info('handleDirEvent ', dirEvents); // TODO del handleDirEvent
 
     if (this.tableApi && dirEvents && this.dirPara) {
       for (let i = 0; i < dirEvents.length; i++) {
@@ -373,7 +379,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
         if (this.isRelevantDir(dirEvent.dir, this.dirPara.path, zi)) {
 
           if (dirEvent.action === "list") {
-            this.rowData = dirEvent.items ?
+            let rows = dirEvent.items ?
               dirEvent.items.filter(fi => (
                 fi.dir === this.dirPara?.path
                 || isSameDir(fi.dir, this.dirPara?.path ?? '')
@@ -382,48 +388,62 @@ export class FileTableComponent implements OnInit, OnDestroy {
               [];
 
             if (!isRoot(this.dirPara.path)) {
-              this.rowData = [
+              rows = [
                 new FileItem(getParent(this.dirPara.path), "..", "", "", "", 1, true),
-                ...this.rowData
+                ...rows
               ];
             }
 
             if (this.tableApi) {
-              this.setRows(this.rowData);
+              this.setRows(rows);
 
               const selectionLabelData: SelectionEvent = this.gridSelectionCountService
                 .getSelectionCountData(
                   [],
-                  this.rowData
+                  this.bodyAreaModel?.getFilteredRows() ?? []
                 );
               this.selectionChanged.next(selectionLabelData);
             }
-            console.info('handleDirEvent ' + this.panelIndex, dirEvents);
+            // console.info('handleDirEvent ' + this.panelIndex, dirEvents);
             if (dirEvent.end) {
               this.appService.resetFocusRowCriterea();
             }
 
-
           } else if (dirEvent.action === "add" || dirEvent.action === "addDir") {
-            this.checkAndAddItems(dirEvent.items);
+            console.info('ADD ADD ADD ADD ADD ADD ADD ADD ADD ADD ADD ADD ADD ADD ')
+            this.tableApi.addRows(dirEvent.items)
+            // this.checkAndAddItems(dirEvent.items);
+            this.repaintTable();
+            console.info(this.bodyAreaModel.getAllRows());
 
           } else if (dirEvent.action === "unlink" || dirEvent.action === "unlinkDir") {
-            this.checkAndRemoveItems(dirEvent.items);
+            console.info('this.tableApi.removeRows')
+            this.tableApi.removeRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
+            this.repaintTable();
+            //this.checkAndRemoveItems(dirEvent.items);
 
           } else if (dirEvent.action === "unselect") {
-            const fileItems: FileItemIf[] = dirEvent.items;
-            fileItems.forEach(fileItem => {
-                let tableRow = this.getRowByCriteria(fileItem);
-                if (tableRow) {
-                  tableRow.selected = false;
-                  this.selectionManager.setRowSelected(tableRow, false);
-                }
-            });
+            this.tableApi.findRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir)
+              .forEach(r => {
+                r.selected = false;
+                this.selectionManager.setRowSelected(r, false);
+              });
+            // const fileItems: FileItemIf[] = dirEvent.items;
+            // fileItems.forEach(fileItem => {
+            //     let tableRow = this.getRowByCriteria(fileItem);
+            //     if (tableRow) {
+            //       tableRow.selected = false;
+            //       this.selectionManager.setRowSelected(tableRow, false);
+            //     }
+            // });
             this.selectionManager.updateSelection();
             this.repaintTable();
 
           } else if (dirEvent.action === "change") {
-            this.reload();
+            this.tableApi.updateRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
+            this.repaintTable();
+            //console.info('TODO handleDirEvent "change"', dirEvent);
+            //this.reload();
 
           } else {
             console.warn("Unknown dir changedir action:", dirEvent);
@@ -434,9 +454,92 @@ export class FileTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getRowByCriteria(criteria: FileItemIf): FileItemIf | undefined {
-    const rowData = this.bodyAreaModel.getFilteredRows();
-    return rowData.find(row => row.base === criteria.base && row.dir === criteria.dir);
+  testAdd(){
+    this.handleDirEvent([
+      {
+        "dir": "/Users/marckronberg/Documents/test66",
+        "items": [
+          {
+            "dir": "/Users/marckronberg/Documents/test66",
+            "base": "NESTJS_TESTING_MIGRATION.md",
+            "ext": ".md",
+            "date": "",
+            "error": "",
+            "size": 0,
+            "isDir": false,
+            "abs": false,
+            "selected": false
+          }
+        ],
+        "begin": false,
+        "end": false,
+        "size": 1,
+        "error": "",
+        "action": "add",
+        "panelIndex": 1
+      }
+    ]);
+  }
+  testUnlink(){
+    this.handleDirEvent([
+      {
+        "dir": "/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak",
+        "items": [
+          {
+            "dir": "/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak",
+            "base": "package.json",
+            "ext": ".json",
+            "date": "",
+            "error": "",
+            "size": 0,
+            "isDir": false,
+            "abs": false,
+            "selected": false
+          }
+        ],
+        "begin": false,
+        "end": false,
+        "size": 1,
+        "error": "",
+        "action": "unlink",
+        "panelIndex": 0
+      }
+    ]);
+  }
+  testUnselect(){
+    this.handleDirEvent([
+      {
+        "dir": "/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak",
+        "items": [
+          {
+            "dir": "/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak",
+            "base": "package.json",
+            "ext": ".json",
+            "date": "",
+            "error": "",
+            "size": 0,
+            "isDir": false,
+            "abs": false,
+            "selected": false
+          }
+        ],
+        "begin": false,
+        "end": false,
+        "size": 1,
+        "error": "",
+        "action": "unselect",
+        "panelIndex": 0
+      }
+    ]);
+  }
+
+  removeRows<T>(rows: FileItemIf[], predicate: (a: FileItemIf, b: FileItemIf) => boolean) {
+    const am = this.bodyAreaModel
+    let allRows1 = am.getAllRows();
+    const allRows = allRows1.filter(r => !rows.some(rr => predicate(r, rr)));
+    console.info(allRows1.length, allRows.length);
+    am.setRows(allRows);
+
   }
 
   onTableReady(tableApi: TableApi) {
@@ -564,7 +667,10 @@ export class FileTableComponent implements OnInit, OnDestroy {
     }
   }
 
-
+  private getRowByCriteria(criteria: FileItemIf): FileItemIf | undefined {
+    const rowData = this.bodyAreaModel.getFilteredRows();
+    return rowData.find(row => row.base === criteria.base && row.dir === criteria.dir);
+  }
 
   private setRows(fileItems: FileItemIf[]): void {
     if (this.tableApi) {
@@ -592,29 +698,32 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
   private checkAndAddItems(items: FileItemIf[]) {
+    const rows: FileItemIf[] = [];
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       if (this.getIndexInRowData(item) === -1) {
-        this.rowData.push(item);
+        rows.push(item);
       }
     }
-    this.setRows(this.rowData);
+    this.setRows(rows);
   }
 
   private checkAndRemoveItems(items: FileItemIf[]) {
+    const rows: FileItemIf[] = this.bodyAreaModel.getAllRows();
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       const idx = this.getIndexInRowData(item);
       if (idx > -1) {
-        this.rowData.splice(idx, 1);
+        rows.splice(idx, 1);
       }
     }
-    this.setRows(this.rowData);
+    this.setRows(rows);
   }
 
   private getIndexInRowData(item: FileItemIf): number {
-    for (let i = 0; i < this.rowData.length; i++) {
-      const row = this.rowData[i];
+    const rows = this.bodyAreaModel.getFilteredRows();
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
       if (row.dir === item.dir && row.base === item.base) {
         return i;
       }
@@ -663,6 +772,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
   private isRelevantDir(f1: string, f2: string, zi: ZipUrlInfo): boolean {
     const sd = isSameDir(f1, f2);
+    console.info('isRelevantDir ' +  f1 +', ' + f2, sd);
     if (sd) return true;
     return isSameDir(f1, zi.zipUrl + ":");
   }
