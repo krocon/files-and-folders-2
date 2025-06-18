@@ -27,7 +27,7 @@ import {NameCellRendererComponent} from "./renderer/name-cell-renderer.component
 import {DateCellRendererComponent} from "./renderer/date-cell-renderer.component";
 import {SizeCellRendererComponent} from "./renderer/size-cell-renderer.component";
 import {
-  ButtonEnableStates,
+  ButtonEnableStates, DirEvent,
   DirEventIf,
   DirPara,
   DOT_DOT,
@@ -61,6 +61,8 @@ import {GotoAnythingDialogData} from "../../../cmd/gotoanything/goto-anything-di
 import {GotoAnythingOptionData} from "../../../cmd/gotoanything/goto-anything-option.data";
 import {ActionId, actionIds} from "../../../../domain/action/fnf-action.enum";
 import {FnfActionLabels} from "../../../../domain/action/fnf-action-labels";
+import {NotifyService} from "../../../../service/cmd/notify-service";
+import {NotifyEventIf} from "../../../../domain/cmd/notify-event.if";
 
 @Component({
   standalone: true,
@@ -149,6 +151,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
     private readonly appService: AppService,
     private readonly gridSelectionCountService: GridSelectionCountService,
     public readonly gotoAnythingDialogService: GotoAnythingDialogService,
+    private readonly notifyService: NotifyService
   ) {
     this.columnDefs.forEach(def => {
       def.sortable = () => true;
@@ -301,6 +304,35 @@ export class FileTableComponent implements OnInit, OnDestroy {
         }
       });
     });
+
+    this.notifyService
+      .valueChanges()
+      .subscribe(
+        (evt: NotifyEventIf) => {
+          console.info('------------------------');
+          console.info('NotifyEventIf', evt);
+          if (Array.isArray(evt.data)){
+            const arr = evt.data as Array<DirEventIf>;
+            this.handleDirEvent(arr);
+            // for (let i = 0; i < arr.length; i++) {
+            //   const item = arr[i];
+            //   console.info('  -----> item ', item);
+            //   if (item instanceof DirEvent) {
+            //     this.handleDirEvent([item]);
+            //   }
+            //
+            //   // if (item.action === 'RELOAD_DIR') {
+            //   //   this.reload();
+            //   // } else if (item.action === 'SELECT_ALL') {
+            //   //   this.selectionManager.selectionAll();
+            //   //   this.tableApi?.repaint();
+            //   // } else if (item.action === 'DESELECT_ALL') {
+            //   //   this.selectionManager.deSelectionAll();
+            //   // }
+            // }
+          }
+        }
+      )
   }
 
 
@@ -447,7 +479,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
       const r = this.bodyAreaModel.focusedRowIndex;
       if (r > -1) {
         const row = this.bodyAreaModel.getRowByIndex(r);
-        if (row.isDir) {
+        if (row?.isDir) {
           this.changeDir(row);
         }
       }
@@ -601,6 +633,9 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
   private changeDir(fileItem: FileItemIf) {
+    if (!fileItem) {
+      return; // skip
+    }
     if (fileItem.isDir) {
       if (fileItem.base === DOT_DOT) {
         this.changeDirNext(fileItem.dir);

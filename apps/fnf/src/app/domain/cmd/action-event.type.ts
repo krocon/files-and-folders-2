@@ -7,7 +7,7 @@ export const actionEventTypes = [
   'delempty',
   'rename',
   'refresh_job_queue_table',
-
+  'update', 'created'
 ] as const;
 
 export type ActionEventType = typeof actionEventTypes[number];

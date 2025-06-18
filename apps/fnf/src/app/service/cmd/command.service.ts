@@ -7,6 +7,7 @@ import {PanelIndex} from "../../domain/panel-index";
 import {ActionQueueService} from "./action-queue.service";
 import {TypedEventService} from "../../common/typed-event.service";
 import {FileOperationParams} from "../../domain/cmd/file-operation-params";
+import {NotifyService} from "./notify-service";
 
 @Injectable({
   providedIn: 'root'
@@ -17,10 +18,11 @@ export class CommandService {
   readonly ACTION_STATUS_NEW: QueueStatus = 'NEW';
 
   private actionId = 0;
-  private eventService = new TypedEventService<any>();
+  // private eventService = new TypedEventService<any>();
 
   constructor(
-    private actionQueueService: ActionQueueService
+    private actionQueueService: ActionQueueService,
+    private readonly eventService: NotifyService
   ) {
     console.info('CommandService initialized');
   }

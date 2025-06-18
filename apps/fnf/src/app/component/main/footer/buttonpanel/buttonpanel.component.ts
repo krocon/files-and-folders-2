@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -12,6 +12,9 @@ import {MatBottomSheet} from "@angular/material/bottom-sheet";
 import {TaskList} from "../../../task/task-list/task-list";
 import {ButtonEnableStates, buttonEnableStatesKey} from "@fnf/fnf-data";
 import {MatList} from "@angular/material/list";
+import {NotifyService} from "../../../../service/cmd/notify-service";
+import {NotifyEventIf} from "../../../../domain/cmd/notify-event.if";
+import {ActionQueueService} from "../../../../service/cmd/action-queue.service";
 
 @Component({
   selector: 'app-button-panel',
@@ -30,7 +33,7 @@ import {MatList} from "@angular/material/list";
   templateUrl: './buttonpanel.component.html',
   styleUrls: ['./buttonpanel.component.css']
 })
-export class ButtonPanelComponent {
+export class ButtonPanelComponent implements OnInit {
 
   @Input() buttonEnableStates = new ButtonEnableStates();
 
@@ -77,7 +80,20 @@ export class ButtonPanelComponent {
   constructor(
     private readonly appService: AppService,
     private readonly matBottomSheet: MatBottomSheet,
+    private readonly notifyService: NotifyService,
+    private readonly actionQueueService: ActionQueueService,
   ) {
+  }
+
+  ngOnInit(): void {
+    this.notifyService
+      .valueChanges()
+      .subscribe(
+        (evt: NotifyEventIf) => {
+          console.info('NotifyEventIf', evt);
+          console.info(this.actionQueueService.getQueues());
+        }
+      )
   }
 
 

@@ -2,12 +2,12 @@ import {Injectable} from '@angular/core';
 import {ActionEvent} from '../../domain/cmd/action-event';
 import {ActionEventType} from '../../domain/cmd/action-event.type';
 import {QueueStatus} from '../../domain/cmd/queue-status';
-import {TypedEventService} from '../../common/typed-event.service';
 import {Observable} from 'rxjs';
 import {QueueProgress} from "../../domain/cmd/queue.progress";
 import {Queue} from "../../domain/cmd/queue";
 import {FileActionService} from "./file-action.service";
 import {DoEventIf} from "@fnf/fnf-data";
+import {NotifyService} from "./notify-service";
 
 @Injectable({
   providedIn: 'root'
@@ -38,15 +38,17 @@ export class ActionQueueService {
   readonly ACTION_RENAME: ActionEventType = 'rename';
 
   // Events
-  readonly REFRESH_JOB_QUEUE_TABLE: string = 'REFRESH_JOB_QUEUE_TABLE';
+  readonly REFRESH_JOB_QUEUE_TABLE: ActionEventType = 'refresh_job_queue_table';
 
   private queues: Queue[] = [];
   private jobId = 0;
   private refreshQueueTableTimer: any;
-  private eventService = new TypedEventService<any>();
+
+  //private eventService = new TypedEventService<any>();
 
   constructor(
-    private readonly fileActionService: FileActionService
+    private readonly fileActionService: FileActionService,
+    private readonly eventService: NotifyService
   ) {
   }
 
@@ -71,6 +73,10 @@ export class ActionQueueService {
    */
   getQueueStatus(queueIndex: number = 0): QueueStatus {
     return this.getQueue(queueIndex).status;
+  }
+
+  getQueues() {
+    return this.queues;
   }
 
   /**
@@ -119,7 +125,7 @@ export class ActionQueueService {
    */
   next(queue: Queue = this.getQueue(0)): void {
     for (let i = 0; i < queue.actions.length; i++) {
-      const action = queue.actions[i];
+      const action: ActionEvent = queue.actions[i];
       if (action.status === this.ACTION_STATUS_NEW) {
         queue.status = this.QUEUE_STATUS_RUNNING;
         action.status = this.ACTION_STATUS_PROCESSING;
@@ -137,16 +143,20 @@ export class ActionQueueService {
           // Since we don't have a direct replacement, we'll simulate the behavior
           this.executeAction(action)
             .subscribe({
-              next: (event) => {
+              next: (event: DoEventIf) => {
                 queue.status = this.QUEUE_STATUS_IDLE;
                 action.status = this.ACTION_STATUS_SUCCESS;
 
                 const events = [event]; // TODO ???
                 if (!action.bulk && events) {
+
                   // fire update events:
                   for (let j = 0; j < events.length; j++) {
                     const e = events[j];
-                    this.eventService.next(e);
+                    this.eventService.next({
+                      type: action.action,
+                      data: e
+                    });
                   }
                 }
                 this.next(queue);
@@ -171,11 +181,14 @@ export class ActionQueueService {
    */
   onEvent<T>(eventType: string): Observable<T> {
     return new Observable<T>((observer) => {
-      const subscription = this.eventService.valueChanges().subscribe((event) => {
-        if (event && event.type === eventType) {
-          observer.next(event.data);
-        }
-      });
+      const subscription =
+        this.eventService
+          .valueChanges()
+          .subscribe((event) => {
+            if (event && event.type === eventType) {
+              observer.next(event.data);
+            }
+          });
 
       return () => {
         subscription.unsubscribe();
