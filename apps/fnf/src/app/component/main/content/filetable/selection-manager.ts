@@ -117,17 +117,17 @@ export class SelectionManagerForObjectModels<T> {
   }
 
 
-  private updateSelection() {
+  updateSelection() {
     this.selection.set(this.getSelectedRows());
   }
 
-  private setRowSelected(row: T, selected: boolean) {
+  setRowSelected(row: T, selected: boolean) {
     if (row && this.options.isSelectable(row)) {
       (row as any)[this.options.selectionKey] = selected;
     }
   }
 
-  private isRowSelected(row: T): boolean {
+  isRowSelected(row: T): boolean {
     return !!(row as any)[this.options.selectionKey];
   }
 }

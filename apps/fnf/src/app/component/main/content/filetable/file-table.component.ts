@@ -309,27 +309,9 @@ export class FileTableComponent implements OnInit, OnDestroy {
       .valueChanges()
       .subscribe(
         (evt: NotifyEventIf) => {
-          console.info('------------------------');
-          console.info('NotifyEventIf', evt);
           if (Array.isArray(evt.data)){
             const arr = evt.data as Array<DirEventIf>;
             this.handleDirEvent(arr);
-            // for (let i = 0; i < arr.length; i++) {
-            //   const item = arr[i];
-            //   console.info('  -----> item ', item);
-            //   if (item instanceof DirEvent) {
-            //     this.handleDirEvent([item]);
-            //   }
-            //
-            //   // if (item.action === 'RELOAD_DIR') {
-            //   //   this.reload();
-            //   // } else if (item.action === 'SELECT_ALL') {
-            //   //   this.selectionManager.selectionAll();
-            //   //   this.tableApi?.repaint();
-            //   // } else if (item.action === 'DESELECT_ALL') {
-            //   //   this.selectionManager.deSelectionAll();
-            //   // }
-            // }
           }
         }
       )
@@ -367,7 +349,21 @@ export class FileTableComponent implements OnInit, OnDestroy {
     }
   }
 
+  test(){
+    this.handleDirEvent(
+      [
+        {"dir":"/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak",
+          "items":[
+            {"dir":"/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak","base":"README.md","ext":".md","date":"2025-05-31T20:12:12.282Z","error":"","size":1546,"isDir":false,"abs":false,"selected":true}
+          ],
+          "begin":false,"end":false,"size":1,"error":"",
+          "action":"unselect","panelIndex":0}
+      ]
+    )
+  }
+
   handleDirEvent(dirEvents: DirEventIf[]): void {
+    console.info('handleDirEvent ',dirEvents); // TODO del handleDirEvent
 
     if (this.tableApi && dirEvents && this.dirPara) {
       for (let i = 0; i < dirEvents.length; i++) {
@@ -375,6 +371,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
         const zi: ZipUrlInfo = getZipUrlInfo(this.dirPara.path);
 
         if (this.isRelevantDir(dirEvent.dir, this.dirPara.path, zi)) {
+
           if (dirEvent.action === "list") {
             this.rowData = dirEvent.items ?
               dirEvent.items.filter(fi => (
@@ -414,18 +411,19 @@ export class FileTableComponent implements OnInit, OnDestroy {
             this.checkAndRemoveItems(dirEvent.items);
 
           } else if (dirEvent.action === "unselect") {
-            const names = dirEvent.items.map(it => it.base);
-            // TODO
-            // this.gridApi.forEachNodeAfterFilter(node => {
-            //   const data: FileItemIf = node.data;
-            //   if (names.indexOf(data.base) > -1) {
-            //     node.setSelected(false);
-            //   }
-            // });
+            const fileItems: FileItemIf[] = dirEvent.items;
+            fileItems.forEach(fileItem => {
+                let tableRow = this.getRowByCriteria(fileItem);
+                if (tableRow) {
+                  tableRow.selected = false;
+                  this.selectionManager.setRowSelected(tableRow, false);
+                }
+            });
+            this.selectionManager.updateSelection();
+            this.repaintTable();
 
           } else if (dirEvent.action === "change") {
-            console.info('change changedir', dirEvent);
-            // TODO this.loadDir(); // zu hart?
+            this.reload();
 
           } else {
             console.warn("Unknown dir changedir action:", dirEvent);
@@ -434,6 +432,11 @@ export class FileTableComponent implements OnInit, OnDestroy {
         }
       }
     }
+  }
+
+  private getRowByCriteria(criteria: FileItemIf): FileItemIf | undefined {
+    const rowData = this.bodyAreaModel.getFilteredRows();
+    return rowData.find(row => row.base === criteria.base && row.dir === criteria.dir);
   }
 
   onTableReady(tableApi: TableApi) {

@@ -360,6 +360,10 @@ export class AppService {
       if (bodyAreaModel) {
         console.info('bodyAreaModel(' + i + ') focusedRowIndex:', bodyAreaModel.focusedRowIndex);
         console.info('bodyAreaModel(' + i + ') row count', bodyAreaModel.getRowCount());
+        for (let j = 0; j < bodyAreaModel.getRowCount(); j++) {
+          const row = bodyAreaModel.getRowByIndex(j);
+          console.info('bodyAreaModel(' + i + ') row(' + j + '):', JSON.stringify(row, null, 0));
+        }
       }
     });
   }
