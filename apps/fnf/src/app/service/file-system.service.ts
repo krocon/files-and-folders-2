@@ -35,15 +35,15 @@ export class FileSystemService {
 
   private watcherObservable: Observable<DirEventIf[]>;
   private doneObservable: Observable<DirEventIf[]>;
-
   private errorObservable: Observable<FilePara>;
+
 
   constructor(
     private readonly socket: Socket,
     private readonly httpClient: HttpClient
   ) {
     this.watcherObservable = this.socket
-      .fromEvent<DirEventIf, string>("watching")
+      .fromEvent<DirEventIf, string>("watchingxxx")
       .pipe(
         map(o => [o]),
       );

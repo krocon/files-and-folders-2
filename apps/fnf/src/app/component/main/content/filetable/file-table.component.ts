@@ -347,10 +347,10 @@ export class FileTableComponent implements OnInit, OnDestroy {
     this.handleDirEvent(
       [
         {
-          "dir": "/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak",
+          "dir": this.dirPara?.path??'',
           "items": [
             {
-              "dir": "/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak",
+              "dir": this.dirPara?.path??'',
               "base": "README.md",
               "ext": ".md",
               "date": "2025-05-31T20:12:12.282Z",
@@ -369,103 +369,107 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
   handleDirEvent(dirEvents: DirEventIf[]): void {
-    console.info('handleDirEvent ', dirEvents); // TODO del handleDirEvent
-
     if (this.tableApi && dirEvents && this.dirPara) {
       for (let i = 0; i < dirEvents.length; i++) {
         const dirEvent = dirEvents[i];
         const zi: ZipUrlInfo = getZipUrlInfo(this.dirPara.path);
 
         if (this.isRelevantDir(dirEvent.dir, this.dirPara.path, zi)) {
-
-          if (dirEvent.action === "list") {
-            let rows = dirEvent.items ?
-              dirEvent.items.filter(fi => (
-                fi.dir === this.dirPara?.path
-                || isSameDir(fi.dir, this.dirPara?.path ?? '')
-                || isRoot(fi.dir) && isRoot(zi.zipInnerUrl))
-              ) :
-              [];
-
-            if (!isRoot(this.dirPara.path)) {
-              rows = [
-                new FileItem(getParent(this.dirPara.path), "..", "", "", "", 1, true),
-                ...rows
-              ];
-            }
-
-            if (this.tableApi) {
-              this.setRows(rows);
-
-              const selectionLabelData: SelectionEvent = this.gridSelectionCountService
-                .getSelectionCountData(
-                  [],
-                  this.bodyAreaModel?.getFilteredRows() ?? []
-                );
-              this.selectionChanged.next(selectionLabelData);
-            }
-            // console.info('handleDirEvent ' + this.panelIndex, dirEvents);
-            if (dirEvent.end) {
-              this.appService.resetFocusRowCriterea();
-            }
-
-          } else if (dirEvent.action === "add" || dirEvent.action === "addDir") {
-            console.info('ADD ADD ADD ADD ADD ADD ADD ADD ADD ADD ADD ADD ADD ADD ')
-            this.tableApi.addRows(dirEvent.items)
-            // this.checkAndAddItems(dirEvent.items);
-            this.repaintTable();
-            console.info(this.bodyAreaModel.getAllRows());
-
-          } else if (dirEvent.action === "unlink" || dirEvent.action === "unlinkDir") {
-            console.info('this.tableApi.removeRows')
-            this.tableApi.removeRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
-            this.repaintTable();
-            //this.checkAndRemoveItems(dirEvent.items);
-
-          } else if (dirEvent.action === "unselect") {
-            this.tableApi.findRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir)
-              .forEach(r => {
-                r.selected = false;
-                this.selectionManager.setRowSelected(r, false);
-              });
-            // const fileItems: FileItemIf[] = dirEvent.items;
-            // fileItems.forEach(fileItem => {
-            //     let tableRow = this.getRowByCriteria(fileItem);
-            //     if (tableRow) {
-            //       tableRow.selected = false;
-            //       this.selectionManager.setRowSelected(tableRow, false);
-            //     }
-            // });
-            this.selectionManager.updateSelection();
-            this.repaintTable();
-
-          } else if (dirEvent.action === "change") {
-            this.tableApi.updateRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
-            this.repaintTable();
-            //console.info('TODO handleDirEvent "change"', dirEvent);
-            //this.reload();
-
-          } else {
-            console.warn("Unknown dir changedir action:", dirEvent);
-          }
-
+          this.handleRelevantDirEvent(dirEvent, zi);
         }
       }
+    }
+  }
+
+  private handleRelevantDirEvent(dirEvent: DirEventIf, zi: ZipUrlInfo) {
+    if (!this.tableApi || !dirEvent || !this.dirPara) return;
+
+    console.info('handleDirEvent ('+this.panelIndex+')', dirEvent); // TODO del handleDirEvent
+
+    if (dirEvent.action === "list") {
+      let rows = dirEvent.items ?
+        dirEvent.items.filter(fi => (
+          fi.dir === this.dirPara?.path
+          || isSameDir(fi.dir, this.dirPara?.path ?? '')
+          || isRoot(fi.dir) && isRoot(zi.zipInnerUrl))
+        ) :
+        [];
+
+      if (!isRoot(this.dirPara.path)) {
+        rows = [
+          new FileItem(getParent(this.dirPara.path), "..", "", "", "", 1, true),
+          ...rows
+        ];
+      }
+
+      if (this.tableApi) {
+        this.setRows(rows);
+
+        const selectionLabelData: SelectionEvent = this.gridSelectionCountService
+          .getSelectionCountData(
+            [],
+            this.bodyAreaModel?.getFilteredRows() ?? []
+          );
+        this.selectionChanged.next(selectionLabelData);
+      }
+      // console.info('handleDirEvent ' + this.panelIndex, dirEvents);
+      if (dirEvent.end) {
+        this.appService.resetFocusRowCriterea();
+      }
+
+    } else if (dirEvent.action === "add" || dirEvent.action === "addDir") {
+      this.tableApi.addRows(dirEvent.items)
+      // this.checkAndAddItems(dirEvent.items);
+      this.repaintTable();
+      console.info(this.bodyAreaModel.getAllRows());
+
+    } else if (dirEvent.action === "unlink" || dirEvent.action === "unlinkDir") {
+      console.info('this.tableApi.removeRows')
+      this.tableApi.removeRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
+      this.repaintTable();
+      //this.checkAndRemoveItems(dirEvent.items);
+
+    } else if (dirEvent.action === "unselect") {
+      this.tableApi.findRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir)
+        .forEach(r => {
+          r.selected = false;
+          this.selectionManager.setRowSelected(r, false);
+        });
+      this.selectionManager.updateSelection();
+      this.repaintTable();
+
+    } else if (dirEvent.action === "select") {
+      this.tableApi.findRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir)
+        .forEach(r => {
+          r.selected = true;
+          this.selectionManager.setRowSelected(r, true);
+        });
+      this.selectionManager.updateSelection();
+      this.repaintTable();
+
+    } else if (dirEvent.action === "change") {
+      this.tableApi.updateRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
+      this.repaintTable();
+      //console.info('TODO handleDirEvent "change"', dirEvent);
+      //this.reload();
+
+    } else {
+      console.warn("Unknown dir changedir action:", dirEvent);
     }
   }
 
   testAdd(){
     this.handleDirEvent([
       {
-        "dir": "/Users/marckronberg/Documents/test66",
+        "dir": this.dirPara?.path??'',
         "items": [
           {
-            "dir": "/Users/marckronberg/Documents/test66",
+            "dir": this.dirPara?.path??'',
             "base": "NESTJS_TESTING_MIGRATION.md",
             "ext": ".md",
             "date": "",
             "error": "",
-            "size": 0,
+            "size": 1234,
             "isDir": false,
             "abs": false,
             "selected": false
@@ -476,17 +480,18 @@ export class FileTableComponent implements OnInit, OnDestroy {
         "size": 1,
         "error": "",
         "action": "add",
-        "panelIndex": 1
+        "panelIndex": this.panelIndex
       }
     ]);
   }
+  
   testUnlink(){
     this.handleDirEvent([
       {
-        "dir": "/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak",
+        "dir": this.dirPara?.path??'',
         "items": [
           {
-            "dir": "/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak",
+            "dir": this.dirPara?.path??'',
             "base": "package.json",
             "ext": ".json",
             "date": "",
@@ -502,17 +507,18 @@ export class FileTableComponent implements OnInit, OnDestroy {
         "size": 1,
         "error": "",
         "action": "unlink",
-        "panelIndex": 0
+        "panelIndex": this.panelIndex
       }
     ]);
   }
+
   testUnselect(){
     this.handleDirEvent([
       {
-        "dir": "/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak",
+        "dir": this.dirPara?.path??'',
         "items": [
           {
-            "dir": "/Users/marckronberg/WebstormProjects/2025/files-and-folders.bak",
+            "dir": this.dirPara?.path??'',
             "base": "package.json",
             "ext": ".json",
             "date": "",
@@ -528,7 +534,34 @@ export class FileTableComponent implements OnInit, OnDestroy {
         "size": 1,
         "error": "",
         "action": "unselect",
-        "panelIndex": 0
+        "panelIndex": this.panelIndex
+      }
+    ]);
+  }
+
+  testSelect(){
+    this.handleDirEvent([
+      {
+        "dir": this.dirPara?.path??'',
+        "items": [
+          {
+            "dir": this.dirPara?.path??'',
+            "base": "package.json",
+            "ext": ".json",
+            "date": "",
+            "error": "",
+            "size": 0,
+            "isDir": false,
+            "abs": false,
+            "selected": true
+          }
+        ],
+        "begin": false,
+        "end": false,
+        "size": 1,
+        "error": "",
+        "action": "select",
+        "panelIndex": this.panelIndex
       }
     ]);
   }
