@@ -2,10 +2,10 @@ import {DirEvent, DirEventIf, FileItemIf, FilePara, fixPath} from "@fnf/fnf-data
 import * as os from "os";
 import * as path from "path";
 import * as fse from "fs-extra";
-import {exec} from "child_process";
 import {slash2backSlash} from "./common/slash-2-backslash.fn";
 import {clone} from "./common/clone";
 import {Logger} from "@nestjs/common";
+import {executeCommand} from "./common/execute-command";
 
 const platform = os.platform();
 const osx = platform === "darwin";
@@ -14,7 +14,7 @@ const linux = platform.indexOf("linux") === 0;
 
 const logger = new Logger("fn-copy");
 
-export function copy(para: FilePara): Promise<DirEventIf[]> {
+export async function copy(para: FilePara): Promise<DirEventIf[]> {
 
 
   function createRet(targetUrl: string, para: FilePara): DirEventIf[] {
@@ -26,10 +26,52 @@ export function copy(para: FilePara): Promise<DirEventIf[]> {
     return ret;
   }
 
-  return new Promise<DirEventIf[]>((resolve, reject) => {
+  function getCmd(
+    osx: boolean,
+    windows: boolean,
+    linux: boolean,
+    sourceUrl: string,
+    targetUrl: string,
+    sourceIsDirectory: boolean,
+    ptarget: FileItemIf,
+    psource: FileItemIf
+  ): string {
+    if (osx) {
+      // cp -r "/Users/marc/__test/src/DUDEN Deutsch 3. Klasse - Lernkalender.pdf" "/Users/marc/__test/target"
+      // cp -r "/Users/marc/__test/src/a" "/Users/marc/__test/target"
+      return "cp -r \"" + sourceUrl + "\" \"" + ptarget.dir + "\"";
+
+    } else if (windows) {
+      const src = slash2backSlash(sourceUrl);
+      if (sourceIsDirectory) {
+        // xcopy  "C:\Users\kronmar\bbbbb\marc\a" "C:\Users\kronmar\bbbbb\marc2\a\" /E /C /I /H /R /Y
+        const t1 = slash2backSlash(ptarget.dir + "/" + psource.base + "/");
+        return `xcopy  "${src}" "${t1}" /E /C /I /H /R /Y `;
+
+      } else {
+        // xcopy  "C:\Users\kronmar\bbbbb\marc\zipEntries.js" "C:\Users\kronmar\bbbbb\marc2" /Y
+        const td = slash2backSlash(ptarget.dir);
+        return `xcopy  "${src}" "${td}" /Y `;
+      }
+
+    } else if (linux) {
+      if (sourceIsDirectory) {
+        // dir to dir:
+        // rsync -avzh /root/rpmpkgs /tmp/backups/
+        return `rsync -avzh "${sourceUrl}" "${targetUrl}"`;
+      } else {
+        // file to dir:
+        // rsync -zvh backup.tar.gz /tmp/backups/
+        return `rsync -zvh "${sourceUrl}" "${targetUrl}"`;
+      }
+    }
+  }
+
+  
+  
+  try {
     if (!para || !para.source || !para.target) {
-      reject("Invalid argument exception!");
-      return;
+      throw new Error("Invalid argument exception!");
     }
     const ptarget = para.target;
     const psource = para.source;
@@ -41,76 +83,32 @@ export function copy(para: FilePara): Promise<DirEventIf[]> {
       path.join(ptarget.dir, "/", ptarget.base ? ptarget.base : "")
     );
 
-    fse.stat(sourceUrl, (error, stats) => {
-      if (!stats) {
-        reject(error);
-        return;
-      }
-      const sourceIsDirectory = stats.isDirectory(); // source only, target not exists!
-      const targetMkdir = sourceIsDirectory ? targetUrl : ptarget.dir;
+    const stats = await fse.stat(sourceUrl);
+    if (!stats) {
+      throw new Error("Could not get stats for source file");
+    }
 
-      fse.mkdirs(targetMkdir, (error) => {
-        if (error) {
-          reject(error);
-          return;
-        }
+    const sourceIsDirectory = stats.isDirectory(); // source only, target not exists!
+    const targetMkdir = sourceIsDirectory ? targetUrl : ptarget.dir;
 
-        let cmd;
-        if (osx) {
-          // cp -r "/Users/marc/__test/src/DUDEN Deutsch 3. Klasse - Lernkalender.pdf" "/Users/marc/__test/target"
-          // cp -r "/Users/marc/__test/src/a" "/Users/marc/__test/target"
-          cmd = "cp -r \"" + sourceUrl + "\" \"" + ptarget.dir + "\"";
+    await fse.mkdirs(targetMkdir);
 
-        } else if (windows) {
-          const src = slash2backSlash(sourceUrl);
-          if (sourceIsDirectory) {
-            // xcopy  "C:\Users\kronmar\bbbbb\marc\a" "C:\Users\kronmar\bbbbb\marc2\a\" /E /C /I /H /R /Y
-            const t1 = slash2backSlash(ptarget.dir + "/" + psource.base + "/");
-            cmd = `xcopy  "${src}" "${t1}" /E /C /I /H /R /Y `;
+    const cmd = getCmd(osx, windows, linux, sourceUrl, targetUrl, sourceIsDirectory, ptarget, psource);
+    logger.log("cmd: " + cmd);
 
-          } else {
-            // xcopy  "C:\Users\kronmar\bbbbb\marc\zipEntries.js" "C:\Users\kronmar\bbbbb\marc2" /Y
-            const td = slash2backSlash(ptarget.dir);
-            cmd = `xcopy  "${src}" "${td}" /Y `;
-          }
-
-        } else if (linux) {
-          if (sourceIsDirectory) {
-            // dir to dir:
-            // rsync -avzh /root/rpmpkgs /tmp/backups/
-            cmd = `rsync -avzh "${sourceUrl}" "${targetUrl}"`;
-          } else {
-            // file to dir:
-            // rsync -zvh backup.tar.gz /tmp/backups/
-            cmd = `rsync -zvh "${sourceUrl}" "${targetUrl}"`;
-          }
-
-        }
-
-        logger.log("cmd: " + cmd);
-
-        exec(cmd, (error, stdout, stderr) => {
-          if (error) {
-            logger.error(error);
-            // zweiter Versuch:
-            const to = path.join(targetUrl, "/", para.source.base);
-            fse.copy(sourceUrl, to, (error) => {
-              if (error) {
-                logger.error(error);
-                reject(error);
-              } else {
-                const ret = createRet(targetUrl, para);
-                resolve(ret);
-              }
-            });
-          } else {
-            const ret = createRet(targetUrl, para);
-            resolve(ret);
-          }
-        });
-      });
-    });
-  });
-
-
+    try {
+      await executeCommand(cmd);
+      return createRet(targetUrl, para);
+      
+    } catch (error) {
+      // second try:
+      logger.error(error);
+      const to = path.join(targetUrl, "/", para.source.base);
+      await fse.copy(sourceUrl, to);
+      return createRet(targetUrl, para);
+    }
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
 }
