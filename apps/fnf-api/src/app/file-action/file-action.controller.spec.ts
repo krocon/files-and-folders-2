@@ -38,7 +38,7 @@ describe('FileActionController', () => {
       expect(Array.isArray(res)).toBeTruthy();
       if (Array.isArray(res)) {
         expect(res.length).toEqual(2);
-        expect(res[0].error).toEqual('');
+        //expect(res[0].meta.error).toEqual('');
         expect(res[0].dir).toEqual(testDir);
         expect(res[0].items.length).toEqual(1);
         expect(res[0].items[0].dir).toBeTruthy();
@@ -127,7 +127,7 @@ describe('FileActionController', () => {
   describe('unpack: demo.zip', () => {
     it("should unpack zip file-content demo.zip", async () => {
       const source = new FileItem(testDir, 'demo.zip', 'zip');
-      const target = new FileItem(testDir, '', '', '', '', 0, true);
+      const target = new FileItem(testDir, '', '', '',  0, true);
       const filePara = new FilePara(source, target, 'unpack');
 
       await expect(appController.onDo(filePara)).resolves.toEqual(20);

@@ -6,8 +6,9 @@ import {Observable} from 'rxjs';
 import {QueueProgress} from "../../domain/cmd/queue.progress";
 import {Queue} from "../../domain/cmd/queue";
 import {FileActionService} from "./file-action.service";
-import {DoEventIf} from "@fnf/fnf-data";
+import {DirEvent, DirEventIf, DoEventIf, OnDoResponseType} from "@fnf/fnf-data";
 import {NotifyService} from "./notify-service";
+import {NotifyEvent} from "../../domain/cmd/notify-event";
 
 @Injectable({
   providedIn: 'root'
@@ -132,10 +133,12 @@ export class ActionQueueService {
 
         if (action.action === this.ACTION_REFRESH_PANEL) {
           action.status = this.ACTION_STATUS_SUCCESS;
-          this.eventService.next({
-            type: this.ACTION_REFRESH_PANEL,
-            data: {index: action.panelIndex}
-          });
+          this.eventService.next(
+            new NotifyEvent(
+              this.ACTION_REFRESH_PANEL,
+              [
+                {...new DirEvent('', []), panelIndex: action.panelIndex}
+              ]));
           this.triggerJobQueueTableUpdate();
 
         } else {
@@ -143,22 +146,21 @@ export class ActionQueueService {
           // Since we don't have a direct replacement, we'll simulate the behavior
           this.executeAction(action)
             .subscribe({
-              next: (event: DoEventIf) => {
+              next: (res: OnDoResponseType) => {
+
+                console.info('------------------------- ');
+                console.info('Action ', action);
+                console.info('Action response', res);
+
                 queue.status = this.QUEUE_STATUS_IDLE;
                 action.status = this.ACTION_STATUS_SUCCESS;
 
-                const events = [event]; // TODO ???
-                if (!action.bulk && events) {
+                this.eventService.next({
+                  type: action.action,
+                  data: res
+                });
 
-                  // fire update events:
-                  for (let j = 0; j < events.length; j++) {
-                    const e = events[j];
-                    this.eventService.next({
-                      type: action.action,
-                      data: e
-                    });
-                  }
-                }
+                // next action:
                 this.next(queue);
                 this.triggerJobQueueTableUpdate();
               },
@@ -179,8 +181,8 @@ export class ActionQueueService {
    * Gets an observable for a specific event type
    * @param eventType The type of event to listen for
    */
-  onEvent<T>(eventType: string): Observable<T> {
-    return new Observable<T>((observer) => {
+  onEvent(eventType: string): Observable<OnDoResponseType> {
+    return new Observable<OnDoResponseType>((observer) => {
       const subscription =
         this.eventService
           .valueChanges()
@@ -274,7 +276,7 @@ export class ActionQueueService {
       clearTimeout(this.refreshQueueTableTimer);
     }
     this.refreshQueueTableTimer = setTimeout(() => {
-      this.eventService.next({type: this.REFRESH_JOB_QUEUE_TABLE, data: ''});
+      this.eventService.next(new NotifyEvent(this.REFRESH_JOB_QUEUE_TABLE, []));
     }, 1111);
   }
 
@@ -293,7 +295,7 @@ export class ActionQueueService {
   }
 
 
-  private executeAction(action: ActionEvent): Observable<DoEventIf> {
+  private executeAction(action: ActionEvent): Observable<OnDoResponseType> {
     return this.fileActionService.do(action.filePara);
   }
 }

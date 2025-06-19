@@ -2,7 +2,7 @@ import {Test} from "@nestjs/testing";
 import {DirGateway} from "./dir.gateway";
 import {Socket, SocketIoConfig} from "ngx-socket-io";
 import {INestApplication} from "@nestjs/common";
-import {DirEvent, DirPara, FileItem, FilePara} from "@fnf/fnf-data";
+import {DirEvent, DirEventIf, DirPara, FileItem, FilePara} from "@fnf/fnf-data";
 import * as fse from "fs-extra";
 import {unpack} from "../file-action/action/unpack.fn";
 
@@ -12,7 +12,7 @@ const config: SocketIoConfig = {
 };
 const testDir = fse.existsSync("./test") ? "./test" : "../../test";
 
-const prepareDemoFolder = async (): Promise<number> => {
+const prepareDemoFolder = async (): Promise<DirEventIf[]> => {
   await fse.removeSync(testDir + "/demo");
   const para = new FilePara(
     new FileItem(testDir + "/", "demo.zip"),

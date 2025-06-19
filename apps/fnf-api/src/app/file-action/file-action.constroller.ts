@@ -1,10 +1,12 @@
 import {Controller, Logger, Post} from "@nestjs/common";
 import {FileService} from "./file.service";
 import {MessageBody} from "@nestjs/websockets";
-import {DirEventIf, DirPara, FilePara, WalkData, WalkParaData} from "@fnf/fnf-data";
+import {DirEventIf, DirPara, FilePara, OnDoResponseType, WalkData, WalkParaData} from "@fnf/fnf-data";
 
 import * as fs from "fs-extra";
 import * as path from "path";
+
+
 
 @Controller("do")
 export class FileActionController {
@@ -17,7 +19,7 @@ export class FileActionController {
   }
 
   @Post("")
-  async onDo(@MessageBody() para: FilePara): Promise<DirEventIf[] | DirEventIf | string | number> {
+  async onDo(@MessageBody() para: FilePara): Promise<OnDoResponseType> {
     this.logger.log("cmd:", para.cmd);
     let fn = this.fileService.getFunctionByCmd(para.cmd);
     return fn(para);

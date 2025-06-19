@@ -4,17 +4,17 @@ import {FileItemMeta} from "./file-item-meta";
 
 export class FileItem implements FileItemIf {
 
-  public meta: FileItemMetaIf = new FileItemMeta();
+
 
   constructor(
     public dir: string,
     public base: string = '',
     public ext: string = '',
     public date: string = '',
-    public error: string = '',
     public size: number = 0,
     public isDir: boolean = false,
-    public abs: boolean = false
+    public abs: boolean = false,
+    public meta: FileItemMetaIf = new FileItemMeta()
   ) {
   }
 

@@ -50,7 +50,7 @@ export class FindGateway {
 
             if (micromatch.isMatch(path.join(dir, base), findDialogData.pattern)) {
               const ext = path.extname(f2);
-              const fileItem = new FileItem(dir, base, ext, null);
+              const fileItem = new FileItem(dir, base, ext);
 
               stats2FileItem(stats2, fileItem);
               fileItem.abs = true;

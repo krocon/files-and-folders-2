@@ -7,7 +7,7 @@ import {rename} from "./action/rename.fn";
 import {open} from "./action/open.fn";
 import {unpack} from "./action/unpack.fn";
 import {dummy} from "./action/common/dummy.fn";
-import {DirEventIf, FileCmd, FilePara} from "@fnf/fnf-data";
+import {FileCmd, FilePara, OnDoResponseType} from "@fnf/fnf-data";
 import {unpacklist} from "./action/unpack-list.fn";
 
 
@@ -20,13 +20,13 @@ export class FileService {
   remove = remove.bind(this); // Promise<DirEventIf[]>
   rename = rename.bind(this); // Promise<DirEventIf[]>
 
-  open = open.bind(this);  // Promise<string>
-  unpack = unpack.bind(this); // Promise<number>
-  unpacklist = unpacklist.bind(this); // Promise<DirEventIf>
+  open = open.bind(this);  // Promise<DirEventIf[]>
+  unpack = unpack.bind(this); // Promise<DirEventIf[]>
+  unpacklist = unpacklist.bind(this); // Promise<DirEventIf[]>
 
   dummy = dummy.bind(this);
 
-  getFunctionByCmd(cmd: FileCmd): (para: FilePara) => Promise<DirEventIf[] | DirEventIf | string | number> {
+  getFunctionByCmd(cmd: FileCmd): (para: FilePara) => Promise<OnDoResponseType> {
     if (cmd === "copy") return this.copy;
     if (cmd === "move") return this.move;
     if (cmd === "mkdir") return this.mkdir;

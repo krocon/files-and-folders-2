@@ -17,7 +17,7 @@ const logger = new Logger("fn-copy");
 export function copy(para: FilePara): Promise<DirEventIf[]> {
 
 
-  function createRet(targetUrl: string, para: FilePara) {
+  function createRet(targetUrl: string, para: FilePara): DirEventIf[] {
     const item = clone<FileItemIf>(para.source);
     item.dir = targetUrl;
     const ret: DirEventIf[] = [];

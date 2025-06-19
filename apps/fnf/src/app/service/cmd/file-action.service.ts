@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
-import {ActionGatewayKeys as keys, DoEventIf, FilePara} from "@fnf/fnf-data";
+import {ActionGatewayKeys as keys, DoEventIf, FilePara, OnDoResponseType} from "@fnf/fnf-data";
 import {Observable} from "rxjs";
 import {Socket} from "ngx-socket-io";
 
@@ -25,9 +25,9 @@ export class FileActionService {
     Object.assign(FileActionService.config, config);
   }
 
-  do(filePara: FilePara): Observable<DoEventIf> {
+  do(filePara: FilePara): Observable<OnDoResponseType> {
     const url = FileActionService.config.url;
-    return this.httpClient.post<DoEventIf>(url, filePara);
+    return this.httpClient.post<OnDoResponseType>(url, filePara);
   }
 
   multiDo(fileParas: FilePara[]): void {

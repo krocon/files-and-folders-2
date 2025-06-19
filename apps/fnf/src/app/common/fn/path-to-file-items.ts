@@ -38,7 +38,6 @@ export function path2FileItems(path: string): FileItemIf[] {
       segment,      // base: the segment name
       '',           // ext: empty for directories
       '',           // date: empty
-      '',           // error: empty
       0,            // size: 0
       true,         // isDir: true since each segment is a directory
       isAbsolute    // abs: true if the path is absolute

@@ -12,11 +12,11 @@ const windows = platform.indexOf("win") === 0;
 function execute(
   cmd: string,
   cmdAlternate: string
-): Promise<string> {
+): Promise<DirEventIf[]> {
 
-  return new Promise<string>((resolve, reject) => {
+  return new Promise<DirEventIf[]>((resolve, reject) => {
     if (!cmd) {
-      reject("Invalid argument exception!");
+      reject([]);
       return;
     }
     exec(cmd, (error, stdout, stderr) => {
@@ -26,11 +26,11 @@ function execute(
           if (error) {
             reject(error);
           } else {
-            resolve("ok");
+            resolve([]);
           }
         });
       } else {
-        resolve("ok");
+        resolve([]);
       }
     });
   });

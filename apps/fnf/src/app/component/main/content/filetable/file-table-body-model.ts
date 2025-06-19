@@ -14,8 +14,8 @@ export class FileTableBodyModel extends AreaModelObjectArrayWithColumndefs<FileI
 
   override getCustomClassesAt(rowIndex: number, _columnIndex: number): string[] {
     const ret: string[] = [];
-    const row = this.getRowByIndex(rowIndex);
-    const selected = row.selected;
+    const row:FileItemIf = this.getRowByIndex(rowIndex);
+    const selected = row?.meta?.selected;
 
     if (selected) {
       ret.push('fnf-selected-row');

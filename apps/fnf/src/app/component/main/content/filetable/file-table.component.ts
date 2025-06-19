@@ -643,7 +643,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
       if (!isRoot(this.dirPara.path)) {
         rows = [
-          new FileItem(getParent(this.dirPara.path), "..", "", "", "", 1, true),
+          new FileItem(getParent(this.dirPara.path), "..", "", "", 1, true),
           ...rows
         ];
       }

@@ -197,7 +197,7 @@ export class DirGateway {
 
         if (!allAtOnce) {
           const previews = files.map(
-            (f) => new FileItem(p, fixPath(f), path.extname(f), null)
+            (f) => new FileItem(p, fixPath(f), path.extname(f))
           );
           const end = files.length === 0;
           const firstEvent = new DirEvent(p, previews, true, end, files.length, "", "listpreview");
@@ -223,7 +223,8 @@ export class DirGateway {
             const stats = fs.statSync(ff);
             stats2FileItem(stats, fileItem);
           } catch (e) {
-            fileItem.error = e;
+            if (!fileItem.meta) fileItem.meta = {};
+            fileItem.meta.error = e;
             console.info("DirGateWay() stats error:", e.message);
           }
           if (idx === files.length - 1) {

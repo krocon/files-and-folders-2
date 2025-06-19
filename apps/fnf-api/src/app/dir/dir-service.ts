@@ -21,7 +21,7 @@ export class DirService {
           .map(s => {
             const base = fixPath(s.replace(p, ''))
               .replace(/^\//g, '');
-            const fileItem = new FileItem(p, base, path.extname(base), null, '', 0, true);
+            const fileItem = new FileItem(p, base, path.extname(base), null, 0, true);
             this.addStats2FileItem(fileItem);
             return fileItem;
           });
@@ -34,8 +34,8 @@ export class DirService {
 
       return new Promise<DirEventIf[]>((resolve, reject) => {
         unpacklist(zipUrlInfo.zipUrl)
-          .then(dirEvent => {
-            return resolve([dirEvent]);
+          .then(dirEvents => {
+            return resolve(dirEvents);
           }, error => reject(error));
       });
 
@@ -53,7 +53,6 @@ export class DirService {
                 p,
                 fixPath(f),
                 path.extname(f),
-                null
               );
               fileItems.push(fileItem);
               this.addStats2FileItem(fileItem);
@@ -80,7 +79,8 @@ export class DirService {
       stats2FileItem(stats, fileItem);
 
     } catch (e) {
-      fileItem.error = e;
+      if (!fileItem.meta) fileItem.meta = {};
+      fileItem.meta.error = e;
       console.info("DirGateWay() stats error:", e.message);
     }
   }

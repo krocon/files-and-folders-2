@@ -1,5 +1,5 @@
 import {Test, TestingModule} from "@nestjs/testing";
-import {DirPara, FileItem, FilePara} from "@fnf/fnf-data";
+import {DirEventIf, DirPara, FileItem, FilePara} from "@fnf/fnf-data";
 
 import * as fse from "fs-extra";
 import {DirController} from "./dir.controller";
@@ -8,7 +8,7 @@ import {unpack} from "../file-action/action/unpack.fn";
 
 
 const testDir = fse.existsSync("./test") ? "./test" : "../../test";
-const prepareDemoFolder = async (): Promise<number> => {
+const prepareDemoFolder = async (): Promise<DirEventIf[]> => {
   await fse.removeSync(testDir + "/demo");
   const para = new FilePara(
     new FileItem(testDir + "/", "demo.zip"),

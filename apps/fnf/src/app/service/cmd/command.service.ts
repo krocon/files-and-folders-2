@@ -1,13 +1,14 @@
 import {Injectable} from '@angular/core';
 import {ActionEvent} from "../../domain/cmd/action-event";
 import {ActionEventType} from "../../domain/cmd/action-event.type";
-import {FileItemIf, FilePara} from "@fnf/fnf-data";
+import {DirEvent, FileItem, FileItemIf, FileItemMeta, FilePara, OnDoResponseType} from "@fnf/fnf-data";
 import {QueueStatus} from "../../domain/cmd/queue-status";
 import {PanelIndex} from "../../domain/panel-index";
 import {ActionQueueService} from "./action-queue.service";
-import {TypedEventService} from "../../common/typed-event.service";
 import {FileOperationParams} from "../../domain/cmd/file-operation-params";
 import {NotifyService} from "./notify-service";
+import {NotifyEventIf} from "../../domain/cmd/notify-event.if";
+import {NotifyEvent} from "../../domain/cmd/notify-event";
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class CommandService {
   readonly ACTION_STATUS_NEW: QueueStatus = 'NEW';
 
   private actionId = 0;
+
   // private eventService = new TypedEventService<any>();
 
   constructor(
@@ -96,13 +98,13 @@ export class CommandService {
 
     if (!bulk) {
       // Send event to show a placeholder in the target table
-      this.eventService.next({
-        type: 'update',
-        data: {
-          panelIndex: srcPanelIndex,
-          item: {dir: source.dir, base: source.base, status: 'temp'}
-        }
-      });
+      // this.eventService.next({
+      //   type: 'update',
+      //   data: {
+      //     panelIndex: srcPanelIndex,
+      //     item: {dir: source.dir, base: source.base, status: 'temp'}
+      //   }
+      // });
     }
 
     return this.createActionEvent(
@@ -139,16 +141,17 @@ export class CommandService {
     const targetPanelIndex = para.targetPanelIndex;
     const bulk = para.bulk || false;
 
-    if (!bulk && targetPanelIndex !== undefined) {
-      // Send event to show a placeholder in the target table
-      this.eventService.next({
-        type: 'created',
-        data: {
-          panelIndex: targetPanelIndex,
-          item: {dir: target.dir, base: target.base, status: 'temp'}
-        }
-      });
-    }
+    // TODO Send event to show a placeholder in the target table
+    // if (!bulk && targetPanelIndex !== undefined) {
+    //   // Send event to show a placeholder in the target table
+    //   this.eventService.next({
+    //     type: 'created',
+    //     data: {
+    //       panelIndex: targetPanelIndex,
+    //       item: {dir: target.dir, base: target.base, status: 'temp'}
+    //     }
+    //   });
+    // }
 
     return this.createActionEvent(
       this.actionQueueService.ACTION_COPY,
@@ -172,25 +175,25 @@ export class CommandService {
 
     if (!bulk) {
       // Send events to show placeholders
-      if (srcPanelIndex !== undefined) {
-        this.eventService.next({
-          type: 'update',
-          data: {
-            panelIndex: srcPanelIndex,
-            item: {dir: source.dir, base: source.base, status: 'temp'}
-          }
-        });
-      }
-
-      if (targetPanelIndex !== undefined) {
-        this.eventService.next({
-          type: 'created',
-          data: {
-            panelIndex: targetPanelIndex,
-            item: {dir: target.dir, base: target.base, status: 'temp'}
-          }
-        });
-      }
+      // if (srcPanelIndex !== undefined) {
+      //   this.eventService.next({
+      //     type: 'update',
+      //     data: {
+      //       panelIndex: srcPanelIndex,
+      //       item: {dir: source.dir, base: source.base, status: 'temp'}
+      //     }
+      //   });
+      // }
+      //
+      // if (targetPanelIndex !== undefined) {
+      //   this.eventService.next({
+      //     type: 'created',
+      //     data: {
+      //       panelIndex: targetPanelIndex,
+      //       item: {dir: target.dir, base: target.base, status: 'temp'}
+      //     }
+      //   });
+      // }
     }
 
     return this.createActionEvent(
@@ -216,13 +219,13 @@ export class CommandService {
     if (!bulk) {
       // Send event to show a placeholder
       if (srcPanelIndex !== undefined) {
-        this.eventService.next({
-          type: 'update',
-          data: {
-            panelIndex: srcPanelIndex,
-            item: {dir: source.dir, base: source.base, status: 'temp'}
-          }
-        });
+        const item: OnDoResponseType = [
+          new DirEvent(source.dir, [
+            {...source, meta: new FileItemMeta('', 'temp', true)}
+            //new FileItem(source.dir, source.base, '', '', 0, false, false, new FileItemMeta('', 'temp', true))
+          ])];
+        let o: NotifyEventIf = new NotifyEvent('update', item)
+        this.eventService.next(o);
       }
     }
 

@@ -34,6 +34,7 @@ export * from './models/file/do-event-2-dir-event';
 export * from './models/file/zip-matcher';
 export * from './models/file/fix-slash.fn';
 export * from './models/file/fix-path.fn';
+export * from './models/file/on-do-response-type';
 
 export * from './models/find/find-dialog.data';
 export * from './models/find/find.data';

@@ -2,9 +2,9 @@ import {DirEvent, DirEventIf, FileItem, FileItemIf} from "@fnf/fnf-data";
 import * as StreamZip from "node-stream-zip";
 import * as path from "path";
 
-export async function unpacklist(file: string): Promise<DirEventIf> {
+export async function unpacklist(file: string): Promise<DirEventIf[]> {
 
-  return new Promise<DirEventIf>(async (resolve, reject) => {
+  return new Promise<DirEventIf[]>(async (resolve, reject) => {
     if (!file) {
       reject("Invalid argument exception!");
       return;
@@ -25,11 +25,11 @@ export async function unpacklist(file: string): Promise<DirEventIf> {
           if (dir.endsWith("/.")) {
             dir = dir.substr(0, dir.length - 2);
           }
-          fileItems.push(new FileItem(dir, entryBase, "", "", "", entry.size, entry.isDirectory, false));
+          fileItems.push(new FileItem(dir, entryBase, "", "", entry.size, entry.isDirectory, false));
         }
       }
       await zip.close();
-      resolve(dirEvent);
+      resolve([dirEvent]);
 
     } catch (e) {
       reject(e);
