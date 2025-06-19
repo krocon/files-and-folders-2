@@ -11,6 +11,9 @@ export * from './models/cmd/get-button-enable-states.fn';
 
 export * from './models/dir/file-item';
 export * from './models/dir/file-item.if';
+export * from './models/dir/file-item-meta.if';
+export * from './models/dir/file-item-meta';
+
 export * from './models/dir/dir-event.if';
 export * from './models/dir/dir-event';
 export * from './models/dir/dir-para';

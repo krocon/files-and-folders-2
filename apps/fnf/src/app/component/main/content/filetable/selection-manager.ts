@@ -1,9 +1,14 @@
 import {AreaModelObjectArray, GeMouseEvent} from "@guiexpert/table";
 import {signal} from "@angular/core";
+import {DOT_DOT, FileItemIf, FileItemMeta} from "@fnf/fnf-data";
 
 
 export class SelectionManagerForObjectModelsOptions<T> {
-  public selectionKey: { [K in keyof T]: T[K] extends boolean | undefined ? K : never }[keyof T] = 'selected' as any;
+
+  isSelected: (row: T) => boolean = (v: T) => false;
+  setSelected: (row: T, selected:boolean) => void =  (v: T) => {};
+
+  //public selectionKey: { [K in keyof T]: T[K] extends boolean | undefined ? K : never }[keyof T] = 'selected' as any;
   public isSelectable: (v: T) => boolean = (v: T) => true;
   public getKey: (a: T) => any = (a: T) => a;
   public equalRows: (a: T, b: T) => boolean = (a: T, b: T) => a === b;
@@ -97,7 +102,7 @@ export class SelectionManagerForObjectModels<T> {
   }
 
   toggleSelection() {
-    this.bodyModel?.getAllRows().forEach((row: any) => this.toggleRowSelection(row));
+    this.bodyModel?.getAllRows().forEach((row: any) => this.setRowSelected(row, !this.isRowSelected(row)));
     this.updateSelection();
   }
 
@@ -123,11 +128,11 @@ export class SelectionManagerForObjectModels<T> {
 
   setRowSelected(row: T, selected: boolean) {
     if (row && this.options.isSelectable(row)) {
-      (row as any)[this.options.selectionKey] = selected;
+      this.options.setSelected(row, selected);
     }
   }
 
   isRowSelected(row: T): boolean {
-    return !!(row as any)[this.options.selectionKey];
+    return this.options.isSelected(row);
   }
 }

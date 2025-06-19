@@ -1,7 +1,10 @@
 import {FileItemIf} from './file-item.if';
+import {FileItemMetaIf} from "./file-item-meta.if";
+import {FileItemMeta} from "./file-item-meta";
 
 export class FileItem implements FileItemIf {
 
+  public meta: FileItemMetaIf = new FileItemMeta();
 
   constructor(
     public dir: string,
@@ -11,8 +14,7 @@ export class FileItem implements FileItemIf {
     public error: string = '',
     public size: number = 0,
     public isDir: boolean = false,
-    public abs: boolean = false,
-    public selected: boolean = false
+    public abs: boolean = false
   ) {
   }
 

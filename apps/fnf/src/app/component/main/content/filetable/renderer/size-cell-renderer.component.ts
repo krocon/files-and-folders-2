@@ -7,7 +7,7 @@ import {formatFileSize} from "../../../../../common/fn/format-file-size";
 @Component({
   selector: 'size-cell-renderer',
   template: `
-    <div [title]="tooltip">{{ text }}</div>`,
+    <div [title]="tooltip" [class]="clazz">{{ text }}</div>`,
   styles: [`
       :host {
           width: 100%;
@@ -28,6 +28,7 @@ export class SizeCellRendererComponent implements ComponentRendererIf<FileItemIf
 
   text: string = '';
   tooltip: string = '';
+  clazz: string = '';
 
 
   setData(
@@ -39,10 +40,11 @@ export class SizeCellRendererComponent implements ComponentRendererIf<FileItemIf
 
     const fileItem: FileItemIf = areaModel.getRowByIndex(rowIndex);
 
+    this.clazz = '';
+    this.text = '';
+    this.tooltip = '';
 
     if (fileItem.base === DOT_DOT) {
-      this.text = '';
-      this.tooltip = '';
       return undefined;
     }
 
@@ -52,9 +54,9 @@ export class SizeCellRendererComponent implements ComponentRendererIf<FileItemIf
       return undefined;
     }
 
-    if (fileItem.status === "temp") {
-      this.text = '-';
-      this.tooltip = '-';
+    if (fileItem?.meta?.status === "temp") {
+      this.tooltip = 'temporary file';
+      this.clazz = 'temporary';
       return undefined;
     }
 

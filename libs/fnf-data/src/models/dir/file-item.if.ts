@@ -1,3 +1,5 @@
+import {FileItemMetaIf} from "./file-item-meta.if";
+
 export interface FileItemIf {
   dir: string;
   base: string;
@@ -6,8 +8,6 @@ export interface FileItemIf {
   date: string;
   isDir: boolean;
   abs: boolean;
-  error?: string;
-  status?: string;
 
-  selected?: boolean;
+  meta?: FileItemMetaIf;
 }

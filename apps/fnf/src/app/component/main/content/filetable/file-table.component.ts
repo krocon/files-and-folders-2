@@ -33,7 +33,7 @@ import {
   DOT_DOT,
   EXP_ZIP_FILE_URL,
   FileItem,
-  FileItemIf,
+  FileItemIf, FileItemMeta,
   getParent,
   getZipUrlInfo,
   isRoot,
@@ -128,15 +128,18 @@ export class FileTableComponent implements OnInit, OnDestroy {
   private readonly selectionManager = new SelectionManagerForObjectModels<FileItemIf>(
     this.bodyAreaModel,
     {
-      selectionKey: 'selected',
       isSelectable: (row: FileItemIf) => row.base !== DOT_DOT,
+      isSelected: (row: FileItemIf) => (row?.meta?.selected ?? false),
+      setSelected: (row: FileItemIf, selected:boolean) => {
+        if (!row.meta) row.meta = new FileItemMeta();
+        row.meta.selected = selected;
+      },
       getKey: (row: FileItemIf) => row.dir + '/' + row.base,
       equalRows: (a: FileItemIf, b: FileItemIf) => a.base === b.base && a.dir === b.dir,
     });
   private selectionLocalStorage: SelectionLocalStorage<FileItemIf> | undefined;
   private tableApi: TableApi | undefined;
   private alive = true;
-  // private rowData: FileItemIf[] = [];
   private injector = inject(Injector);
   private filterText = "";
   private filterActive = false;
@@ -363,11 +366,12 @@ export class FileTableComponent implements OnInit, OnDestroy {
               "base": "README.md",
               "ext": ".md",
               "date": "2025-05-31T20:12:12.282Z",
-              "error": "",
               "size": 1546,
               "isDir": false,
               "abs": false,
-              "selected": true
+              meta: {
+                "selected": true
+              }
             }
           ],
           "begin": false, "end": false, "size": 1, "error": "",
@@ -378,6 +382,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
   handleDirEvent(dirEvents: DirEventIf[]): void {
+    console.info('file table ('+ this.panelIndex+') all handleDirEvent:', dirEvents); // TODO del handleDirEvent
     if (this.tableApi && dirEvents && this.dirPara) {
       for (let i = 0; i < dirEvents.length; i++) {
         const dirEvent = dirEvents[i];
@@ -400,11 +405,9 @@ export class FileTableComponent implements OnInit, OnDestroy {
             "base": "NESTJS_TESTING_MIGRATION.md",
             "ext": ".md",
             "date": "",
-            "error": "",
             "size": 1234,
             "isDir": false,
-            "abs": false,
-            "selected": false
+            "abs": false
           }
         ],
         "begin": false,
@@ -427,11 +430,9 @@ export class FileTableComponent implements OnInit, OnDestroy {
             "base": "package.json",
             "ext": ".json",
             "date": "",
-            "error": "",
             "size": 0,
             "isDir": false,
             "abs": false,
-            "selected": false
           }
         ],
         "begin": false,
@@ -454,11 +455,9 @@ export class FileTableComponent implements OnInit, OnDestroy {
             "base": "package.json",
             "ext": ".json",
             "date": "",
-            "error": "",
             "size": 0,
             "isDir": false,
-            "abs": false,
-            "selected": false
+            "abs": false
           }
         ],
         "begin": false,
@@ -481,11 +480,9 @@ export class FileTableComponent implements OnInit, OnDestroy {
             "base": "package.json",
             "ext": ".json",
             "date": "",
-            "error": "",
             "size": 0,
             "isDir": false,
-            "abs": false,
-            "selected": true
+            "abs": false
           }
         ],
         "begin": false,
@@ -498,14 +495,13 @@ export class FileTableComponent implements OnInit, OnDestroy {
     ]);
   }
 
-  removeRows<T>(rows: FileItemIf[], predicate: (a: FileItemIf, b: FileItemIf) => boolean) {
-    const am = this.bodyAreaModel
-    let allRows1 = am.getAllRows();
-    const allRows = allRows1.filter(r => !rows.some(rr => predicate(r, rr)));
-    console.info(allRows1.length, allRows.length);
-    am.setRows(allRows);
-
-  }
+  // removeRows<T>(rows: FileItemIf[], predicate: (a: FileItemIf, b: FileItemIf) => boolean) {
+  //   const am = this.bodyAreaModel
+  //   let allRows1 = am.getAllRows();
+  //   const allRows = allRows1.filter(r => !rows.some(rr => predicate(r, rr)));
+  //   console.info(allRows1.length, allRows.length);
+  //   am.setRows(allRows);
+  // }
 
   onTableReady(tableApi: TableApi) {
     this.tableApi = tableApi
@@ -634,7 +630,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
   private handleRelevantDirEvent(dirEvent: DirEventIf, zi: ZipUrlInfo) {
     if (!this.tableApi || !dirEvent || !this.dirPara) return;
 
-    console.info('handleDirEvent (' + this.panelIndex + ')', dirEvent); // TODO del handleDirEvent
+    console.info('file table (' + this.panelIndex + ') Relevant handleDirEvent: ', dirEvent); // TODO del handleDirEvent
 
     if (dirEvent.action === "list") {
       let rows = dirEvent.items ?
@@ -682,7 +678,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
     } else if (dirEvent.action === "unselect") {
       this.tableApi.findRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir)
         .forEach(r => {
-          r.selected = false;
+          this.setFileItemSelected(r, false);
           this.selectionManager.setRowSelected(r, false);
         });
       this.selectionManager.updateSelection();
@@ -691,7 +687,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
     } else if (dirEvent.action === "select") {
       this.tableApi.findRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir)
         .forEach(r => {
-          r.selected = true;
+          this.setFileItemSelected(r, true);
           this.selectionManager.setRowSelected(r, true);
         });
       this.selectionManager.updateSelection();
@@ -705,6 +701,13 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
     } else {
       console.warn("Unknown dir changedir action:", dirEvent);
+    }
+  }
+  
+  private setFileItemSelected(fileItem:FileItemIf, selected:boolean){
+    if (!fileItem.meta) {
+      fileItem.meta = new FileItemMeta();
+      fileItem.meta.selected = selected;
     }
   }
 
