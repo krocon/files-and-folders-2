@@ -1,10 +1,11 @@
+import {DirEvent, DirEventIf, FileItemIf, FilePara, fixPath} from "@fnf/fnf-data";
 import * as os from "os";
 import * as path from "path";
 import * as fse from "fs-extra";
-import {exec} from "child_process";
 import {slash2backSlash} from "./common/slash-2-backslash.fn";
-import {DirEvent, DirEventIf, FileItemIf, FilePara, fixPath} from "@fnf/fnf-data";
+import {clone} from "./common/clone";
 import {Logger} from "@nestjs/common";
+import {executeCommand} from "./common/execute-command";
 
 const platform = os.platform();
 const osx = platform === "darwin";
@@ -13,103 +14,97 @@ const linux = platform.indexOf("linux") === 0;
 
 const logger = new Logger("fn-move");
 
-export function move(para: FilePara): Promise<DirEventIf[]> {
+export async function move(para: FilePara): Promise<DirEventIf[]> {
 
   function createRet(targetUrl: string, para: FilePara): DirEventIf[] {
+    const item = clone<FileItemIf>(para.source);
+    item.dir = targetUrl;
     const ret: DirEventIf[] = [];
     const isDir = para.source.isDir;
     ret.push(new DirEvent(para.source.dir, [para.source], false, false, 1, "", isDir ? "unlinkDir" : "unlink"));
-    ret.push(new DirEvent(targetUrl, [{
-      ...para.source,
-      dir: targetUrl
-    }], false, false, 1, "", isDir ? "addDir" : "add"));
+    ret.push(new DirEvent(targetUrl, [item], false, false, 1, "", isDir ? "addDir" : "add"));
     return ret;
   }
 
+  function getCmd(
+    osx: boolean,
+    windows: boolean,
+    linux: boolean,
+    sourceUrl: string,
+    targetUrl: string,
+    sourceIsDirectory: boolean,
+    ptarget: FileItemIf,
+    psource: FileItemIf
+  ): string {
+    if (osx) {
+      // cmd mv "/Users/marc/__test/src/a" "/Users/marc/__test/target"
+      // cmd mv "/Users/marc/__test/src/DUDEN Deutsch 3. Klasse - Lernkalender.pdf" "/Users/marc/__test/target"
+      return "mv \"" + sourceUrl + "\" \"" + ptarget.dir + "\"";
 
-  return new Promise<DirEventIf[]>((resolve, reject) => {
-    if (!para || !para.source || !para.target) {
-      reject("Invalid argument exception!");
-      return;
+    } else if (windows) {
+      const bsTargetDir = slash2backSlash(ptarget.dir);
+      if (psource.isDir) {
+        // robocopy "test\demo\a1" ".\test\demo\mkdir1\a1" /e /move
+        let bsSource = `${slash2backSlash(sourceUrl)}`;
+        return `robocopy  "${bsSource}" "${bsTargetDir}" /e /move`;
+      } else {
+        const bsSourceDir = slash2backSlash(psource.dir);
+        return `robocopy  "${bsSourceDir}" "${bsTargetDir}" ${psource.base}  /move`;
+      }
+
+    } else if (linux) {
+      if (sourceIsDirectory) {
+        // dir to dir:
+        // rsync -avzh /root/rpmpkgs /tmp/backups/
+        return `rsync --remove-source-files -avzh "${sourceUrl}" "${targetUrl}"`;
+      } else {
+        // file to dir:
+        // rsync -zvh backup.tar.gz /tmp/backups/
+        return `rsync --remove-source-files -zvh "${sourceUrl}" "${targetUrl}"`;
+      }
     }
-    const ptarget: FileItemIf = para.target;
-    const psource: FileItemIf = para.source;
+  }
 
-    const source:string = fixPath(path.join(psource.dir, "/", psource.base));
-    const target:string = fixPath(path.join(ptarget.dir, "/", ptarget.base));
+  try {
+    if (!para || !para.source || !para.target) {
+      throw new Error("Invalid argument exception!");
+    }
+    const ptarget = para.target;
+    const psource = para.source;
 
-    fse.stat(source, (error, stats) => {
-      const sourceIsDirectory = stats.isDirectory(); // source only, target not exists!
-      const targetMkdir = sourceIsDirectory ? target : ptarget.dir;
+    const sourceUrl = fixPath(
+      path.join(psource.dir, "/", psource.base ? psource.base : "")
+    );
+    const targetUrl = fixPath(
+      path.join(ptarget.dir, "/", ptarget.base ? ptarget.base : "")
+    );
 
-      fse.mkdirs(targetMkdir, (error) => {
-        if (error) {
-          reject(error);
-          return;
-        }
+    const stats = await fse.stat(sourceUrl);
+    if (!stats) {
+      throw new Error("Could not get stats for source file");
+    }
 
-        let cmd;
-        //const t = target;
-        if (osx) {
-          // cmd mv "/Users/marc/__test/src/a" "/Users/marc/__test/target"
-          // cmd mv "/Users/marc/__test/src/DUDEN Deutsch 3. Klasse - Lernkalender.pdf" "/Users/marc/__test/target"
-          cmd = "mv \"" + source + "\" \"" + ptarget.dir + "\"";
+    const sourceIsDirectory = stats.isDirectory(); // source only, target not exists!
+    const targetMkdir = sourceIsDirectory ? targetUrl : ptarget.dir;
 
-        } else if (windows) {
+    await fse.mkdirs(targetMkdir);
 
-          const bsTargetDir = slash2backSlash(ptarget.dir);
-          if (psource.isDir) {
-            // robocopy "test\demo\a1" ".\test\demo\mkdir1\a1" /e /move
-            let bsSource = `${slash2backSlash(source)}`;
-            cmd = `robocopy  "${bsSource}" "${bsTargetDir}" /e /move`;
-          } else {
-            const bsSourceDir = slash2backSlash(psource.dir);
-            cmd = `robocopy  "${bsSourceDir}" "${bsTargetDir}" ${psource.base}  /move`;
-          }
+    const cmd = getCmd(osx, windows, linux, sourceUrl, targetUrl, sourceIsDirectory, ptarget, psource);
+    logger.log("cmd: " + cmd);
 
-        } else if (linux) {
-          if (sourceIsDirectory) {
-            // dir to dir:
-            // rsync -avzh /root/rpmpkgs /tmp/backups/
-            cmd = `rsync --remove-source-files -avzh "${source}" "${target}"`;
-          } else {
-            // file to dir:
-            // rsync -zvh backup.tar.gz /tmp/backups/
-            cmd = `rsync --remove-source-files -zvh "${source}" "${target}"`;
-          }
-        }
+    try {
+      await executeCommand(cmd);
+      return createRet(targetUrl, para);
 
-        logger.log("cmd: " + cmd);
-
-        exec(cmd, (error, stdout, stderr) => {
-          const realError = stdout?.match(
-            /[\s\S]*----[\s\S]*(ERROR\s*:?\s*[\s\S]*?)(Simple Usage|$)/
-          );
-
-          //const item1 = new DirEvent(para.source.dir, [para.source], false, false, 1, "", para.source.isDir ? "unlinkDir" : "unlink");
-          //const targetItem = clone<FileItemIf>(para.target);
-          //const item2 = new DirEvent(para.target.dir, [targetItem], false, false, 1, "", para.source.isDir ? "addDir" : "add");
-          //const ret: DirEventIf[] = [item1, item2];
-
-          if (realError) {
-            logger.error(realError);
-            // zweiter Versuch:
-            fse.move(source, target, (error) => {
-              if (error) {
-                logger.error(error);
-                reject(error);
-              } else {
-                const ret = createRet(target, para);
-                resolve(ret);
-              }
-            });
-          } else {
-            const ret = createRet(target, para);
-            resolve(ret);
-          }
-        });
-      });
-    });
-  });
-
+    } catch (error) {
+      // second try:
+      logger.error(error);
+      const to = path.join(targetUrl, "/", para.source.base);
+      await fse.move(sourceUrl, to);
+      return createRet(targetUrl, para);
+    }
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
 }
