@@ -376,16 +376,8 @@ export class AppService {
         new CopyOrMoveDialogData(sources, this.getOtherPanelSelectedTabData().path, "copy"),
         (target) => {
           if (target) {
-            // TODO hier gehts weiter
             const paras: FileOperationParams[] = this.createFileOperationParams(target);
-            console.info('paras', paras);
             const actionEvents = paras.map(item => this.commandService.copy(item));
-            console.info('actionEvents', actionEvents);
-
-            // console.info('paras', paras);
-            // this.updateFocusRowCritereaOnInactivePanel({dir: paras[0].target.dir, base: paras[0].source.base});
-            //
-            // const actionEvents = paras.map(item => this.commandService.copy(item));
             this.commandService.addActions(actionEvents);
           }
         }
@@ -403,8 +395,6 @@ export class AppService {
         (target) => {
           if (target) {
             const paras: FileOperationParams[] = this.createFileOperationParams(target);
-            this.updateFocusRowCritereaOnInactivePanel({dir: paras[0].target.dir, base: paras[0].source.base});
-
             const actionEvents = paras.map(item => this.commandService.move(item));
             this.commandService.addActions(actionEvents);
           }

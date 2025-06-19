@@ -138,20 +138,7 @@ export class CommandService {
     const source = para.source;
     const srcPanelIndex = para.srcPanelIndex;
     const target = para.target;
-    const targetPanelIndex = para.targetPanelIndex;
     const bulk = para.bulk || false;
-
-    // TODO Send event to show a placeholder in the target table
-    // if (!bulk && targetPanelIndex !== undefined) {
-    //   // Send event to show a placeholder in the target table
-    //   this.eventService.next({
-    //     type: 'created',
-    //     data: {
-    //       panelIndex: targetPanelIndex,
-    //       item: {dir: target.dir, base: target.base, status: 'temp'}
-    //     }
-    //   });
-    // }
 
     return this.createActionEvent(
       this.actionQueueService.ACTION_COPY,
@@ -170,32 +157,8 @@ export class CommandService {
     const source = para.source;
     const srcPanelIndex = para.srcPanelIndex;
     const target = para.target;
-    const targetPanelIndex = para.targetPanelIndex;
+    // const targetPanelIndex = para.targetPanelIndex;
     const bulk = para.bulk || false;
-
-    if (!bulk) {
-      // Send events to show placeholders
-      // if (srcPanelIndex !== undefined) {
-      //   this.eventService.next({
-      //     type: 'update',
-      //     data: {
-      //       panelIndex: srcPanelIndex,
-      //       item: {dir: source.dir, base: source.base, status: 'temp'}
-      //     }
-      //   });
-      // }
-      //
-      // if (targetPanelIndex !== undefined) {
-      //   this.eventService.next({
-      //     type: 'created',
-      //     data: {
-      //       panelIndex: targetPanelIndex,
-      //       item: {dir: target.dir, base: target.base, status: 'temp'}
-      //     }
-      //   });
-      // }
-    }
-
     return this.createActionEvent(
       this.actionQueueService.ACTION_MOVE,
       source,

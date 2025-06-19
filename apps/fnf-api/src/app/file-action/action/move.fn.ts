@@ -4,7 +4,6 @@ import * as fse from "fs-extra";
 import {exec} from "child_process";
 import {slash2backSlash} from "./common/slash-2-backslash.fn";
 import {DirEvent, DirEventIf, FileItemIf, FilePara, fixPath} from "@fnf/fnf-data";
-import {clone} from "./common/clone";
 import {Logger} from "@nestjs/common";
 
 const platform = os.platform();
@@ -15,16 +14,29 @@ const linux = platform.indexOf("linux") === 0;
 const logger = new Logger("fn-move");
 
 export function move(para: FilePara): Promise<DirEventIf[]> {
+
+  function createRet(targetUrl: string, para: FilePara): DirEventIf[] {
+    const ret: DirEventIf[] = [];
+    const isDir = para.source.isDir;
+    ret.push(new DirEvent(para.source.dir, [para.source], false, false, 1, "", isDir ? "unlinkDir" : "unlink"));
+    ret.push(new DirEvent(targetUrl, [{
+      ...para.source,
+      dir: targetUrl
+    }], false, false, 1, "", isDir ? "addDir" : "add"));
+    return ret;
+  }
+
+
   return new Promise<DirEventIf[]>((resolve, reject) => {
     if (!para || !para.source || !para.target) {
       reject("Invalid argument exception!");
       return;
     }
-    const ptarget = para.target;
-    const psource = para.source;
+    const ptarget: FileItemIf = para.target;
+    const psource: FileItemIf = para.source;
 
-    const source = fixPath(path.join(psource.dir, "/", psource.base));
-    const target = fixPath(path.join(ptarget.dir, "/", ptarget.base));
+    const source:string = fixPath(path.join(psource.dir, "/", psource.base));
+    const target:string = fixPath(path.join(ptarget.dir, "/", ptarget.base));
 
     fse.stat(source, (error, stats) => {
       const sourceIsDirectory = stats.isDirectory(); // source only, target not exists!
@@ -74,10 +86,10 @@ export function move(para: FilePara): Promise<DirEventIf[]> {
             /[\s\S]*----[\s\S]*(ERROR\s*:?\s*[\s\S]*?)(Simple Usage|$)/
           );
 
-          const item1 = new DirEvent(para.source.dir, [para.source], false, false, 1, "", para.source.isDir ? "unlinkDir" : "unlink");
-          const targetItem = clone<FileItemIf>(para.target);
-          const item2 = new DirEvent(para.target.dir, [targetItem], false, false, 1, "", para.source.isDir ? "addDir" : "add");
-          const ret: DirEventIf[] = [item1, item2];
+          //const item1 = new DirEvent(para.source.dir, [para.source], false, false, 1, "", para.source.isDir ? "unlinkDir" : "unlink");
+          //const targetItem = clone<FileItemIf>(para.target);
+          //const item2 = new DirEvent(para.target.dir, [targetItem], false, false, 1, "", para.source.isDir ? "addDir" : "add");
+          //const ret: DirEventIf[] = [item1, item2];
 
           if (realError) {
             logger.error(realError);
@@ -87,10 +99,12 @@ export function move(para: FilePara): Promise<DirEventIf[]> {
                 logger.error(error);
                 reject(error);
               } else {
+                const ret = createRet(target, para);
                 resolve(ret);
               }
             });
           } else {
+            const ret = createRet(target, para);
             resolve(ret);
           }
         });
