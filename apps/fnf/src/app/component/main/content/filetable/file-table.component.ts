@@ -53,6 +53,7 @@ import {SelectionManagerForObjectModels} from "./selection-manager";
 import {FileTableBodyModel} from "./file-table-body-model";
 import {TabsPanelData} from "../../../../domain/filepagedata/data/tabs-panel.data";
 import {Subject} from "rxjs";
+import {takeWhile} from "rxjs/operators";
 import {GridSelectionCountService} from "../../../../service/grid-selection-count.service";
 import {SelectionEvent} from "../../../../domain/filepagedata/data/selection-event";
 import {SelectionLocalStorage} from "./selection-local-storage";
@@ -141,6 +142,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
   private filterActive = false;
   private dirPara?: DirPara;
   private focusRowCriterea: Partial<FileItemIf> | null = null;
+
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
@@ -260,23 +262,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
       effect(() => {
         const selection = this.selectionManager.selection;
         const selectedRows = selection();
-        if (this.dirPara?.path) {
-          this.selectionLocalStorage?.persistSelection(this.dirPara?.path);
-        }
-        const selectionLabelData: SelectionEvent = this.gridSelectionCountService
-          .getSelectionCountData(
-            selectedRows,
-            this.bodyAreaModel?.getFilteredRows() ?? []
-          );
-        this.selectionChanged.next(selectionLabelData);
-
-        let rows: FileItemIf[] = [...selectedRows];
-        if (rows.length === 0
-          && this.bodyAreaModel.focusedRowIndex > -1
-          && this.bodyAreaModel.focusedRowIndex < this.bodyAreaModel.getRowCount()) {
-          rows = [this.bodyAreaModel.getRowByIndex(this.bodyAreaModel.focusedRowIndex)];
-        }
-        this.buttonStatesChanged.next(this.getButtonEnableStates(rows));
+        this.calcButtonStates(selectedRows);
       });
     });
 
@@ -290,14 +276,13 @@ export class FileTableComponent implements OnInit, OnDestroy {
       });
     });
 
-    runInInjectionContext(this.injector, () => {
-      effect(() => {
-        const actionEvent = this.appService.actionEvents();
+    this.appService.actionEvents$
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(actionEvent => {
         if (actionEvent && this.alive && this.selected) {
           this.actionCall(actionEvent);
         }
       });
-    });
 
     this.notifyService
       .valueChanges()
@@ -312,6 +297,30 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
 
+  private calcButtonStates<T>(selectedRows: FileItemIf[]) {
+    if (this.dirPara?.path) {
+      this.selectionLocalStorage?.persistSelection(this.dirPara?.path);
+    }
+    const selectionLabelData: SelectionEvent = this.gridSelectionCountService
+      .getSelectionCountData(
+        selectedRows,
+        this.bodyAreaModel?.getFilteredRows() ?? []
+      );
+    this.selectionChanged.next(selectionLabelData);
+
+    let rows: FileItemIf[] = [...selectedRows];
+    if (rows.length === 0
+      && this.bodyAreaModel.focusedRowIndex > -1
+      && this.bodyAreaModel.focusedRowIndex < this.bodyAreaModel.getRowCount()) {
+      const rowByIndex = this.bodyAreaModel.getRowByIndex(this.bodyAreaModel.focusedRowIndex);
+      if (rowByIndex.base !== DOT_DOT) {
+        rows = [rowByIndex];
+      }
+    }
+    this.buttonStatesChanged.next(this.getButtonEnableStates(rows));
+  }
+
+
   ngOnDestroy(): void {
     this.alive = false;
   }
@@ -323,7 +332,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
     } else if (evt.clickCount === 1 && evt.areaIdent === 'body' && this.tableModel) {
       if (this.tableApi) {
-        this.bodyAreaModel.focusedRowIndex = evt.rowIndex;
+        this.setFocus2Index(evt.rowIndex);
         this.selectionManager.handleGeMouseEvent(evt);
       }
     }
@@ -347,10 +356,10 @@ export class FileTableComponent implements OnInit, OnDestroy {
     this.handleDirEvent(
       [
         {
-          "dir": this.dirPara?.path??'',
+          "dir": this.dirPara?.path ?? '',
           "items": [
             {
-              "dir": this.dirPara?.path??'',
+              "dir": this.dirPara?.path ?? '',
               "base": "README.md",
               "ext": ".md",
               "date": "2025-05-31T20:12:12.282Z",
@@ -381,90 +390,13 @@ export class FileTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  private handleRelevantDirEvent(dirEvent: DirEventIf, zi: ZipUrlInfo) {
-    if (!this.tableApi || !dirEvent || !this.dirPara) return;
-
-    console.info('handleDirEvent ('+this.panelIndex+')', dirEvent); // TODO del handleDirEvent
-
-    if (dirEvent.action === "list") {
-      let rows = dirEvent.items ?
-        dirEvent.items.filter(fi => (
-          fi.dir === this.dirPara?.path
-          || isSameDir(fi.dir, this.dirPara?.path ?? '')
-          || isRoot(fi.dir) && isRoot(zi.zipInnerUrl))
-        ) :
-        [];
-
-      if (!isRoot(this.dirPara.path)) {
-        rows = [
-          new FileItem(getParent(this.dirPara.path), "..", "", "", "", 1, true),
-          ...rows
-        ];
-      }
-
-      if (this.tableApi) {
-        this.setRows(rows);
-
-        const selectionLabelData: SelectionEvent = this.gridSelectionCountService
-          .getSelectionCountData(
-            [],
-            this.bodyAreaModel?.getFilteredRows() ?? []
-          );
-        this.selectionChanged.next(selectionLabelData);
-      }
-      // console.info('handleDirEvent ' + this.panelIndex, dirEvents);
-      if (dirEvent.end) {
-        this.appService.resetFocusRowCriterea();
-      }
-
-    } else if (dirEvent.action === "add" || dirEvent.action === "addDir") {
-      this.tableApi.addRows(dirEvent.items)
-      // this.checkAndAddItems(dirEvent.items);
-      this.repaintTable();
-      console.info(this.bodyAreaModel.getAllRows());
-
-    } else if (dirEvent.action === "unlink" || dirEvent.action === "unlinkDir") {
-      console.info('this.tableApi.removeRows')
-      this.tableApi.removeRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
-      this.repaintTable();
-      //this.checkAndRemoveItems(dirEvent.items);
-
-    } else if (dirEvent.action === "unselect") {
-      this.tableApi.findRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir)
-        .forEach(r => {
-          r.selected = false;
-          this.selectionManager.setRowSelected(r, false);
-        });
-      this.selectionManager.updateSelection();
-      this.repaintTable();
-
-    } else if (dirEvent.action === "select") {
-      this.tableApi.findRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir)
-        .forEach(r => {
-          r.selected = true;
-          this.selectionManager.setRowSelected(r, true);
-        });
-      this.selectionManager.updateSelection();
-      this.repaintTable();
-
-    } else if (dirEvent.action === "change") {
-      this.tableApi.updateRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
-      this.repaintTable();
-      //console.info('TODO handleDirEvent "change"', dirEvent);
-      //this.reload();
-
-    } else {
-      console.warn("Unknown dir changedir action:", dirEvent);
-    }
-  }
-
-  testAdd(){
+  testAdd() {
     this.handleDirEvent([
       {
-        "dir": this.dirPara?.path??'',
+        "dir": this.dirPara?.path ?? '',
         "items": [
           {
-            "dir": this.dirPara?.path??'',
+            "dir": this.dirPara?.path ?? '',
             "base": "NESTJS_TESTING_MIGRATION.md",
             "ext": ".md",
             "date": "",
@@ -484,14 +416,14 @@ export class FileTableComponent implements OnInit, OnDestroy {
       }
     ]);
   }
-  
-  testUnlink(){
+
+  testUnlink() {
     this.handleDirEvent([
       {
-        "dir": this.dirPara?.path??'',
+        "dir": this.dirPara?.path ?? '',
         "items": [
           {
-            "dir": this.dirPara?.path??'',
+            "dir": this.dirPara?.path ?? '',
             "base": "package.json",
             "ext": ".json",
             "date": "",
@@ -512,13 +444,13 @@ export class FileTableComponent implements OnInit, OnDestroy {
     ]);
   }
 
-  testUnselect(){
+  testUnselect() {
     this.handleDirEvent([
       {
-        "dir": this.dirPara?.path??'',
+        "dir": this.dirPara?.path ?? '',
         "items": [
           {
-            "dir": this.dirPara?.path??'',
+            "dir": this.dirPara?.path ?? '',
             "base": "package.json",
             "ext": ".json",
             "date": "",
@@ -539,13 +471,13 @@ export class FileTableComponent implements OnInit, OnDestroy {
     ]);
   }
 
-  testSelect(){
+  testSelect() {
     this.handleDirEvent([
       {
-        "dir": this.dirPara?.path??'',
+        "dir": this.dirPara?.path ?? '',
         "items": [
           {
-            "dir": this.dirPara?.path??'',
+            "dir": this.dirPara?.path ?? '',
             "base": "package.json",
             "ext": ".json",
             "date": "",
@@ -623,35 +555,24 @@ export class FileTableComponent implements OnInit, OnDestroy {
         }
       }
 
+
     } else if (action === "HOME_PRESSED") {
-      this.bodyAreaModel.focusedRowIndex = 0;
-      this.appService.resetFocusRowCriterea();
-      this.tableApi?.repaint();
+      this.setFocus2Index(0);
 
     } else if (action === "END_PRESSED") {
-      this.bodyAreaModel.focusedRowIndex = Math.max(0, this.bodyAreaModel.getRowCount() - 1);
-      this.appService.resetFocusRowCriterea();
-      this.tableApi?.repaint();
+      this.setFocus2Index(Math.max(0, this.bodyAreaModel.getRowCount() - 1));
 
     } else if (action === "ARROW_UP") {
-      this.bodyAreaModel.focusedRowIndex = Math.max(0, this.bodyAreaModel.focusedRowIndex - 1);
-      this.appService.resetFocusRowCriterea();
-      this.tableApi?.repaint();
+      this.setFocus2Index(Math.max(0, this.bodyAreaModel.focusedRowIndex - 1));
 
     } else if (action === "ARROW_DOWN") {
-      this.bodyAreaModel.focusedRowIndex = Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.focusedRowIndex + 1);
-      this.appService.resetFocusRowCriterea();
-      this.tableApi?.repaint();
+      this.setFocus2Index(Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.focusedRowIndex + 1));
 
     } else if (action === "PAGEUP_PRESSED") {
-      this.bodyAreaModel.focusedRowIndex = Math.max(0, this.bodyAreaModel.focusedRowIndex - this.getDisplayedRowCount() + 1);
-      this.appService.resetFocusRowCriterea();
-      this.tableApi?.repaint();
+      this.setFocus2Index(Math.max(0, this.bodyAreaModel.focusedRowIndex - this.getDisplayedRowCount() + 1));
 
     } else if (action === "PAGEDOWN_PRESSED") {
-      this.bodyAreaModel.focusedRowIndex = Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.focusedRowIndex + this.getDisplayedRowCount() + 1);
-      this.appService.resetFocusRowCriterea();
-      this.tableApi?.repaint();
+      this.setFocus2Index(Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.focusedRowIndex + this.getDisplayedRowCount() + 1));
 
     } else if (action === "NAVIGATE_LEVEL_DOWN") {
       const fileItem = this.bodyAreaModel.getRowByIndex(0);
@@ -700,6 +621,93 @@ export class FileTableComponent implements OnInit, OnDestroy {
     }
   }
 
+  setFocus2Index(index: number) {
+    this.bodyAreaModel.focusedRowIndex = index;
+    this.appService.resetFocusRowCriterea();
+    this.tableApi?.repaint();
+
+    const selection = this.selectionManager.selection;
+    const selectedRows = selection();
+    this.calcButtonStates(selectedRows);
+  }
+
+  private handleRelevantDirEvent(dirEvent: DirEventIf, zi: ZipUrlInfo) {
+    if (!this.tableApi || !dirEvent || !this.dirPara) return;
+
+    console.info('handleDirEvent (' + this.panelIndex + ')', dirEvent); // TODO del handleDirEvent
+
+    if (dirEvent.action === "list") {
+      let rows = dirEvent.items ?
+        dirEvent.items.filter(fi => (
+          fi.dir === this.dirPara?.path
+          || isSameDir(fi.dir, this.dirPara?.path ?? '')
+          || isRoot(fi.dir) && isRoot(zi.zipInnerUrl))
+        ) :
+        [];
+
+      if (!isRoot(this.dirPara.path)) {
+        rows = [
+          new FileItem(getParent(this.dirPara.path), "..", "", "", "", 1, true),
+          ...rows
+        ];
+      }
+
+      if (this.tableApi) {
+        this.setRows(rows);
+
+        const selectionLabelData: SelectionEvent = this.gridSelectionCountService
+          .getSelectionCountData(
+            [],
+            this.bodyAreaModel?.getFilteredRows() ?? []
+          );
+        this.selectionChanged.next(selectionLabelData);
+      }
+      // console.info('handleDirEvent ' + this.panelIndex, dirEvents);
+      if (dirEvent.end) {
+        this.appService.resetFocusRowCriterea();
+      }
+
+    } else if (dirEvent.action === "add" || dirEvent.action === "addDir") {
+      this.tableApi.addRows(dirEvent.items)
+      // this.checkAndAddItems(dirEvent.items);
+      this.repaintTable();
+      console.info(this.bodyAreaModel.getAllRows());
+
+    } else if (dirEvent.action === "unlink" || dirEvent.action === "unlinkDir") {
+      console.info('this.tableApi.removeRows')
+      this.tableApi.removeRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
+      this.repaintTable();
+      //this.checkAndRemoveItems(dirEvent.items);
+
+    } else if (dirEvent.action === "unselect") {
+      this.tableApi.findRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir)
+        .forEach(r => {
+          r.selected = false;
+          this.selectionManager.setRowSelected(r, false);
+        });
+      this.selectionManager.updateSelection();
+      this.repaintTable();
+
+    } else if (dirEvent.action === "select") {
+      this.tableApi.findRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir)
+        .forEach(r => {
+          r.selected = true;
+          this.selectionManager.setRowSelected(r, true);
+        });
+      this.selectionManager.updateSelection();
+      this.repaintTable();
+
+    } else if (dirEvent.action === "change") {
+      this.tableApi.updateRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
+      this.repaintTable();
+      //console.info('TODO handleDirEvent "change"', dirEvent);
+      //this.reload();
+
+    } else {
+      console.warn("Unknown dir changedir action:", dirEvent);
+    }
+  }
+
   private getRowByCriteria(criteria: FileItemIf): FileItemIf | undefined {
     const rowData = this.bodyAreaModel.getFilteredRows();
     return rowData.find(row => row.base === criteria.base && row.dir === criteria.dir);
@@ -721,10 +729,10 @@ export class FileTableComponent implements OnInit, OnDestroy {
             Object.entries(this.focusRowCriterea!)
               .every(([key, value]) => row[key as keyof FileItemIf] === value)
         );
-        this.bodyAreaModel.focusedRowIndex = rowIndex ?? 0;
+        this.setFocus2Index(rowIndex ?? 0);
       }
       if (this.bodyAreaModel.focusedRowIndex >= this.bodyAreaModel.getRowCount()) {
-        this.bodyAreaModel.focusedRowIndex = Math.max(0, this.bodyAreaModel.getRowCount() - 1);
+        this.setFocus2Index(Math.max(0, this.bodyAreaModel.getRowCount() - 1));
       }
       this.tableApi.repaintHard();
     }
@@ -805,7 +813,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
   private isRelevantDir(f1: string, f2: string, zi: ZipUrlInfo): boolean {
     const sd = isSameDir(f1, f2);
-    console.info('isRelevantDir ' +  f1 +', ' + f2, sd);
+    console.info('isRelevantDir ' + f1 + ', ' + f2, sd);
     if (sd) return true;
     return isSameDir(f1, zi.zipUrl + ":");
   }
@@ -816,5 +824,3 @@ export class FileTableComponent implements OnInit, OnDestroy {
       || value.base.toLowerCase().includes(this.filterText.toLowerCase());
   }
 }
-
-

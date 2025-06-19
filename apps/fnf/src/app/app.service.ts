@@ -7,7 +7,7 @@ import {ConfigService} from "./service/config.service";
 import {FileSystemService} from "./service/file-system.service";
 import {environment} from "../environments/environment";
 import {Config, DirEventIf, DirPara, FileItemIf, Sysinfo, SysinfoIf} from "@fnf-data";
-import {firstValueFrom, tap} from "rxjs";
+import {BehaviorSubject, firstValueFrom, Subject, tap} from "rxjs";
 import {PanelIndex} from "./domain/panel-index";
 import {FilePageData} from "./domain/filepagedata/data/file-page.data";
 import {DockerRootDeletePipe} from "./component/main/header/tabpanel/filemenu/docker-root-delete.pipe";
@@ -53,10 +53,11 @@ export class AppService {
   public readonly config = signal<Config | null>(null);
   public readonly changeDirRequest = signal<ChangeDirEvent | null>(null);
 
-  // Signal for directory events
+
   public readonly dirEvents = signal<Map<string, DirEventIf[]>>(new Map());
 
-  public readonly actionEvents = signal<ActionId>("DO_NOTHING");
+  public readonly actionEvents$ = new Subject<ActionId>();
+
   public bodyAreaModels: [FileTableBodyModel | undefined, FileTableBodyModel | undefined] = [undefined, undefined];
   public selectionManagers: [SelectionManagerForObjectModels<FileItemIf> | undefined, SelectionManagerForObjectModels<FileItemIf> | undefined] = [undefined, undefined];
 
@@ -342,9 +343,8 @@ export class AppService {
       //   this.filePageData.update(v=> this.clone(v));
 
     } else {
-      console.log('> appService this.actionEvents.set(id);:', id);
-      this.actionEvents.set(id);
-      setTimeout(() => this.actionEvents.set('DUMMY_ACTION'), 50); // workaround
+      console.log('> appService this.actionEventsSubject.next(id):', id);
+      this.actionEvents$.next(id);
     }
   }
 
@@ -377,6 +377,7 @@ export class AppService {
         (target) => {
           if (target) {
             const paras: FileOperationParams[] = this.createFileOperationParams(target);
+            console.info('paras', paras);
             this.updateFocusRowCritereaOnInactivePanel({dir: paras[0].target.dir, base: paras[0].source.base});
 
             const actionEvents = paras.map(item => this.commandService.copy(item));

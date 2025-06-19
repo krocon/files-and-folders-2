@@ -5,6 +5,7 @@ import {
   inject,
   Injector,
   Input,
+  OnDestroy,
   OnInit,
   Output,
   runInInjectionContext,
@@ -25,6 +26,7 @@ import {FormsModule} from "@angular/forms";
 import {AppService} from "../../../../app.service";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {ActionShortcutPipe} from "../../../../common/action-shortcut.pipe";
+import {takeWhile} from "rxjs/operators";
 
 @Component({
   selector: 'app-tabpanel',
@@ -44,7 +46,7 @@ import {ActionShortcutPipe} from "../../../../common/action-shortcut.pipe";
   templateUrl: './tabpanel.component.html',
   styleUrl: './tabpanel.component.css'
 })
-export class TabpanelComponent implements OnInit {
+export class TabpanelComponent implements OnInit, OnDestroy {
 
   // @Input() filterText: string = '';
 
@@ -64,6 +66,7 @@ export class TabpanelComponent implements OnInit {
 
   private readonly appService = inject(AppService);
   private readonly injector = inject(Injector);
+  private alive = true;
 
   private _tabsPanelData?: TabsPanelData;
 
@@ -76,9 +79,9 @@ export class TabpanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    runInInjectionContext(this.injector, () => {
-      effect(() => {
-        const action = this.appService.actionEvents();
+    this.appService.actionEvents$
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(action => {
         if (action === 'SELECT_LEFT_PANEL') {
           this.appService.setPanelActive(0);
           this.openMenu(this.panelIndex === 1);
@@ -90,7 +93,10 @@ export class TabpanelComponent implements OnInit {
           this.openMenu(this.panelIndex === 0);
         }
       });
-    });
+  }
+
+  ngOnDestroy(): void {
+    this.alive = false;
   }
 
   onSelectedIndexChanged(n: number) {

@@ -132,7 +132,7 @@
   <div class="footer-bottom-div fnf-footer-bg-color fnf-footer-fg-color">
     @if (initialized) {
     <app-button-panel
-        [buttonEnableStates]="buttonEnableStates"></app-button-panel>
+        [buttonEnableStates]="buttonEnableStatesArr[activePanelIndex()]"></app-button-panel>
     }
   </div>
 

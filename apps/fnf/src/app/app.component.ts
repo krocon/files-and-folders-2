@@ -82,7 +82,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
   filePageData: FilePageData = this.appService.filePageData();
   selectionEvents: SelectionEvent[] = this.panelIndices
     .map(i => new SelectionEvent());
-  buttonEnableStates = new ButtonEnableStates();
+  buttonEnableStatesArr = [
+    new ButtonEnableStates(),
+    new ButtonEnableStates()
+  ];
 
   @ViewChild('splitPaneMain') private readonly splitPaneMainRef!: ElementRef<HTMLDivElement>;
   @ViewChild('splitPaneLeft') private readonly splitPaneLeftRef!: ElementRef<HTMLDivElement>;
@@ -177,7 +180,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
   // ----------------------------------
 
   onButtonStatesChanged(states: ButtonEnableStates, number: number) {
-    this.buttonEnableStates = states;
+    this.buttonEnableStatesArr[number] = states;
   }
 
   private updatePathes(): void {
