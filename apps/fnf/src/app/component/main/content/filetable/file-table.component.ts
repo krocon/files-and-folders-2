@@ -311,7 +311,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
     } else if (evt.clickCount === 1 && evt.areaIdent === 'body' && this.tableModel) {
       if (this.tableApi) {
-        this.setFocus2Index(evt.rowIndex);
+        if (evt.rowIndex>-1) this.setFocus2Index(evt.rowIndex);
         this.selectionManager.handleGeMouseEvent(evt);
       }
     }
