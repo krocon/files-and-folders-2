@@ -11,7 +11,7 @@ export type ShortcutActionMapping = { [key: string]: string };
 export class ShortcutService {
 
   private static readonly config = {
-    getShortcutActionMappingUrl: "assets/config/shortcut/windows.json"
+    getShortcutActionMappingUrl: "assets/config/shortcut/"
   };
 
   // Initialize with default shortcuts to ensure something is available before init() is called
@@ -26,9 +26,9 @@ export class ShortcutService {
     Object.assign(ShortcutService.config, config);
   }
 
-  async init(): Promise<void> {
+  async init(sys:'osx' | 'windows'): Promise<ShortcutActionMapping> {
     try {
-      const shortcutMappings = await this.fetchShortcutMappings();
+      const shortcutMappings = await this.fetchShortcutMappings(sys);
       if (shortcutMappings) {
         this.activeShortcuts = this.updateShortcutMappings(shortcutMappings);
       }
@@ -37,6 +37,7 @@ export class ShortcutService {
       console.error('Failed to initialize shortcuts:', error);
       throw error;
     }
+    return this.activeShortcuts;
   }
 
   createHarmonizedShortcutByKeyboardEvent(keyboardEvent: KeyboardEvent): string {
@@ -70,11 +71,18 @@ export class ShortcutService {
     return this.activeShortcuts;
   }
 
-  private async fetchShortcutMappings(): Promise<ShortcutActionMapping | undefined> {
+  private async fetchShortcutMappings(sys:'osx' | 'windows'): Promise<ShortcutActionMapping | undefined> {
     return await this.httpClient
-      .get<ShortcutActionMapping>(ShortcutService.config.getShortcutActionMappingUrl)
+      .get<ShortcutActionMapping>(ShortcutService.config.getShortcutActionMappingUrl+sys+'.json')
       .toPromise();
   }
+
+  public addAdditionalShortcutMappings(map: ShortcutActionMapping): void {
+    Object.entries(map).forEach(([key, value]) => {
+      this.activeShortcuts[harmonizeShortcut(key)] = value;
+    });
+  }
+
 
   private updateShortcutMappings(fetchedMappings: ShortcutActionMapping): ShortcutActionMapping {
     const updatedMappings: ShortcutActionMapping = {...this.activeShortcuts};

@@ -109,8 +109,8 @@ export class ButtonPanelComponent implements OnInit {
   onButtonClick(action: string): void {
     if (action === 'copy') {
       this.appService.copy();
-    } else if (action === 'edit') {
-      this.appService.onEditClicked();
+    // } else if (action === 'edit') {
+    //   this.appService.onEditClicked();
     } else if (action === 'move') {
       this.appService.move();
     } else if (action === 'mkdir') {
@@ -155,7 +155,6 @@ export class ButtonPanelComponent implements OnInit {
   }
 
   onToolClicked(tool: CmdIf) {
-    console.info('onToolClicked', tool);
     this.appService.execute(tool);
   }
 }

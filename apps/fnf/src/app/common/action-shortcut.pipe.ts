@@ -5,25 +5,17 @@ import {ShortcutService} from "../service/shortcut.service";
 @Pipe({name: "fnfShortcut", pure: false})
 export class ActionShortcutPipe implements PipeTransform {
 
-  private shortcutCache: { [key: string]: string } = {};
-  private initialized = false;
+  public static shortcutCache: { [key: string]: string } = {};
 
   constructor(
     private readonly shortcutService: ShortcutService
   ) {
-    // Initialize shortcuts when pipe is created
-    this.initShortcuts();
   }
 
   transform(action: string): string {
     // If we have a cached value, return it immediately
-    if (this.shortcutCache[action]) {
-      return this.shortcutCache[action];
-    }
-
-    // If not initialized yet, trigger initialization and return empty string for now
-    if (!this.initialized) {
-      this.initShortcuts();
+    if (ActionShortcutPipe.shortcutCache[action]) {
+      return ActionShortcutPipe.shortcutCache[action];
     }
 
     // Get shortcuts synchronously
@@ -31,33 +23,13 @@ export class ActionShortcutPipe implements PipeTransform {
 
     // Cache and return the result
     if (shortcutsByAction && shortcutsByAction.length > 0) {
-      this.shortcutCache[action] = shortcutsByAction[0];
+      ActionShortcutPipe.shortcutCache[action] = shortcutsByAction[0];
       return shortcutsByAction[0];
     }
 
-    this.shortcutCache[action] = '';
+    ActionShortcutPipe.shortcutCache[action] = '';
     return '';
   }
 
-  private initShortcuts(): void {
-    // Only initialize once
-    if (this.initialized) return;
-
-    // Check if shortcuts need to be loaded
-    if (Object.keys(this.shortcutService['activeShortcuts']).length === 0) {
-      this.shortcutService
-        .init()
-        .then(() => {
-          this.initialized = true;
-          // Clear cache to force re-evaluation
-          this.shortcutCache = {};
-        })
-        .catch(err => {
-          console.error('Error initializing shortcuts:', err);
-        });
-    } else {
-      this.initialized = true;
-    }
-  }
 
 }

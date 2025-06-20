@@ -19,7 +19,7 @@ export const environment = {
     getLookAndFeelUrl: "assets/config/color/%theme%.json"
   },
   shortcut: {
-    getShortcutActionMappingUrl: "assets/config/shortcut/windows.json"
+    getShortcutActionMappingUrl: "assets/config/shortcut/"
   },
   edit: {
     getFile: "api/file?name=",

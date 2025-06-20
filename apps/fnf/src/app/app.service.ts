@@ -1,6 +1,6 @@
-import {computed, effect, inject, Injectable, Injector, runInInjectionContext, Signal, signal} from "@angular/core";
+import {effect, inject, Injectable, Injector, runInInjectionContext, signal} from "@angular/core";
 import {LookAndFeelService} from "./service/look-and-feel.service";
-import {ShortcutService} from "./service/shortcut.service";
+import {ShortcutActionMapping, ShortcutService} from "./service/shortcut.service";
 import {SysinfoService} from "./service/sysinfo.service";
 import {FilePageDataService} from "./domain/filepagedata/file-page-data.service";
 import {ConfigService} from "./service/config.service";
@@ -14,7 +14,6 @@ import {DockerRootDeletePipe} from "./component/main/header/tabpanel/filemenu/do
 import {PanelSelectionService} from "./domain/filepagedata/service/panel-selection.service";
 import {LatestDataService} from "./domain/filepagedata/service/latest-data.service";
 import {FavDataService} from "./domain/filepagedata/service/fav-data.service";
-import {takeWhile} from "rxjs/operators";
 import {ChangeDirEventService} from "./service/change-dir-event.service";
 import {ChangeDirEvent} from "./service/change-dir-event";
 import {ActionId} from "./domain/action/fnf-action.enum";
@@ -37,6 +36,7 @@ import {MkdirDialogData} from "./component/cmd/mkdir/mkdir-dialog.data";
 import {MkdirDialogResultData} from "./component/cmd/mkdir/mkdir-dialog-result.data";
 import {ShortcutDialogService} from "./component/shortcut/shortcut-dialog.service";
 import {ToolService} from "./service/tool.service";
+import {ActionShortcutPipe} from "./common/action-shortcut.pipe";
 
 @Injectable({
   providedIn: "root"
@@ -62,9 +62,8 @@ export class AppService {
   public bodyAreaModels: [FileTableBodyModel | undefined, FileTableBodyModel | undefined] = [undefined, undefined];
   public selectionManagers: [SelectionManagerForObjectModels<FileItemIf> | undefined, SelectionManagerForObjectModels<FileItemIf> | undefined] = [undefined, undefined];
 
-  private alive = true;
   private injector = inject(Injector);
-
+  private defaultTools: CmdIf[] = [];
 
   constructor(
     private readonly lookAndFeelService: LookAndFeelService,
@@ -90,7 +89,6 @@ export class AppService {
     SysinfoService.forRoot(environment.sysinfo);
     LookAndFeelService.forRoot(environment.lookAndFeel);
     ShortcutService.forRoot(environment.shortcut);
-    // EditDataService.forRoot(environment.edit);
     FileSystemService.forRoot(environment.fileSystem);
     FileActionService.forRoot(environment.fileAction);
     GotoAnythingDialogService.forRoot(environment.gotoAnything);
@@ -98,29 +96,24 @@ export class AppService {
 
     // Initialize signals with data from observables
     this.favDataService.valueChanges()
-      .pipe(takeWhile(() => this.alive))
       .subscribe(o => {
         this.favs.set(o.filter((his, i, arr) => arr.indexOf(his) === i));
       });
 
     this.latestDataService.valueChanges()
-      .pipe(takeWhile(() => this.alive))
       .subscribe(o => {
         this.latest.set(o.filter((his, i, arr) => arr.indexOf(his) === i));
       });
 
     this.sysinfoService.getDrives()
-      .pipe(takeWhile(() => this.alive))
       .subscribe(winDrives => this.winDrives.set(winDrives));
 
     this.sysinfoService.getSysinfo()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(sysinfo => this.sysinfo.set(sysinfo));
+      .subscribe(sysinfo => {
+        this.sysinfo.set(sysinfo);
+      });
 
     this.configService.getConfig()
-      .pipe(
-        takeWhile(() => this.alive)
-      )
       .subscribe(config => {
         this.config.set(config);
         this.dockerRoot.set(config.dockerRoot);
@@ -128,7 +121,6 @@ export class AppService {
 
     // Initialize filePageData signal from FilePageDataService
     this.filePageDataService.valueChanges()
-      .pipe(takeWhile(() => this.alive))
       .subscribe(data => this.filePageData.set(data));
 
     // Set up effect for changeDirRequest
@@ -137,7 +129,6 @@ export class AppService {
       effect(() => {
         this.changeDirEventService.valueChanges()
           .pipe(
-            takeWhile(() => this.alive),
             tap(console.warn)
           )
           .subscribe(event => this.changeDirRequest.set(event));
@@ -148,27 +139,45 @@ export class AppService {
     runInInjectionContext(this.injector, () => {
       effect(() => {
         const changeDirEvent = this.changeDirRequest();
-        if (changeDirEvent && this.alive) {
+        if (changeDirEvent) {
           this.setPathToActiveTabInGivenPanel(changeDirEvent.path, changeDirEvent.panelIndex);
         }
       });
     });
   }
 
-  ngOnDestroy(): void {
-    this.alive = false;
-  }
-
   public async init(callback: Function) {
     // init look and feel (LaF):
     await this.lookAndFeelService.init();
 
-    // init shortcuts:
-    await this.shortcutService.init();
+    const sysInfo: SysinfoIf | undefined = await this.sysinfoService.getSysinfo().toPromise();
+    if (sysInfo) {
+      const sys = sysInfo.osx ? 'osx' : 'windows';
+
+      // init shortcuts:
+      const shortcutMapping: ShortcutActionMapping = await this.shortcutService.init(sys);
+      ActionShortcutPipe.shortcutCache = shortcutMapping;
+
+      // init tools:
+      const defaultTools: CmdIf[] | undefined = await this.toolService.fetchTools(sys);
+      if (defaultTools) {
+        this.defaultTools = defaultTools;
+        const toolMappings: ShortcutActionMapping = {};
+        for (const tool of defaultTools) {
+          toolMappings[tool.shortcut] = tool.id;
+        }
+        console.info('        > defaultTools', defaultTools);
+        console.info('        > toolMappings', toolMappings);
+
+        this.shortcutService.addAdditionalShortcutMappings(toolMappings);
+        console.info('        > active shortcuts', this.shortcutService.getActiveShortcuts());
+      }
+    }
+
 
     // Get config using firstValueFrom instead of subscribe
     try {
-      const config = await firstValueFrom(this.configService.getConfig());
+      const config:Config = await firstValueFrom(this.configService.getConfig());
       console.info('        > Config       :', config);
       DockerRootDeletePipe.dockerRoot = config.dockerRoot;
     } catch (error) {
@@ -216,9 +225,9 @@ export class AppService {
   //   this.updateFilePageData(currentData);
   // }
 
-  public getDirEvents(path: string): Signal<DirEventIf[] | undefined> {
-    return computed(() => this.dirEvents().get(path));
-  }
+  // public getDirEvents(path: string): Signal<DirEventIf[] | undefined> {
+  //   return computed(() => this.dirEvents().get(path));
+  // }
 
   public async checkPath(path: string): Promise<string> {
     return await firstValueFrom(this.fileSystemService.checkPath(path));
@@ -279,13 +288,7 @@ export class AppService {
     this.latestDataService.addLatest(item);
   }
 
-  /**
-   * Handles various actions specified by the given action identifier.
-   * Executes the corresponding logic based on the action type.
-   *
-   * @param {ActionId} id The identifier of the action to trigger.
-   * @return {void} No return value.
-   */
+
   triggerAction(id: ActionId) {
     console.log('> triggerAction:', id);
 
@@ -346,6 +349,14 @@ export class AppService {
       //   this.filePageData.update(v=> this.clone(v));
 
     } else {
+
+      for (const tool of this.defaultTools) {
+        if (tool.id === id) {
+          this.execute(tool);
+          return;
+        }
+      }
+
       console.log('> appService this.actionEventsSubject.next(id):', id);
       this.actionEvents$.next(id);
     }
@@ -427,7 +438,6 @@ export class AppService {
       );
   }
 
-
   delete() {
     const selectedData: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
     const sources: string[] = this.getSourcePaths(selectedData);
@@ -456,15 +466,6 @@ export class AppService {
 
   getActionByKeyEvent(keyboardEvent: KeyboardEvent): ActionId {
     return this.shortcutService.getActionByKeyEvent(keyboardEvent) as ActionId;
-  }
-
-  onEditClicked() {
-    // TODO
-    // const selectedData = this.getSelectedData();
-    // if (selectedData.length === 1) {
-    //   const name = selectedData[0].dir + "/" + selectedData[0].base; // + '.' + selectedData[0].ext;
-    //   this.editFile(name);
-    // }
   }
 
 
@@ -510,9 +511,9 @@ export class AppService {
     }
   }
 
-  createHarmonizedShortcutByKeyboardEvent(keyboardEvent: KeyboardEvent): string {
-    return this.shortcutService.createHarmonizedShortcutByKeyboardEvent(keyboardEvent);
-  }
+  // createHarmonizedShortcutByKeyboardEvent(keyboardEvent: KeyboardEvent): string {
+  //   return this.shortcutService.createHarmonizedShortcutByKeyboardEvent(keyboardEvent);
+  // }
 
   setBodyAreaModel(panelIndex: PanelIndex, m: FileTableBodyModel) {
     this.bodyAreaModels[panelIndex] = m;
@@ -565,7 +566,7 @@ export class AppService {
   }
 
   getDefaultTools(): CmdIf[] {
-    return this.toolService.getDefaultTools(this.sysinfo());
+    return this.defaultTools;
   }
 
   execute(cmd: CmdIf) {
@@ -628,9 +629,9 @@ export class AppService {
     this.updateFocusRowCriterea(this.getActivePanelIndex(), focusRowCriterea);
   }
 
-  private updateFocusRowCritereaOnInactivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
-    this.updateFocusRowCriterea(this.getInactivePanelIndex(), focusRowCriterea);
-  }
+  // private updateFocusRowCritereaOnInactivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
+  //   this.updateFocusRowCriterea(this.getInactivePanelIndex(), focusRowCriterea);
+  // }
 
   private updateFocusRowCriterea(panelIndex: PanelIndex, focusRowCriterea: Partial<FileItemIf> | null) {
     const filePageDataValue = this.clone(this.filePageDataService.getValue());
@@ -641,7 +642,6 @@ export class AppService {
 
   private createFileOperationParams(target: FileItemIf): FileOperationParams[] {
     const selectedData = this.getSelectedOrFocussedDataForActivePanel();
-    // const sources: string[] = this.getSourcePaths(selectedData);
     const srcPanelIndex = this.getActivePanelIndex();
     const targetPanelIndex = this.getInactivePanelIndex();
     return selectedData.map(item =>
