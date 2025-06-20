@@ -569,7 +569,7 @@ export class AppService {
   }
 
   execute(cmd: CmdIf) {
-    const currentDir = this.getOtherPanelSelectedTabData().path;
+    const currentDir = this.getActiveTabOnActivePanel().path;
     const fileItems: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
 
     const cmds: CmdIf[] = [];
