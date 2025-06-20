@@ -211,4 +211,19 @@ export class CommandService {
   }
 
 
+  open(para: FileOperationParams): ActionEvent {
+    const source = para.source;
+    const srcPanelIndex = para.srcPanelIndex;
+    const target = para.target;
+    const bulk = para.bulk || false;
+
+    return this.createActionEvent(
+      this.actionQueueService.ACTION_OPEN,
+      source,
+      target,
+      srcPanelIndex,
+      bulk
+    );
+  }
+
 }

@@ -7,7 +7,7 @@ import {ConfigService} from "./service/config.service";
 import {FileSystemService} from "./service/file-system.service";
 import {environment} from "../environments/environment";
 import {Config, DirEventIf, DirPara, FileItemIf, Sysinfo, SysinfoIf} from "@fnf-data";
-import {BehaviorSubject, firstValueFrom, Subject, tap} from "rxjs";
+import {firstValueFrom, Subject, tap} from "rxjs";
 import {PanelIndex} from "./domain/panel-index";
 import {FilePageData} from "./domain/filepagedata/data/file-page.data";
 import {DockerRootDeletePipe} from "./component/main/header/tabpanel/filemenu/docker-root-delete.pipe";
@@ -541,9 +541,24 @@ export class AppService {
   }
 
 
-
   resetFocusRowCriterea() {
     this.updateFocusRowCritereaOnActivePanel(null);
+  }
+
+  open(fileItem?: FileItemIf) {
+    const srcPanelIndex = this.getActivePanelIndex();
+    if (!fileItem) {
+      const rows = this.getSelectedOrFocussedData(srcPanelIndex);
+      if (rows?.length === 1) {
+        fileItem = rows[0];
+      }
+    }
+    if (fileItem) {
+      const actionEvent = this.commandService.open(
+        new FileOperationParams(fileItem, srcPanelIndex, fileItem)
+      );
+      this.commandService.addActions([actionEvent]);
+    }
   }
 
   private removeTab() {
@@ -635,7 +650,6 @@ export class AppService {
     return [activeTab.path];
   }
 
-
   private clone<T>(o: T): T {
     return JSON.parse(JSON.stringify(o));
   }
@@ -664,7 +678,6 @@ export class AppService {
     return ret ?? [];
   }
 
-
   private getFocussedData(panelIndex: PanelIndex): FileItemIf | null {
     if (this.bodyAreaModels[panelIndex]) {
       const focusedRowIndex = this.bodyAreaModels[panelIndex]?.focusedRowIndex ?? 0;
@@ -673,5 +686,4 @@ export class AppService {
     }
     return null;
   }
-
 }

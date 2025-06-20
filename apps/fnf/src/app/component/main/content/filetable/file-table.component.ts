@@ -307,7 +307,11 @@ export class FileTableComponent implements OnInit, OnDestroy {
   onMouseClicked(evt: GeMouseEvent) {
     if (evt.clickCount === 2 && evt.areaIdent === 'body' && this.tableModel) {
       const fileItem: FileItemIf = this.bodyAreaModel.getRowByIndex(evt.rowIndex);
-      this.changeDir(fileItem);
+      if (fileItem.isDir) {
+        this.changeDir(fileItem);
+      } else {
+        this.appService.open(fileItem);
+      }
 
     } else if (evt.clickCount === 1 && evt.areaIdent === 'body' && this.tableModel) {
       if (this.tableApi) {
@@ -523,6 +527,8 @@ export class FileTableComponent implements OnInit, OnDestroy {
         const row = this.bodyAreaModel.getRowByIndex(r);
         if (row?.isDir) {
           this.changeDir(row);
+        } else {
+          this.appService.open(row);
         }
       }
 

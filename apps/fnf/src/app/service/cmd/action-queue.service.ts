@@ -32,6 +32,7 @@ export class ActionQueueService {
   // Action Event Keys
   readonly ACTION_REFRESH_PANEL: ActionEventType = 'refresh_panel';
   readonly ACTION_MKDIR: ActionEventType = 'mkdir';
+  readonly ACTION_OPEN: ActionEventType = 'open';
   readonly ACTION_COPY: ActionEventType = 'copy';
   readonly ACTION_MOVE: ActionEventType = 'move';
   readonly ACTION_REMOVE: ActionEventType = 'remove';
