@@ -1,7 +1,6 @@
 <div class="button-panel-container">
   <div class="button-panel">
 
-
     @for (button of buttons; track button) {
       <button
           (click)="onButtonClick(button.action)"
@@ -37,7 +36,6 @@
       Actions
       <mat-icon>keyboard_arrow_up</mat-icon>
     </button>
-
     <mat-menu #menuAction="matMenu" >
 
       <div class="menu-container">
@@ -247,6 +245,24 @@
 
 
     </mat-menu>
+
+
+
+
+    <button class="panel-button row-reverse" mat-stroked-button [matMenuTriggerFor]="menuTools">
+      Tools <mat-icon>keyboard_arrow_up</mat-icon>
+    </button>
+    <mat-menu #menuTools="matMenu">
+      @for (tool of tools; track tool) {
+      <button mat-menu-item (click)="onToolClicked(tool)">
+        {{tool.label}}
+        <span class="float-right">
+          <fnf-shortcut [keys]="tool.shortcut.split(' ')"></fnf-shortcut>
+        </span>
+      </button>
+      }
+    </mat-menu>
+
 
 
     <button

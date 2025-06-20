@@ -38,6 +38,9 @@ export const environment = {
   },
   gotoAnything: {
     findFoldersUrl: prefix + "/api/findfolders"
+  },
+  tool: {
+    shellUrl: prefix + "/api/shell"
   }
 };
 

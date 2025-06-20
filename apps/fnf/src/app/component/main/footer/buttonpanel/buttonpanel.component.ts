@@ -10,7 +10,7 @@ import {AppService} from "../../../../app.service";
 import {ActionId} from "../../../../domain/action/fnf-action.enum";
 import {MatBottomSheet} from "@angular/material/bottom-sheet";
 import {TaskList} from "../../../task/task-list/task-list";
-import {ButtonEnableStates, buttonEnableStatesKey} from "@fnf/fnf-data";
+import {ButtonEnableStates, buttonEnableStatesKey, CmdIf} from "@fnf/fnf-data";
 import {MatList} from "@angular/material/list";
 import {NotifyService} from "../../../../service/cmd/notify-service";
 import {NotifyEventIf} from "../../../../domain/cmd/notify-event.if";
@@ -77,6 +77,8 @@ export class ButtonPanelComponent implements OnInit {
     // },
   ];
 
+  tools: CmdIf[]=[];
+
   constructor(
     private readonly appService: AppService,
     private readonly matBottomSheet: MatBottomSheet,
@@ -94,7 +96,8 @@ export class ButtonPanelComponent implements OnInit {
           console.info('NotifyEventIf', evt);
           console.info(this.actionQueueService.getQueues());
         }
-      )
+      );
+    this.tools = this.appService.getDefaultTools();
   }
 
 
@@ -149,5 +152,10 @@ export class ButtonPanelComponent implements OnInit {
 
   openShortcutDlg(evt: MouseEvent) {
     this.triggerAction('OPEN_SHORTCUT_DLG');
+  }
+
+  onToolClicked(tool: CmdIf) {
+    console.info('onToolClicked', tool);
+    this.appService.execute(tool);
   }
 }

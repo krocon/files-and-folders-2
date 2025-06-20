@@ -16,6 +16,7 @@ import {ConfigModule} from "./config/config.module";
 import {FindModule} from "./find/find.module";
 import {Config} from "@fnf/fnf-data";
 import {FindFolderModule} from "./findfolder/find-folder.module";
+import {CmdModule} from "./cmd/cmd.module";
 
 const config = new Config(
   process.env.FNF_INCOMPATIBLE_PATHS ? process.env.FNF_INCOMPATIBLE_PATHS.split(",") : [],
@@ -38,6 +39,7 @@ const config = new Config(
     FileActionModule,
     WalkModule,
     FindModule,
+    CmdModule,
     FindFolderModule.forRoot(
       config
     ),

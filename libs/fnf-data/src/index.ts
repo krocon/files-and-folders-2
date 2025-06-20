@@ -43,6 +43,9 @@ export * from './models/findfolder/find-folder.para';
 
 export * from './models/sysinfo/sysinfo.if';
 export * from './models/sysinfo/sysinfo';
+
+export * from './models/shell/cmd.if';
+
 export { getParent } from "./models/file/get-parent";
 export { isSameDir } from "./models/file/is-same-dir";
 export { isRoot } from "./models/file/is-root";

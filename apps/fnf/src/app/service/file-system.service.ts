@@ -43,7 +43,7 @@ export class FileSystemService {
     private readonly httpClient: HttpClient
   ) {
     this.watcherObservable = this.socket
-      .fromEvent<DirEventIf, string>("watchingxxx")
+      .fromEvent<DirEventIf, string>("watchingxxx") // disabled xxx
       .pipe(
         map(o => [o]),
       );

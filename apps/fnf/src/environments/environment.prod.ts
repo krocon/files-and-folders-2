@@ -31,5 +31,8 @@ export const environment = {
   },
   gotoAnything: {
     findFoldersUrl: "api/findfolders"
+  },
+  tool: {
+    shellUrl: "api/shell"
   }
 };

@@ -6,7 +6,7 @@ import {FilePageDataService} from "./domain/filepagedata/file-page-data.service"
 import {ConfigService} from "./service/config.service";
 import {FileSystemService} from "./service/file-system.service";
 import {environment} from "../environments/environment";
-import {Config, DirEventIf, DirPara, FileItemIf, Sysinfo, SysinfoIf} from "@fnf-data";
+import {CmdIf, Config, DirEventIf, DirPara, FileItemIf, Sysinfo, SysinfoIf} from "@fnf-data";
 import {firstValueFrom, Subject, tap} from "rxjs";
 import {PanelIndex} from "./domain/panel-index";
 import {FilePageData} from "./domain/filepagedata/data/file-page.data";
@@ -36,6 +36,7 @@ import {MkdirDialogService} from "./component/cmd/mkdir/mkdir-dialog.service";
 import {MkdirDialogData} from "./component/cmd/mkdir/mkdir-dialog.data";
 import {MkdirDialogResultData} from "./component/cmd/mkdir/mkdir-dialog-result.data";
 import {ShortcutDialogService} from "./component/shortcut/shortcut-dialog.service";
+import {ToolService} from "./service/tool.service";
 
 @Injectable({
   providedIn: "root"
@@ -82,6 +83,7 @@ export class AppService {
     private readonly mkdirDialogService: MkdirDialogService,
     private readonly commandService: CommandService,
     private readonly shortcutDialogService: ShortcutDialogService,
+    private readonly toolService: ToolService,
   ) {
     // Set config to services:
     ConfigService.forRoot(environment.config);
@@ -92,6 +94,7 @@ export class AppService {
     FileSystemService.forRoot(environment.fileSystem);
     FileActionService.forRoot(environment.fileAction);
     GotoAnythingDialogService.forRoot(environment.gotoAnything);
+    ToolService.forRoot(environment.tool);
 
     // Initialize signals with data from observables
     this.favDataService.valueChanges()
@@ -559,6 +562,27 @@ export class AppService {
       );
       this.commandService.addActions([actionEvent]);
     }
+  }
+
+  getDefaultTools(): CmdIf[] {
+    return this.toolService.getDefaultTools(this.sysinfo());
+  }
+
+  execute(cmd: CmdIf) {
+    const currentDir = this.getOtherPanelSelectedTabData().path;
+    const fileItems: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
+
+    const cmds: CmdIf[] = [];
+    for (let i = 0; i < fileItems.length; i++) {
+      const fileItem = fileItems[i];
+      const cmdClone = this.clone(cmd);
+      cmdClone.para = cmdClone.para
+        .replace(/\$file/g, fileItem.dir + '/' + fileItem.base)
+        .replace(/\$dir/g, currentDir);
+      cmds.push(cmdClone);
+    }
+
+    this.toolService.execute(cmds);
   }
 
   private removeTab() {
