@@ -26,5 +26,15 @@ export class FileTableBodyModel extends AreaModelObjectArrayWithColumndefs<FileI
     return ret;
   }
 
+  public getRowIndexByCriteria(criteria: Partial<FileItemIf>): number {
+    return this.getFilteredRows().findIndex(
+      row => row.base === criteria.base && row.dir === criteria.dir
+    );
+  }
+
+  public getRowByCriteria(criteria: Partial<FileItemIf>): FileItemIf | undefined {
+    return this.getFilteredRows().find(row => row.base === criteria.base && row.dir === criteria.dir);
+  }
+
 
 }

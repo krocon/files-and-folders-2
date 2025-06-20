@@ -358,7 +358,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
   handleDirEvent(dirEvents: DirEventIf[]): void {
-    console.info('file table (' + this.panelIndex + ') all handleDirEvent:', dirEvents); // TODO del handleDirEvent
     if (this.tableApi && dirEvents && this.dirPara) {
       for (let i = 0; i < dirEvents.length; i++) {
         const dirEvent = dirEvents[i];
@@ -629,7 +628,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
   private handleRelevantDirEvent(dirEvent: DirEventIf, zi: ZipUrlInfo) {
     if (!this.tableApi || !dirEvent || !this.dirPara) return;
 
-    console.info('file table (' + this.panelIndex + ') Relevant handleDirEvent: ', dirEvent); // TODO del handleDirEvent
+    // console.info('file table (' + this.panelIndex + ') Relevant handleDirEvent: ', dirEvent); // TODO del handleDirEvent
 
     if (dirEvent.action === "list") {
       let rows = dirEvent.items ?
@@ -666,10 +665,8 @@ export class FileTableComponent implements OnInit, OnDestroy {
       this.tableApi.addRows(dirEvent.items)
       this.repaintTable();
       this.selectionManager.updateSelection();
-      console.info(this.bodyAreaModel.getAllRows());
 
     } else if (dirEvent.action === "unlink" || dirEvent.action === "unlinkDir") {
-      console.info('this.tableApi.removeRows')
       this.tableApi.removeRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
       this.bodyAreaModel.focusedRowIndex = Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.focusedRowIndex);
       this.repaintTable();
@@ -677,7 +674,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
     } else if (dirEvent.action === "focus") {
       this.focusRowCriterea = dirEvent.items[0];
-      console.info('this.focusRowCriterea', this.focusRowCriterea);
       this.updateFocusIndexByCriteria();
       this.repaintTable();
 
@@ -723,10 +719,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getRowByCriteria(criteria: FileItemIf): FileItemIf | undefined {
-    const rowData = this.bodyAreaModel.getFilteredRows();
-    return rowData.find(row => row.base === criteria.base && row.dir === criteria.dir);
-  }
+
 
   private setRows(fileItems: FileItemIf[]): void {
     if (this.tableApi) {
@@ -746,48 +739,9 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
   private updateFocusIndexByCriteria() {
     if (this.focusRowCriterea) {
-      const rows = this.bodyAreaModel.getFilteredRows();
-      const rowIndex = rows.findIndex(
-        row => row.base === this.focusRowCriterea?.base && row.dir === this.focusRowCriterea?.dir
-          // Object.entries(this.focusRowCriterea!)
-          //   .every(([key, value]) => row[key as keyof FileItemIf] === value)
-      );
+      const rowIndex = this.bodyAreaModel.getRowIndexByCriteria(this.focusRowCriterea );
       this.setFocus2Index(rowIndex ?? 0);
     }
-  }
-
-  private checkAndAddItems(items: FileItemIf[]) {
-    const rows: FileItemIf[] = [];
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (this.getIndexInRowData(item) === -1) {
-        rows.push(item);
-      }
-    }
-    this.setRows(rows);
-  }
-
-  private checkAndRemoveItems(items: FileItemIf[]) {
-    const rows: FileItemIf[] = this.bodyAreaModel.getAllRows();
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      const idx = this.getIndexInRowData(item);
-      if (idx > -1) {
-        rows.splice(idx, 1);
-      }
-    }
-    this.setRows(rows);
-  }
-
-  private getIndexInRowData(item: FileItemIf): number {
-    const rows = this.bodyAreaModel.getFilteredRows();
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      if (row.dir === item.dir && row.base === item.base) {
-        return i;
-      }
-    }
-    return -1;
   }
 
   private repaintTable() {
@@ -831,7 +785,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
   private isRelevantDir(f1: string, f2: string, zi: ZipUrlInfo): boolean {
     const sd = isSameDir(f1, f2);
-    console.info('isRelevantDir ' + f1 + ', ' + f2, sd);
     if (sd) return true;
     return isSameDir(f1, zi.zipUrl + ":");
   }
