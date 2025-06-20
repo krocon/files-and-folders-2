@@ -675,12 +675,24 @@ export class FileTableComponent implements OnInit, OnDestroy {
       this.repaintTable();
       this.selectionManager.updateSelection();
 
+    } else if (dirEvent.action === "focus") {
+      this.focusRowCriterea = dirEvent.items[0];
+      console.info('this.focusRowCriterea', this.focusRowCriterea);
+      this.updateFocusIndexByCriteria();
+      this.repaintTable();
+
     } else if (dirEvent.action === "unselect") {
       this.tableApi.findRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir)
         .forEach(r => {
           this.setFileItemSelected(r, false);
           this.selectionManager.setRowSelected(r, false);
         });
+      this.selectionManager.updateSelection();
+      this.repaintTable();
+
+    } else if (dirEvent.action === "unselectall") {
+      this.bodyAreaModel.getAllRows().forEach(r => this.setFileItemSelected(r, false));
+      this.selectionManager.clear();
       this.selectionManager.updateSelection();
       this.repaintTable();
 
@@ -724,20 +736,23 @@ export class FileTableComponent implements OnInit, OnDestroy {
       }
       this.tableApi.externalFilterChanged();
       this.tableApi.reSort();
-
-      if (this.focusRowCriterea) {
-        const rows = this.bodyAreaModel.getFilteredRows();
-        const rowIndex = rows.findIndex(
-          row =>
-            Object.entries(this.focusRowCriterea!)
-              .every(([key, value]) => row[key as keyof FileItemIf] === value)
-        );
-        this.setFocus2Index(rowIndex ?? 0);
-      }
+      this.updateFocusIndexByCriteria();
       if (this.bodyAreaModel.focusedRowIndex >= this.bodyAreaModel.getRowCount()) {
         this.setFocus2Index(Math.max(0, this.bodyAreaModel.getRowCount() - 1));
       }
       this.tableApi.repaintHard();
+    }
+  }
+
+  private updateFocusIndexByCriteria() {
+    if (this.focusRowCriterea) {
+      const rows = this.bodyAreaModel.getFilteredRows();
+      const rowIndex = rows.findIndex(
+        row => row.base === this.focusRowCriterea?.base && row.dir === this.focusRowCriterea?.dir
+          // Object.entries(this.focusRowCriterea!)
+          //   .every(([key, value]) => row[key as keyof FileItemIf] === value)
+      );
+      this.setFocus2Index(rowIndex ?? 0);
     }
   }
 

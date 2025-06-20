@@ -1,7 +1,6 @@
-import {DirEvent, DirEventIf, FileItemIf, FilePara, fixPath} from "@fnf/fnf-data";
+import {DirEvent, DirEventIf, FileItem, FilePara, fixPath} from "@fnf/fnf-data";
 import * as path from "path";
 import * as fse from "fs-extra";
-import {clone} from "./common/clone";
 
 
 export async function mkdir(para: FilePara): Promise<DirEventIf[]> {
@@ -22,8 +21,9 @@ export async function mkdir(para: FilePara): Promise<DirEventIf[]> {
     throw new Error("Could not get stats for target directory");
   }
 
-  const targetItem = clone<FileItemIf>(para.target);
+  const targetItem = new FileItem(para.target.dir, para.target.base, '', '', 0, true);
   const item1 = new DirEvent(para.target.dir, [targetItem], false, false, 1, "", "addDir");
-  const item2 = new DirEvent(para.target.dir, [targetItem], false, false, 1, "", "select");
-  return [item1, item2];
+  const item2 = new DirEvent(para.target.dir, [], false, false, 1, "", "unselectall");
+  const item3 = new DirEvent(para.target.dir, [targetItem], false, false, 1, "", "focus");
+  return [item1, item2, item3];
 }

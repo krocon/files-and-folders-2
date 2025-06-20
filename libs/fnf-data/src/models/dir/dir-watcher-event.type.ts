@@ -11,4 +11,6 @@ export type DirWatcherEventType =
   | "list"
   | "listpreview"
   | "select"
-  | "unselect";
+  | "focus"
+  | "unselect"
+  | "unselectall";

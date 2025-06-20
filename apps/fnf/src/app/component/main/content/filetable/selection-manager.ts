@@ -96,6 +96,9 @@ export class SelectionManagerForObjectModels<T> {
     this.updateSelection();
   }
 
+  clear(){
+    this.deSelectionAll();
+  }
   deSelectionAll() {
     this.bodyModel?.getAllRows().forEach((row: any) => this.setRowSelected(row, false));
     this.updateSelection();

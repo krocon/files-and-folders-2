@@ -368,6 +368,28 @@ export class AppService {
     });
   }
 
+  mkdir() {
+    const panelIndex = this.getActivePanelIndex();
+    const activeTabOnActivePanel = this.getActiveTabOnActivePanel();
+    const dir = activeTabOnActivePanel.path;
+    const focussedData = this.getFocussedData(panelIndex);
+    const data = new MkdirDialogData(dir, focussedData?.base ?? '');
+
+    this.mkdirDialogService
+      .open(data, (result: MkdirDialogResultData | undefined) => {
+        if (result) {
+          const para = {
+            dir: result.target.dir,
+            base: result.target.base,
+            panelIndex
+          };
+          this.updateFocusRowCritereaOnActivePanel({dir: para.dir, base: para.base});
+          const actionEvent = this.commandService.mkdir(para);
+          this.commandService.addActions([actionEvent]);
+        }
+      });
+  }
+
   copy() {
     const selectedData: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
     let sources: string[] = this.getSourcePaths(selectedData);
@@ -518,29 +540,7 @@ export class AppService {
     this.changeDir(new ChangeDirEvent(srcPanelIndex, path));
   }
 
-  mkdir() {
-    const panelIndex = this.getActivePanelIndex();
-    const activeTabOnActivePanel = this.getActiveTabOnActivePanel();
-    const dir = activeTabOnActivePanel.path;
-    const focussedData = this.getFocussedData(panelIndex);
-    const data = new MkdirDialogData(dir, focussedData?.base ?? '');
 
-
-    this.mkdirDialogService
-      .open(data, (result: MkdirDialogResultData | undefined) => {
-        if (result) {
-          const para = {
-            dir: result.target.dir,
-            base: result.target.base,
-            panelIndex
-          };
-          this.updateFocusRowCritereaOnActivePanel({dir: para.dir, base: para.base});
-
-          const actionEvent = this.commandService.mkdir(para);
-          this.commandService.addActions([actionEvent]);
-        }
-      });
-  }
 
   resetFocusRowCriterea() {
     this.updateFocusRowCritereaOnActivePanel(null);

@@ -74,6 +74,8 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
     // @ts-ignore
     if (fileItem.error && fileItem.error['code'] === "EPERM") return "fa fa-file-alt";
 
+    if (!fileItem.ext) return "fa fa-file-o";
+
     const ext = fileItem.ext;
     if (ext.match(/\.signature$/)) return "fa fa-file-signature-o";
     if (ext.match(/\.csv$/)) return "fa fa-file-csv-o";
