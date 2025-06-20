@@ -34,6 +34,7 @@ export class ToolService {
 
   getDefaultTools(systemFlags: SysinfoIf): CmdIf[] {
     const ret: CmdIf[] = [];
+
     if (systemFlags.windows) {
       ret.push({
         id: 'CMD_SHELL',
@@ -51,26 +52,26 @@ export class ToolService {
         shortcut: 'control 4',
         // ln -s "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" /usr/local/bin/sublime
         // see http://olivierlacan.com/posts/launch-sublime-text-3-from-the-command-line/
-        cmd: 'code',
+        cmd: 'code ',
         fileLimit: 4,
         para: ' $file ',
         local: true
       });
       ret.push({
-        "id": "CMD_SHELL",
-        "label": "CMD Shell",
-        "shortcut": "control 0",
-        "cmd": "open -a Terminal ",
-        "para": " $dir ",
-        "local": true
+        id: "CMD_SHELL",
+        label: "CMD Shell",
+        shortcut: "control 0",
+        cmd: "open -a Terminal ",
+        para: " $dir ",
+        local: true
       });
       ret.push({
-        "id": "CMD_REVEAL_IN_FINDER",
-        "label": "Reveal in Finder",
-        "shortcut": "control shift f",
-        "cmd": "open ",
-        "para": " $dir ",
-        "local": true
+        id: "CMD_REVEAL_IN_FINDER",
+        label: "Reveal in Finder",
+        shortcut: "control shift f",
+        cmd: "open ",
+        para: " $dir ",
+        local: true
       });
 
       // https://www.npmjs.com/package/ttab#manual-installation
