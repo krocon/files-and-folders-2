@@ -4,28 +4,24 @@ import * as path from "path";
 import * as StreamZip from "node-stream-zip";
 import * as fse from "fs-extra";
 
-export function unpack(para: FilePara): Promise<DirEventIf[]> {
-  return new Promise<DirEventIf[]>((resolve, reject) => {
-    if (!para || !para.source || !para.target) {
-      reject("Invalid argument exception!");
-      return;
-    }
-    const ptarget = para.target;
-    const psource = para.source;
+export async function unpack(para: FilePara): Promise<DirEventIf[]> {
+  if (!para || !para.source || !para.target) {
+    throw new Error("Invalid argument exception!");
+  }
+  const ptarget = para.target;
+  const psource = para.source;
 
-    const sourceUrl = fixPath(
-      path.join(psource.dir, "/", psource.base ? psource.base : "")
-    );
-    const targetUrl = fixPath(
-      path.join(ptarget.dir, "/", ptarget.base ? ptarget.base : "")
-    );
+  const sourceUrl = fixPath(
+    path.join(psource.dir, "/", psource.base ? psource.base : "")
+  );
+  const targetUrl = fixPath(
+    path.join(ptarget.dir, "/", ptarget.base ? ptarget.base : "")
+  );
 
-    fse.ensureDirSync(targetUrl);
+  fse.ensureDirSync(targetUrl);
 
-    const zip = new StreamZip.async({file: sourceUrl});
-    zip.extract(null, targetUrl).then(async count => {
-      await zip.close();
-      resolve([]);
-    });
-  });
+  const zip = new StreamZip.async({file: sourceUrl});
+  await zip.extract(null, targetUrl);
+  await zip.close();
+  return [];
 }

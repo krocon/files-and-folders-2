@@ -67,48 +67,43 @@ export async function copy(para: FilePara): Promise<DirEventIf[]> {
     }
   }
 
-  
-  
-  try {
-    if (!para || !para.source || !para.target) {
-      throw new Error("Invalid argument exception!");
-    }
-    const ptarget = para.target;
-    const psource = para.source;
 
-    const sourceUrl = fixPath(
-      path.join(psource.dir, "/", psource.base ? psource.base : "")
-    );
-    const targetUrl = fixPath(
-      path.join(ptarget.dir, "/", ptarget.base ? ptarget.base : "")
-    );
-
-    const stats = await fse.stat(sourceUrl);
-    if (!stats) {
-      throw new Error("Could not get stats for source file");
-    }
-
-    const sourceIsDirectory = stats.isDirectory(); // source only, target not exists!
-    const targetMkdir = sourceIsDirectory ? targetUrl : ptarget.dir;
-
-    await fse.mkdirs(targetMkdir);
-
-    const cmd = getCmd(osx, windows, linux, sourceUrl, targetUrl, sourceIsDirectory, ptarget, psource);
-    logger.log("cmd: " + cmd);
-
-    try {
-      await executeCommand(cmd);
-      return createRet(targetUrl, para);
-      
-    } catch (error) {
-      // second try:
-      logger.error(error);
-      const to = path.join(targetUrl, "/", para.source.base);
-      await fse.copy(sourceUrl, to);
-      return createRet(targetUrl, para);
-    }
-  } catch (error) {
-    logger.error(error);
-    throw error;
+  if (!para || !para.source || !para.target) {
+    throw new Error("Invalid argument exception!");
   }
+  const ptarget = para.target;
+  const psource = para.source;
+
+  const sourceUrl = fixPath(
+    path.join(psource.dir, "/", psource.base ? psource.base : "")
+  );
+  const targetUrl = fixPath(
+    path.join(ptarget.dir, "/", ptarget.base ? ptarget.base : "")
+  );
+
+  const stats = await fse.stat(sourceUrl);
+  if (!stats) {
+    throw new Error("Could not get stats for source file");
+  }
+
+  const sourceIsDirectory = stats.isDirectory(); // source only, target not exists!
+  const targetMkdir = sourceIsDirectory ? targetUrl : ptarget.dir;
+
+  await fse.mkdirs(targetMkdir);
+
+  const cmd = getCmd(osx, windows, linux, sourceUrl, targetUrl, sourceIsDirectory, ptarget, psource);
+  logger.log("cmd: " + cmd);
+
+  try {
+    await executeCommand(cmd);
+    return createRet(targetUrl, para);
+
+  } catch (error) {
+    // second try:
+    logger.error(error);
+    const to = path.join(targetUrl, "/", para.source.base);
+    await fse.copy(sourceUrl, to);
+    return createRet(targetUrl, para);
+  }
+
 }
