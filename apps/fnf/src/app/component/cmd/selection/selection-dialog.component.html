@@ -1,0 +1,44 @@
+<h2
+    data-test-id="page-subtitle-h2"
+    mat-dialog-title [innerText]="title"></h2>
+
+<mat-dialog-content>
+  <div class="dlg-content-div">
+
+
+    <form
+        [formGroup]="formGroup"
+        autocomplete="off">
+
+      <mat-form-field>
+        <input
+            (keydown.enter)="onOkClicked()"
+            [fnfAutofocus]="true"
+            formControlName="target"
+            matInput
+            placeholder="Pattern"/>
+        <mat-error></mat-error>
+      </mat-form-field>
+    </form>
+
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button
+      (click)="onCancelClicked()"
+      data-test-id="dialog-cancel-button"
+      mat-raised-button>
+    Cancel
+  </button>
+
+  <button
+      (click)="onOkClicked()"
+      [disabled]="!formGroup.valid"
+      color="primary"
+      data-test-id="dialog-ok-button"
+      mat-raised-button>
+    OK
+  </button>
+</mat-dialog-actions>

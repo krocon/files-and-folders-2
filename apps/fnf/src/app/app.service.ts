@@ -1,4 +1,4 @@
-import {effect, inject, Injectable, Injector, runInInjectionContext} from "@angular/core";
+import {inject, Injectable, Injector} from "@angular/core";
 import {LookAndFeelService} from "./service/look-and-feel.service";
 import {ShortcutActionMapping, ShortcutService} from "./service/shortcut.service";
 import {SysinfoService} from "./service/sysinfo.service";
@@ -7,7 +7,7 @@ import {ConfigService} from "./service/config.service";
 import {FileSystemService} from "./service/file-system.service";
 import {environment} from "../environments/environment";
 import {CmdIf, Config, DirEventIf, DirPara, FileItemIf, Sysinfo, SysinfoIf} from "@fnf-data";
-import {BehaviorSubject, firstValueFrom, map, Observable, Subject, tap} from "rxjs";
+import {BehaviorSubject, firstValueFrom, Subject} from "rxjs";
 import {PanelIndex} from "./domain/panel-index";
 import {FilePageData} from "./domain/filepagedata/data/file-page.data";
 import {DockerRootDeletePipe} from "./component/main/header/tabpanel/filemenu/docker-root-delete.pipe";
@@ -37,20 +37,22 @@ import {MkdirDialogResultData} from "./component/cmd/mkdir/mkdir-dialog-result.d
 import {ShortcutDialogService} from "./component/shortcut/shortcut-dialog.service";
 import {ToolService} from "./service/tool.service";
 import {ActionShortcutPipe} from "./common/action-shortcut.pipe";
+import {SelectionDialogService} from "./component/cmd/selection/selection-dialog.service";
+import {SelectionDialogData} from "./component/cmd/selection/selection-dialog.data";
 
 @Injectable({
   providedIn: "root"
 })
 export class AppService {
 
-  public sysinfo:SysinfoIf = new Sysinfo();
-  public dockerRoot:string='';
-  public config:Config | undefined = undefined;
+  public sysinfo: SysinfoIf = new Sysinfo();
+  public dockerRoot: string = '';
+  public config: Config | undefined = undefined;
 
-  public favs:string[]= [];
-  public latest:string[] = [];
-  public winDrives: string[] =[];
-  public filePageData:FilePageData=new FilePageData();
+  public favs: string[] = [];
+  public latest: string[] = [];
+  public winDrives: string[] = [];
+  public filePageData: FilePageData = new FilePageData();
 
   // Observable properties
   public readonly changeDirRequest$ = new Subject<ChangeDirEvent | null>();
@@ -83,6 +85,7 @@ export class AppService {
     private readonly commandService: CommandService,
     private readonly shortcutDialogService: ShortcutDialogService,
     private readonly toolService: ToolService,
+    private readonly selectionDialogService: SelectionDialogService,
   ) {
     // Set config to services:
     ConfigService.forRoot(environment.config);
@@ -104,7 +107,7 @@ export class AppService {
 
     this.sysinfoService
       .getDrives()
-      .subscribe(winDrives => this.winDrives= winDrives);
+      .subscribe(winDrives => this.winDrives = winDrives);
 
     this.filePageDataService
       .valueChanges()
@@ -122,13 +125,13 @@ export class AppService {
     });
   }
 
-  filePageDataChanges(){
+  filePageDataChanges() {
     return this.filePageDataService.valueChanges();
   }
 
   public async init(callback: Function) {
     this.config = await this.configService.getConfig();
-    this.dockerRoot= this.config?.dockerRoot ??'';
+    this.dockerRoot = this.config?.dockerRoot ?? '';
     DockerRootDeletePipe.dockerRoot = this.dockerRoot;
     console.info('        > Config       :', this.config);
 
@@ -291,7 +294,6 @@ export class AppService {
       this.addNewTab();
 
     } else if (id === 'SELECT_LEFT_PANEL') {
-
       this.panelSelectionService.update(0);
 
     } else if (id === 'SELECT_RIGHT_PANEL') {
@@ -318,11 +320,16 @@ export class AppService {
 
     } else if (id === "OPEN_MKDIR_DLG") {
       this.mkdir();
+
     } else if (id === "OPEN_SHORTCUT_DLG") {
       this.shortcutDialogService.open();
 
-      // } else if (id === "RELOAD_DIR") {
-      //   this.filePageData.update(v=> this.clone(v));
+    } else if (id === "ENHANCE_SELECTION") {
+      this.selectionDialogService.open(
+        new SelectionDialogData('', true),
+        (data) => {
+          console.info(data);
+        });
 
     } else {
 
