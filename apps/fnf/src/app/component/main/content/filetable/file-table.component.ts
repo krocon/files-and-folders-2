@@ -270,15 +270,14 @@ export class FileTableComponent implements OnInit, OnDestroy {
       });
     });
 
-    runInInjectionContext(this.injector, () => {
-      effect(() => {
-        const dirEventsMap = this.appService.dirEvents();
+    this.appService.dirEvents$
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(dirEventsMap => {
         if (this.dirPara?.path) {
           let dirEvents = dirEventsMap.get(this.dirPara.path);
           if (dirEvents) this.handleDirEvent(dirEvents);
         }
       });
-    });
 
     this.appService.actionEvents$
       .pipe(takeWhile(() => this.alive))

@@ -1,4 +1,4 @@
-import {effect, inject, Injectable, Injector, runInInjectionContext, signal} from "@angular/core";
+import {effect, inject, Injectable, Injector, runInInjectionContext} from "@angular/core";
 import {LookAndFeelService} from "./service/look-and-feel.service";
 import {ShortcutActionMapping, ShortcutService} from "./service/shortcut.service";
 import {SysinfoService} from "./service/sysinfo.service";
@@ -7,7 +7,7 @@ import {ConfigService} from "./service/config.service";
 import {FileSystemService} from "./service/file-system.service";
 import {environment} from "../environments/environment";
 import {CmdIf, Config, DirEventIf, DirPara, FileItemIf, Sysinfo, SysinfoIf} from "@fnf-data";
-import {firstValueFrom, Subject, tap} from "rxjs";
+import {BehaviorSubject, firstValueFrom, map, Observable, Subject, tap} from "rxjs";
 import {PanelIndex} from "./domain/panel-index";
 import {FilePageData} from "./domain/filepagedata/data/file-page.data";
 import {DockerRootDeletePipe} from "./component/main/header/tabpanel/filemenu/docker-root-delete.pipe";
@@ -52,9 +52,9 @@ export class AppService {
   public winDrives: string[] =[];
   public filePageData:FilePageData=new FilePageData();
 
-  // Signal properties
-  public readonly changeDirRequest = signal<ChangeDirEvent | null>(null);
-  public readonly dirEvents = signal<Map<string, DirEventIf[]>>(new Map());
+  // Observable properties
+  public readonly changeDirRequest$ = new Subject<ChangeDirEvent | null>();
+  public readonly dirEvents$ = new BehaviorSubject<Map<string, DirEventIf[]>>(new Map());
 
 
   public readonly actionEvents$ = new Subject<ActionId>();
@@ -94,7 +94,6 @@ export class AppService {
     GotoAnythingDialogService.forRoot(environment.gotoAnything);
     ToolService.forRoot(environment.tool);
 
-    // Initialize signals with data from observables
     this.favDataService
       .valueChanges()
       .subscribe(o => this.favs = (o.filter((his, i, arr) => arr.indexOf(his) === i)));
@@ -107,31 +106,19 @@ export class AppService {
       .getDrives()
       .subscribe(winDrives => this.winDrives= winDrives);
 
-    // Initialize filePageData signal from FilePageDataService
     this.filePageDataService
       .valueChanges()
       .subscribe(data => this.filePageData = data);
 
-    // Set up effect for changeDirRequest
-    // Wrap effect in runInInjectionContext to provide proper injection context
-    runInInjectionContext(this.injector, () => {
-      effect(() => {
-        this.changeDirEventService.valueChanges()
-          .pipe(
-            tap(console.warn)
-          )
-          .subscribe(event => this.changeDirRequest.set(event));
-      });
-    });
+    // Connect changeDirEventService to changeDirRequest$ observable
+    this.changeDirEventService.valueChanges()
+      .subscribe(event => this.changeDirRequest$.next(event));
 
     // Handle directory change requests
-    runInInjectionContext(this.injector, () => {
-      effect(() => {
-        const changeDirEvent = this.changeDirRequest();
-        if (changeDirEvent) {
-          this.setPathToActiveTabInGivenPanel(changeDirEvent.path, changeDirEvent.panelIndex);
-        }
-      });
+    this.changeDirRequest$.subscribe(changeDirEvent => {
+      if (changeDirEvent) {
+        this.setPathToActiveTabInGivenPanel(changeDirEvent.path, changeDirEvent.panelIndex);
+      }
     });
   }
 
@@ -183,17 +170,16 @@ export class AppService {
   }
 
 
-  // Methods using Signals
   public async fetchDir(para: DirPara): Promise<void> {
     this.fileSystemService
       .fetchDir(para)
       .subscribe(
         {
           next: events => {
-            const currentMap = this.dirEvents();
+            const currentMap = this.dirEvents$.getValue();
             const newMap = new Map(currentMap);
             newMap.set(para.path, events);
-            this.dirEvents.set(newMap);
+            this.dirEvents$.next(newMap);
           },
           error: error => {
             console.error('Error fetching dir:', para.path);
@@ -213,8 +199,10 @@ export class AppService {
   //   this.updateFilePageData(currentData);
   // }
 
-  // public getDirEvents(path: string): Signal<DirEventIf[] | undefined> {
-  //   return computed(() => this.dirEvents().get(path));
+  // public getDirEvents(path: string): Observable<DirEventIf[] | undefined> {
+  //   return this.dirEvents$.pipe(
+  //     map(dirEventsMap => dirEventsMap.get(path))
+  //   );
   // }
 
   public async checkPath(path: string): Promise<string> {
