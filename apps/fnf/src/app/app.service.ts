@@ -43,19 +43,19 @@ import {ActionShortcutPipe} from "./common/action-shortcut.pipe";
 })
 export class AppService {
 
+  public sysinfo:SysinfoIf = new Sysinfo();
+  public dockerRoot:string='';
+  public config:Config | undefined = undefined;
+
 
   // Signal properties
   public readonly favs = signal<string[]>([]);
   public readonly latest = signal<string[]>([]);
   public readonly winDrives = signal<string[]>([]);
-  public readonly sysinfo = signal<SysinfoIf>(new Sysinfo());
-  public readonly dockerRoot = signal<string>('');
   public readonly filePageData = signal<FilePageData>(new FilePageData());
-  public readonly config = signal<Config | null>(null);
   public readonly changeDirRequest = signal<ChangeDirEvent | null>(null);
-
-
   public readonly dirEvents = signal<Map<string, DirEventIf[]>>(new Map());
+
 
   public readonly actionEvents$ = new Subject<ActionId>();
 
@@ -108,17 +108,6 @@ export class AppService {
     this.sysinfoService.getDrives()
       .subscribe(winDrives => this.winDrives.set(winDrives));
 
-    this.sysinfoService.getSysinfo()
-      .subscribe(sysinfo => {
-        this.sysinfo.set(sysinfo);
-      });
-
-    this.configService.getConfig()
-      .subscribe(config => {
-        this.config.set(config);
-        this.dockerRoot.set(config.dockerRoot);
-      });
-
     // Initialize filePageData signal from FilePageDataService
     this.filePageDataService.valueChanges()
       .subscribe(data => this.filePageData.set(data));
@@ -147,11 +136,15 @@ export class AppService {
   }
 
   public async init(callback: Function) {
+    this.config = await this.configService.getConfig().toPromise();
+    this.dockerRoot= this.config?.dockerRoot ??'';
+
     // init look and feel (LaF):
     await this.lookAndFeelService.init();
 
     const sysInfo: SysinfoIf | undefined = await this.sysinfoService.getSysinfo().toPromise();
     if (sysInfo) {
+      this.sysinfo = sysInfo;
       const sys = sysInfo.osx ? 'osx' : 'windows';
 
       // init shortcuts:
@@ -364,8 +357,8 @@ export class AppService {
 
   debug() {
     console.clear();
-    console.info('sysinfo\n', JSON.stringify(this.sysinfo(), null, 4));
-    console.info('config\n', JSON.stringify(this.config(), null, 4));
+    console.info('sysinfo\n', JSON.stringify(this.sysinfo, null, 4));
+    console.info('config\n', JSON.stringify(this.config, null, 4));
     console.info('winDrives\n', JSON.stringify(this.winDrives(), null, 4));
     console.info('latest\n', JSON.stringify(this.latest(), null, 4));
     console.info('favs\n', JSON.stringify(this.favs(), null, 4));
