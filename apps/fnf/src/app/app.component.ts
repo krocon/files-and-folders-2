@@ -5,14 +5,12 @@ import {
   Component,
   computed,
   DoCheck,
-  effect,
   ElementRef,
   inject,
   Injector,
   OnDestroy,
   OnInit,
   Renderer2,
-  runInInjectionContext,
   ViewChild
 } from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
@@ -74,12 +72,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
   readonly favs = this.appService.favs;
   readonly dockerRoot = this.appService.dockerRoot;
 
-  counter = 0; // TODO do we relly need this?
-
   readonly panelIndices: PanelIndex[] = [0, 1];
   readonly activePanelIndex = computed(() => this.panelSelectionService.panelIndex());
 
-  filePageData: FilePageData = this.appService.filePageData();
+  filePageData: FilePageData = this.appService.filePageData;
   selectionEvents: SelectionEvent[] = this.panelIndices
     .map(i => new SelectionEvent());
   buttonEnableStatesArr = [
@@ -118,13 +114,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
       this.cdr.detectChanges();
     });
 
-    runInInjectionContext(this.injector, () => {
-      effect(() => {
-        const fd = this.appService.filePageData();
-        this.normalizeFilePageData(fd);
-        this.filePageData = {...fd};
-        this.cdr.detectChanges();
-      });
+    this.appService.filePageDataChanges().subscribe(fd => {
+      this.normalizeFilePageData(fd);
+      this.filePageData = {...fd};
+      this.cdr.detectChanges();
     });
   }
 
@@ -186,7 +179,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
   private updatePathes(): void {
     this.appService.model2local(0);
     this.appService.model2local(1);
-    this.counter = this.filePageData?.counter ?? 0;
   }
 
   private initializePanels(): void {

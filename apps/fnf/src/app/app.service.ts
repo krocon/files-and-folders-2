@@ -47,12 +47,12 @@ export class AppService {
   public dockerRoot:string='';
   public config:Config | undefined = undefined;
 
+  public favs:string[]= [];
+  public latest:string[] = [];
+  public winDrives: string[] =[];
+  public filePageData:FilePageData=new FilePageData();
 
   // Signal properties
-  public readonly favs = signal<string[]>([]);
-  public readonly latest = signal<string[]>([]);
-  public readonly winDrives = signal<string[]>([]);
-  public readonly filePageData = signal<FilePageData>(new FilePageData());
   public readonly changeDirRequest = signal<ChangeDirEvent | null>(null);
   public readonly dirEvents = signal<Map<string, DirEventIf[]>>(new Map());
 
@@ -97,20 +97,20 @@ export class AppService {
     // Initialize signals with data from observables
     this.favDataService.valueChanges()
       .subscribe(o => {
-        this.favs.set(o.filter((his, i, arr) => arr.indexOf(his) === i));
+        this.favs = (o.filter((his, i, arr) => arr.indexOf(his) === i));
       });
 
     this.latestDataService.valueChanges()
       .subscribe(o => {
-        this.latest.set(o.filter((his, i, arr) => arr.indexOf(his) === i));
+        this.latest = (o.filter((his, i, arr) => arr.indexOf(his) === i));
       });
 
     this.sysinfoService.getDrives()
-      .subscribe(winDrives => this.winDrives.set(winDrives));
+      .subscribe(winDrives => this.winDrives= winDrives);
 
     // Initialize filePageData signal from FilePageDataService
     this.filePageDataService.valueChanges()
-      .subscribe(data => this.filePageData.set(data));
+      .subscribe(data => this.filePageData = data);
 
     // Set up effect for changeDirRequest
     // Wrap effect in runInInjectionContext to provide proper injection context
@@ -133,6 +133,10 @@ export class AppService {
         }
       });
     });
+  }
+
+  filePageDataChanges(){
+    return this.filePageDataService.valueChanges();
   }
 
   public async init(callback: Function) {
@@ -228,18 +232,18 @@ export class AppService {
 
   public updateFilePageData(fileData: FilePageData) {
     // Update both the signal and the service
-    this.filePageData.set(this.clone(fileData));
+    this.filePageData = this.clone(fileData);
     this.filePageDataService.update(fileData);
   }
 
   public async initTabs() {
     // first start ever?
-    if (this.filePageData().default) {
+    if (this.filePageData.default) {
       console.info('        > Init Tabs.....');
       try {
         const startFolder = await firstValueFrom(this.sysinfoService.getFirstStartFolder());
         console.info('        > First Start  :', startFolder);
-        const v = this.clone(this.filePageData());
+        const v = this.clone(this.filePageData);
         v.default = false;
         v.tabRows[0].tabs[0].path = startFolder;
         v.tabRows[1].tabs[0].path = startFolder;
@@ -359,10 +363,10 @@ export class AppService {
     console.clear();
     console.info('sysinfo\n', JSON.stringify(this.sysinfo, null, 4));
     console.info('config\n', JSON.stringify(this.config, null, 4));
-    console.info('winDrives\n', JSON.stringify(this.winDrives(), null, 4));
-    console.info('latest\n', JSON.stringify(this.latest(), null, 4));
-    console.info('favs\n', JSON.stringify(this.favs(), null, 4));
-    console.info('filePageData\n', this.filePageData());
+    console.info('winDrives\n', JSON.stringify(this.winDrives, null, 4));
+    console.info('latest\n', JSON.stringify(this.latest, null, 4));
+    console.info('favs\n', JSON.stringify(this.favs, null, 4));
+    console.info('filePageData\n', this.filePageData);
     this.bodyAreaModels.forEach((bodyAreaModel, i) => {
       if (bodyAreaModel) {
         console.info('bodyAreaModel(' + i + ') focusedRowIndex:', bodyAreaModel.focusedRowIndex);
@@ -486,7 +490,7 @@ export class AppService {
   ): Promise<void> {
     try {
       const checkedPath: string = await this.checkPath(path);
-      const fileData: FilePageData = this.filePageData();
+      const fileData: FilePageData = this.filePageData;
       const tabData: TabData = this.getTabDataForPanelIndex(panelIndex);
       tabData.path = checkedPath;
       // add checkedPath on top:
@@ -648,7 +652,7 @@ export class AppService {
 
   private getOtherPanelSelectedTabData(): TabData {
     const inactivePanelIndex = [1, 0][this.getActivePanelIndex()];
-    const fpd: FilePageData = this.filePageData();
+    const fpd: FilePageData = this.filePageData;
     return fpd.tabRows[inactivePanelIndex].tabs[fpd.tabRows[inactivePanelIndex].selectedTabIndex];
   }
 
@@ -662,7 +666,7 @@ export class AppService {
       });
     }
     const panelIndex = this.getActivePanelIndex();
-    const fpd: FilePageData = this.filePageData();
+    const fpd: FilePageData = this.filePageData;
     const activeTab = fpd.tabRows[panelIndex].tabs[fpd.tabRows[panelIndex].selectedTabIndex];
     return [activeTab.path];
   }
@@ -672,7 +676,7 @@ export class AppService {
   }
 
   private getTabDataForPanelIndex(panelIndex: 0 | 1): TabData {
-    const fileData = this.filePageData();
+    const fileData = this.filePageData;
     const tabsPanelData = fileData.tabRows[panelIndex];
     return tabsPanelData.tabs[tabsPanelData.selectedTabIndex];
   }
