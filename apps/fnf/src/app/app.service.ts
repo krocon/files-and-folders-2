@@ -95,21 +95,21 @@ export class AppService {
     ToolService.forRoot(environment.tool);
 
     // Initialize signals with data from observables
-    this.favDataService.valueChanges()
-      .subscribe(o => {
-        this.favs = (o.filter((his, i, arr) => arr.indexOf(his) === i));
-      });
+    this.favDataService
+      .valueChanges()
+      .subscribe(o => this.favs = (o.filter((his, i, arr) => arr.indexOf(his) === i)));
 
-    this.latestDataService.valueChanges()
-      .subscribe(o => {
-        this.latest = (o.filter((his, i, arr) => arr.indexOf(his) === i));
-      });
+    this.latestDataService
+      .valueChanges()
+      .subscribe(o => this.latest = (o.filter((his, i, arr) => arr.indexOf(his) === i)));
 
-    this.sysinfoService.getDrives()
+    this.sysinfoService
+      .getDrives()
       .subscribe(winDrives => this.winDrives= winDrives);
 
     // Initialize filePageData signal from FilePageDataService
-    this.filePageDataService.valueChanges()
+    this.filePageDataService
+      .valueChanges()
       .subscribe(data => this.filePageData = data);
 
     // Set up effect for changeDirRequest
@@ -140,20 +140,21 @@ export class AppService {
   }
 
   public async init(callback: Function) {
-    this.config = await this.configService.getConfig().toPromise();
+    this.config = await this.configService.getConfig();
     this.dockerRoot= this.config?.dockerRoot ??'';
+    DockerRootDeletePipe.dockerRoot = this.dockerRoot;
+    console.info('        > Config       :', this.config);
 
     // init look and feel (LaF):
     await this.lookAndFeelService.init();
 
-    const sysInfo: SysinfoIf | undefined = await this.sysinfoService.getSysinfo().toPromise();
+    const sysInfo: SysinfoIf | undefined = await this.sysinfoService.getSysinfo();
     if (sysInfo) {
       this.sysinfo = sysInfo;
       const sys = sysInfo.osx ? 'osx' : 'windows';
 
       // init shortcuts:
-      const shortcutMapping: ShortcutActionMapping = await this.shortcutService.init(sys);
-      ActionShortcutPipe.shortcutCache = shortcutMapping;
+      ActionShortcutPipe.shortcutCache = await this.shortcutService.init(sys);
 
       // init tools:
       const defaultTools: CmdIf[] | undefined = await this.toolService.fetchTools(sys);
@@ -163,22 +164,12 @@ export class AppService {
         for (const tool of defaultTools) {
           toolMappings[tool.shortcut] = tool.id;
         }
+        this.shortcutService.addAdditionalShortcutMappings(toolMappings);
+
         console.info('        > defaultTools', defaultTools);
         console.info('        > toolMappings', toolMappings);
-
-        this.shortcutService.addAdditionalShortcutMappings(toolMappings);
         console.info('        > active shortcuts', this.shortcutService.getActiveShortcuts());
       }
-    }
-
-
-    // Get config using firstValueFrom instead of subscribe
-    try {
-      const config:Config = await firstValueFrom(this.configService.getConfig());
-      console.info('        > Config       :', config);
-      DockerRootDeletePipe.dockerRoot = config.dockerRoot;
-    } catch (error) {
-      console.error('Error fetching config:', error);
     }
 
     await this.initTabs();
@@ -241,7 +232,7 @@ export class AppService {
     if (this.filePageData.default) {
       console.info('        > Init Tabs.....');
       try {
-        const startFolder = await firstValueFrom(this.sysinfoService.getFirstStartFolder());
+        const startFolder = await this.sysinfoService.getFirstStartFolder();
         console.info('        > First Start  :', startFolder);
         const v = this.clone(this.filePageData);
         v.default = false;
