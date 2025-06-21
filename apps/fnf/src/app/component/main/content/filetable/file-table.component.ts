@@ -1,15 +1,4 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  effect,
-  inject,
-  Injector,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-  runInInjectionContext
-} from '@angular/core';
+import {ChangeDetectorRef, Component, inject, Injector, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {RenderWrapperFactory, TableComponent} from "@guiexpert/angular-table";
 import {
@@ -261,14 +250,11 @@ export class FileTableComponent implements OnInit, OnDestroy {
     this.appService.setBodyAreaModel(this._panelIndex, this.bodyAreaModel);
     this.appService.setSelectionManagers(this._panelIndex, this.selectionManager);
 
-    // Listen to changes in the entire dirEvents signal and log the results
-    runInInjectionContext(this.injector, () => {
-      effect(() => {
-        const selection = this.selectionManager.selection;
-        const selectedRows = selection();
+    // Subscribe to selection$ changes
+    this.selectionManager.selection$
+      .subscribe(selectedRows => {
         this.calcButtonStates(selectedRows);
       });
-    });
 
     this.appService.dirEvents$
       .pipe(takeWhile(() => this.alive))
@@ -314,7 +300,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
     } else if (evt.clickCount === 1 && evt.areaIdent === 'body' && this.tableModel) {
       if (this.tableApi) {
-        if (evt.rowIndex>-1) this.setFocus2Index(evt.rowIndex);
+        if (evt.rowIndex > -1) this.setFocus2Index(evt.rowIndex);
         this.selectionManager.handleGeMouseEvent(evt);
       }
     }
@@ -602,8 +588,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
     this.appService.resetFocusRowCriterea();
     this.tableApi?.repaint();
 
-    const selection = this.selectionManager.selection;
-    const selectedRows = selection();
+    const selectedRows = this.selectionManager.getSelectionValue();
     this.calcButtonStates(selectedRows);
   }
 
@@ -725,7 +710,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
 
-
   private setRows(fileItems: FileItemIf[]): void {
     if (this.tableApi) {
       this.tableApi.setRows(fileItems);
@@ -744,7 +728,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
   private updateFocusIndexByCriteria() {
     if (this.focusRowCriterea) {
-      const rowIndex = this.bodyAreaModel.getRowIndexByCriteria(this.focusRowCriterea );
+      const rowIndex = this.bodyAreaModel.getRowIndexByCriteria(this.focusRowCriterea);
       this.setFocus2Index(rowIndex ?? 0);
     }
   }

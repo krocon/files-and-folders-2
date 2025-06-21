@@ -1,5 +1,5 @@
 import {AreaModelObjectArray, GeMouseEvent} from "@guiexpert/table";
-import {signal} from "@angular/core";
+import {BehaviorSubject} from "rxjs";
 import {DOT_DOT, FileItemIf, FileItemMeta} from "@fnf/fnf-data";
 
 
@@ -17,7 +17,13 @@ export class SelectionManagerForObjectModelsOptions<T> {
 
 export class SelectionManagerForObjectModels<T> {
 
-  public readonly selection = signal<T[]>([]);
+
+  public readonly selection$ = new BehaviorSubject<T[]>([]);
+
+  // Method to get the current value of the selection$ (replaces signal() call)
+  public getSelectionValue(): T[] {
+    return this.selection$.getValue();
+  }
 
   private previousEvt?: GeMouseEvent;
 
@@ -68,7 +74,7 @@ export class SelectionManagerForObjectModels<T> {
 
     } else {
       // no special key.
-      // for selection type  'row' and 'column' we have to select the current row (or column):
+      // for selection$ type  'row' and 'column' we have to select the current row (or column):
       const row = this.bodyModel.getRowByIndex(evt.rowIndex);
       this.setRowSelected(row, true);
       dirty = true;
@@ -126,7 +132,7 @@ export class SelectionManagerForObjectModels<T> {
 
 
   updateSelection() {
-    this.selection.set(this.getSelectedRows());
+    this.selection$.next(this.getSelectedRows());
   }
 
   setRowSelected(row: T, selected: boolean) {
