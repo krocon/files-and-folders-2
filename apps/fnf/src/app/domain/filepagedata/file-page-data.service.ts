@@ -4,6 +4,7 @@ import {FilePageData} from "./data/file-page.data";
 import {TabData} from "./data/tab.data";
 import {BehaviorSubject} from "rxjs";
 import {PanelIndex} from "../panel-index";
+import {TypeDataDefaultOptions} from "../../common/type-data-default-options";
 
 
 @Injectable({
@@ -12,7 +13,22 @@ import {PanelIndex} from "../panel-index";
 export class FilePageDataService {
 
   private static readonly innerService =
-    new TypedDataService<FilePageData>("tabs", new FilePageData());
+    new TypedDataService<FilePageData>(
+      "tabs",
+      new FilePageData(),
+      // {
+      //   ...new TypeDataDefaultOptions<FilePageData>(),
+      //   parse: (s: string) => {
+      //     if (s === null) {
+      //       return null;
+      //     }
+      //     return {
+      //       ...new FilePageData(),
+      //       ...JSON.parse(s) as FilePageData
+      //     };
+      //   }
+      // }
+    );
 
   public valueChanges(): BehaviorSubject<FilePageData> {
     return FilePageDataService.innerService.valueChanges$;

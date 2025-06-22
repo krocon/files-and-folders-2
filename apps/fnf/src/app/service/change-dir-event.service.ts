@@ -7,4 +7,7 @@ import {TypedEventService} from "../common/typed-event.service";
   providedIn: "root"
 })
 export class ChangeDirEventService extends TypedEventService<ChangeDirEvent> {
+
+  public static skipNextHistoryChange: boolean = false;
+
 }

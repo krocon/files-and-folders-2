@@ -32,6 +32,7 @@ export const actionIds = [
 
   "NAVIGATE_LEVEL_DOWN",
   "NAVIGATE_BACK",
+  "NAVIGATE_FORWARD",
   "SAVE_CONFIG",
   "RELOAD_DIR",
 

@@ -36,7 +36,7 @@
       Actions
       <mat-icon>keyboard_arrow_up</mat-icon>
     </button>
-    <mat-menu #menuAction="matMenu" >
+    <mat-menu #menuAction="matMenu">
 
       <div class="menu-container">
         <div>
@@ -181,8 +181,8 @@
                 mat-menu-item>
               Parent Dir
               <span class="float-right">
-          <fnf-shortcut [keys]="['⇧', 'PAGEUP']"></fnf-shortcut>
-        </span>
+                <fnf-shortcut [keys]="['⇧', 'PAGEUP']"></fnf-shortcut>
+              </span>
             </button>
             <button
                 (click)="triggerAction('NAVIGATE_BACK')"
@@ -192,6 +192,14 @@
           <fnf-shortcut [keys]="['⇧', 'PAGEDOWN']"></fnf-shortcut>
         </span>
             </button>
+            <!--button
+                (click)="triggerAction('NAVIGATE_FORWARD')"
+                mat-menu-item>
+              History Forward
+              <span class="float-right">
+          <fnf-shortcut [keys]="['⇧', 'PAGEUP']"></fnf-shortcut>
+        </span>
+            </button-->
             <mat-divider></mat-divider>
 
             <button
@@ -243,26 +251,28 @@
       </div>
 
 
-
     </mat-menu>
 
 
-
-
-    <button class="panel-button row-reverse" mat-stroked-button [matMenuTriggerFor]="menuTools">
-      Tools <mat-icon>keyboard_arrow_up</mat-icon>
+    <button
+        class="panel-button row-reverse"
+        mat-stroked-button
+        [matMenuTriggerFor]="menuTools">
+      Tools
+      <mat-icon>keyboard_arrow_up</mat-icon>
     </button>
     <mat-menu #menuTools="matMenu">
       @for (tool of tools; track tool) {
-      <button mat-menu-item (click)="onToolClicked(tool)">
-        {{tool.label}}
-        <span class="float-right">
+        <button
+            mat-menu-item
+            (click)="onToolClicked(tool)">
+          {{ tool.label }}
+          <span class="float-right">
           <fnf-shortcut [keys]="tool.shortcut.split(' ')"></fnf-shortcut>
         </span>
-      </button>
+        </button>
       }
     </mat-menu>
-
 
 
     <button

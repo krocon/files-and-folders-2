@@ -473,16 +473,23 @@ export class AppService {
       const fileData: FilePageData = this.filePageData;
       const tabData: TabData = this.getTabDataForPanelIndex(panelIndex);
       tabData.path = checkedPath;
-      // add checkedPath on top:
-      tabData.history.splice(0, 0, checkedPath);
-      // remove double items:
-      tabData.history = tabData.history.filter((his, i, arr) => arr.indexOf(his) === i);
-      // max count = 10:
-      if (tabData.history.length > 10) {
-        tabData.history.length = 10;
+
+      if (ChangeDirEventService.skipNextHistoryChange) {
+        ChangeDirEventService.skipNextHistoryChange = false;
+
+        // add checkedPath on top:
+        tabData.history.splice(0, 0, checkedPath);
+        // remove double items:
+        tabData.history = tabData.history.filter((his, i, arr) => arr.indexOf(his) === i);
+        // max count = 10:
+        if (tabData.history.length > 10) {
+          tabData.history.length = 10;
+        }
+        this.addLatest(checkedPath);
       }
-      this.addLatest(checkedPath);
+      // update ui:
       this.updateFilePageData(fileData);
+
     } catch (e) {
       console.error(e);
     }
@@ -515,9 +522,38 @@ export class AppService {
   }
 
   navigateBack() {
-    const tabData = this.getActiveTabOnActivePanel();
-    const path = tabData.history.shift();
     const srcPanelIndex = this.getActivePanelIndex();
+    const filePageDataValue = this.filePageDataService.getValue();
+    const tabsPanelDatum = filePageDataValue.tabRows[srcPanelIndex];
+    const tabData= tabsPanelDatum.tabs[tabsPanelDatum.selectedTabIndex];
+
+    if (!tabData.historyIndex) tabData.historyIndex = 0;
+    tabData.historyIndex = Math.max(0, tabData.historyIndex+1);
+    tabData.historyIndex = Math.min(tabData.historyIndex, tabData.history.length - 1);
+    ChangeDirEventService.skipNextHistoryChange = true;
+
+    const path = tabData.history[tabData.historyIndex];
+    this.filePageData = filePageDataValue;
+    this.filePageDataService.update(this.filePageData);
+    this.changeDir(new ChangeDirEvent(srcPanelIndex, path));
+  }
+
+  navigateForward() {
+    const srcPanelIndex = this.getActivePanelIndex();
+    const filePageDataValue = this.filePageDataService.getValue();
+    const tabsPanelDatum = filePageDataValue.tabRows[srcPanelIndex];
+    const tabData = tabsPanelDatum.tabs[tabsPanelDatum.selectedTabIndex];
+
+    if (!tabData.historyIndex) tabData.historyIndex = 0;
+    tabData.historyIndex--;
+    if (tabData.historyIndex < 0) tabData.historyIndex = tabData.history.length - 1;
+    if (tabData.historyIndex > tabData.history.length - 1) tabData.historyIndex = 0;
+    ChangeDirEventService.skipNextHistoryChange = true;
+
+    const path = tabData.history[tabData.historyIndex];
+    this.filePageData = filePageDataValue;
+
+    this.filePageDataService.update(this.filePageData);
     this.changeDir(new ChangeDirEvent(srcPanelIndex, path));
   }
 

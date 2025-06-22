@@ -8,6 +8,9 @@ export class TabData {
   public filterText: string = '';
   public id: number = 0;
 
+  public historyIndex: number = 0;
+
+
   public focusRowCriterea: Partial<FileItemIf> | null = null;
 
   constructor(

@@ -73,7 +73,9 @@ export class FileTableComponent implements OnInit, OnDestroy {
   @Input() selected: boolean = false;
   @Output() selectionChanged = new Subject<SelectionEvent>();
   @Output() buttonStatesChanged = new Subject<ButtonEnableStates>();
+
   tableModel?: TableModelIf;
+
   private readonly rowHeight = 34;
   private readonly columnDefs = [
     ColumnDef.create({
@@ -581,6 +583,8 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
     } else if (action === "NAVIGATE_BACK") {
       this.appService.navigateBack();
+    } else if (action === "NAVIGATE_FORWARD") {
+      this.appService.navigateForward();
     }
   }
 
@@ -602,7 +606,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
   private handleSelectionDialogResult(data: string | undefined, enhance: boolean) {
-    console.info('handleSelectionDialogResult', data); // TODO del
     if (data) {
       const fs = data.toLowerCase().split(' ');
 
@@ -613,8 +616,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
       const poss = fs?.filter(f => !f.startsWith('-'))
         .map(f => f.replace(/^\+/g, '').trim())
         .filter(f => f);
-
-      console.info(poss);
 
       const rows = this.bodyAreaModel
         .getFilteredRows()
