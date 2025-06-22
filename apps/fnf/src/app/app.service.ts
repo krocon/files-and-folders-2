@@ -665,7 +665,7 @@ export class AppService {
     return this.getSelectedOrFocussedData(this.getActivePanelIndex());
   }
 
-  private getSelectedOrFocussedData(panelIndex: PanelIndex): FileItemIf[] {
+  getSelectedOrFocussedData(panelIndex: PanelIndex): FileItemIf[] {
     let ret = this.selectionManagers[panelIndex]?.getSelectedRows() ?? [];
     if (!ret?.length && this.bodyAreaModels[panelIndex]) {
       const focusedRowIndex = this.bodyAreaModels[panelIndex]?.focusedRowIndex ?? 0;
