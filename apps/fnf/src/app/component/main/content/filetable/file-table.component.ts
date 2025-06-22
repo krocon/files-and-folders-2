@@ -593,9 +593,15 @@ export class FileTableComponent implements OnInit, OnDestroy {
   private handleSelectionDialogResult(data: string | undefined, enhance:boolean) {
     if (data) {
       const fs = data?.toLowerCase().split(' ');
+      const negs = fs?.filter(f=>f.startsWith('-')).map(f=>f.substring(1));
+      const poss = fs?.filter(f=>!f.startsWith('-'));
       const rows = this.bodyAreaModel
         .getFilteredRows()
-        .filter(r => r.base !== DOT_DOT && fs.every(f => r.base.toLowerCase().includes(f)));
+        .filter(r =>
+          r.base !== DOT_DOT
+          && poss.every(f => r.base.toLowerCase().includes(f))
+          && negs.every(f => !r.base.toLowerCase().includes(f))
+        );
       rows.forEach(r => this.selectionManager.setRowSelected(r, enhance));
       this.selectionManager.updateSelection()
       this.tableApi?.repaint();
