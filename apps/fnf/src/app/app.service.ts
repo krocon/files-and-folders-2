@@ -324,13 +324,6 @@ export class AppService {
     } else if (id === "OPEN_SHORTCUT_DLG") {
       this.shortcutDialogService.open();
 
-    } else if (id === "ENHANCE_SELECTION") {
-      this.selectionDialogService.open(
-        new SelectionDialogData('', true),
-        (data) => {
-          console.info(data);
-        });
-
     } else {
 
       for (const tool of this.defaultTools) {
@@ -564,6 +557,10 @@ export class AppService {
     }
 
     this.toolService.execute(cmds);
+  }
+
+  openSelectionDialog(data: SelectionDialogData, cb: (result: string|undefined) => void){
+    this.selectionDialogService.open(data, cb);
   }
 
   private removeTab() {

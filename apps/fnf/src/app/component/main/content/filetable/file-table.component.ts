@@ -54,6 +54,7 @@ import {ActionId, actionIds} from "../../../../domain/action/fnf-action.enum";
 import {FnfActionLabels} from "../../../../domain/action/fnf-action-labels";
 import {NotifyService} from "../../../../service/cmd/notify-service";
 import {NotifyEventIf} from "../../../../domain/cmd/notify-event.if";
+import {SelectionDialogData} from "../../../cmd/selection/selection-dialog.data";
 
 @Component({
   standalone: true,
@@ -492,11 +493,11 @@ export class FileTableComponent implements OnInit, OnDestroy {
       this.selectionManager.toggleRowSelection(row);
       this.tableApi?.repaint();
 
-    } else if (action === 'ENHANCE_SELECTION') {
-      // TODO ENHANCE_SELECTION
+    } else if (action === "ENHANCE_SELECTION") {
+      this.openSelectionDialog(true);
 
-    } else if (action === 'REDUCE_SELECTION') {
-      // TODO ENHANCE_SELECTION
+    } else if (action === "REDUCE_SELECTION") {
+      this.openSelectionDialog(false);
 
     } else if (action === "SPACE_PRESSED") {
       const r = this.bodyAreaModel.focusedRowIndex;
@@ -580,6 +581,24 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
     } else if (action === "NAVIGATE_BACK") {
       this.appService.navigateBack();
+    }
+  }
+
+  private openSelectionDialog(enhance:boolean) {
+    this.appService.openSelectionDialog(
+      new SelectionDialogData('', enhance),
+      (data) => this.handleSelectionDialogResult(data, enhance));
+  }
+
+  private handleSelectionDialogResult(data: string | undefined, enhance:boolean) {
+    if (data) {
+      const fs = data?.toLowerCase().split(' ');
+      const rows = this.bodyAreaModel
+        .getFilteredRows()
+        .filter(r => r.base !== DOT_DOT && fs.every(f => r.base.toLowerCase().includes(f)));
+      rows.forEach(r => this.selectionManager.setRowSelected(r, enhance));
+      this.selectionManager.updateSelection()
+      this.tableApi?.repaint();
     }
   }
 

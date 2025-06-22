@@ -44,7 +44,7 @@ export class SelectionDialogComponent {
     this.title = data.enhance ? 'Enhance Selection':'Reduce Selection';
     this.formGroup = this.formBuilder.group(
       {
-        target: new FormControl(
+        text: new FormControl(
           data.text,
           {
             validators: [
