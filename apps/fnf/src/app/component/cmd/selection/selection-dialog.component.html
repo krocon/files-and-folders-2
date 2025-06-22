@@ -11,14 +11,25 @@
         autocomplete="off">
 
       <mat-form-field>
+<!--        <span matTextPrefix>+1 &nbsp;</span>-->
         <input
             (keydown.enter)="onOkClicked()"
             [fnfAutofocus]="true"
             formControlName="text"
             matInput
             placeholder="Pattern"/>
+        <mat-icon matSuffix [matMenuTriggerFor]="menuSettings">expand_more</mat-icon>
         <mat-error></mat-error>
       </mat-form-field>
+
+      <mat-menu #menuSettings="matMenu">
+        @for (fe of filetypeExtensions; track fe) {
+          <button
+              (click)="setText(fe)"
+              mat-menu-item>{{ fe.label }}</button>
+        }
+      </mat-menu>
+
     </form>
 
 

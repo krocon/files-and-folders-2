@@ -21,6 +21,9 @@ export const environment = {
   shortcut: {
     getShortcutActionMappingUrl: "assets/config/shortcut/"
   },
+  filetypeExtensions: {
+    getFiletypesUrl: "assets/config/filetype/filetype-extensions.json"
+  },
   edit: {
     getFile: "api/file?name=",
     saveFile: "api/file?name="

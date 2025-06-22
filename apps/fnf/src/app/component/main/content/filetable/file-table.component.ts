@@ -584,39 +584,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  private openSelectionDialog(enhance:boolean) {
-    const rows = this.appService.getSelectedOrFocussedData(this.panelIndex);
-    const s = rows.length ? rows[0].ext : '';
-    this.appService.openSelectionDialog(
-      new SelectionDialogData(s, enhance),
-      (data) => this.handleSelectionDialogResult(data, enhance));
-  }
-
-  private handleSelectionDialogResult(data: string | undefined, enhance:boolean) {
-    if (data) {
-      const fs = data?.toLowerCase().split(' ');
-
-      const negs = fs?.filter(f=>f.startsWith('-'))
-        .map(f=>f.substring(1).trim())
-        .filter(f=>f);
-
-      const poss = fs?.filter(f=>!f.startsWith('-'))
-        .map(f=>f.replace(/^\+/g, '').trim())
-        .filter(f=>f);
-
-      const rows = this.bodyAreaModel
-        .getFilteredRows()
-        .filter(r =>
-          r.base !== DOT_DOT
-          && poss.every(f => r.base.toLowerCase().includes(f))
-          && negs.every(f => !r.base.toLowerCase().includes(f))
-        );
-      rows.forEach(r => this.selectionManager.setRowSelected(r, enhance));
-      this.selectionManager.updateSelection()
-      this.tableApi?.repaint();
-    }
-  }
-
   setFocus2Index(index: number) {
     this.bodyAreaModel.focusedRowIndex = index;
     this.appService.resetFocusRowCriterea();
@@ -624,6 +591,54 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
     const selectedRows = this.selectionManager.getSelectionValue();
     this.calcButtonStates(selectedRows);
+  }
+
+  private openSelectionDialog(enhance: boolean) {
+    const rows = this.appService.getSelectedOrFocussedData(this.panelIndex);
+    const s = rows.length ? rows[0].ext : '';
+    this.appService.openSelectionDialog(
+      new SelectionDialogData(s, enhance),
+      (data) => this.handleSelectionDialogResult(data, enhance));
+  }
+
+  private handleSelectionDialogResult(data: string | undefined, enhance: boolean) {
+    console.info('handleSelectionDialogResult', data); // TODO del
+    if (data) {
+      const fs = data.toLowerCase().split(' ');
+
+      const negs = fs?.filter(f => f.startsWith('-'))
+        .map(f => f.substring(1).trim())
+        .filter(f => f);
+
+      const poss = fs?.filter(f => !f.startsWith('-'))
+        .map(f => f.replace(/^\+/g, '').trim())
+        .filter(f => f);
+
+      console.info(poss);
+
+      const rows = this.bodyAreaModel
+        .getFilteredRows()
+        .filter(r =>
+            r.base !== DOT_DOT
+            && poss.every(f => {
+              if (f.includes('|')) {
+                const ors = f.split('|');
+                return ors.some(or => r.base.toLowerCase().includes(or));
+              }
+              return r.base.toLowerCase().includes(f)
+            })
+            && negs.every(f => {
+              if (f.includes('|')) {
+                const ors = f.split('|');
+                return !ors.some(or => r.base.toLowerCase().includes(or));
+              }
+              return !r.base.toLowerCase().includes(f);
+            })
+        );
+      rows.forEach(r => this.selectionManager.setRowSelected(r, enhance));
+      this.selectionManager.updateSelection()
+      this.tableApi?.repaint();
+    }
   }
 
   private calcButtonStates<T>(selectedRows: FileItemIf[]) {

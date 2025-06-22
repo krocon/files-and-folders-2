@@ -6,7 +6,7 @@ import {FilePageDataService} from "./domain/filepagedata/file-page-data.service"
 import {ConfigService} from "./service/config.service";
 import {FileSystemService} from "./service/file-system.service";
 import {environment} from "../environments/environment";
-import {CmdIf, Config, DirEventIf, DirPara, FileItemIf, Sysinfo, SysinfoIf} from "@fnf-data";
+import {CmdIf, Config, DirEventIf, DirPara, FileItemIf, FiletypeExtensionsIf, Sysinfo, SysinfoIf} from "@fnf-data";
 import {BehaviorSubject, firstValueFrom, Subject} from "rxjs";
 import {PanelIndex} from "./domain/panel-index";
 import {FilePageData} from "./domain/filepagedata/data/file-page.data";
@@ -39,6 +39,7 @@ import {ToolService} from "./service/tool.service";
 import {ActionShortcutPipe} from "./common/action-shortcut.pipe";
 import {SelectionDialogService} from "./component/cmd/selection/selection-dialog.service";
 import {SelectionDialogData} from "./component/cmd/selection/selection-dialog.data";
+import {FiletypeExtensionsService} from "./service/filetype-extensions.service";
 
 @Injectable({
   providedIn: "root"
@@ -66,6 +67,8 @@ export class AppService {
 
   private injector = inject(Injector);
   private defaultTools: CmdIf[] = [];
+
+
 
   constructor(
     private readonly lookAndFeelService: LookAndFeelService,
@@ -96,6 +99,7 @@ export class AppService {
     FileActionService.forRoot(environment.fileAction);
     GotoAnythingDialogService.forRoot(environment.gotoAnything);
     ToolService.forRoot(environment.tool);
+    FiletypeExtensionsService.forRoot(environment.filetypeExtensions);
 
     this.favDataService
       .valueChanges()
