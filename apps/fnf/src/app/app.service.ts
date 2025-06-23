@@ -8,7 +8,7 @@ import {FileSystemService} from "./service/file-system.service";
 import {environment} from "../environments/environment";
 import {
   CmdIf,
-  Config, DirEvent,
+  Config,
   DirEventIf,
   DirPara,
   DOT_DOT,
@@ -213,18 +213,6 @@ export class AppService {
       );
   }
 
-
-  // public addTab(panelIndex: PanelIndex, tabData: TabData) {
-  //   const currentData = this.filePageData();
-  //   currentData.tabRows[panelIndex].tabs.push(tabData);
-  //   this.updateFilePageData(currentData);
-  // }
-
-  // public getDirEvents(path: string): Observable<DirEventIf[] | undefined> {
-  //   return this.dirEvents$.pipe(
-  //     map(dirEventsMap => dirEventsMap.get(path))
-  //   );
-  // }
 
   public async checkPath(path: string): Promise<string> {
     return await firstValueFrom(this.fileSystemService.checkPath(path));
@@ -466,13 +454,17 @@ export class AppService {
   public async model2local(panelIndex: 0 | 1) {
     const tabData = this.getTabDataForPanelIndex(panelIndex);
     if (tabData) {
-      try {
-        const path = await this.checkPath(tabData.path);
-        if (tabData.path !== path) {
-          await this.setPathToActiveTabInGivenPanel(path, panelIndex);
+      if (tabData.path.startsWith('tabfind')) {
+// TODO find tab data
+      } else {
+        try {
+          const path = await this.checkPath(tabData.path);
+          if (tabData.path !== path) {
+            await this.setPathToActiveTabInGivenPanel(path, panelIndex);
+          }
+        } catch (e) {
+          console.error(e);
         }
-      } catch (e) {
-        console.error(e);
       }
     }
   }
@@ -638,6 +630,14 @@ export class AppService {
     return this.shortcutService.getFirstShortcutByActionAsTokens(action);
   }
 
+  public addTab(panelIndex: PanelIndex, tabData: TabData) {
+    const currentData = this.filePageData;
+    const tabsPanel = currentData.tabRows[panelIndex];
+    tabsPanel.tabs.push(tabData);
+    tabsPanel.selectedTabIndex = tabsPanel.tabs.length - 1;
+    this.updateFilePageData(currentData);
+  }
+
   private removeTab() {
     const value = this.filePageDataService.getValue();
     const tabsPanelData = value.tabRows[this.panelSelectionService.getValue()];
@@ -657,6 +657,10 @@ export class AppService {
     tabsPanelData.selectedTabIndex = tabsPanelData.tabs.length - 1;
     this.filePageDataService.update(value);
   }
+
+  // private updateFocusRowCritereaOnInactivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
+  //   this.updateFocusRowCriterea(this.getInactivePanelIndex(), focusRowCriterea);
+  // }
 
   private rename() {
     const srcPanelIndex = this.getActivePanelIndex();
@@ -678,30 +682,49 @@ export class AppService {
     }
   }
 
-  // private updateFocusRowCritereaOnInactivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
-  //   this.updateFocusRowCriterea(this.getInactivePanelIndex(), focusRowCriterea);
-  // }
-
   private find() {
     const srcPanelIndex = this.getActivePanelIndex();
     const tabData = this.getActiveTabOnActivePanel();
     // const rows = this.getSelectedOrFocussedData(srcPanelIndex);
 
     const data = new FindDialogData(tabData.path, '**/*.ts', true, false);
+    let tabAdded = false;
     this.findDialogService
       .open(data, (result: FindDialogData | undefined) => {
         if (result) {
-          console.info('srcPanelIndex', srcPanelIndex);
-          console.info('find result', result);
-          if (result){
-            let findData:FindData = this.findSocketService.createFindData(result);
-            this.findSocketService.find(findData, event => {
-              console.info('find, dir event', event);
-            })
+          // console.info('srcPanelIndex', srcPanelIndex);
+          // console.info('find result', result);
+          if (result) {
+            let findData: FindData = this.findSocketService.createFindData(result);
+            console.info('findData', findData);
+            this.findSocketService
+              .find(findData, event => {
+                if (!tabAdded) {
+                  tabAdded = true;
+                  let tabDataFindings = new TabData(findData.dirTabKey);
+                  this.addTab(srcPanelIndex, tabDataFindings);
+                  // this.onChangeDir(findData.dirTabKey, srcPanelIndex);
+                }
+
+                //if (event.end) {
+                  const currentMap = this.dirEvents$.getValue();
+                  const newMap = new Map(currentMap);
+                  newMap.set(findData.dirTabKey, [event]);
+                  this.dirEvents$.next(newMap);
+
+                  console.info('find, dir event', event);
+                //}
+              });
           }
         }
       });
   }
+
+  // public getDirEvents(path: string): Observable<DirEventIf[] | undefined> {
+  //   return this.dirEvents$.pipe(
+  //     map(dirEventsMap => dirEventsMap.get(path))
+  //   );
+  // }
 
   private updateFocusRowCritereaOnActivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
     this.updateFocusRowCriterea(this.getActivePanelIndex(), focusRowCriterea);

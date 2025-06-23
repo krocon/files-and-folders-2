@@ -37,4 +37,10 @@ export class TabComponent {
   }
 
 
+  getLabel(fi: FileItemIf) {
+    if (fi.base.startsWith('tabfind')) {
+      return fi.base.replace('tabfind', 'F');
+    }
+    return fi.base;
+  }
 }

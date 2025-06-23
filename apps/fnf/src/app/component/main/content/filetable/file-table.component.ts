@@ -262,6 +262,8 @@ export class FileTableComponent implements OnInit, OnDestroy {
     this.appService.dirEvents$
       .pipe(takeWhile(() => this.alive))
       .subscribe(dirEventsMap => {
+        console.info('this.dirPara?.path', this.dirPara?.path);
+        console.info('eeeeee', dirEventsMap.get(this.dirPara?.path??''));
         if (this.dirPara?.path) {
           let dirEvents = dirEventsMap.get(this.dirPara.path);
           if (dirEvents) this.handleDirEvent(dirEvents);
@@ -355,7 +357,8 @@ export class FileTableComponent implements OnInit, OnDestroy {
         const dirEvent = dirEvents[i];
         const zi: ZipUrlInfo = getZipUrlInfo(this.dirPara.path);
 
-        if (this.isRelevantDir(dirEvent.dir, this.dirPara.path, zi)) {
+        if (this.dirPara.path.startsWith('tabfind')
+          || this.isRelevantDir(dirEvent.dir, this.dirPara.path, zi)) {
           this.handleRelevantDirEvent(dirEvent, zi);
         }
       }
@@ -674,12 +677,13 @@ export class FileTableComponent implements OnInit, OnDestroy {
       let rows = dirEvent.items ?
         dirEvent.items.filter(fi => (
           fi.dir === this.dirPara?.path
+          || this.dirPara?.path.startsWith('tabfind')
           || isSameDir(fi.dir, this.dirPara?.path ?? '')
           || isRoot(fi.dir) && isRoot(zi.zipInnerUrl))
         ) :
         [];
 
-      if (!isRoot(this.dirPara.path)) {
+      if (!isRoot(this.dirPara.path) && !this.dirPara?.path.startsWith('tabfind')) {
         rows = [
           new FileItem(getParent(this.dirPara.path), "..", "", "", 1, true),
           ...rows
