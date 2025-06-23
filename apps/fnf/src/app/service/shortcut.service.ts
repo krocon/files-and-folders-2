@@ -67,6 +67,23 @@ export class ShortcutService {
     return ret;
   }
 
+  getFirstShortcutByActionAsTokens(action: string): string[] {
+    for (const sc in this.activeShortcuts) {
+      const a = this.activeShortcuts[sc];
+      if (a === action) {
+        const hs = harmonizeShortcut(sc);
+        return hs
+          .split(' ')
+          .map(s => s
+            .replace(/ctrl/g, '^')
+            .replace(/shift/g, '⇧')
+            .replace(/cmd/g, '⌘')
+          );
+      }
+    }
+    return [];
+  }
+
   getActiveShortcuts(): ShortcutActionMapping {
     return this.activeShortcuts;
   }

@@ -727,4 +727,8 @@ export class AppService {
     }
     return null;
   }
+
+  getFirstShortcutByActionAsTokens(action: ActionId):string[] {
+    return this.shortcutService.getFirstShortcutByActionAsTokens(action);
+  }
 }

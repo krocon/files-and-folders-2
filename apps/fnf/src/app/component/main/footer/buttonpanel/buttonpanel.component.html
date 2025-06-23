@@ -43,66 +43,42 @@
           <mat-list>
             <button
                 (click)="triggerAction('OPEN_FIND_DLG')"
-                mat-menu-item>
-              Find...
-              <span class="float-right">
-          <fnf-shortcut [keys]="['alt', 'F7']"></fnf-shortcut>
-        </span>
+                mat-menu-item> Find...
+              <fnf-shortcut [keys]="['alt', 'F7']"></fnf-shortcut>
             </button>
-            <!--TODO button mat-menu-item>
-              Change Dir...
-              <span class="float-right">
-                <fnf-shortcut [keys]="['alt', 'F10']"></fnf-shortcut>
-              </span>
-            </button-->
-
+            <!--TODO button mat-menu-item>  Change Dir...      <fnf-shortcut [keys]="['alt', 'F10']"></fnf-shortcut>  </button-->
             <button
                 (click)="triggerAction('TOGGLE_FILTER')"
-                mat-menu-item>
-              Toggle Filter...
+                mat-menu-item> Toggle Filter...
               <fnf-shortcut [keys]="['^', '⇧', 'F']"></fnf-shortcut>
             </button>
-
             <button
                 (click)="triggerAction('RELOAD_DIR')"
-                mat-menu-item>
-              Reload...
+                mat-menu-item> Reload...
               <fnf-shortcut [keys]="['^', '⇧', 'F12']"></fnf-shortcut>
             </button>
-
             <mat-divider></mat-divider>
-
             <button
                 (click)="triggerAction('OPEN_RENAME_DLG')"
-                mat-menu-item>
-              <!--      <button (click)="onRenameClicked()" [disabled]="!buttonEnableStates.rename" mat-menu-item>-->
-              Rename...
+                mat-menu-item>  <!--      <button (click)="onRenameClicked()" [disabled]="!buttonEnableStates.rename" mat-menu-item>-->  Rename...
               <fnf-shortcut [keys]="['⇧', 'F6']"></fnf-shortcut>
             </button>
-
             <button
                 (click)="triggerAction('OPEN_MULTIRENAME_DLG')"
-                mat-menu-item>
-              Multi Rename...
+                mat-menu-item> Multi Rename...
               <fnf-shortcut [keys]="['alt', 'F6']"></fnf-shortcut>
             </button>
-
             <button
                 (click)="triggerAction('OPEN_GROUPFILES_DLG')"
-                mat-menu-item>
-              Group Files...
+                mat-menu-item> Group Files...
               <fnf-shortcut [keys]="['alt', 'G']"></fnf-shortcut>
             </button>
-
             <button
                 (click)="triggerAction('OPEN_DELETE_EMPTY_FOLDERS_DLG')"
-                mat-menu-item>
-              Delete Empty Folders...
+                mat-menu-item> Delete Empty Folders...
               <fnf-shortcut [keys]="['^', 'alt', 'R']"></fnf-shortcut>
             </button>
-
             <mat-divider></mat-divider>
-
             <button
                 (click)="triggerAction('COPY_2_CLIPBOARD_NAMES')"
                 mat-menu-item>Copy names to clipboard
@@ -119,14 +95,11 @@
                 (click)="triggerAction('COPY_2_CLIPBOARD_FULLNAMES_AS_JSON')"
                 mat-menu-item>Copy full names to clipboard as JSON
             </button>
-
             <mat-divider></mat-divider>
-
             <button
                 (click)="triggerAction('OPEN_GOTO_ANYTHING_DLG')"
-                mat-menu-item>
-              Go to anything...
-              <fnf-shortcut [keys]="['^', 'F12']"></fnf-shortcut>
+                mat-menu-item> Go to anything...
+              <fnf-shortcut [keys]="getShortcutsByAction('OPEN_GOTO_ANYTHING_DLG')"></fnf-shortcut>
             </button>
           </mat-list>
         </div>
@@ -134,115 +107,69 @@
           <mat-list class="border-left">
             <button
                 (click)="triggerAction('ENHANCE_SELECTION')"
-                mat-menu-item>
-              Enhance Selection...
-              <span class="float-right">
-          <fnf-shortcut [keys]="['num', '+']"></fnf-shortcut>
-        </span>
+                mat-menu-item> Enhance Selection...
+              <fnf-shortcut [keys]="['num', '+']"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('REDUCE_SELECTION')"
-                mat-menu-item>
-              Reduce Selection...
-              <span class="float-right">
-          <fnf-shortcut [keys]="['num', '-']"></fnf-shortcut>
-        </span>
+                mat-menu-item> Reduce Selection...
+              <fnf-shortcut [keys]="['num', '-']"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('TOGGLE_SELECTION')"
-                mat-menu-item>
-              Toggle Selection...
-              <span class="float-right">
-          <fnf-shortcut [keys]="['num', '*']"></fnf-shortcut>
-        </span>
+                mat-menu-item> Toggle Selection...
+              <fnf-shortcut [keys]="['num', '*']"></fnf-shortcut>
             </button>
-
             <button
                 (click)="triggerAction('SELECT_ALL')"
-                mat-menu-item>
-              Select All
-              <span class="float-right">
-          <fnf-shortcut [keys]="['^', 'num', '+']"></fnf-shortcut>
-        </span>
+                mat-menu-item> Select All
+              <fnf-shortcut [keys]="['^', 'num', '+']"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('DESELECT_ALL')"
-                mat-menu-item>
-              Deselect All
-              <span class="float-right">
-          <fnf-shortcut [keys]="['^', 'num', '-']"></fnf-shortcut>
-        </span>
+                mat-menu-item> Deselect All
+              <fnf-shortcut [keys]="['^', 'num', '-']"></fnf-shortcut>
             </button>
-
             <mat-divider></mat-divider>
-
             <button
                 (click)="triggerAction('NAVIGATE_LEVEL_DOWN')"
-                mat-menu-item>
-              Parent Dir
-              <span class="float-right">
-                <fnf-shortcut [keys]="['⇧', 'PAGEUP']"></fnf-shortcut>
-              </span>
+                mat-menu-item> Parent Dir
+              <fnf-shortcut [keys]="['⇧', 'PAGEUP']"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('NAVIGATE_BACK')"
-                mat-menu-item>
-              History Back
-              <span class="float-right">
-          <fnf-shortcut [keys]="['⇧', 'PAGEDOWN']"></fnf-shortcut>
-        </span>
+                mat-menu-item> History Back
+              <fnf-shortcut [keys]="['⇧', 'PAGEDOWN']"></fnf-shortcut>
             </button>
-            <!--button
-                (click)="triggerAction('NAVIGATE_FORWARD')"
-                mat-menu-item>
-              History Forward
-              <span class="float-right">
-          <fnf-shortcut [keys]="['⇧', 'PAGEUP']"></fnf-shortcut>
-        </span>
+            <!--button    (click)="triggerAction('NAVIGATE_FORWARD')"    mat-menu-item>  History Forward
+              <fnf-shortcut [keys]="['⇧', 'PAGEUP']"></fnf-shortcut>
             </button-->
             <mat-divider></mat-divider>
-
             <button
                 (click)="triggerAction('SELECT_LEFT_PANEL')"
-                mat-menu-item>
-              Left Panel
-              <span class="float-right">
-          <fnf-shortcut [keys]="['alt', '1']"></fnf-shortcut>
-        </span>
+                mat-menu-item> Left Panel
+              <fnf-shortcut [keys]="['alt', '1']"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('SELECT_RIGHT_PANEL')"
-                mat-menu-item>
-              Right Panel
-              <span class="float-right">
-          <fnf-shortcut [keys]="['alt', '2']"></fnf-shortcut>
-        </span>
+                mat-menu-item> Right Panel
+              <fnf-shortcut [keys]="['alt', '2']"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('TOGGLE_PANEL')"
-                mat-menu-item>
-              Toggle Panel
-              <span class="float-right">
-          <fnf-shortcut [keys]="['TAB']"></fnf-shortcut>
-        </span>
+                mat-menu-item> Toggle Panel
+              <fnf-shortcut [keys]="['TAB']"></fnf-shortcut>
             </button>
             <mat-divider></mat-divider>
-
             <button
                 (click)="onAddTabClicked()"
-                mat-menu-item>
-              Add Tab
-              <span class="float-right">
-          <fnf-shortcut [keys]="['alt', 'T']"></fnf-shortcut>
-        </span>
+                mat-menu-item> Add Tab
+              <fnf-shortcut [keys]="['alt', 'T']"></fnf-shortcut>
             </button>
             <button
                 (click)="onRemoveTabClicked()"
-                mat-menu-item>
-              Remove Tab
-              <span class="float-right">
-          <fnf-shortcut [keys]="['⇧','T']"></fnf-shortcut>
-        </span>
+                mat-menu-item> Remove Tab
+              <fnf-shortcut [keys]="['⇧','T']"></fnf-shortcut>
             </button>
 
           </mat-list>
@@ -255,9 +182,9 @@
 
 
     <button
+        [matMenuTriggerFor]="menuTools"
         class="panel-button row-reverse"
-        mat-stroked-button
-        [matMenuTriggerFor]="menuTools">
+        mat-stroked-button>
       Tools
       <mat-icon>keyboard_arrow_up</mat-icon>
     </button>
@@ -265,11 +192,8 @@
       @for (tool of tools; track tool) {
         <button
             mat-menu-item
-            (click)="onToolClicked(tool)">
-          {{ tool.label }}
-          <span class="float-right">
+            (click)="onToolClicked(tool)">{{ tool.label }}
           <fnf-shortcut [keys]="tool.shortcut.split(' ')"></fnf-shortcut>
-        </span>
         </button>
       }
     </mat-menu>

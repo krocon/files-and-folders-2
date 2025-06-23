@@ -157,4 +157,10 @@ export class ButtonPanelComponent implements OnInit {
   onToolClicked(tool: CmdIf) {
     this.appService.execute(tool);
   }
+
+  getShortcutsByAction(action: ActionId) {
+    let shortcutsByAction = this.appService.getFirstShortcutByActionAsTokens(action);
+    console.info('getShortcutsByAction', action, shortcutsByAction);
+    return shortcutsByAction;
+  }
 }
