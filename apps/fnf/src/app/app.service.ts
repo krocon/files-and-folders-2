@@ -698,11 +698,8 @@ export class AppService {
     this.findDialogService
       .open(data, (result: FindDialogData | undefined) => {
         if (result) {
-          // console.info('srcPanelIndex', srcPanelIndex);
-          // console.info('find result', result);
           if (result) {
             let findData: FindData = this.findSocketService.createFindData(result);
-            //console.info('findData', findData);
             if (!tabAdded) {
               tabAdded = true;
               const tabDataFindings = new TabData(findData.dirTabKey);
@@ -739,10 +736,8 @@ export class AppService {
   }
 
   requestFindings(findData: FindData) {
-    console.info('requestFindings()...');
     this.findSocketService
       .find(findData, event => {
-        console.info('find, dir event', event);
         const currentMap = this.dirEvents$.getValue();
         const newMap = new Map(currentMap);
         newMap.set(findData.dirTabKey, [event]);

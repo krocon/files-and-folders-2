@@ -1,4 +1,7 @@
 
+.search-div {
+    padding: 4px 0 4px 16px;
+}
 .breadcrumb-div {
     display: flex;
     flex-direction: row;

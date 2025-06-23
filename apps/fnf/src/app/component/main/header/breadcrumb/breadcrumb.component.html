@@ -1,11 +1,20 @@
-<div class="breadcrumb-div">
-  /
-  @for (item of fileItems; track item) {
-    <div
-        (click)="onPathClicked(item)"
-        class="file-item-div">{{ item.base }}/
-    </div>
-  }
-  <div class="file-item-div w-100">&nbsp;</div>
 
-</div>
+
+@if (this.pattern) {
+  <div class="search-div">
+    Search:&nbsp;"{{this.pattern}}"
+  </div>
+}
+
+@if (!this.pattern && fileItem) {
+  <div class="breadcrumb-div">
+    /
+    @for (item of fileItems; track item) {
+      <div
+          (click)="onPathClicked(item)"
+          class="file-item-div">{{ item.base }}/
+      </div>
+    }
+    <div class="file-item-div w-100">&nbsp;</div>
+  </div>
+}

@@ -93,7 +93,7 @@ export class ButtonPanelComponent implements OnInit {
       .subscribe(
         (evt: NotifyEventIf) => {
           //V TODO show status on button
-          console.info('NotifyEventIf', evt);
+          console.info('TODO NotifyEventIf', evt);
           console.info(this.actionQueueService.getQueues());
         }
       );

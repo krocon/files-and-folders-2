@@ -5,11 +5,15 @@ import {TabData} from "../../../../../domain/filepagedata/data/tab.data";
 import {CommonModule} from "@angular/common";
 import {path2FileItems} from "../../../../../common/fn/path-to-file-items";
 import {FileItemIf} from "@fnf/fnf-data";
+import {MatIcon} from "@angular/material/icon";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: 'app-tab',
   imports: [
-    CommonModule
+    CommonModule,
+    MatIcon,
+    MatTooltip
   ],
   templateUrl: './tab.component.html',
   styleUrl: './tab.component.css'
@@ -18,6 +22,8 @@ export class TabComponent {
 
   fileItems: Array<FileItemIf> = [];
   fileItem: FileItemIf | undefined = undefined;
+  tabfind:boolean = false;
+  pattern: string = '';
 
   @Input() panelIndex: PanelIndex = 0;
   @Input() filePageData?: FilePageData;
@@ -34,11 +40,13 @@ export class TabComponent {
     this._tab = value;
     this.fileItems = path2FileItems(value.path);
     this.fileItem = this.fileItems[this.fileItems.length - 1];
+    this.tabfind = this.fileItem.base.startsWith('tabfind');
+    this.pattern = value.findData?.findDialogData?.pattern ?? '';
   }
 
 
   getLabel(fi: FileItemIf) {
-    if (fi.base.startsWith('tabfind')) {
+    if (this.tabfind) {
       return fi.base.replace('tabfind', 'F');
     }
     return fi.base;

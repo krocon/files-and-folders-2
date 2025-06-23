@@ -212,11 +212,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
     this.filterText = selectedTabData.filterText ?? '';
     this.filterActive = selectedTabData.filterActive ?? false;
 
-
-    console.info('____selectedTabData', selectedTabData);
-    console.info('____selectedTabData.findData', selectedTabData.findData);
     if (selectedTabData.findData) {
-      //this.appService.requestFindings(selectedTabData.findData);
       if (this.tableApi) {
         this.tableApi.setRows([]);
         this.repaintTable();
@@ -275,12 +271,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
     this.appService.dirEvents$
       .pipe(takeWhile(() => this.alive))
       .subscribe(dirEventsMap => {
-        if (this.panelIndex === 1) {
-          console.info('this.dirPara?.path', this.dirPara?.path);
-          console.info('---->', dirEventsMap.get(this.dirPara?.path ?? ''));
-          //console.info('---->', dirEventsMap.get(this.dirPara?.path ?? ''));
-        }
-
         if (this.dirPara?.path) {
           let dirEvents = dirEventsMap.get(this.dirPara.path);
           if (dirEvents) this.handleDirEvent(dirEvents);
@@ -701,8 +691,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
   private handleRelevantDirEvent(dirEvent: DirEventIf, zi: ZipUrlInfo) {
     if (!this.tableApi || !dirEvent || !this.dirPara) return;
 
-    // console.info('file table (' + this.panelIndex + ') Relevant handleDirEvent: ', dirEvent); // TODO del handleDirEvent
-
     if (dirEvent.action === "list") {
       let rows: FileItemIf[] = [];
 
@@ -783,8 +771,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
     } else if (dirEvent.action === "change") {
       this.tableApi.updateRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
       this.repaintTable();
-      //console.info('TODO handleDirEvent "change"', dirEvent);
-      //this.reload();
 
     } else {
       console.warn("Unknown dir changedir action:", dirEvent);

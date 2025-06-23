@@ -27,13 +27,13 @@ export class ShortcutService {
   }
 
   async init(sys:'osx' | 'windows'): Promise<ShortcutActionMapping> {
-    console.info('Shortcuts init...',sys);
-    console.info('harmonizeShortcut(\'ctrl+shift+f\')',harmonizeShortcut('ctrl+shift+f'));
+    // console.info('Shortcuts init...',sys);
+    // console.info('harmonizeShortcut(\'ctrl+shift+f\')',harmonizeShortcut('ctrl+shift+f'));
     try {
       const shortcutMappings = await this.fetchShortcutMappings(sys);
       if (shortcutMappings) {
         this.activeShortcuts = this.updateShortcutMappings(shortcutMappings);
-        console.info('Shortcuts initialized ('+sys+'):', this.activeShortcuts);
+        // console.info('Shortcuts initialized ('+sys+'):', this.activeShortcuts);
       }
 
     } catch (error) {

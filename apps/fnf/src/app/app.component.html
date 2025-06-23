@@ -12,7 +12,6 @@
       @if (initialized && filePageData) {
         <app-breadcrumb
             [tabsPanelData]="filePageData.tabRows[0]"
-            [panelIndex]="0"
             (pathClicked)="onBreadcrumbClicked($event, 0)">/
         </app-breadcrumb>
       }
@@ -25,7 +24,6 @@
       @if (initialized && filePageData) {
         <app-breadcrumb
             [tabsPanelData]="filePageData.tabRows[1]"
-            [panelIndex]="1"
             (pathClicked)="onBreadcrumbClicked($event, 1)">/
         </app-breadcrumb>
       }

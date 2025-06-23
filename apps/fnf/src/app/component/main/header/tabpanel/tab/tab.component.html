@@ -1,6 +1,14 @@
-@if (fileItem) {
+@if (fileItem && !this.tabfind) {
   <div
       class="fnf-header-fg-color not-selectable"
-      [class.fnf-activepanel-header-fg-color]="activeAndSelected">{{ getLabel(fileItem) }}
+      [class.fnf-activepanel-header-fg-color]="activeAndSelected">{{ fileItem.base }}
+  </div>
+}
+@if (fileItem && this.tabfind) {
+  <div
+      class="fnf-header-fg-color not-selectable"
+      [matTooltip]="'Search '+pattern"
+      [class.fnf-activepanel-header-fg-color]="activeAndSelected">
+    <mat-icon>search</mat-icon>
   </div>
 }

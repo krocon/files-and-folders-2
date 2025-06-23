@@ -1,10 +1,10 @@
-import {ChangeDetectionStrategy, Component, Input, OnInit, Output} from '@angular/core';
-import {PanelIndex} from "../../../../domain/panel-index";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, Output} from '@angular/core';
 import {FileItemIf} from "@fnf/fnf-data";
 import {CommonModule} from "@angular/common";
 import {path2FileItems} from "../../../../common/fn/path-to-file-items";
 import {Subject} from "rxjs";
 import {TabsPanelData} from "../../../../domain/filepagedata/data/tabs-panel.data";
+import {TabData} from "../../../../domain/filepagedata/data/tab.data";
 
 @Component({
   selector: 'app-breadcrumb',
@@ -15,14 +15,20 @@ import {TabsPanelData} from "../../../../domain/filepagedata/data/tabs-panel.dat
   styleUrl: './breadcrumb.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BreadcrumbComponent implements OnInit {
+export class BreadcrumbComponent {
 
-  @Input() panelIndex: PanelIndex = 0;
+
   @Output() pathClicked = new Subject<FileItemIf>();
   @Output() toggleFavClicked = new Subject<string>();
-  fileItems: Array<FileItemIf> = [];
 
-  constructor() {
+  fileItems: Array<FileItemIf> = [];
+  fileItem: FileItemIf | undefined = undefined;
+  pattern: string = '';
+  tabDataItem?: TabData;
+
+  constructor(
+    private readonly cdr: ChangeDetectorRef,
+  ) {
   }
 
   private _tabsPanelData?: TabsPanelData;
@@ -33,23 +39,27 @@ export class BreadcrumbComponent implements OnInit {
 
   @Input() set tabsPanelData(value: TabsPanelData) {
     this._tabsPanelData = value;
-    this.createFileItems();
+
+    this.fileItems = [];
+    this.fileItem = undefined;
+    this.pattern = '';
+
+    if (this._tabsPanelData) {
+      this.tabDataItem = this._tabsPanelData.tabs[this._tabsPanelData.selectedTabIndex];
+
+      if (this.tabDataItem) {
+        this.fileItems = path2FileItems(this.tabDataItem.path);
+        this.fileItem = this.fileItems[this.fileItems.length - 1];
+        this.pattern = this.tabDataItem.findData?.findDialogData?.pattern ?? '';
+      }
+    }
+    this.cdr.detectChanges();
   }
 
-  ngOnInit() {
-    // this.createFileItems();
-  }
 
   onPathClicked(item: FileItemIf) {
     this.pathClicked.next(item);
   }
 
-  private createFileItems() {
-    if (this._tabsPanelData) {
-      let tabDataItem = this._tabsPanelData.tabs[this._tabsPanelData.selectedTabIndex];
-      this.fileItems = path2FileItems(tabDataItem.path);
-    } else {
-      this.fileItems = [];
-    }
-  }
+
 }
