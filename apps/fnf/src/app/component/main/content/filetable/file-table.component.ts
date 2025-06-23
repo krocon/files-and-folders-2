@@ -674,15 +674,20 @@ export class FileTableComponent implements OnInit, OnDestroy {
     // console.info('file table (' + this.panelIndex + ') Relevant handleDirEvent: ', dirEvent); // TODO del handleDirEvent
 
     if (dirEvent.action === "list") {
-      let rows = dirEvent.items ?
-        dirEvent.items.filter(fi => (
-          fi.dir === this.dirPara?.path
-          || this.dirPara?.path.startsWith('tabfind')
-          || isSameDir(fi.dir, this.dirPara?.path ?? '')
-          || isRoot(fi.dir) && isRoot(zi.zipInnerUrl))
-        ) :
-        [];
+      let rows:FileItemIf[] = [];
 
+      if (!dirEvent.end) {
+        rows = [...this.bodyAreaModel.getAllRows()];
+      }
+      if (dirEvent.items) {
+        rows = [...rows,
+          ...dirEvent.items.filter(fi => (
+            fi.dir === this.dirPara?.path
+            || this.dirPara?.path.startsWith('tabfind')
+            || isSameDir(fi.dir, this.dirPara?.path ?? '')
+            || isRoot(fi.dir) && isRoot(zi.zipInnerUrl))
+          )];
+      }
       if (!isRoot(this.dirPara.path) && !this.dirPara?.path.startsWith('tabfind')) {
         rows = [
           new FileItem(getParent(this.dirPara.path), "..", "", "", 1, true),

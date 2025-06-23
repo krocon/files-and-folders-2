@@ -2,12 +2,16 @@ import {ComponentRendererIf} from "@guiexpert/angular-table";
 import {ChangeDetectionStrategy, Component} from "@angular/core";
 import {AreaIdent, AreaModelIf, RendererCleanupFnType} from "@guiexpert/table";
 import {DOT_DOT, FileItemIf} from "@fnf/fnf-data";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: 'name-cell-renderer',
   template: `
     <i [attr.class]="iconClass"></i>
-    <div class="ffn-name-cell-label">{{ text }}</div>
+    <div
+        [matTooltip]="tooltip"
+        class="ffn-name-cell-label">{{ text }}
+    </div>
   `,
   styles: [`
       :host {
@@ -32,12 +36,16 @@ import {DOT_DOT, FileItemIf} from "@fnf/fnf-data";
           max-width: calc(100% - 40px);
       }
   `],
+  imports: [
+    MatTooltip,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf> {
 
   iconClass: string = '';
   text: string = '';
+  tooltip: string = '';
 
   setData(
     rowIndex: number,
@@ -47,7 +55,7 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
     cellValue: any): RendererCleanupFnType | undefined {
 
     const fileItem: FileItemIf = areaModel.getRowByIndex(rowIndex);
-
+    this.tooltip = '';
     this.iconClass = this.getIconClass(fileItem);
 
     let name = fileItem.base;
@@ -55,7 +63,13 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
       this.text = `[${name}]`;
     } else {
       const base = fileItem.base.substring(0, fileItem.base.length - fileItem.ext.length);
-      this.text = `${base}`;
+
+      if (fileItem.abs) {
+        this.text = `${fileItem.dir}${base}`;
+        this.tooltip = this.text;
+      } else {
+        this.text = `${base}`;
+      }
     }
 
     return undefined;
