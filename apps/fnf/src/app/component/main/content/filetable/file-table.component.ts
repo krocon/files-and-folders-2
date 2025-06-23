@@ -24,6 +24,7 @@ import {
   FileItem,
   FileItemIf,
   FileItemMeta,
+  FindData,
   getParent,
   getZipUrlInfo,
   isRoot,
@@ -211,7 +212,19 @@ export class FileTableComponent implements OnInit, OnDestroy {
     this.filterText = selectedTabData.filterText ?? '';
     this.filterActive = selectedTabData.filterActive ?? false;
 
-    if (!this.dirPara || this.dirPara?.path !== selectedTabData.path) {
+
+    console.info('____selectedTabData', selectedTabData);
+    console.info('____selectedTabData.findData', selectedTabData.findData);
+    if (selectedTabData.findData) {
+      //this.appService.requestFindings(selectedTabData.findData);
+      if (this.tableApi) {
+        this.tableApi.setRows([]);
+        this.repaintTable();
+      }
+      this.dirPara = new DirPara(selectedTabData.path, `file-panel-${this._panelIndex}`);
+      this.requestRows();
+
+    } else if (!this.dirPara || this.dirPara?.path !== selectedTabData.path) {
       if (this.tableApi) {
         this.tableApi.setRows([]);
         this.repaintTable();
@@ -262,8 +275,12 @@ export class FileTableComponent implements OnInit, OnDestroy {
     this.appService.dirEvents$
       .pipe(takeWhile(() => this.alive))
       .subscribe(dirEventsMap => {
-        console.info('this.dirPara?.path', this.dirPara?.path);
-        console.info('eeeeee', dirEventsMap.get(this.dirPara?.path??''));
+        if (this.panelIndex === 1) {
+          console.info('this.dirPara?.path', this.dirPara?.path);
+          console.info('---->', dirEventsMap.get(this.dirPara?.path ?? ''));
+          //console.info('---->', dirEventsMap.get(this.dirPara?.path ?? ''));
+        }
+
         if (this.dirPara?.path) {
           let dirEvents = dirEventsMap.get(this.dirPara.path);
           if (dirEvents) this.handleDirEvent(dirEvents);
@@ -315,7 +332,20 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
   async requestRows(): Promise<void> {
-    if (this.dirPara) {
+    let findData: FindData | undefined = undefined;
+    if (this._tabsPanelData) {
+      const selectedTabData = this._tabsPanelData.tabs[this._tabsPanelData.selectedTabIndex];
+      if (selectedTabData.findData) {
+        findData = selectedTabData.findData;
+      }
+    }
+
+    if (findData) {
+      // request findings:
+      this.appService.requestFindings(findData);
+
+    } else if (this.dirPara) {
+      // request directory entries
       try {
         await this.appService.fetchDir(this.dirPara);
         // The effect in ngOnInit will handle the directory events
@@ -674,7 +704,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
     // console.info('file table (' + this.panelIndex + ') Relevant handleDirEvent: ', dirEvent); // TODO del handleDirEvent
 
     if (dirEvent.action === "list") {
-      let rows:FileItemIf[] = [];
+      let rows: FileItemIf[] = [];
 
       if (!dirEvent.end) {
         rows = [...this.bodyAreaModel.getAllRows()];

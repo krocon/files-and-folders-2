@@ -38,26 +38,28 @@ export class FindGateway {
       const ffs = fs.readdirSync(dir);
       ffs.forEach(f => {
         const f2 = path.join(dir, f);
-        const stats2 = fs.statSync(f2);
-        if (stats2.isDirectory()) {
-          dirs.push(f2);
+        if (fs.exists(f2)) {
+          const stats2 = fs.statSync(f2);
+          if (stats2.isDirectory()) {
+            dirs.push(f2);
 
-        } else {
-          if (!directoriesOnly) {
-            const dir = path.dirname(f2);
-            const base = path.basename(f2);
+          } else {
+            if (!directoriesOnly) {
+              const dir = path.dirname(f2);
+              const base = path.basename(f2);
 
-            // console.log(path.join(dir, base)+ ", find "+findDialogData.pattern + ',   ' +
-            //   (micromatch.isMatch(path.join(dir, base), findDialogData.pattern))
-            // );
-            if (micromatch.isMatch(path.join(dir, base), findDialogData.pattern)) {
-              const ext = path.extname(f2);
-              const fileItem = new FileItem(dir, base, ext);
+              // console.log(path.join(dir, base)+ ", find "+findDialogData.pattern + ',   ' +
+              //   (micromatch.isMatch(path.join(dir, base), findDialogData.pattern))
+              // );
+              if (micromatch.isMatch(path.join(dir, base), findDialogData.pattern)) {
+                const ext = path.extname(f2);
+                const fileItem = new FileItem(dir, base, ext);
 
-              stats2FileItem(stats2, fileItem);
-              fileItem.abs = true;
-              items.push(fileItem);
-              allItems.push(fileItem);
+                stats2FileItem(stats2, fileItem);
+                fileItem.abs = true;
+                items.push(fileItem);
+                allItems.push(fileItem);
+              }
             }
           }
         }
