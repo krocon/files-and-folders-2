@@ -44,39 +44,39 @@
             <button
                 (click)="triggerAction('OPEN_FIND_DLG')"
                 mat-menu-item> Find...
-              <fnf-shortcut [keys]="['alt', 'F7']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('OPEN_FIND_DLG')"></fnf-shortcut>
             </button>
             <!--TODO button mat-menu-item>  Change Dir...      <fnf-shortcut [keys]="['alt', 'F10']"></fnf-shortcut>  </button-->
             <button
                 (click)="triggerAction('TOGGLE_FILTER')"
                 mat-menu-item> Toggle Filter...
-              <fnf-shortcut [keys]="['^', '⇧', 'F']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('TOGGLE_FILTER')"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('RELOAD_DIR')"
                 mat-menu-item> Reload...
-              <fnf-shortcut [keys]="['^', '⇧', 'F12']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('RELOAD_DIR')"></fnf-shortcut>
             </button>
             <mat-divider></mat-divider>
             <button
                 (click)="triggerAction('OPEN_RENAME_DLG')"
                 mat-menu-item>  <!--      <button (click)="onRenameClicked()" [disabled]="!buttonEnableStates.rename" mat-menu-item>-->  Rename...
-              <fnf-shortcut [keys]="['⇧', 'F6']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('OPEN_RENAME_DLG')"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('OPEN_MULTIRENAME_DLG')"
                 mat-menu-item> Multi Rename...
-              <fnf-shortcut [keys]="['alt', 'F6']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('OPEN_MULTIRENAME_DLG')"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('OPEN_GROUPFILES_DLG')"
                 mat-menu-item> Group Files...
-              <fnf-shortcut [keys]="['alt', 'G']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('OPEN_GROUPFILES_DLG')"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('OPEN_DELETE_EMPTY_FOLDERS_DLG')"
                 mat-menu-item> Delete Empty Folders...
-              <fnf-shortcut [keys]="['^', 'alt', 'R']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('OPEN_DELETE_EMPTY_FOLDERS_DLG')"></fnf-shortcut>
             </button>
             <mat-divider></mat-divider>
             <button
@@ -108,68 +108,68 @@
             <button
                 (click)="triggerAction('ENHANCE_SELECTION')"
                 mat-menu-item> Enhance Selection...
-              <fnf-shortcut [keys]="['num', '+']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('ENHANCE_SELECTION')"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('REDUCE_SELECTION')"
                 mat-menu-item> Reduce Selection...
-              <fnf-shortcut [keys]="['num', '-']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('REDUCE_SELECTION')"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('TOGGLE_SELECTION')"
                 mat-menu-item> Toggle Selection...
-              <fnf-shortcut [keys]="['num', '*']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('TOGGLE_SELECTION')"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('SELECT_ALL')"
                 mat-menu-item> Select All
-              <fnf-shortcut [keys]="['^', 'num', '+']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('SELECT_ALL')"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('DESELECT_ALL')"
                 mat-menu-item> Deselect All
-              <fnf-shortcut [keys]="['^', 'num', '-']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('DESELECT_ALL')"></fnf-shortcut>
             </button>
             <mat-divider></mat-divider>
             <button
                 (click)="triggerAction('NAVIGATE_LEVEL_DOWN')"
                 mat-menu-item> Parent Dir
-              <fnf-shortcut [keys]="['⇧', 'PAGEUP']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('NAVIGATE_LEVEL_DOWN')"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('NAVIGATE_BACK')"
                 mat-menu-item> History Back
-              <fnf-shortcut [keys]="['⇧', 'PAGEDOWN']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('NAVIGATE_BACK')"></fnf-shortcut>
             </button>
             <!--button    (click)="triggerAction('NAVIGATE_FORWARD')"    mat-menu-item>  History Forward
-              <fnf-shortcut [keys]="['⇧', 'PAGEUP']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('NAVIGATE_FORWARD')"></fnf-shortcut>
             </button-->
             <mat-divider></mat-divider>
             <button
                 (click)="triggerAction('SELECT_LEFT_PANEL')"
                 mat-menu-item> Left Panel
-              <fnf-shortcut [keys]="['alt', '1']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('SELECT_LEFT_PANEL')"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('SELECT_RIGHT_PANEL')"
                 mat-menu-item> Right Panel
-              <fnf-shortcut [keys]="['alt', '2']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('SELECT_RIGHT_PANEL')"></fnf-shortcut>
             </button>
             <button
                 (click)="triggerAction('TOGGLE_PANEL')"
                 mat-menu-item> Toggle Panel
-              <fnf-shortcut [keys]="['TAB']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('TOGGLE_PANEL')"></fnf-shortcut>
             </button>
             <mat-divider></mat-divider>
             <button
                 (click)="onAddTabClicked()"
                 mat-menu-item> Add Tab
-              <fnf-shortcut [keys]="['alt', 'T']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('ADD_NEW_TAB')"></fnf-shortcut>
             </button>
             <button
                 (click)="onRemoveTabClicked()"
                 mat-menu-item> Remove Tab
-              <fnf-shortcut [keys]="['⇧','T']"></fnf-shortcut>
+              <fnf-shortcut [keys]="getShortcutsByAction('REMOVE_TAB')"></fnf-shortcut>
             </button>
 
           </mat-list>

@@ -273,7 +273,7 @@ export class AppService {
 
 
   triggerAction(id: ActionId) {
-    console.log('> triggerAction:', id);
+    // console.log('> triggerAction:', id);
 
     if (id === 'TOGGLE_PANEL') {
       this.panelSelectionService.toggle();

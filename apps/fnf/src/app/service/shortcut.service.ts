@@ -27,10 +27,13 @@ export class ShortcutService {
   }
 
   async init(sys:'osx' | 'windows'): Promise<ShortcutActionMapping> {
+    console.info('Shortcuts init...',sys);
+    console.info('harmonizeShortcut(\'ctrl+shift+f\')',harmonizeShortcut('ctrl+shift+f'));
     try {
       const shortcutMappings = await this.fetchShortcutMappings(sys);
       if (shortcutMappings) {
         this.activeShortcuts = this.updateShortcutMappings(shortcutMappings);
+        console.info('Shortcuts initialized ('+sys+'):', this.activeShortcuts);
       }
 
     } catch (error) {
@@ -73,11 +76,18 @@ export class ShortcutService {
       if (a === action) {
         const hs = harmonizeShortcut(sc);
         return hs
+          .replace('num_', 'num ')
           .split(' ')
           .map(s => s
             .replace(/ctrl/g, '^')
             .replace(/shift/g, '⇧')
             .replace(/cmd/g, '⌘')
+            .replace(/add/g, '+')
+            .replace(/plus/g, '+')
+            .replace(/minus/g, '-')
+            .replace(/subtract/g, '-')
+            .replace(/multiply/g, '*')
+            .replace(/minus/g, '-')
           );
       }
     }
@@ -96,6 +106,15 @@ export class ShortcutService {
 
   public addAdditionalShortcutMappings(map: ShortcutActionMapping): void {
     Object.entries(map).forEach(([key, value]) => {
+      if (this.activeShortcuts[harmonizeShortcut(key)]){
+        console.warn('Shortcut already exists:' + harmonizeShortcut(key));
+        console.warn(this.activeShortcuts[harmonizeShortcut(key)], value);
+        // throw new Error(
+        //   'Shortcut already exists:' + harmonizeShortcut(key) +
+        //   ' - ' + this.activeShortcuts[harmonizeShortcut(key)] +
+        //   ' - ' + value
+        // )
+      }
       this.activeShortcuts[harmonizeShortcut(key)] = value;
     });
   }

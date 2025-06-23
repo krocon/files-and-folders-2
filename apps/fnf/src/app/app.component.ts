@@ -35,6 +35,7 @@ import {PanelSelectionService} from "./domain/filepagedata/service/panel-selecti
 import {SummaryLabel} from "./component/main/footer/summarylabel/summary-label";
 import {TabsPanelData} from "./domain/filepagedata/data/tabs-panel.data";
 import {SelectionEvent} from "./domain/filepagedata/data/selection-event";
+import {createHarmonizedShortcutByKeyboardEvent} from "@guiexpert/table";
 
 
 const CONFIG: ResizeConfig = {
@@ -162,6 +163,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
   }
 
   onKeydown(keyboardEvent: KeyboardEvent) {
+    // console.info(keyboardEvent);
+    // console.info(createHarmonizedShortcutByKeyboardEvent(keyboardEvent));
+
     const actionByKeyEvent = this.appService.getActionByKeyEvent(keyboardEvent);
     if (actionByKeyEvent && actionByKeyEvent !== 'DO_NOTHING') {
       keyboardEvent.preventDefault();

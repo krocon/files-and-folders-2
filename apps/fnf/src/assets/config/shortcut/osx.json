@@ -36,6 +36,8 @@
   "cmd+alt+a": "SELECT_ALL",
   "num_subtract": "OPEN_DESELECT_DLG",
   "ctrl+num_subtract": "DESELECT_ALL",
+  "num_plus": "ENHANCE_SELECTION",
+  "num_minus": "REDUCE_SELECTION",
   "num_multiply": "TOGGLE_SELECTION",
   "shift pageup": "NAVIGATE_LEVEL_DOWN",
   "shift pagedown": "NAVIGATE_BACK",

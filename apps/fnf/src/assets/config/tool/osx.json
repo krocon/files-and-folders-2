@@ -11,7 +11,7 @@
   {
     "id": "CMD_SHELL",
     "label": "CMD Shell",
-    "shortcut": "control 0",
+    "shortcut": "cmd 0",
     "cmd": "open -a Terminal ",
     "para": " $dir ",
     "local": true
@@ -19,7 +19,7 @@
   {
     "id": "CMD_REVEAL_IN_FINDER",
     "label": "Reveal in Finder",
-    "shortcut": "control shift f",
+    "shortcut": "cmd shift f",
     "cmd": "open ",
     "para": " $dir ",
     "local": true
