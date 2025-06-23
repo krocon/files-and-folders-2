@@ -6,7 +6,17 @@ import {FilePageDataService} from "./domain/filepagedata/file-page-data.service"
 import {ConfigService} from "./service/config.service";
 import {FileSystemService} from "./service/file-system.service";
 import {environment} from "../environments/environment";
-import {CmdIf, Config, DirEventIf, DirPara, FileItemIf, FiletypeExtensionsIf, Sysinfo, SysinfoIf} from "@fnf-data";
+import {
+  CmdIf,
+  Config,
+  DirEventIf,
+  DirPara,
+  DOT_DOT,
+  FileItemIf,
+  FiletypeExtensionsIf,
+  Sysinfo,
+  SysinfoIf
+} from "@fnf-data";
 import {BehaviorSubject, firstValueFrom, Subject} from "rxjs";
 import {PanelIndex} from "./domain/panel-index";
 import {FilePageData} from "./domain/filepagedata/data/file-page.data";
@@ -629,6 +639,7 @@ export class AppService {
 
     if (rows?.length === 1) {
       const source = rows[0];
+      if (source.base===DOT_DOT) return // skip it
       const data = new RenameDialogData(source);
       this.renameDialogService
         .open(data, (result: RenameDialogResultData | undefined) => {
