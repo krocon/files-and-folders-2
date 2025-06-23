@@ -1,0 +1,61 @@
+<h2
+    data-test-id="page-subtitle-h2"
+    mat-dialog-title>Find</h2>
+
+<mat-dialog-content>
+  <div class="dlg-content-div">
+
+
+    <form
+        [formGroup]="formGroup"
+        autocomplete="off">
+      <mat-form-field>
+        <mat-label>Search in</mat-label>
+        <input
+            (keydown.enter)="onOkClicked()"
+            formControlName="folder"
+            matInput
+            placeholder="Search in"/>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Search for</mat-label>
+        <input
+            (keydown.enter)="onOkClicked()"
+            [fnfAutofocus]="true"
+            formControlName="pattern"
+            matInput
+            placeholder="Search for"/>
+      </mat-form-field>
+
+      <mat-checkbox formControlName="directoriesOnly">
+        Directories only
+      </mat-checkbox>
+
+      <mat-checkbox formControlName="newtab">
+        Open hits in a new tab
+      </mat-checkbox>
+
+    </form>
+
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button
+      (click)="onCancelClicked()"
+      data-test-id="dialog-cancel-button"
+      mat-raised-button>
+    Cancel
+  </button>
+
+  <button
+      (click)="onOkClicked()"
+      [disabled]="!formGroup.valid"
+      color="primary"
+      data-test-id="dialog-ok-button"
+      mat-raised-button>
+    Find
+  </button>
+</mat-dialog-actions>

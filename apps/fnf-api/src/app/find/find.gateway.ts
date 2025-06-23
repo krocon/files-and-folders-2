@@ -26,7 +26,6 @@ export class FindGateway {
   find(@MessageBody() findData: FindData): void {
     const findDialogData = findData.findDialogData;
     const directoriesOnly = findDialogData.directoriesOnly;
-
     const dirs: string[] = findDialogData.folders ? findDialogData.folders : [findDialogData.folder];
     const allItems: FileItem[] = [];
     let first = true;
@@ -48,6 +47,9 @@ export class FindGateway {
             const dir = path.dirname(f2);
             const base = path.basename(f2);
 
+            // console.log(path.join(dir, base)+ ", find "+findDialogData.pattern + ',   ' +
+            //   (micromatch.isMatch(path.join(dir, base), findDialogData.pattern))
+            // );
             if (micromatch.isMatch(path.join(dir, base), findDialogData.pattern)) {
               const ext = path.extname(f2);
               const fileItem = new FileItem(dir, base, ext);

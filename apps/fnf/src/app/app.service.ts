@@ -8,12 +8,13 @@ import {FileSystemService} from "./service/file-system.service";
 import {environment} from "../environments/environment";
 import {
   CmdIf,
-  Config,
+  Config, DirEvent,
   DirEventIf,
   DirPara,
   DOT_DOT,
   FileItemIf,
-  FiletypeExtensionsIf,
+  FindData,
+  FindDialogData,
   Sysinfo,
   SysinfoIf
 } from "@fnf-data";
@@ -50,6 +51,8 @@ import {ActionShortcutPipe} from "./common/action-shortcut.pipe";
 import {SelectionDialogService} from "./component/cmd/selection/selection-dialog.service";
 import {SelectionDialogData} from "./component/cmd/selection/selection-dialog.data";
 import {FiletypeExtensionsService} from "./service/filetype-extensions.service";
+import {FindDialogService} from "./component/cmd/find/find-dialog.service";
+import {FindSocketService} from "./service/find.socketio.service";
 
 @Injectable({
   providedIn: "root"
@@ -79,7 +82,6 @@ export class AppService {
   private defaultTools: CmdIf[] = [];
 
 
-
   constructor(
     private readonly lookAndFeelService: LookAndFeelService,
     private readonly shortcutService: ShortcutService,
@@ -99,6 +101,8 @@ export class AppService {
     private readonly shortcutDialogService: ShortcutDialogService,
     private readonly toolService: ToolService,
     private readonly selectionDialogService: SelectionDialogService,
+    private readonly findDialogService: FindDialogService,
+    private readonly findSocketService: FindSocketService,
   ) {
     // Set config to services:
     ConfigService.forRoot(environment.config);
@@ -332,6 +336,9 @@ export class AppService {
     } else if (id === "OPEN_RENAME_DLG") {
       this.rename();
 
+    } else if (id === "OPEN_FIND_DLG") {
+      this.find();
+
     } else if (id === "OPEN_MKDIR_DLG") {
       this.mkdir();
 
@@ -535,10 +542,10 @@ export class AppService {
     const srcPanelIndex = this.getActivePanelIndex();
     const filePageDataValue = this.filePageDataService.getValue();
     const tabsPanelDatum = filePageDataValue.tabRows[srcPanelIndex];
-    const tabData= tabsPanelDatum.tabs[tabsPanelDatum.selectedTabIndex];
+    const tabData = tabsPanelDatum.tabs[tabsPanelDatum.selectedTabIndex];
 
     if (!tabData.historyIndex) tabData.historyIndex = 0;
-    tabData.historyIndex = Math.max(0, tabData.historyIndex+1);
+    tabData.historyIndex = Math.max(0, tabData.historyIndex + 1);
     tabData.historyIndex = Math.min(tabData.historyIndex, tabData.history.length - 1);
     ChangeDirEventService.skipNextHistoryChange = true;
 
@@ -609,8 +616,26 @@ export class AppService {
     this.toolService.execute(cmds);
   }
 
-  openSelectionDialog(data: SelectionDialogData, cb: (result: string|undefined) => void){
+  openSelectionDialog(data: SelectionDialogData, cb: (result: string | undefined) => void) {
     this.selectionDialogService.open(data, cb);
+  }
+
+  getSelectedOrFocussedData(panelIndex: PanelIndex): FileItemIf[] {
+    let ret = this.selectionManagers[panelIndex]?.getSelectedRows() ?? [];
+    if (!ret?.length && this.bodyAreaModels[panelIndex]) {
+      const focusedRowIndex = this.bodyAreaModels[panelIndex]?.focusedRowIndex ?? 0;
+      const frd = this.bodyAreaModels[panelIndex]?.getRowByIndex(focusedRowIndex) ?? null;
+      if (frd) {
+        ret = [frd];
+      } else {
+        ret = [];
+      }
+    }
+    return ret ?? [];
+  }
+
+  getFirstShortcutByActionAsTokens(action: ActionId): string[] {
+    return this.shortcutService.getFirstShortcutByActionAsTokens(action);
   }
 
   private removeTab() {
@@ -639,7 +664,7 @@ export class AppService {
 
     if (rows?.length === 1) {
       const source = rows[0];
-      if (source.base===DOT_DOT) return // skip it
+      if (source.base === DOT_DOT) return // skip it
       const data = new RenameDialogData(source);
       this.renameDialogService
         .open(data, (result: RenameDialogResultData | undefined) => {
@@ -653,13 +678,34 @@ export class AppService {
     }
   }
 
-  private updateFocusRowCritereaOnActivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
-    this.updateFocusRowCriterea(this.getActivePanelIndex(), focusRowCriterea);
-  }
-
   // private updateFocusRowCritereaOnInactivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
   //   this.updateFocusRowCriterea(this.getInactivePanelIndex(), focusRowCriterea);
   // }
+
+  private find() {
+    const srcPanelIndex = this.getActivePanelIndex();
+    const tabData = this.getActiveTabOnActivePanel();
+    // const rows = this.getSelectedOrFocussedData(srcPanelIndex);
+
+    const data = new FindDialogData(tabData.path, '**/*.ts', true, false);
+    this.findDialogService
+      .open(data, (result: FindDialogData | undefined) => {
+        if (result) {
+          console.info('srcPanelIndex', srcPanelIndex);
+          console.info('find result', result);
+          if (result){
+            let findData:FindData = this.findSocketService.createFindData(result);
+            this.findSocketService.find(findData, event => {
+              console.info('find, dir event', event);
+            })
+          }
+        }
+      });
+  }
+
+  private updateFocusRowCritereaOnActivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
+    this.updateFocusRowCriterea(this.getActivePanelIndex(), focusRowCriterea);
+  }
 
   private updateFocusRowCriterea(panelIndex: PanelIndex, focusRowCriterea: Partial<FileItemIf> | null) {
     const filePageDataValue = this.clone(this.filePageDataService.getValue());
@@ -716,20 +762,6 @@ export class AppService {
     return this.getSelectedOrFocussedData(this.getActivePanelIndex());
   }
 
-  getSelectedOrFocussedData(panelIndex: PanelIndex): FileItemIf[] {
-    let ret = this.selectionManagers[panelIndex]?.getSelectedRows() ?? [];
-    if (!ret?.length && this.bodyAreaModels[panelIndex]) {
-      const focusedRowIndex = this.bodyAreaModels[panelIndex]?.focusedRowIndex ?? 0;
-      const frd = this.bodyAreaModels[panelIndex]?.getRowByIndex(focusedRowIndex) ?? null;
-      if (frd) {
-        ret = [frd];
-      } else {
-        ret = [];
-      }
-    }
-    return ret ?? [];
-  }
-
   private getFocussedData(panelIndex: PanelIndex): FileItemIf | null {
     if (this.bodyAreaModels[panelIndex]) {
       const focusedRowIndex = this.bodyAreaModels[panelIndex]?.focusedRowIndex ?? 0;
@@ -737,9 +769,5 @@ export class AppService {
       return frd ?? null;
     }
     return null;
-  }
-
-  getFirstShortcutByActionAsTokens(action: ActionId):string[] {
-    return this.shortcutService.getFirstShortcutByActionAsTokens(action);
   }
 }
