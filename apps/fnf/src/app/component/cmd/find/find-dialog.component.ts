@@ -16,7 +16,7 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatCheckbox} from "@angular/material/checkbox";
 
 @Component({
-  selector: "fnf-find-dialog",
+  selector: "fnf-openFindDialog-dialog",
   templateUrl: "./find-dialog.component.html",
   imports: [
     MatDialogTitle,

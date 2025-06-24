@@ -15,10 +15,10 @@ export class FindGateway {
   private readonly cancellings = {};
 
   /**
-   * Handles the "find" message event by searching for files and directories
+   * Handles the "openFindDialog" message event by searching for files and directories
    * that match a specified pattern and emitting the search results.
    *
-   * @param {FindData} findData - The data needed for performing the find operation,
+   * @param {FindData} findData - The data needed for performing the openFindDialog operation,
    * including folder(s) to search in, search patterns, and keys for canceling or emitting events.
    * @return {void} This method does not return a value. It emits events with the search results.
    */
@@ -38,7 +38,7 @@ export class FindGateway {
       const ffs = fs.readdirSync(dir);
       ffs.forEach(f => {
         const f2 = path.join(dir, f);
-        if (fs.exists(f2)) {
+        if (fs.existsSync(f2)) {
           const stats2 = fs.statSync(f2);
           if (stats2.isDirectory()) {
             dirs.push(f2);
@@ -48,7 +48,7 @@ export class FindGateway {
               const dir = path.dirname(f2);
               const base = path.basename(f2);
 
-              // console.log(path.join(dir, base)+ ", find "+findDialogData.pattern + ',   ' +
+              // console.log(path.join(dir, base)+ ", openFindDialog "+findDialogData.pattern + ',   ' +
               //   (micromatch.isMatch(path.join(dir, base), findDialogData.pattern))
               // );
               if (micromatch.isMatch(path.join(dir, base), findDialogData.pattern)) {

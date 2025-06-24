@@ -1,7 +1,10 @@
 
 
 @if (this.pattern) {
-  <div class="search-div" [matTooltip]="tabDataItem?.findData|json">
+  <div
+      (dblclick)="onSearchDblClicked()"
+      class="search-div"
+      [matTooltip]="tabDataItem?.findData|json">
     Search:&nbsp;"{{this.pattern}}"
   </div>
 }

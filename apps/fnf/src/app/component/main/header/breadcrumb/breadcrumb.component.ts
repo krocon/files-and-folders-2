@@ -1,11 +1,12 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, Output} from '@angular/core';
-import {FileItemIf} from "@fnf/fnf-data";
+import {FileItemIf, FindDialogData} from "@fnf/fnf-data";
 import {CommonModule} from "@angular/common";
 import {path2FileItems} from "../../../../common/fn/path-to-file-items";
 import {Subject} from "rxjs";
 import {TabsPanelData} from "../../../../domain/filepagedata/data/tabs-panel.data";
 import {TabData} from "../../../../domain/filepagedata/data/tab.data";
 import {MatTooltip} from "@angular/material/tooltip";
+import {AppService} from "../../../../app.service";
 
 @Component({
   selector: 'app-breadcrumb',
@@ -30,6 +31,7 @@ export class BreadcrumbComponent {
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
+    private readonly appService: AppService,
   ) {
   }
 
@@ -64,4 +66,14 @@ export class BreadcrumbComponent {
   }
 
 
+  onSearchDblClicked() {
+    if (this.tabDataItem?.findData?.findDialogData) {
+      const findDialogData: FindDialogData = {
+        ...new FindDialogData(this.tabDataItem.path, '', false, false),
+        ...this.tabDataItem?.findData?.findDialogData,
+        newtab: false
+      };
+      this.appService.openFindDialog(findDialogData);
+    }
+  }
 }

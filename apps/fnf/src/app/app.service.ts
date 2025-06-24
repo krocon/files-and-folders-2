@@ -325,7 +325,7 @@ export class AppService {
       this.rename();
 
     } else if (id === "OPEN_FIND_DLG") {
-      this.find();
+      this.openFindDialog();
 
     } else if (id === "OPEN_MKDIR_DLG") {
       this.mkdir();
@@ -456,7 +456,7 @@ export class AppService {
     if (tabData) {
       if (tabData.path.startsWith('tabfind')) {
         this.updateFilePageData(this.filePageData);
-// TODO find tab data
+
       } else {
         try {
           const path = await this.checkPath(tabData.path);
@@ -687,51 +687,31 @@ export class AppService {
     }
   }
 
-  private find() {
+  public openFindDialog(
+    data:FindDialogData = new FindDialogData(this.getActiveTabOnActivePanel().path, '**/*.ts', true, false)
+  ) {
     const srcPanelIndex = this.getActivePanelIndex();
     const tabData = this.getActiveTabOnActivePanel();
-    // const rows = this.getSelectedOrFocussedData(srcPanelIndex);
-
-    const data = new FindDialogData(tabData.path, '**/*.ts', true, false);
-    let tabAdded = false;
 
     this.findDialogService
       .open(data, (result: FindDialogData | undefined) => {
         if (result) {
-          if (result) {
             let findData: FindData = this.findSocketService.createFindData(result);
-            if (!tabAdded) {
-              tabAdded = true;
+
+            if (findData.findDialogData.newtab) {
               const tabDataFindings = new TabData(findData.dirTabKey);
               tabDataFindings.findData = findData;
               this.addTab(srcPanelIndex, tabDataFindings);
 
             } else {
+              const currentData = this.filePageData;
+              const tabsPanel = currentData.tabRows[srcPanelIndex];
+              const tabData = tabsPanel.tabs[tabsPanel.selectedTabIndex];
               tabData.path = findData.dirTabKey;
               tabData.findData = findData;
               this.updateFilePageData(this.filePageData);
             }
-
-            // this.findSocketService
-            //   .find(findData, event => {
-            //     // if (!tabAdded) {
-            //     //   tabAdded = true;
-            //     //   let tabDataFindings = new TabData(findData.dirTabKey);
-            //     //   this.addTab(srcPanelIndex, tabDataFindings);
-            //     //   // this.onChangeDir(findData.dirTabKey, srcPanelIndex);
-            //     // }
-            //
-            //     //if (event.end) {
-            //       const currentMap = this.dirEvents$.getValue();
-            //       const newMap = new Map(currentMap);
-            //       newMap.set(findData.dirTabKey, [event]);
-            //       this.dirEvents$.next(newMap);
-            //
-            //       console.info('find, dir event', event);
-            //     //}
-            //   });
           }
-        }
       });
   }
 

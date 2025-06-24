@@ -212,28 +212,32 @@ export class FileTableComponent implements OnInit, OnDestroy {
     this.filterText = selectedTabData.filterText ?? '';
     this.filterActive = selectedTabData.filterActive ?? false;
 
-    if (selectedTabData.findData) {
-      if (this.tableApi) {
-        this.tableApi.setRows([]);
-        this.repaintTable();
+    if (!this.dirPara
+      || this.dirPara?.path !== selectedTabData.path) {
+
+      if (selectedTabData.findData) {
+        if (this.tableApi) {
+          this.tableApi.setRows([]);
+          this.repaintTable();
+        }
+        this.dirPara = new DirPara(selectedTabData.path, `file-panel-${this._panelIndex}`);
+        this.requestRows();
+
+      } else if (!this.dirPara || this.dirPara?.path !== selectedTabData.path) {
+        if (this.tableApi) {
+          this.tableApi.setRows([]);
+          this.repaintTable();
+        }
+
+        this.dirPara = new DirPara(selectedTabData.path, `file-panel-${this._panelIndex}`);
+        this.requestRows();
       }
-      this.dirPara = new DirPara(selectedTabData.path, `file-panel-${this._panelIndex}`);
-      this.requestRows();
 
-    } else if (!this.dirPara || this.dirPara?.path !== selectedTabData.path) {
-      if (this.tableApi) {
-        this.tableApi.setRows([]);
-        this.repaintTable();
+      if (filterChanged && this.tableApi) {
+        this.tableApi.externalFilterChanged();
+        this.tableApi.reSort();
+        this.tableApi.repaintHard();
       }
-
-      this.dirPara = new DirPara(selectedTabData.path, `file-panel-${this._panelIndex}`);
-      this.requestRows();
-    }
-
-    if (filterChanged && this.tableApi) {
-      this.tableApi.externalFilterChanged();
-      this.tableApi.reSort();
-      this.tableApi.repaintHard();
     }
   }
 

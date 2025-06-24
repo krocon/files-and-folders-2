@@ -33,7 +33,7 @@ export class FindFolderService {
       if (depth >= para.folderDeep) continue;
 
       try {
-        if (fs.exists(dir)) {
+        if (fs.existsSync(dir)) {
           const items: string[] = await fs.readdir(dir);
           for (const item of items) {
 
