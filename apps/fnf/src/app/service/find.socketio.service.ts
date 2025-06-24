@@ -11,7 +11,7 @@ export type FindCallback = (event: DirEvent) => void;
 })
 export class FindSocketService {
 
-  private rid = 0;
+  private rid:string = 'abc';
   private cancellings: { [key: string]: Subscription } = {};
   private cache: { [key: string]: DirEvent } = {};
 
@@ -30,7 +30,7 @@ export class FindSocketService {
   }
 
   public createFindData(findDialogData: FindDialogData): FindData {
-    this.rid++;
+    this.rid = Math.random().toString(36).substring(2, 12);
     const listenKey = `find${this.rid}`;
     const cancelKey = `cancelfind${this.rid}`;
     const tabKey = `tabfind${this.rid}`;

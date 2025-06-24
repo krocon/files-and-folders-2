@@ -1,7 +1,7 @@
 
 
 @if (this.pattern) {
-  <div class="search-div">
+  <div class="search-div" [matTooltip]="tabDataItem?.findData|json">
     Search:&nbsp;"{{this.pattern}}"
   </div>
 }

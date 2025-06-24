@@ -5,11 +5,13 @@ import {path2FileItems} from "../../../../common/fn/path-to-file-items";
 import {Subject} from "rxjs";
 import {TabsPanelData} from "../../../../domain/filepagedata/data/tabs-panel.data";
 import {TabData} from "../../../../domain/filepagedata/data/tab.data";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: 'app-breadcrumb',
   imports: [
-    CommonModule
+    CommonModule,
+    MatTooltip
   ],
   templateUrl: './breadcrumb.component.html',
   styleUrl: './breadcrumb.component.css',
