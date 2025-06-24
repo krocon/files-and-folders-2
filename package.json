@@ -6,15 +6,18 @@
     "pnpm-i": "pnpm i -f",
     "start:fnf": "pnpm --filter fnf start",
     "start:fnf-api": "pnpm --filter fnf-api start",
+    "start:fnf-electron": "pnpm --filter fnf-electron start",
     "build:fnf": "pnpm --filter fnf build",
     "build:fnf-api": "pnpm --filter fnf-api build",
     "build:fnf-data": "pnpm --filter fnf-data build",
+    "build:fnf-electron": "pnpm --filter fnf-electron build",
     "build": "pnpm build:fnf-data && pnpm build:fnf && pnpm build:fnf-api",
+    "build:all": "pnpm build && pnpm build:fnf-electron",
     "test:fnf": "pnpm --filter fnf test",
     "test:fnf-api": "pnpm --filter fnf-api test",
     "test:fnf-data": "pnpm --filter fnf-data test",
     "test": "pnpm test:fnf-data && pnpm test:fnf && pnpm test:fnf-api",
-    "install:all": "pnpm install && pnpm --filter fnf-data install && pnpm --filter fnf install && pnpm --filter fnf-api install"
+    "install:all": "pnpm install && pnpm --filter fnf-data install && pnpm --filter fnf install && pnpm --filter fnf-api install && pnpm --filter fnf-electron install"
   },
   "private": true,
   "engines": {
