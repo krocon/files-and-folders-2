@@ -178,3 +178,5 @@ fnf2.pub
 # Exclude large image files
 apps/fnf/src/assets/screens_old/
 !/.github/workflows/deploy.yml
+/apps/fnf-electron/mac_development.cer
+/apps/fnf-electron/CertificateSigningRequest.certSigningRequest

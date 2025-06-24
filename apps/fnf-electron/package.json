@@ -35,7 +35,9 @@
       "node_modules/**/*"
     ],
     "mac": {
-      "category": "public.app-category.utilities"
+      "category": "public.app-category.utilities",
+      "identity": "Marc Kronberg (XB35N4CZ95)"
+
     },
     "win": {
       "target": "nsis"
