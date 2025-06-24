@@ -29,9 +29,15 @@ import {MatTooltip} from "@angular/material/tooltip";
       }
 
       .ffn-name-cell-label {
+          direction: rtl;
+          text-align: left;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          
+          /*white-space: nowrap;*/
+          /*overflow: hidden;*/
+          /*text-overflow: ellipsis;*/
           display: inline-block;
           max-width: calc(100% - 40px);
       }
