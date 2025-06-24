@@ -10,8 +10,7 @@ import {MatTooltip} from "@angular/material/tooltip";
     <i [attr.class]="iconClass"></i>
     <div
         [matTooltip]="tooltip"
-        class="ffn-name-cell-label">{{ text }}
-    </div>
+        class="ffn-name-cell-label">{{ text }}</div>
   `,
   styles: [`
       :host {
@@ -61,19 +60,27 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
     cellValue: any): RendererCleanupFnType | undefined {
 
     const fileItem: FileItemIf = areaModel.getRowByIndex(rowIndex);
-    this.tooltip = '';
+
+    this.tooltip = fileItem.dir + '/' + fileItem.base;
     this.iconClass = this.getIconClass(fileItem);
 
     let name = fileItem.base;
     if (name !== DOT_DOT && fileItem.isDir) {
-      this.text = `[${name}]`;
-    } else {
-      const base = fileItem.base.substring(0, fileItem.base.length - fileItem.ext.length);
 
       if (fileItem.abs) {
-        this.text = `${fileItem.dir}${base}`;
-        this.tooltip = this.text;
+        this.text = fileItem.dir + '/' + fileItem.base;
       } else {
+        this.text = `[${name}]`;
+      }
+
+
+    } else {
+      console.log("fileItem", fileItem);
+      if (fileItem.abs) {
+        this.text = fileItem.dir + '/' + fileItem.base.replace(fileItem.ext, '');
+        this.text = this.text.substring(1); // hack, because of rtl css bug
+      } else {
+        const base = fileItem.base.substring(0, fileItem.base.length - fileItem.ext.length );
         this.text = `${base}`;
       }
     }
