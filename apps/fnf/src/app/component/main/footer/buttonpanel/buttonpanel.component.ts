@@ -161,4 +161,7 @@ export class ButtonPanelComponent implements OnInit {
   getShortcutsByAction(action: ActionId) {
     return this.appService.getFirstShortcutByActionAsTokens(action);
   }
+  getShortcutAsLabelTokens(sc:string):string[] {
+    return this.appService.getShortcutAsLabelTokens(sc);
+  }
 }

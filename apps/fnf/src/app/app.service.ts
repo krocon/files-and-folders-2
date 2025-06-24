@@ -634,6 +634,9 @@ export class AppService {
   getFirstShortcutByActionAsTokens(action: ActionId): string[] {
     return this.shortcutService.getFirstShortcutByActionAsTokens(action);
   }
+  getShortcutAsLabelTokens(sc:string):string[] {
+    return this.shortcutService.getShortcutAsLabelTokens(sc);
+  }
 
   public addTab(panelIndex: PanelIndex, tabData: TabData) {
     const currentData = this.filePageData;

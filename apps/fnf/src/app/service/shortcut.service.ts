@@ -74,24 +74,28 @@ export class ShortcutService {
     for (const sc in this.activeShortcuts) {
       const a = this.activeShortcuts[sc];
       if (a === action) {
-        const hs = harmonizeShortcut(sc);
-        return hs
-          .replace('num_', 'num ')
-          .split(' ')
-          .map(s => s
-            .replace(/ctrl/g, '^')
-            .replace(/shift/g, '⇧')
-            .replace(/cmd/g, '⌘')
-            .replace(/add/g, '+')
-            .replace(/plus/g, '+')
-            .replace(/minus/g, '-')
-            .replace(/subtract/g, '-')
-            .replace(/multiply/g, '*')
-            .replace(/minus/g, '-')
-          );
+        return this.getShortcutAsLabelTokens(sc);
       }
     }
     return [];
+  }
+
+  getShortcutAsLabelTokens(sc:string):string[] {
+    const hs = harmonizeShortcut(sc);
+    return hs
+      .replace('num_', 'num ')
+      .split(' ')
+      .map(s => s
+        .replace(/ctrl/g, '^')
+        .replace(/shift/g, '⇧')
+        .replace(/cmd/g, '⌘')
+        .replace(/add/g, '+')
+        .replace(/plus/g, '+')
+        .replace(/minus/g, '-')
+        .replace(/subtract/g, '-')
+        .replace(/multiply/g, '*')
+        .replace(/minus/g, '-')
+      );
   }
 
   getActiveShortcuts(): ShortcutActionMapping {

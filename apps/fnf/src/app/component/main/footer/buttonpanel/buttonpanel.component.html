@@ -193,7 +193,7 @@
         <button
             mat-menu-item
             (click)="onToolClicked(tool)">{{ tool.label }}
-          <fnf-shortcut [keys]="tool.shortcut.split(' ')"></fnf-shortcut>
+          <fnf-shortcut [keys]="getShortcutAsLabelTokens(tool.shortcut)"></fnf-shortcut>
         </button>
       }
     </mat-menu>
