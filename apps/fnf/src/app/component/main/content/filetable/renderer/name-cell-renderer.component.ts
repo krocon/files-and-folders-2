@@ -26,6 +26,10 @@ import {MatTooltip} from "@angular/material/tooltip";
       :host {
           padding-left: 10px;
       }
+      i {
+          min-width: 16px;
+          text-align: center;
+      }
 
       .ffn-name-cell-label {
           direction: rtl;
@@ -65,17 +69,21 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
     this.iconClass = this.getIconClass(fileItem);
 
     let name = fileItem.base;
-    if (name !== DOT_DOT && fileItem.isDir) {
 
+
+    if (name === DOT_DOT) {
+      this.text = `..`;
+
+    } else if (fileItem.isDir) {
+      // Directory:
       if (fileItem.abs) {
         this.text = fileItem.dir + '/' + fileItem.base;
       } else {
         this.text = `[${name}]`;
       }
 
-
     } else {
-      console.log("fileItem", fileItem);
+      // File:
       if (fileItem.abs) {
         this.text = fileItem.dir + '/' + fileItem.base.replace(fileItem.ext, '');
         this.text = this.text.substring(1); // hack, because of rtl css bug
