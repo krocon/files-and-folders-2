@@ -19,7 +19,7 @@
 
         .row-1 {
             display: grid;
-            grid-template-columns: minmax(100px, 1fr) 280px auto auto auto;
+            grid-template-columns: minmax(100px, 1fr) 280px 160px 160px 160px;
             grid-gap: 12px;
         }
         .row-2 {
@@ -31,6 +31,7 @@
             grid-gap: 24px;
         }
     }
+    .mat-mdc-form-field-subscript-wrapper {display: none}
 }
 
 

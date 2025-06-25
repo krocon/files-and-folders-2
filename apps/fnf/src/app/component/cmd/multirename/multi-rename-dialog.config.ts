@@ -8,7 +8,7 @@ export class MultiRenameDialogConfig extends MatDialogConfig {
   constructor(data: MultiRenameDialogData) {
     super();
     this.data = data;
-    this.minHeight = 'calc(100vh - 200px)';
+    this.minHeight = 'calc(100vh - 20px)';
     this.minWidth = "calc(100vw - 200px)";
   }
 }
