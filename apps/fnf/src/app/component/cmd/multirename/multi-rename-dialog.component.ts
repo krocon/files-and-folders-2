@@ -56,7 +56,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
     public dialogRef: MatDialogRef<MultiRenameDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public multiRenameDialogData: MultiRenameDialogData,
     private readonly formBuilder: FormBuilder,
-    // private readonly walkSocketService: WalkSocketService
+
   ) {
     console.info(multiRenameDialogData);
     this.data = multiRenameDialogData.data;
@@ -69,10 +69,25 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
         counterStart: new FormControl(this.data.counterStart, []),
         counterStep: new FormControl(this.data.counterStep, []),
         counterDigits: new FormControl(this.data.counterDigits, []),
+
         replaceGermanUmlauts: new FormControl(this.data.replaceGermanUmlauts, []),
         replaceRiskyChars: new FormControl(this.data.replaceRiskyChars, []),
         replaceSpaceToUnderscore: new FormControl(this.data.replaceSpaceToUnderscore, []),
         replaceParentDir: new FormControl(this.data.replaceParentDir, []),
+
+        replacementsChecked: new FormControl(this.data.replacementsChecked, []),
+        replacements: formBuilder.array(
+          this.data.replacements.map(r => this.formBuilder.group(
+            {
+              checked: new FormControl(r.checked, []),
+              textFrom: new FormControl(r.textFrom, []),
+              textTo: new FormControl(r.textTo, []),
+              regExpr: new FormControl(r.regExpr, []),
+              ifFlag: new FormControl(r.ifFlag, []),
+              ifMatch: new FormControl(r.ifMatch, [])
+            })
+          )
+        )
       }
     );
 

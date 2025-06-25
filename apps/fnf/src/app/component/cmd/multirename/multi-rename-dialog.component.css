@@ -7,7 +7,7 @@
     form {
         height: 100%;
         display: grid;
-        grid-template-rows: auto auto auto auto auto 1fr;
+        grid-template-rows: auto auto auto auto auto auto 1fr;
         grid-gap: 12px;
         align-items: start;
         align-content: start;
@@ -29,6 +29,9 @@
             display: grid;
             grid-template-columns: auto auto auto auto 1fr;
             grid-gap: 24px;
+        }
+        .hidden {
+            display: none;
         }
     }
     .mat-mdc-form-field-subscript-wrapper {display: none}
