@@ -1,0 +1,28 @@
+<h2
+    data-test-id="page-subtitle-h2"
+    mat-dialog-title>Multi Rename</h2>
+
+<mat-dialog-content>
+  <div class="dlg-content-div">
+
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button
+      (click)="onCancelClicked()"
+      data-test-id="dialog-cancel-button"
+      mat-raised-button>
+    Cancel
+  </button>
+
+  <button
+      (click)="onOkClicked()"
+      [disabled]="!formGroup.valid"
+      color="primary"
+      data-test-id="dialog-ok-button"
+      mat-raised-button>
+    Rename All
+  </button>
+</mat-dialog-actions>

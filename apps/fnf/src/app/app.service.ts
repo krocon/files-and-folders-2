@@ -53,6 +53,9 @@ import {SelectionDialogData} from "./component/cmd/selection/selection-dialog.da
 import {FiletypeExtensionsService} from "./service/filetype-extensions.service";
 import {FindDialogService} from "./component/cmd/find/find-dialog.service";
 import {FindSocketService} from "./service/find.socketio.service";
+import {MultiRenameDialogComponent} from "./component/cmd/multirename/multi-rename-dialog.component";
+import {MultiRenameDialogService} from "./component/cmd/multirename/multi-rename-dialog.service";
+import {MultiRenameDialogData} from "./component/cmd/multirename/multi-rename-dialog.data";
 
 @Injectable({
   providedIn: "root"
@@ -103,6 +106,7 @@ export class AppService {
     private readonly selectionDialogService: SelectionDialogService,
     private readonly findDialogService: FindDialogService,
     private readonly findSocketService: FindSocketService,
+    private readonly multiRenameDialogService: MultiRenameDialogService,
   ) {
     // Set config to services:
     ConfigService.forRoot(environment.config);
@@ -323,6 +327,9 @@ export class AppService {
 
     } else if (id === "OPEN_RENAME_DLG") {
       this.rename();
+
+    } else if (id === "OPEN_MULTIRENAME_DLG") {
+      this.multiRename();
 
     } else if (id === "OPEN_FIND_DLG") {
       this.openFindDialog();
@@ -685,6 +692,25 @@ export class AppService {
               new FileOperationParams(result.source, srcPanelIndex, result.target)
             );
             this.commandService.addActions([actionEvent]);
+          }
+        });
+    }
+  }
+
+  private multiRename() {
+    const srcPanelIndex = this.getActivePanelIndex();
+    const rows = this.getSelectedOrFocussedData(srcPanelIndex).filter(item => item.base !== DOT_DOT);
+
+    if (rows?.length) {
+      const data = new MultiRenameDialogData(rows);
+      this.multiRenameDialogService
+        .open(data, (result: /*MultirenameDialogResultData*/any | undefined) => {
+          console.info(result);
+          if (result) {
+            // const actionEvent = this.commandService.multiRename(
+            //   new FileOperationParams(result.source, srcPanelIndex, result.target)
+            // );
+            // this.commandService.addActions([actionEvent]);
           }
         });
     }
