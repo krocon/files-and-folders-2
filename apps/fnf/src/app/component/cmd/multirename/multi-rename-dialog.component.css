@@ -19,7 +19,7 @@
 
         .row-1 {
             display: grid;
-            grid-template-columns: 1fr 280px  auto auto auto;
+            grid-template-columns: minmax(100px, 1fr) 280px auto auto auto;
             grid-gap: 12px;
         }
         .row-2 {
