@@ -1,5 +1,5 @@
 import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
-import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MultiRenameDialogData} from "./data/multi-rename-dialog.data";
 import {
   MAT_DIALOG_DATA,
@@ -39,7 +39,8 @@ import {MatCheckbox} from "@angular/material/checkbox";
     MatSelect,
     MatOption,
     MatLabel,
-    MatCheckbox
+    MatCheckbox,
+
   ],
   styleUrls: ["./multi-rename-dialog.component.css"]
 })
@@ -118,4 +119,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
   }
 
 
+  get replacements(): FormArray {
+    return this.formGroup.get('replacements') as FormArray;
+  }
 }

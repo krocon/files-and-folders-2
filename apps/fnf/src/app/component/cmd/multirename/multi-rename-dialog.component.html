@@ -66,7 +66,7 @@
     <div class="row-2">
       <label>
         [N] Name,
-        [N#-#] Part of Name,
+        [N#-#] Part of Name (Example: [N1-8]),
         [E] Extension,
         [E#-#] Part of Ext,
         [C] Counter,
@@ -88,23 +88,41 @@
     </div>
 
     <div class="row-5" [class.hidden]="!formGroup.get('replacementsChecked')?.value">
-
       <ng-container formArrayName="replacements">
-      @for (replacementForm of formGroup.get('replacements'); track replacementForm; let i = $index) {
-        <div [formGroupName]="replacementForm">
-          <mat-checkbox formControlName="replacementForm.checked">Replace</mat-checkbox>
-          <mat-checkbox formControlName="replacementForm.regExpr">Replace</mat-checkbox>
-          <mat-checkbox formControlName="replacementForm.ifFlag">Replace</mat-checkbox>
-        </div>
+        @if (replacements.controls) {
+          @for (replacementForm of replacements.controls; track replacementForm; let i = $index) {
+          <div [formGroupName]="i" class="replacement-row">
+
+            <mat-checkbox formControlName="checked">
+              Replace
+            </mat-checkbox>
+
+            <mat-form-field>
+              <input formControlName="textFrom" matInput/>
+            </mat-form-field>
+
+            <label>with</label>
+
+            <mat-form-field>
+              <input formControlName="textTo" matInput/>
+            </mat-form-field>
+
+            <mat-checkbox formControlName="regExpr">Use RegExp </mat-checkbox>
+
+            <mat-checkbox formControlName="ifFlag">only if match </mat-checkbox>
+
+            <mat-form-field>
+              <input formControlName="ifMatch" matInput />
+            </mat-form-field>
+          </div>
+        }
       }
       </ng-container>
     </div>
 
-    <div class="row-6" style="background-color: red">
-      test 6
-    </div>
+
     <div class="row-6" style="background-color: yellow">
-      test 6
+      TABELLE
     </div>
 
   </form>
