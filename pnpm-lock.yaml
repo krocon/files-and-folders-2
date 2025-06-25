@@ -208,25 +208,6 @@ importers:
         specifier: ^5.1.3
         version: 5.4.5
 
-  apps/fnf-electron:
-    dependencies:
-      electron-serve:
-        specifier: ^1.1.0
-        version: 1.3.0
-    devDependencies:
-      concurrently:
-        specifier: ^9.2.0
-        version: 9.2.0
-      electron:
-        specifier: ^23.3.13
-        version: 23.3.13
-      electron-builder:
-        specifier: ^25.1.8
-        version: 25.1.8(electron-builder-squirrel-windows@25.1.8)
-      wait-on:
-        specifier: ^8.0.3
-        version: 8.0.3
-
   libs/fnf-data:
     dependencies:
       tslib:

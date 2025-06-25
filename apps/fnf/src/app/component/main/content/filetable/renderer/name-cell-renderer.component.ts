@@ -10,7 +10,9 @@ import {MatTooltip} from "@angular/material/tooltip";
     <i [attr.class]="iconClass"></i>
     <div
         [matTooltip]="tooltip"
-        class="ffn-name-cell-label">{{ text }}</div>
+        class="ffn-name-cell-label"
+        [class.rtl]="rtl"
+    >{{ text }}</div>
   `,
   styles: [`
       :host {
@@ -32,17 +34,16 @@ import {MatTooltip} from "@angular/material/tooltip";
       }
 
       .ffn-name-cell-label {
-          direction: rtl;
           text-align: left;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          
-          /*white-space: nowrap;*/
-          /*overflow: hidden;*/
-          /*text-overflow: ellipsis;*/
           display: inline-block;
           max-width: calc(100% - 40px);
+          
+          &.rtl {
+              direction: rtl;
+          }
       }
   `],
   imports: [
@@ -55,6 +56,7 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
   iconClass: string = '';
   text: string = '';
   tooltip: string = '';
+  rtl: boolean  = false;
 
   setData(
     rowIndex: number,
@@ -64,6 +66,7 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
     cellValue: any): RendererCleanupFnType | undefined {
 
     const fileItem: FileItemIf = areaModel.getRowByIndex(rowIndex);
+    this.rtl = fileItem.abs;
 
     this.tooltip = fileItem.dir + '/' + fileItem.base;
     this.iconClass = this.getIconClass(fileItem);
