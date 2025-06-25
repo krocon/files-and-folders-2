@@ -7,6 +7,7 @@
 
   <form
       [formGroup]="formGroup"
+      [class.replacements-checked]="!formGroup.get('replacementsChecked')?.value"
       autocomplete="off">
 
     <div class="row-1">
@@ -87,9 +88,9 @@
       <mat-checkbox formControlName="replacementsChecked">Search and replace</mat-checkbox>
     </div>
 
-    <div class="row-5" [class.hidden]="!formGroup.get('replacementsChecked')?.value">
+    <div class="row-5">
       <ng-container formArrayName="replacements">
-        @if (replacements.controls) {
+        @if (replacements.controls && formGroup.get('replacementsChecked')?.value) {
           @for (replacementForm of replacements.controls; track replacementForm; let i = $index) {
           <div [formGroupName]="i" class="replacement-row">
 
@@ -118,9 +119,13 @@
       </ng-container>
     </div>
 
-
-    <div class="row-6" style="background-color: yellow">
-      TABELLE
+    <div class="row-6">
+        <guiexpert-table
+            (tableReady)="onTableReady($event)"
+            [debounceMouseClickDelay]="150"
+            [tableModel]="tableModel"
+            [tableOptions]="tableOptions"
+            class="ge-table multi-rename-table"></guiexpert-table>
     </div>
 
   </form>

@@ -15,7 +15,7 @@ import {NotifyEvent} from "../../domain/cmd/notify-event";
 })
 export class CommandService {
   // Constants
-  readonly BULK_LOWER_LIMIT = 30;
+  public static readonly BULK_LOWER_LIMIT = 30;
   readonly ACTION_STATUS_NEW: QueueStatus = 'NEW';
 
   private actionId = 0;

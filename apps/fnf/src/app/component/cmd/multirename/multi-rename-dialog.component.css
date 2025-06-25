@@ -12,6 +12,9 @@
         align-items: start;
         align-content: start;
 
+        &.replacements-checked {
+            grid-template-rows: auto auto auto auto 0 1fr;
+        }
         & > div {
             height: 100%;
             width: 100%;
@@ -38,6 +41,12 @@
                 align-items: center;
             }
         }
+        .row-6 {
+            height: 100%;
+            display: grid;
+            grid-template-rows: 1fr;
+            background-color: #4be20b;
+        }
         .hidden {
             display: none;
         }
@@ -45,7 +54,9 @@
     .mat-mdc-form-field-subscript-wrapper {display: none}
 }
 
-
+.multi-rename-table{
+    height: 100%;
+}
 .mat-mdc-form-field {
     /*width: 100%;*/
 }

@@ -31,8 +31,8 @@ import {ActionId} from "./domain/action/fnf-action.enum";
 import {Theme} from "./domain/customcss/css-theme-type";
 import {TabData} from "./domain/filepagedata/data/tab.data";
 import {FileActionService} from "./service/cmd/file-action.service";
-import {FileTableBodyModel} from "./component/main/content/filetable/file-table-body-model";
-import {SelectionManagerForObjectModels} from "./component/main/content/filetable/selection-manager";
+import {FileTableBodyModel} from "./component/main/filetable/file-table-body-model";
+import {SelectionManagerForObjectModels} from "./component/main/filetable/selection-manager";
 import {CopyOrMoveDialogData} from "./component/cmd/copyormove/copy-or-move-dialog.data";
 import {CopyOrMoveDialogService} from "./component/cmd/copyormove/copy-or-move-dialog.service";
 import {ClipboardService} from "./service/clipboard-service";
@@ -702,7 +702,7 @@ export class AppService {
     const rows = this.getSelectedOrFocussedData(srcPanelIndex).filter(item => item.base !== DOT_DOT);
 
     if (rows?.length) {
-      const data = new MultiRenameDialogData(rows);
+      const data = new MultiRenameDialogData(rows, srcPanelIndex);
       this.multiRenameDialogService
         .open(data, (result: /*MultirenameDialogResultData*/any | undefined) => {
           console.info(result);

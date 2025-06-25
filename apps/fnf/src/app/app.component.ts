@@ -25,7 +25,7 @@ import {ButtonPanelComponent} from './component/main/footer/buttonpanel/buttonpa
 import {environment} from "../environments/environment";
 import {ButtonEnableStates, FileItemIf} from "@fnf-data";
 import {AppService} from "./app.service";
-import {FileTableComponent} from "./component/main/content/filetable/file-table.component";
+import {FileTableComponent} from "./component/main/filetable/file-table.component";
 import {CommonModule} from "@angular/common";
 import {FilePageData} from "./domain/filepagedata/data/file-page.data";
 import {BreadcrumbComponent} from "./component/main/header/breadcrumb/breadcrumb.component";
