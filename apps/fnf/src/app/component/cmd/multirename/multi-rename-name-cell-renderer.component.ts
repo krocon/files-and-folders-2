@@ -3,9 +3,10 @@ import {ChangeDetectionStrategy, Component} from "@angular/core";
 import {AreaIdent, AreaModelIf, RendererCleanupFnType} from "@guiexpert/table";
 import {DOT_DOT, FileItemIf} from "@fnf/fnf-data";
 import {MatTooltip} from "@angular/material/tooltip";
+import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
 
 @Component({
-  selector: 'name-cell-renderer',
+  selector: 'multi-rename-name-cell-renderer',
   template: `
     <i [attr.class]="iconClass"></i>
     <div
@@ -51,7 +52,7 @@ import {MatTooltip} from "@angular/material/tooltip";
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf> {
+export class MultiRenameNameCellRendererComponent implements ComponentRendererIf<FileOperationParams> {
 
   iconClass: string = '';
   text: string = '';
@@ -63,9 +64,10 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
     columnIndex: number,
     areaIdent: AreaIdent,
     areaModel: AreaModelIf,
-    cellValue: any): RendererCleanupFnType | undefined {
+    cellValue: FileItemIf): RendererCleanupFnType | undefined {
 
-    const fileItem: FileItemIf = areaModel.getRowByIndex(rowIndex);
+    //const fop: FileOperationParams = areaModel.getRowByIndex(rowIndex);
+    const fileItem = cellValue;
     this.rtl = fileItem.abs;
 
     this.tooltip = fileItem.dir + '/' + fileItem.base;

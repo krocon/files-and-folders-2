@@ -19,7 +19,16 @@ import {MultiRenameOptions} from "./data/multi-rename-options";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {RenderWrapperFactory, TableComponent} from "@guiexpert/angular-table";
-import {ColumnDef, Size, TableApi, TableFactory, TableModelIf, TableOptions, TableOptionsIf} from "@guiexpert/table";
+import {
+  AutoRestoreOptions,
+  ColumnDef,
+  Size,
+  TableApi,
+  TableFactory,
+  TableModelIf,
+  TableOptions,
+  TableOptionsIf
+} from "@guiexpert/table";
 import {NameCellRendererComponent} from "../../main/filetable/renderer/name-cell-renderer.component";
 import {fileNameComparator} from "../../main/filetable/comparator/name-comparator";
 import {extComparator} from "../../main/filetable/comparator/ext-comparator";
@@ -29,6 +38,8 @@ import {DateCellRendererComponent} from "../../main/filetable/renderer/date-cell
 import {dateComparator} from "../../main/filetable/comparator/date-comparator";
 import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
 import {CommandService} from "../../../service/cmd/command.service";
+import {ChangeCellRendererComponent} from "./change-cell-renderer.component";
+import {MultiRenameNameCellRendererComponent} from "./multi-rename-name-cell-renderer.component";
 
 @Component({
   selector: "fnf-multi-rename-dialog",
@@ -47,7 +58,7 @@ import {CommandService} from "../../../service/cmd/command.service";
     MatLabel,
     MatCheckbox,
     TableComponent,
-
+    NameCellRendererComponent
   ],
   styleUrls: ["./multi-rename-dialog.component.css"]
 })
@@ -72,14 +83,14 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
     },
     horizontalBorderVisible: false,
     verticalBorderVisible: false,
-    // autoRestoreOptions: {
-    //   ...new AutoRestoreOptions<FileItemIf>(),
-    //   getStorageKeyFn: () => `fnf-multirename-table`,
-    //   autoRestoreCollapsedExpandedState: true,
-    //   autoRestoreScrollPosition: true,
-    //   autoRestoreSortingState: true,
-    //   autoRestoreSelectedState: false
-    // },
+    autoRestoreOptions: {
+      ...new AutoRestoreOptions<FileItemIf>(),
+      getStorageKeyFn: () => `fnf-multirename-table`,
+      autoRestoreCollapsedExpandedState: true,
+      autoRestoreScrollPosition: true,
+      autoRestoreSortingState: true,
+      autoRestoreSelectedState: false
+    },
     // externalFilterFunction: this.filterFn.bind(this),
     getSelectionModel: () => undefined,
     getFocusModel: () => undefined,
@@ -132,13 +143,12 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
       }
     );
 
-    dialogRef
-      .afterOpened()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(() => {
-        //
-      });
-
+    // dialogRef
+    //   .afterOpened()
+    //   .pipe(takeWhile(() => this.alive))
+    //   .subscribe(() => {
+    //     //
+    //   });
 
     const rows: FileOperationParams[] = multiRenameDialogData.rows.map(
       r => new FileOperationParams(
@@ -150,60 +160,45 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
     );
     const columnDefs = [
       ColumnDef.create({
-        property: "source.base",
+        property: "source",
         headerLabel: "Old Name",
         width: new Size(50, 'weight'),
-        // width: new Size(60, '%'),
         minWidth: new Size(200, 'px'),
-        // bodyRenderer: this.rwf.create(NameCellRendererComponent, this.cdr),
+        bodyRenderer: this.rwf.create(MultiRenameNameCellRendererComponent, this.cdr),
         headerClasses: ["ge-table-text-align-left"],
         bodyClasses: ["ge-table-text-align-left"],
-        sortComparator: fileNameComparator
+        // sortComparator: fileNameComparator,
+        sortable: () => true,
+        sortIconVisible: () => true,
       }),
       ColumnDef.create({
-        property: "target.base",
-        headerLabel: "New Name",
-        width: new Size(50, 'weight'),
-        // width: new Size(60, '%'),
-        minWidth: new Size(200, 'px'),
-        // bodyRenderer: this.rwf.create(NameCellRendererComponent, this.cdr),
+        property: "target",
+        headerLabel: " ",
+        width: new Size(30, 'px'),
+        minWidth: new Size(30, 'px'),
         headerClasses: ["ge-table-text-align-left"],
         bodyClasses: ["ge-table-text-align-left"],
-        sortComparator: fileNameComparator
+        bodyRenderer: this.rwf.create(ChangeCellRendererComponent, this.cdr),
+        sortable: () => true,
+        sortIconVisible: () => true,
       }),
-      // ColumnDef.create({
-      //   property: "ext",
-      //   headerLabel: "Ext",
-      //   width: new Size(60, 'px'),
-      //   //bodyRenderer: this.rwf.create(EmailRendererComponent, this.cdr),
-      //   headerClasses: ["ge-table-text-align-left"],
-      //   bodyClasses: ["ge-table-text-align-left"],
-      //   sortComparator: extComparator
-      // }),
-      // ColumnDef.create({
-      //   property: "size",
-      //   headerLabel: "Size",
-      //   width: new Size(100, 'px'),
-      //   bodyRenderer: this.rwf.create(SizeCellRendererComponent, this.cdr),
-      //   headerClasses: ["ge-table-text-align-right"],
-      //   bodyClasses: ["ge-table-text-align-right"],
-      //   sortComparator: sizeComparator
-      // }),
-      // ColumnDef.create({
-      //   property: "date",
-      //   headerLabel: "Date",
-      //   width: new Size(160, 'px'),
-      //   bodyRenderer: this.rwf.create(DateCellRendererComponent, this.cdr),
-      //   headerClasses: ["ge-table-text-align-left"],
-      //   bodyClasses: ["ge-table-text-align-left"],
-      //   sortComparator: dateComparator
-      // }),
+      ColumnDef.create({
+        property: "target",
+        headerLabel: "New Name",
+        width: new Size(50, 'weight'),
+        minWidth: new Size(200, 'px'),
+        headerClasses: ["ge-table-text-align-left"],
+        bodyClasses: ["ge-table-text-align-left"],
+        bodyRenderer: this.rwf.create(MultiRenameNameCellRendererComponent, this.cdr),
+        // sortComparator: fileNameComparator,
+        sortable: () => true,
+        sortIconVisible: () => true,
+      }),
     ];
     this.tableModel = TableFactory.createTableModel({
       rows,
       columnDefs,
       tableOptions: this.tableOptions,
-      // fixedLeftColumnCount: 0
     });
   }
 
