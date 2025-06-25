@@ -9,11 +9,12 @@
     <form
         [formGroup]="formGroup"
         autocomplete="off">
+
       <mat-form-field>
         <input
+            [matTooltip]="sourceTooltip"
             formControlName="source"
             matInput
-            [matTooltip]="sourceTooltip"
             placeholder="Current name"/>
       </mat-form-field>
 

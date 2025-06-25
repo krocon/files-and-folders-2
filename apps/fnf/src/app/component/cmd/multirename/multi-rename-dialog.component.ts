@@ -19,6 +19,7 @@ import {FnfAutofocusDirective} from "../../../common/fnf-autofocus.directive";
 import {MultiRenameData} from "./data/multi-rename.data";
 import {MultiRenameOptions} from "./data/multi-rename-options";
 import {MatOption, MatSelect} from "@angular/material/select";
+import {MatCheckbox} from "@angular/material/checkbox";
 
 @Component({
   selector: "fnf-multi-rename-dialog",
@@ -37,7 +38,8 @@ import {MatOption, MatSelect} from "@angular/material/select";
     MatError,
     MatSelect,
     MatOption,
-    MatLabel
+    MatLabel,
+    MatCheckbox
   ],
   styleUrls: ["./multi-rename-dialog.component.css"]
 })
@@ -67,6 +69,10 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
         counterStart: new FormControl(this.data.counterStart, []),
         counterStep: new FormControl(this.data.counterStep, []),
         counterDigits: new FormControl(this.data.counterDigits, []),
+        replaceGermanUmlauts: new FormControl(this.data.replaceGermanUmlauts, []),
+        replaceRiskyChars: new FormControl(this.data.replaceRiskyChars, []),
+        replaceSpaceToUnderscore: new FormControl(this.data.replaceSpaceToUnderscore, []),
+        replaceParentDir: new FormControl(this.data.replaceParentDir, []),
       }
     );
 

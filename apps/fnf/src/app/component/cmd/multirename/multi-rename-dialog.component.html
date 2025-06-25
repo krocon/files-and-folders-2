@@ -9,72 +9,92 @@
       [formGroup]="formGroup"
       autocomplete="off">
 
-    <div>
-        <mat-form-field>
-          <mat-label>New name</mat-label>
-          <input
-              formControlName="name"
-              matInput
-              placeholder="New name"/>
-        </mat-form-field>
+    <div class="row-1">
+      <mat-form-field>
+        <mat-label>New name</mat-label>
+        <input
+            formControlName="name"
+            matInput
+            placeholder="New name"/>
+      </mat-form-field>
 
-        <mat-form-field>
-          <mat-label>Capitalize</mat-label>
-          <mat-select
-              formControlName="capitalizeMode"
-              placeholder="Capitalize">
-            @for (option of options.capitalizeModes; track option.value) {
-              <mat-option [value]="option.value">{{option.label}}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+      <mat-form-field>
+        <mat-label>Capitalize</mat-label>
+        <mat-select
+            formControlName="capitalizeMode"
+            placeholder="Capitalize">
+          @for (option of options.capitalizeModes; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
 
-        <mat-form-field>
-          <mat-label>Counter Start</mat-label>
-          <mat-select
-              formControlName="counterStart"
-              placeholder="Counter Start">
-            @for (option of options.starts; track option.value) {
-              <mat-option [value]="option.value">{{option.label}}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+      <mat-form-field>
+        <mat-label>Counter Start</mat-label>
+        <mat-select
+            formControlName="counterStart"
+            placeholder="Counter Start">
+          @for (option of options.starts; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
 
-        <mat-form-field>
-          <mat-label>Counter Steps</mat-label>
-          <mat-select
-              formControlName="counterStep"
-              placeholder="Counter Step">
-            @for (option of options.steps; track option.value) {
-              <mat-option [value]="option.value">{{option.label}}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+      <mat-form-field>
+        <mat-label>Counter Steps</mat-label>
+        <mat-select
+            formControlName="counterStep"
+            placeholder="Counter Step">
+          @for (option of options.steps; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
 
-        <mat-form-field>
-          <mat-label>Counter Digits</mat-label>
-          <mat-select
-              formControlName="counterDigits"
-              placeholder="Counter Digits">
-            @for (option of options.digits; track option.value) {
-              <mat-option [value]="option.value">{{option.label}}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
+      <mat-form-field>
+        <mat-label>Counter Digits</mat-label>
+        <mat-select
+            formControlName="counterDigits"
+            placeholder="Counter Digits">
+          @for (option of options.digits; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
     </div>
-    <div style="background-color: lightgoldenrodyellow">
-      test 2
+
+    <div class="row-2">
+      <label>
+        [N] Name,
+        [N#-#] Part of Name,
+        [E] Extension,
+        [E#-#] Part of Ext,
+        [C] Counter,
+        [P] Parent Dir
+      </label>
     </div>
-    <div style="background-color: lightcyan">
-      test 3
+
+    <div class="row-3">
+      <mat-checkbox formControlName="replaceGermanUmlauts">Fix german umlauts</mat-checkbox>
+      <mat-checkbox formControlName="replaceRiskyChars">Replace risky chars</mat-checkbox>
+      <mat-checkbox formControlName="replaceSpaceToUnderscore">Space to underscore</mat-checkbox>
+      <mat-checkbox formControlName="replaceParentDir">Remove parent dir</mat-checkbox>
+      <div></div>
     </div>
-    <div style="background-color: lightgreen">
+
+
+    <div class="row-4" style="background-color: lightgreen">
       test 4
     </div>
-    <div style="background-color: lightyellow">
+
+    <div class="row-5" style="background-color: lightyellow">
       test 5
     </div>
+
+    <div class="row-6" style="background-color: red">
+      test 6
+    </div>
+
   </form>
 </mat-dialog-content>
 

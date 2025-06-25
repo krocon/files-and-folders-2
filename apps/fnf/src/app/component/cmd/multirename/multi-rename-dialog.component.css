@@ -7,7 +7,7 @@
     form {
         height: 100%;
         display: grid;
-        grid-template-rows: auto auto auto auto 1fr;
+        grid-template-rows: auto auto auto auto auto 1fr;
         grid-gap: 12px;
         align-items: start;
         align-content: start;
@@ -15,6 +15,20 @@
         & > div {
             height: 100%;
             width: 100%;
+        }
+
+        .row-1 {
+            display: grid;
+            grid-template-columns: 1fr 280px  auto auto auto;
+            grid-gap: 12px;
+        }
+        .row-2 {
+            padding-left: 12px;
+        }
+        .row-3 {
+            display: grid;
+            grid-template-columns: auto auto auto auto 1fr;
+            grid-gap: 24px;
         }
     }
 }
