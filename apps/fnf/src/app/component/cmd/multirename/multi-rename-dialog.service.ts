@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {MultiRenameDialogData} from "./multi-rename-dialog.data";
+import {MultiRenameDialogData} from "./data/multi-rename-dialog.data";
 import {MultiRenameDialogComponent} from "./multi-rename-dialog.component";
 import {takeWhile} from "rxjs/operators";
 import {MatDialog} from "@angular/material/dialog";

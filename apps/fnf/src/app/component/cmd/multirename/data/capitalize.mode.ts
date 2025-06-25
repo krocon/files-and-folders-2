@@ -1,0 +1,1 @@
+export type CapitalizeMode = 'none' | 'uppercase' | 'lowercase' | 'capitalize';

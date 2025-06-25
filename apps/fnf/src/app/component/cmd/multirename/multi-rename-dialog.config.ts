@@ -1,5 +1,5 @@
 import {MatDialogConfig} from "@angular/material/dialog";
-import {MultiRenameDialogData} from "./multi-rename-dialog.data";
+import {MultiRenameDialogData} from "./data/multi-rename-dialog.data";
 
 export class MultiRenameDialogConfig extends MatDialogConfig {
 

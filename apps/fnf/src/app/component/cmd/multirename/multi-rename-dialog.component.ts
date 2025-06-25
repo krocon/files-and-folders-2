@@ -1,6 +1,6 @@
 import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {MultiRenameDialogData} from "./multi-rename-dialog.data";
+import {MultiRenameDialogData} from "./data/multi-rename-dialog.data";
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -48,7 +48,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
     private readonly formBuilder: FormBuilder,
     // private readonly walkSocketService: WalkSocketService
   ) {
-    console.log(data);
+    console.info(data);
 
     this.formGroup = this.formBuilder.group(
       {

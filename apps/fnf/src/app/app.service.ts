@@ -55,7 +55,7 @@ import {FindDialogService} from "./component/cmd/find/find-dialog.service";
 import {FindSocketService} from "./service/find.socketio.service";
 import {MultiRenameDialogComponent} from "./component/cmd/multirename/multi-rename-dialog.component";
 import {MultiRenameDialogService} from "./component/cmd/multirename/multi-rename-dialog.service";
-import {MultiRenameDialogData} from "./component/cmd/multirename/multi-rename-dialog.data";
+import {MultiRenameDialogData} from "./component/cmd/multirename/data/multi-rename-dialog.data";
 
 @Injectable({
   providedIn: "root"
