@@ -12,10 +12,13 @@ import {FileItem} from "@fnf/fnf-data";
 
 import {takeWhile} from "rxjs/operators";
 import {FnfFileSizePipe} from "../../../common/fnf-file-size.pipe";
-import {MatError, MatFormField, MatInput} from "@angular/material/input";
+import {MatError, MatFormField, MatInput, MatLabel} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {FnfAutofocusDirective} from "../../../common/fnf-autofocus.directive";
+import {MultiRenameData} from "./data/multi-rename.data";
+import {MultiRenameOptions} from "./data/multi-rename-options";
+import {MatOption, MatSelect} from "@angular/material/select";
 
 @Component({
   selector: "fnf-multi-rename-dialog",
@@ -31,7 +34,10 @@ import {FnfAutofocusDirective} from "../../../common/fnf-autofocus.directive";
     MatDialogActions,
     MatFormField,
     FnfAutofocusDirective,
-    MatError
+    MatError,
+    MatSelect,
+    MatOption,
+    MatLabel
   ],
   styleUrls: ["./multi-rename-dialog.component.css"]
 })
@@ -39,21 +45,28 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
 
   formGroup: FormGroup;
   source = "";
+  data: MultiRenameData;
+  options: MultiRenameOptions;
 
   private alive = true;
 
   constructor(
     public dialogRef: MatDialogRef<MultiRenameDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: MultiRenameDialogData,
+    @Inject(MAT_DIALOG_DATA) public multiRenameDialogData: MultiRenameDialogData,
     private readonly formBuilder: FormBuilder,
     // private readonly walkSocketService: WalkSocketService
   ) {
-    console.info(data);
+    console.info(multiRenameDialogData);
+    this.data = multiRenameDialogData.data;
+    this.options = multiRenameDialogData.options;
 
     this.formGroup = this.formBuilder.group(
       {
-        // rows: new FormControl(this.rows, []),
-        //target: new FormControl(data.target, [Validators.required, Validators.minLength(1)])
+        name: new FormControl(this.data.name, [Validators.required, Validators.minLength(1)]),
+        capitalizeMode: new FormControl(this.data.capitalizeMode, []),
+        counterStart: new FormControl(this.data.counterStart, []),
+        counterStep: new FormControl(this.data.counterStep, []),
+        counterDigits: new FormControl(this.data.counterDigits, []),
       }
     );
 

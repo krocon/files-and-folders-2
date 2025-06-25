@@ -1,14 +1,27 @@
 
-.dlg-content-div {
+.mat-mdc-dialog-content {
+    height: 100%;
     display: grid;
-    grid-template-rows: auto auto auto auto;
-    grid-gap: 24px;
-    align-items: center;
+    grid-template-rows: 1fr;
+
+    form {
+        height: 100%;
+        display: grid;
+        grid-template-rows: auto auto auto auto 1fr;
+        grid-gap: 12px;
+        align-items: start;
+        align-content: start;
+
+        & > div {
+            height: 100%;
+            width: 100%;
+        }
+    }
 }
 
 
 .mat-mdc-form-field {
-    width: 100%;
+    /*width: 100%;*/
 }
 
 .mat-mdc-dialog-actions {

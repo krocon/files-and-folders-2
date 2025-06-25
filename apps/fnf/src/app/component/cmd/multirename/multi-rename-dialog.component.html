@@ -3,10 +3,79 @@
     mat-dialog-title>Multi Rename</h2>
 
 <mat-dialog-content>
-  <div class="dlg-content-div">
 
 
-  </div>
+  <form
+      [formGroup]="formGroup"
+      autocomplete="off">
+
+    <div>
+        <mat-form-field>
+          <mat-label>New name</mat-label>
+          <input
+              formControlName="name"
+              matInput
+              placeholder="New name"/>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Capitalize</mat-label>
+          <mat-select
+              formControlName="capitalizeMode"
+              placeholder="Capitalize">
+            @for (option of options.capitalizeModes; track option.value) {
+              <mat-option [value]="option.value">{{option.label}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Counter Start</mat-label>
+          <mat-select
+              formControlName="counterStart"
+              placeholder="Counter Start">
+            @for (option of options.starts; track option.value) {
+              <mat-option [value]="option.value">{{option.label}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Counter Steps</mat-label>
+          <mat-select
+              formControlName="counterStep"
+              placeholder="Counter Step">
+            @for (option of options.steps; track option.value) {
+              <mat-option [value]="option.value">{{option.label}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Counter Digits</mat-label>
+          <mat-select
+              formControlName="counterDigits"
+              placeholder="Counter Digits">
+            @for (option of options.digits; track option.value) {
+              <mat-option [value]="option.value">{{option.label}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+    </div>
+    <div style="background-color: lightgoldenrodyellow">
+      test 2
+    </div>
+    <div style="background-color: lightcyan">
+      test 3
+    </div>
+    <div style="background-color: lightgreen">
+      test 4
+    </div>
+    <div style="background-color: lightyellow">
+      test 5
+    </div>
+  </form>
 </mat-dialog-content>
 
 <mat-dialog-actions>
