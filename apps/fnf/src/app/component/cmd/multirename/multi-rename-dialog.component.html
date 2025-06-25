@@ -93,9 +93,7 @@
           @for (replacementForm of replacements.controls; track replacementForm; let i = $index) {
           <div [formGroupName]="i" class="replacement-row">
 
-            <mat-checkbox formControlName="checked">
-              Replace
-            </mat-checkbox>
+            <mat-checkbox formControlName="checked">Replace</mat-checkbox>
 
             <mat-form-field>
               <input formControlName="textFrom" matInput/>
@@ -107,9 +105,9 @@
               <input formControlName="textTo" matInput/>
             </mat-form-field>
 
-            <mat-checkbox formControlName="regExpr">Use RegExp </mat-checkbox>
+            <mat-checkbox formControlName="regExpr">Use RegExp</mat-checkbox>
 
-            <mat-checkbox formControlName="ifFlag">only if match </mat-checkbox>
+            <mat-checkbox formControlName="ifFlag">only if match</mat-checkbox>
 
             <mat-form-field>
               <input formControlName="ifMatch" matInput />
