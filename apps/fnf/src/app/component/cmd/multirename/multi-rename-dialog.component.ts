@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit} from "@angular/core";
+import {ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit} from "@angular/core";
 import {FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MultiRenameDialogData} from "./data/multi-rename-dialog.data";
 import {
@@ -105,6 +105,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
     private readonly rwf: RenderWrapperFactory,
     private readonly cdr: ChangeDetectorRef,
     private readonly multiRenameService: MultiRenameService,
+    private readonly zone: NgZone,
   ) {
     console.info(multiRenameDialogData);
     this.data = multiRenameDialogData.data;
@@ -218,10 +219,12 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
         console.info('----------');
         console.info(evt);
         //console.info(this.rows,);
-        // this.multiRenameService.updateTargets(this.rows, this.formGroup.getRawValue());
-        // this.tableApi?.setRows(this.rows);
-        this.tableApi?.repaint();
-        console.info(this.rows);
+        this.zone.runOutsideAngular(() => {
+          this.multiRenameService.updateTargets(this.rows, this.formGroup.getRawValue());
+          this.tableApi?.setRows(this.rows);
+          this.tableApi?.repaint();
+          console.info(this.rows.map(r => r.target.base));
+        });
       });
   }
 
