@@ -32,10 +32,11 @@ import {
 
 import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
 import {CommandService} from "../../../service/cmd/command.service";
-import {ChangeCellRendererComponent} from "./change-cell-renderer.component";
 import {GroupFilesNameCellRendererComponent} from "./group-files-name-cell-renderer.component";
 import {GroupFilesService} from "./group-files.service";
 import {debounceTime} from "rxjs";
+import {GroupFilesResult} from "./data/group-files-result";
+import {GroupFilesTargetCellRendererComponent} from "./group-files-target-cell-renderer.component";
 
 @Component({
   selector: "fnf-group-files-dialog",
@@ -101,10 +102,9 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
     private readonly formBuilder: FormBuilder,
     private readonly rwf: RenderWrapperFactory,
     private readonly cdr: ChangeDetectorRef,
-    private readonly multiRenameService: GroupFilesService,
+    private readonly groupFilesService: GroupFilesService,
     private readonly zone: NgZone,
   ) {
-    console.info(groupFilesDialogData);
     this.data = groupFilesDialogData.data;
     this.options = groupFilesDialogData.options;
 
@@ -124,7 +124,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
       r => new FileOperationParams(
         r,
         0,
-        this.clone(r),
+        this.clone<FileItemIf>(r),
         0,
         groupFilesDialogData.rows.length > CommandService.BULK_LOWER_LIMIT)
     );
@@ -138,21 +138,20 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
         bodyRenderer: this.rwf.create(GroupFilesNameCellRendererComponent, this.cdr),
         headerClasses: ["ge-table-text-align-left"],
         bodyClasses: ["ge-table-text-align-left"],
-        // sortComparator: fileNameComparator,
         sortable: () => true,
         sortIconVisible: () => true,
       }),
-      ColumnDef.create({
-        property: "target",
-        headerLabel: " ",
-        width: new Size(30, 'px'),
-        minWidth: new Size(30, 'px'),
-        headerClasses: ["ge-table-text-align-left"],
-        bodyClasses: ["ge-table-text-align-left"],
-        bodyRenderer: this.rwf.create(ChangeCellRendererComponent, this.cdr),
-        sortable: () => true,
-        sortIconVisible: () => true,
-      }),
+      // ColumnDef.create({
+      //   property: "target",
+      //   headerLabel: " ",
+      //   width: new Size(30, 'px'),
+      //   minWidth: new Size(30, 'px'),
+      //   headerClasses: ["ge-table-text-align-left"],
+      //   bodyClasses: ["ge-table-text-align-left"],
+      //   bodyRenderer: this.rwf.create(ChangeCellRendererComponent, this.cdr),
+      //   sortable: () => true,
+      //   sortIconVisible: () => true,
+      // }),
       ColumnDef.create({
         property: "target",
         headerLabel: "Target",
@@ -160,12 +159,12 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
         minWidth: new Size(200, 'px'),
         headerClasses: ["ge-table-text-align-left"],
         bodyClasses: ["ge-table-text-align-left"],
-        bodyRenderer: this.rwf.create(GroupFilesNameCellRendererComponent, this.cdr),
-        // sortComparator: fileNameComparator,
+        bodyRenderer: this.rwf.create(GroupFilesTargetCellRendererComponent, this.cdr),
         sortable: () => true,
         sortIconVisible: () => true,
       }),
     ];
+    this.updateTableRows();
     this.tableModel = TableFactory.createTableModel({
       rows: this.rows,
       columnDefs,
@@ -186,11 +185,9 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
         debounceTime(300),
       )
       .subscribe(evt => {
-        this.zone.runOutsideAngular(() => {
-          // this.multiRenameService.updateTargets(this.rows, this.formGroup.getRawValue());
-          this.tableApi?.setRows(this.rows);
-          this.tableApi?.repaint();
-        });
+        this.updateTableRows();
+        this.tableApi?.setRows(this.rows);
+        this.tableApi?.repaint();
       });
   }
 
@@ -207,7 +204,19 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
     this.tableApi = tableApi
   }
 
-  private clone(r: FileItemIf): FileItemIf {
+  private updateTableRows() {
+    const dialogData = this.clone<GroupFilesDialogData>(this.groupFilesDialogData);
+    dialogData.data = this.formGroup.getRawValue();
+    const updateModel: GroupFilesResult = this.groupFilesService.getUpdateModel(dialogData);
+    this.rows = this.groupFilesService.getFileOperationParams(
+      updateModel.rows,
+      dialogData.sourcePanelIndex,
+      dialogData.targetPanelIndex
+    );
+    this.groupCount = updateModel.groupCount;
+  }
+
+  private clone<T>(r: T): T {
     return JSON.parse(JSON.stringify(r));
   }
 }

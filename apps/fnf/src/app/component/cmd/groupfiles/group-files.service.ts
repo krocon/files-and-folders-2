@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
-import { FileOperationParams } from '../../../domain/cmd/file-operation-params';
-import { GroupFilesData } from './data/group-files.data';
-import { PanelIndex } from '../../../domain/panel-index';
-import { ActionEvent } from '../../../domain/cmd/action-event';
-import { CommandService } from '../../../service/cmd/command.service';
+import {Injectable} from '@angular/core';
+import {FileOperationParams} from '../../../domain/cmd/file-operation-params';
+import {GroupFilesData} from './data/group-files.data';
+import {PanelIndex} from '../../../domain/panel-index';
+import {ActionEvent} from '../../../domain/cmd/action-event';
+import {CommandService} from '../../../service/cmd/command.service';
 import {FileItem, FileItemIf} from '@fnf/fnf-data';
-import { GroupFilesDialogData } from './data/group-files-dialog.data';
-import { GroupFilesResult } from './data/group-files-result';
-import { GroupFilesRow } from './data/group-files-row';
+import {GroupFilesDialogData} from './data/group-files-dialog.data';
+import {GroupFilesResult} from './data/group-files-result';
+import {GroupFilesRow} from './data/group-files-row';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,8 @@ export class GroupFilesService {
 
   constructor(
     private readonly commandService: CommandService
-  ) { }
+  ) {
+  }
 
   /**
    * Updates the target property of each row based on the multi-rename configuration
@@ -44,11 +45,12 @@ export class GroupFilesService {
 
   /**
    * Updates the table model based on the first letter of the file names
-   * @param para The group files data
-   * @param selectedFiles The selected files
    * @returns The group files result
    */
-  updateTableModelFirstLetter(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
+  updateTableModelFirstLetter(dialogData: GroupFilesDialogData): GroupFilesResult {
+
+    const para: GroupFilesData = dialogData.data;
+    const selectedFiles: FileItemIf[] = dialogData.rows;
     const rows: GroupFilesRow[] = [];
     let i: number;
     const groups: string[] = [];
@@ -69,7 +71,7 @@ export class GroupFilesService {
       }
       dir = dir
         .replace(/(^[\s_-]+|[\s_-]+$)/g, '')
-        .substr(0, letterCount);
+        .substring(0, letterCount);
 
       if (para.modus.indexOf('lower') > -1) dir = dir.toLowerCase();
       if (para.modus.indexOf('upper') > -1) dir = dir.toUpperCase();
@@ -90,11 +92,11 @@ export class GroupFilesService {
 
   /**
    * Updates the table model based on the minus separator in the file names
-   * @param para The group files data
-   * @param selectedFiles The selected files
    * @returns The group files result
    */
-  updateTableModelMinusSeparator(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
+  updateTableModelMinusSeparator(dialogData: GroupFilesDialogData): GroupFilesResult {
+    const para: GroupFilesData = dialogData.data;
+    const selectedFiles: FileItemIf[] = dialogData.rows;
     const rows: GroupFilesRow[] = [];
     let i: number, m: RegExpMatchArray | null;
     const groups: { [key: string]: FileItemIf[] } = {};
@@ -154,11 +156,11 @@ export class GroupFilesService {
 
   /**
    * Updates the table model based on the first word of the file names
-   * @param para The group files data
-   * @param selectedFiles The selected files
    * @returns The group files result
    */
-  updateTableModelFirstWord(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
+  updateTableModelFirstWord(dialogData: GroupFilesDialogData): GroupFilesResult {
+    const para: GroupFilesData = dialogData.data;
+    const selectedFiles: FileItemIf[] = dialogData.rows;
     const rows: GroupFilesRow[] = [];
     let i: number, m: RegExpMatchArray | null;
     const groups: { [key: string]: FileItemIf[] } = {};
@@ -218,11 +220,11 @@ export class GroupFilesService {
 
   /**
    * Updates the table model based on running numbers in the file names
-   * @param para The group files data
-   * @param selectedFiles The selected files
    * @returns The group files result
    */
-  updateTableModelRunningNumber(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
+  updateTableModelRunningNumber(dialogData: GroupFilesDialogData): GroupFilesResult {
+    const para: GroupFilesData = dialogData.data;
+    const selectedFiles: FileItemIf[] = dialogData.rows;
     const rows: GroupFilesRow[] = [];
     let i: number;
     const groups: { [key: string]: FileItemIf[] } = {};
@@ -283,11 +285,11 @@ export class GroupFilesService {
 
   /**
    * Updates the table model based on a new folder
-   * @param para The group files data
-   * @param selectedFiles The selected files
    * @returns The group files result
    */
-  updateTableModelNewFolder(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
+  updateTableModelNewFolder(dialogData: GroupFilesDialogData): GroupFilesResult {
+    const para: GroupFilesData = dialogData.data;
+    const selectedFiles: FileItemIf[] = dialogData.rows;
     const rows: GroupFilesRow[] = [];
     let i: number;
     const targetDir = para.useSourceDir ? dialogData.sourceDir : dialogData.targetDir;
@@ -310,28 +312,39 @@ export class GroupFilesService {
 
   /**
    * Updates the table model based on the selected mode
-   * @param para The group files data
-   * @param selectedFiles The selected files
    * @returns The group files result
    */
-  updateTableModel(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
-    if (para.modus === 'new_folder') {
-      return this.updateTableModelNewFolder(para, selectedFiles, dialogData);
+  getUpdateModel(
+    dialogData: GroupFilesDialogData
+  ): GroupFilesResult {
+    let mode = dialogData.data.modus;
+    if (mode === 'new_folder') {
+      return this.updateTableModelNewFolder( dialogData);
     }
-    if (para.modus === 'running_number') {
-      return this.updateTableModelRunningNumber(para, selectedFiles, dialogData);
+    if (mode === 'running_number') {
+      return this.updateTableModelRunningNumber( dialogData);
     }
-    if (para.modus === 'minus_separator') {
-      return this.updateTableModelMinusSeparator(para, selectedFiles, dialogData);
+    if (mode === 'minus_separator') {
+      return this.updateTableModelMinusSeparator( dialogData);
     }
-    if (para.modus === 'first_word') {
-      return this.updateTableModelFirstWord(para, selectedFiles, dialogData);
+    if (mode === 'first_word') {
+      return this.updateTableModelFirstWord( dialogData);
     }
-    if (para.modus.indexOf('letter') > -1) {
-      return this.updateTableModelFirstLetter(para, selectedFiles, dialogData);
+    if (mode.indexOf('letter') > -1) {
+      return this.updateTableModelFirstLetter( dialogData);
     }
 
-    console.warn('updateTableModel. Unknown mode:', para.modus);
+    console.warn('updateTableModel. Unknown mode:', dialogData.data.modus);
     return new GroupFilesResult(0, []);
+  }
+
+  getFileOperationParams(
+    rows: GroupFilesRow[],
+    srcPanelIndex: PanelIndex,
+    targetPanelIndex: PanelIndex): FileOperationParams[]{
+
+    return rows.map(r => new FileOperationParams(
+      r.src, srcPanelIndex, r.target, targetPanelIndex, rows.length>  CommandService.BULK_LOWER_LIMIT
+    ));
   }
 }
