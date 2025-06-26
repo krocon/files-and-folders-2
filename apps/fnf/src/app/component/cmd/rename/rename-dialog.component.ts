@@ -80,7 +80,7 @@ export class RenameDialogComponent {
               FnfFilenameValidation.validateChars,
               FnfFilenameValidation.validateReservedNames,
               FnfFilenameValidation.validateStartEndChars,
-              FnfFilenameValidation.checkSpacesUnderscores,
+              // FnfFilenameValidation.checkSpacesUnderscores,
             ]
           })
       }

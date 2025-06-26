@@ -38,8 +38,9 @@ export class FnfFilenameValidation {
     if (!control.value) return null;
     
     const value = control.value.toString();
-    const invalidStartEndChars = /^[\s._\-]|[\s._\-]$/;
-    
+    // const invalidStartEndChars = /^[\s._\-]|[\s._\-]$/;
+    const invalidStartEndChars = /^[\s.\-]|[\s.\-]$/;
+
     if (invalidStartEndChars.test(value)) {
       return { 'invalid_start_end': true };
     }

@@ -7,7 +7,7 @@
 @if (fileItem && this.tabfind) {
   <div
       class="fnf-header-fg-color not-selectable"
-      [matTooltip]="'Search '+pattern"
+      [matTooltipShowDelay]="2000" [matTooltip]="'Search '+pattern"
       [class.fnf-activepanel-header-fg-color]="activeAndSelected">
     <mat-icon>search</mat-icon>
   </div>

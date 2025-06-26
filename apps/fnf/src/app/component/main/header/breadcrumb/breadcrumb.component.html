@@ -4,7 +4,7 @@
   <div
       (dblclick)="onSearchDblClicked()"
       class="search-div"
-      [matTooltip]="tabDataItem?.findData|json">
+      [matTooltipShowDelay]="2000" [matTooltip]="tabDataItem?.findData|json">
     Search:&nbsp;"{{this.pattern}}"
   </div>
 }

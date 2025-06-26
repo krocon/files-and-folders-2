@@ -1,12 +1,12 @@
 <div class="summary-div">
   <span
       [class]="{'fnf-active-fg-color':selected}"
-      [matTooltip]="selectionEvent.selectedSize|number">
+      [matTooltipShowDelay]="2000" [matTooltip]="selectionEvent.selectedSize|number">
   {{ selectionEvent.selectionLabelData.selectedSizeSumText }}
   </span>
   /
   <span
-      [matTooltip]="selectionEvent.allSize|number">
+      [matTooltipShowDelay]="2000" [matTooltip]="selectionEvent.allSize|number">
     {{ selectionEvent.selectionLabelData.sizeSumText }}
   </span>
 
