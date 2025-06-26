@@ -1,0 +1,53 @@
+
+.mat-mdc-dialog-content {
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr;
+
+    form {
+        height: 100%;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        grid-gap: 12px;
+        align-items: start;
+        align-content: start;
+
+        & > div {
+            height: 100%;
+            width: 100%;
+        }
+
+        .row-1 {
+            display: grid;
+            grid-template-columns: minmax(100px, 300px) 200px 200px 200px 200px;
+            grid-gap: 12px;
+            align-items: center;
+        }
+        .row-6 {
+            height: 100%;
+            display: grid;
+            grid-template-rows: 1fr;
+            background-color: #4be20b;
+        }
+    }
+    .mat-mdc-form-field-subscript-wrapper {
+        display: none;
+    }
+}
+
+.group-files-table{
+    height: 100%;
+}
+.mat-mdc-form-field {
+    /*width: 100%;*/
+}
+
+.mat-mdc-dialog-actions {
+    justify-content: flex-end;
+
+    .mdc-button {
+        min-width: 200px;
+    }
+}
+
+

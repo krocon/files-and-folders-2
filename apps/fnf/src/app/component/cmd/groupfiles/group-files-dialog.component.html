@@ -1,0 +1,73 @@
+<h2
+    data-test-id="page-subtitle-h2"
+    mat-dialog-title>Group Files</h2>
+
+<mat-dialog-content>
+
+
+  <form
+      [formGroup]="formGroup"
+      [class.replacements-checked]="!formGroup.get('replacementsChecked')?.value"
+      autocomplete="off">
+
+    <div class="row-1">
+
+      <mat-form-field>
+        <mat-label>Mode</mat-label>
+        <mat-select
+            formControlName="modus"
+            placeholder="Mode">
+          @for (option of options.modes; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-checkbox formControlName="ignoreBrackets">Ignore Brackets</mat-checkbox>
+      <mat-checkbox formControlName="useSourceDir">Use Source Directory</mat-checkbox>
+
+@if (formGroup.get('modus')?.value === 'runnig_number') {
+      <mat-form-field>
+        <mat-label>Minimum Size</mat-label>
+        <mat-select
+            formControlName="minsize"
+            placeholder="Mode">
+          @for (option of options.minSizes; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <label>{{groupCount}} groups found</label>
+}
+    </div>
+
+    <div class="row-6">
+        <guiexpert-table
+            (tableReady)="onTableReady($event)"
+            [debounceMouseClickDelay]="150"
+            [tableModel]="tableModel"
+            [tableOptions]="tableOptions"
+            class="ge-table group-files-table"></guiexpert-table>
+    </div>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button
+      (click)="onCancelClicked()"
+      data-test-id="dialog-cancel-button"
+      mat-raised-button>
+    Cancel
+  </button>
+
+  <button
+      (click)="onOkClicked()"
+      [disabled]="!formGroup.valid"
+      color="primary"
+      data-test-id="dialog-ok-button"
+      mat-raised-button>
+    Rename All
+  </button>
+</mat-dialog-actions>

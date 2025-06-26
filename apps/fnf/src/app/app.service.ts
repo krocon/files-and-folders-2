@@ -56,6 +56,8 @@ import {FindDialogService} from "./component/cmd/find/find-dialog.service";
 import {FindSocketService} from "./service/find.socketio.service";
 import {MultiRenameDialogService} from "./component/cmd/multirename/multi-rename-dialog.service";
 import {MultiRenameDialogData} from "./component/cmd/multirename/data/multi-rename-dialog.data";
+import {GroupFilesDialogData} from "./component/cmd/groupfiles/data/group-files-dialog.data";
+import {GroupFilesDialogService} from "./component/cmd/groupfiles/group-files-dialog.service";
 
 
 @Injectable({
@@ -108,6 +110,7 @@ export class AppService {
     private readonly findDialogService: FindDialogService,
     private readonly findSocketService: FindSocketService,
     private readonly multiRenameDialogService: MultiRenameDialogService,
+    private readonly groupFilesDialogService: GroupFilesDialogService,
   ) {
     // Set config to services:
     ConfigService.forRoot(environment.config);
@@ -256,6 +259,10 @@ export class AppService {
     return this.panelSelectionService.getValue();
   }
 
+  getInActivePanelIndex(): PanelIndex {
+    return this.panelSelectionService.getValue() ? 0 : 1;
+  }
+
   getActiveTabOnActivePanel(): TabData {
     const pi = this.getActivePanelIndex();
     const filePageDataValue = this.filePageDataService.getValue();
@@ -331,6 +338,9 @@ export class AppService {
 
     } else if (id === "OPEN_MULTIRENAME_DLG") {
       this.multiRename();
+
+    } else if (id === "OPEN_GROUPFILES_DLG") {
+      this.groupFiles();
 
     } else if (id === "OPEN_FIND_DLG") {
       this.openFindDialog();
@@ -747,6 +757,33 @@ export class AppService {
         .open(data, (arr: ActionEvent[] | undefined) => {
           if (arr) {
             console.info('multiRename ActionEvents:', arr); // TODO del
+            // const events: ActionEvent[] = arr.map(r => this.commandService.rename(r));
+            this.commandService.addActions(arr);
+          }
+        });
+    }
+  }
+
+
+  private groupFiles() {
+    const srcPanelIndex = this.getActivePanelIndex();
+    const targetPanelIndex = this.getInActivePanelIndex();
+    const sourceTabData = this.getActiveTabOnActivePanel();
+    const targetTabData = this.getOtherPanelSelectedTabData();
+    const rows = this.getSelectedOrFocussedData(srcPanelIndex).filter(item => item.base !== DOT_DOT);
+
+    if (rows?.length) {
+      const data = new GroupFilesDialogData(
+        rows,
+        sourceTabData.path,
+        srcPanelIndex,
+        targetTabData.path,
+        targetPanelIndex
+      );
+      this.groupFilesDialogService
+        .open(data, (arr: ActionEvent[] | undefined) => {
+          if (arr) {
+            console.info('groupFiles ActionEvents:', arr); // TODO del
             // const events: ActionEvent[] = arr.map(r => this.commandService.rename(r));
             this.commandService.addActions(arr);
           }
