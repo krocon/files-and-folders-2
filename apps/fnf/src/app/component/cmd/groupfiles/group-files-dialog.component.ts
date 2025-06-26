@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit} from "@angular/core";
-import {FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {GroupFilesDialogData} from "./data/group-files-dialog.data";
 import {
   MAT_DIALOG_DATA,
@@ -11,7 +11,7 @@ import {
 import {FileItemIf} from "@fnf/fnf-data";
 
 import {takeWhile} from "rxjs/operators";
-import {MatFormField, MatInput, MatLabel} from "@angular/material/input";
+import {MatFormField, MatLabel} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {GroupFilesData} from "./data/group-files.data";
@@ -45,7 +45,6 @@ import {debounceTime} from "rxjs";
     MatDialogContent,
     ReactiveFormsModule,
     MatIconModule,
-    MatInput,
     MatButton,
     MatDialogActions,
     MatFormField,
@@ -63,7 +62,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
   source = "";
   data: GroupFilesData;
   options: GroupFilesOptions;
-  groupCount:number = 0;
+  groupCount: number = 0;
 
   tableModel?: TableModelIf;
   rows: FileOperationParams[];
@@ -173,7 +172,6 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
       tableOptions: this.tableOptions,
     });
   }
-
 
 
   ngOnDestroy(): void {

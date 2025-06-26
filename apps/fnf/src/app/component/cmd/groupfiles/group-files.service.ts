@@ -81,15 +81,7 @@ export class GroupFilesService {
           file.base,
           file,
           dir,
-          {
-            dir: targetDir + '/' + dir,
-            base: file.base,
-            ext: '',
-            size: 0,
-            date: '',
-            isDir: false,
-            abs: false
-          }
+          new FileItem(targetDir + '/' + dir, file.base)
         ));
       }
     }
@@ -150,15 +142,7 @@ export class GroupFilesService {
               f.base,
               f,
               dir,
-              {
-                dir: targetDir + '/' + dir,
-                base: f.base,
-                ext: '',
-                size: 0,
-                date: '',
-                isDir: false,
-                abs: false
-              }
+              new FileItem(targetDir + '/' + dir, f.base)
             ));
           }
         }
@@ -223,15 +207,7 @@ export class GroupFilesService {
               f.base,
               f,
               dir,
-              {
-                dir: targetDir + '/' + dir,
-                base: f.base,
-                ext: '',
-                size: 0,
-                date: '',
-                isDir: false,
-                abs: false
-              }
+              new FileItem(targetDir + '/' + dir, f.base)
             ));
           }
         }
@@ -296,15 +272,7 @@ export class GroupFilesService {
               f.base,
               f,
               dir,
-              {
-                dir: targetDir + '/' + dir,
-                base: f.base,
-                ext: '',
-                size: 0,
-                date: '',
-                isDir: false,
-                abs: false
-              }
+              new FileItem(targetDir + '/' + dir, f.base)
             ));
           }
         }
