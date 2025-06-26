@@ -70,16 +70,17 @@ export class MultiRenameService {
 
   /**
    * Renames a file according to the multi-rename configuration
-   * @param file The file to rename
+   * @param source The file to rename
    * @param data The multi-rename configuration
    * @param index The index of the file in the list
    * @returns The renamed file
    */
-  rename(file: FileItemIf, data: MultiRenameData, index: number): FileItemIf {
+  rename(source: FileItemIf, data: MultiRenameData, index: number): FileItemIf {
+    const target = {...source};
     const pattern = data.name;
-    const ext = file.base.split('.').pop() || '';
-    const name = file.base.substr(0, file.base.lastIndexOf(ext) - 1) || file.base;
-    const parent = this.getParentDir(file.dir);
+    const ext = source.base.split('.').pop() || '';
+    const name = source.base.substr(0, source.base.lastIndexOf(ext) - 1) || source.base;
+    const parent = this.getParentDir(source.dir);
 
     let processedName = this.applyCapitalization(name, data.capitalizeMode);
 
@@ -131,10 +132,10 @@ export class MultiRenameService {
       }
     }
 
-    return {
-      dir: file.dir,
-      base: base
-    } as FileItemIf;
+    target.dir = source.dir;
+    target.base = base;
+    target.ext = source.base.includes('.') ? '.' + source.base.split('.').pop() : '';
+    return target;
   }
 
   /**

@@ -25,36 +25,9 @@ export async function rename(para: FilePara): Promise<DirEventIf[]> {
   }
 
   const targetItem = clone<FileItemIf>(para.target);
-  const item1 = new DirEvent(para.target.dir, [targetItem], false, false, 1, "", targetItem.isDir ? "addDir" : "add");
-  const item2 = new DirEvent(para.source.dir, [para.source], false, false, 1, "", para.source.isDir ? "addDir" : "add");
-  const ret: DirEventIf[] = [item1, item2];
-  return ret;
+  const item1 = new DirEvent(targetItem.dir, [targetItem], false, false, 1, "", targetItem.isDir ? "addDir" : "add");
+  const item2 = new DirEvent(psource.dir, [psource], false, false, 1, "", psource.isDir ? "unlinkDir" : "unlink");
+  const item3 = new DirEvent(targetItem.dir, [targetItem], false, false, 1, "", "focus");
+  return [item1, item2, item3];
 
-  // var msg = {
-  //   changedir: 'created',
-  //   panelIndex:action.panelIndex,
-  //   item: {dir: action.target.dir, base: slash.fixPath(action.target.base)}
-  // };
-  // if (stats) {
-  //   msg.item.size = stats.isDirectory() ? null : stats.size;
-  //   msg.item.date = stats.atime;
-  //   msg.item.isDir = stats.isDirectory();
-  // }
-  //
-  // var back = {
-  //   events: [
-  //     {
-  //       changedir: 'removed',
-  //       panelIndex: action.panelIndex,
-  //       item: action.src
-  //     },
-  //     msg,
-  //     {
-  //       changedir: 'focus',
-  //       panelIndex: action.panelIndex,
-  //       item: action.target
-  //     }
-  //   ],
-  //   error: null
-  // };
 }

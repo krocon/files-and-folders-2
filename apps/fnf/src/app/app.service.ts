@@ -19,6 +19,7 @@ import {
   SysinfoIf
 } from "@fnf-data";
 import {BehaviorSubject, firstValueFrom, Subject} from "rxjs";
+import {ActionEvent} from "./domain/cmd/action-event";
 import {PanelIndex} from "./domain/panel-index";
 import {FilePageData} from "./domain/filepagedata/data/file-page.data";
 import {DockerRootDeletePipe} from "./component/main/header/tabpanel/filemenu/docker-root-delete.pipe";
@@ -53,9 +54,9 @@ import {SelectionDialogData} from "./component/cmd/selection/selection-dialog.da
 import {FiletypeExtensionsService} from "./service/filetype-extensions.service";
 import {FindDialogService} from "./component/cmd/find/find-dialog.service";
 import {FindSocketService} from "./service/find.socketio.service";
-import {MultiRenameDialogComponent} from "./component/cmd/multirename/multi-rename-dialog.component";
 import {MultiRenameDialogService} from "./component/cmd/multirename/multi-rename-dialog.service";
 import {MultiRenameDialogData} from "./component/cmd/multirename/data/multi-rename-dialog.data";
+
 
 @Injectable({
   providedIn: "root"
@@ -641,7 +642,8 @@ export class AppService {
   getFirstShortcutByActionAsTokens(action: ActionId): string[] {
     return this.shortcutService.getFirstShortcutByActionAsTokens(action);
   }
-  getShortcutAsLabelTokens(sc:string):string[] {
+
+  getShortcutAsLabelTokens(sc: string): string[] {
     return this.shortcutService.getShortcutAsLabelTokens(sc);
   }
 
@@ -652,6 +654,48 @@ export class AppService {
     tabsPanel.selectedTabIndex = tabsPanel.tabs.length - 1;
     this.updateFilePageData(currentData);
   }
+
+  public openFindDialog(
+    data: FindDialogData = new FindDialogData(this.getActiveTabOnActivePanel().path, '**/*.ts', true, false)
+  ) {
+    const srcPanelIndex = this.getActivePanelIndex();
+    const tabData = this.getActiveTabOnActivePanel();
+
+    this.findDialogService
+      .open(data, (result: FindDialogData | undefined) => {
+        if (result) {
+          let findData: FindData = this.findSocketService.createFindData(result);
+
+          if (findData.findDialogData.newtab) {
+            const tabDataFindings = new TabData(findData.dirTabKey);
+            tabDataFindings.findData = findData;
+            this.addTab(srcPanelIndex, tabDataFindings);
+
+          } else {
+            const currentData = this.filePageData;
+            const tabsPanel = currentData.tabRows[srcPanelIndex];
+            const tabData = tabsPanel.tabs[tabsPanel.selectedTabIndex];
+            tabData.path = findData.dirTabKey;
+            tabData.findData = findData;
+            this.updateFilePageData(this.filePageData);
+          }
+        }
+      });
+  }
+
+  requestFindings(findData: FindData) {
+    this.findSocketService
+      .find(findData, event => {
+        const currentMap = this.dirEvents$.getValue();
+        const newMap = new Map(currentMap);
+        newMap.set(findData.dirTabKey, [event]);
+        this.dirEvents$.next(newMap);
+      });
+  }
+
+  // private updateFocusRowCritereaOnInactivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
+  //   this.updateFocusRowCriterea(this.getInactivePanelIndex(), focusRowCriterea);
+  // }
 
   private removeTab() {
     const value = this.filePageDataService.getValue();
@@ -672,10 +716,6 @@ export class AppService {
     tabsPanelData.selectedTabIndex = tabsPanelData.tabs.length - 1;
     this.filePageDataService.update(value);
   }
-
-  // private updateFocusRowCritereaOnInactivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
-  //   this.updateFocusRowCriterea(this.getInactivePanelIndex(), focusRowCriterea);
-  // }
 
   private rename() {
     const srcPanelIndex = this.getActivePanelIndex();
@@ -704,61 +744,15 @@ export class AppService {
     if (rows?.length) {
       const data = new MultiRenameDialogData(rows, srcPanelIndex);
       this.multiRenameDialogService
-        .open(data, (result: /*MultirenameDialogResultData*/any | undefined) => {
-          console.info(result);
-          if (result) {
-            // const actionEvent = this.commandService.multiRename(
-            //   new FileOperationParams(result.source, srcPanelIndex, result.target)
-            // );
-            // this.commandService.addActions([actionEvent]);
+        .open(data, (arr: FileOperationParams[] | undefined) => {
+          if (arr) {
+            const events: ActionEvent[] = arr.map(r => this.commandService.rename(r));
+            this.commandService.addActions(events);
           }
         });
     }
   }
 
-  public openFindDialog(
-    data:FindDialogData = new FindDialogData(this.getActiveTabOnActivePanel().path, '**/*.ts', true, false)
-  ) {
-    const srcPanelIndex = this.getActivePanelIndex();
-    const tabData = this.getActiveTabOnActivePanel();
-
-    this.findDialogService
-      .open(data, (result: FindDialogData | undefined) => {
-        if (result) {
-            let findData: FindData = this.findSocketService.createFindData(result);
-
-            if (findData.findDialogData.newtab) {
-              const tabDataFindings = new TabData(findData.dirTabKey);
-              tabDataFindings.findData = findData;
-              this.addTab(srcPanelIndex, tabDataFindings);
-
-            } else {
-              const currentData = this.filePageData;
-              const tabsPanel = currentData.tabRows[srcPanelIndex];
-              const tabData = tabsPanel.tabs[tabsPanel.selectedTabIndex];
-              tabData.path = findData.dirTabKey;
-              tabData.findData = findData;
-              this.updateFilePageData(this.filePageData);
-            }
-          }
-      });
-  }
-
-  requestFindings(findData: FindData) {
-    this.findSocketService
-      .find(findData, event => {
-        const currentMap = this.dirEvents$.getValue();
-        const newMap = new Map(currentMap);
-        newMap.set(findData.dirTabKey, [event]);
-        this.dirEvents$.next(newMap);
-      });
-  }
-
-  // public getDirEvents(path: string): Observable<DirEventIf[] | undefined> {
-  //   return this.dirEvents$.pipe(
-  //     map(dirEventsMap => dirEventsMap.get(path))
-  //   );
-  // }
 
   private updateFocusRowCritereaOnActivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
     this.updateFocusRowCriterea(this.getActivePanelIndex(), focusRowCriterea);

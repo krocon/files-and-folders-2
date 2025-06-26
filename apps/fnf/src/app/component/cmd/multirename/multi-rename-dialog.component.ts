@@ -68,7 +68,6 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
   rows: FileOperationParams[];
 
   private readonly rowHeight = 34;
-
   readonly tableOptions: TableOptionsIf = {
     ...new TableOptions(),
     hoverColumnVisible: false,
@@ -92,8 +91,6 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
     getFocusModel: () => undefined,
     shortcutActionsDisabled: true,
   };
-
-
   private tableApi: TableApi | undefined;
   private alive = true;
 
@@ -140,12 +137,6 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
       }
     );
 
-    // dialogRef
-    //   .afterOpened()
-    //   .pipe(takeWhile(() => this.alive))
-    //   .subscribe(() => {
-    //     //
-    //   });
 
     this.rows = multiRenameDialogData.rows.map(
       r => new FileOperationParams(
@@ -216,22 +207,16 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
         debounceTime(300),
       )
       .subscribe(evt => {
-        console.info('----------');
-        console.info(evt);
-        //console.info(this.rows,);
         this.zone.runOutsideAngular(() => {
           this.multiRenameService.updateTargets(this.rows, this.formGroup.getRawValue());
           this.tableApi?.setRows(this.rows);
           this.tableApi?.repaint();
-          console.info(this.rows.map(r => r.target.base));
         });
       });
   }
 
   onOkClicked() {
-    // const fileItem = new FileItem(this.data.target, this.formGroup.getRawValue().name, "");
-    // fileItem.isDir = true;
-    // this.dialogRef.close(fileItem);
+    this.dialogRef.close(this.rows);
   }
 
   onCancelClicked() {
