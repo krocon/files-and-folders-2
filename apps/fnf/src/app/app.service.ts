@@ -744,10 +744,11 @@ export class AppService {
     if (rows?.length) {
       const data = new MultiRenameDialogData(rows, srcPanelIndex);
       this.multiRenameDialogService
-        .open(data, (arr: FileOperationParams[] | undefined) => {
+        .open(data, (arr: ActionEvent[] | undefined) => {
           if (arr) {
-            const events: ActionEvent[] = arr.map(r => this.commandService.rename(r));
-            this.commandService.addActions(events);
+            console.info('multiRename ActionEvents:', arr); // TODO del
+            // const events: ActionEvent[] = arr.map(r => this.commandService.rename(r));
+            this.commandService.addActions(arr);
           }
         });
     }

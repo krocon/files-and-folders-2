@@ -349,31 +349,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  test() {
-    this.handleDirEvent(
-      [
-        {
-          "dir": this.dirPara?.path ?? '',
-          "items": [
-            {
-              "dir": this.dirPara?.path ?? '',
-              "base": "README.md",
-              "ext": ".md",
-              "date": "2025-05-31T20:12:12.282Z",
-              "size": 1546,
-              "isDir": false,
-              "abs": false,
-              meta: {
-                "selected": true
-              }
-            }
-          ],
-          "begin": false, "end": false, "size": 1, "error": "",
-          "action": "unselect", "panelIndex": 0
-        }
-      ]
-    )
-  }
+
 
   handleDirEvent(dirEvents: DirEventIf[]): void {
     if (this.tableApi && dirEvents && this.dirPara) {
@@ -389,105 +365,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  testAdd() {
-    this.handleDirEvent([
-      {
-        "dir": this.dirPara?.path ?? '',
-        "items": [
-          {
-            "dir": this.dirPara?.path ?? '',
-            "base": "NESTJS_TESTING_MIGRATION.md",
-            "ext": ".md",
-            "date": "",
-            "size": 1234,
-            "isDir": false,
-            "abs": false
-          }
-        ],
-        "begin": false,
-        "end": false,
-        "size": 1,
-        "error": "",
-        "action": "add",
-        "panelIndex": this.panelIndex
-      }
-    ]);
-  }
 
-  testUnlink() {
-    this.handleDirEvent([
-      {
-        "dir": this.dirPara?.path ?? '',
-        "items": [
-          {
-            "dir": this.dirPara?.path ?? '',
-            "base": "package.json",
-            "ext": ".json",
-            "date": "",
-            "size": 0,
-            "isDir": false,
-            "abs": false,
-          }
-        ],
-        "begin": false,
-        "end": false,
-        "size": 1,
-        "error": "",
-        "action": "unlink",
-        "panelIndex": this.panelIndex
-      }
-    ]);
-  }
-
-  testUnselect() {
-    this.handleDirEvent([
-      {
-        "dir": this.dirPara?.path ?? '',
-        "items": [
-          {
-            "dir": this.dirPara?.path ?? '',
-            "base": "package.json",
-            "ext": ".json",
-            "date": "",
-            "size": 0,
-            "isDir": false,
-            "abs": false
-          }
-        ],
-        "begin": false,
-        "end": false,
-        "size": 1,
-        "error": "",
-        "action": "unselect",
-        "panelIndex": this.panelIndex
-      }
-    ]);
-  }
-
-  testSelect() {
-    this.handleDirEvent([
-      {
-        "dir": this.dirPara?.path ?? '',
-        "items": [
-          {
-            "dir": this.dirPara?.path ?? '',
-            "base": "package.json",
-            "ext": ".json",
-            "date": "",
-            "size": 0,
-            "isDir": false,
-            "abs": false
-          }
-        ],
-        "begin": false,
-        "end": false,
-        "size": 1,
-        "error": "",
-        "action": "select",
-        "panelIndex": this.panelIndex
-      }
-    ]);
-  }
 
   onTableReady(tableApi: TableApi) {
     this.tableApi = tableApi
@@ -695,6 +573,10 @@ export class FileTableComponent implements OnInit, OnDestroy {
   private handleRelevantDirEvent(dirEvent: DirEventIf, zi: ZipUrlInfo) {
     if (!this.tableApi || !dirEvent || !this.dirPara) return;
 
+    if (this.panelIndex===1) {
+      console.info('dirEvent -->  ' + dirEvent.action, JSON.stringify(dirEvent, null, 4)); // TODO del
+    }
+
     if (dirEvent.action === "list") {
       let rows: FileItemIf[] = [];
 
@@ -710,9 +592,13 @@ export class FileTableComponent implements OnInit, OnDestroy {
             || isRoot(fi.dir) && isRoot(zi.zipInnerUrl))
           )];
       }
-      if (!isRoot(this.dirPara.path) && !this.dirPara?.path.startsWith('tabfind')) {
+      if (!isRoot(this.dirPara.path)
+        && !this.dirPara?.path.startsWith('tabfind')
+        && !rows.find(r => r.base === DOT_DOT)
+      ) {
+        // Adding '..' as first item (parent dir):
         rows = [
-          new FileItem(getParent(this.dirPara.path), "..", "", "", 1, true),
+          new FileItem(getParent(this.dirPara.path), DOT_DOT, "", "", 1, true),
           ...rows
         ];
       }
@@ -743,6 +629,10 @@ export class FileTableComponent implements OnInit, OnDestroy {
       this.repaintTable();
       this.selectionManager.updateSelection();
 
+    } else if (dirEvent.action === "change") {
+      this.tableApi.updateRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
+      this.repaintTable();
+
     } else if (dirEvent.action === "focus") {
       this.focusRowCriterea = dirEvent.items[0];
       this.updateFocusIndexByCriteria();
@@ -770,10 +660,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
           this.selectionManager.setRowSelected(r, true);
         });
       this.selectionManager.updateSelection();
-      this.repaintTable();
-
-    } else if (dirEvent.action === "change") {
-      this.tableApi.updateRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
       this.repaintTable();
 
     } else {

@@ -216,7 +216,8 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
   }
 
   onOkClicked() {
-    this.dialogRef.close(this.rows);
+    const actionEvents = this.multiRenameService.createActionEvents(this.rows, this.multiRenameDialogData.panelIndex);
+    this.dialogRef.close(actionEvents);
   }
 
   onCancelClicked() {

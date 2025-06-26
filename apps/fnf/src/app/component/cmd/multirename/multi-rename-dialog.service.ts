@@ -4,8 +4,7 @@ import {MultiRenameDialogComponent} from "./multi-rename-dialog.component";
 import {takeWhile} from "rxjs/operators";
 import {MatDialog} from "@angular/material/dialog";
 import {MultiRenameDialogConfig} from "./multi-rename-dialog.config";
-import {FileItem, FileItemIf} from "@fnf/fnf-data";
-import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
+import {ActionEvent} from "../../../domain/cmd/action-event";
 
 @Injectable({
   providedIn: "root"
@@ -19,12 +18,12 @@ export class MultiRenameDialogService {
   }
 
 
-  public open(data: MultiRenameDialogData, cb: (target: FileOperationParams[] | undefined) => void) {
+  public open(data: MultiRenameDialogData, cb: (target: ActionEvent[] | undefined) => void) {
     let alive = true;
     const config = new MultiRenameDialogConfig(data);
 
     return this.dialog
-      .open<MultiRenameDialogComponent, MultiRenameDialogData, FileOperationParams[] | undefined>(MultiRenameDialogComponent, config)
+      .open<MultiRenameDialogComponent, MultiRenameDialogData, ActionEvent[] | undefined>(MultiRenameDialogComponent, config)
       .afterClosed()
       .pipe(takeWhile(() => alive))
       .subscribe(item => {

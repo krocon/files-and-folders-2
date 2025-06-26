@@ -5,11 +5,7 @@ export class FileTableBodyModel extends AreaModelObjectArrayWithColumndefs<FileI
 
 
   constructor(columnDefs: ColumnDefIf[], defaultRowHeight: number = 34) {
-    super("body", [], columnDefs, defaultRowHeight
-      // TODO later
-      // ,'fnf-selected-row'
-      // ,'fnf-focused-row'
-    );
+    super("body", [], columnDefs, defaultRowHeight);
   }
 
   override getCustomClassesAt(rowIndex: number, _columnIndex: number): string[] {

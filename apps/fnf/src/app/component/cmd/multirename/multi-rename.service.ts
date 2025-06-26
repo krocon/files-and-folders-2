@@ -42,9 +42,10 @@ export class MultiRenameService {
       if (row.source && row.target && this.isFileChanged(row.source, row.target)) {
         actions.push(
           this.commandService.rename({
-            bulk: rows.length > CommandService.BULK_LOWER_LIMIT,
+            bulk: true, // rows.length > CommandService.BULK_LOWER_LIMIT,
             source: row.source,
             srcPanelIndex: panelIndex,
+            targetPanelIndex: panelIndex,
             target: row.target
           })
         );
@@ -134,7 +135,7 @@ export class MultiRenameService {
 
     target.dir = source.dir;
     target.base = base;
-    target.ext = source.base.includes('.') ? '.' + source.base.split('.').pop() : '';
+    target.ext = base.includes('.') ? '.' + base.split('.').pop() : '';
     return target;
   }
 
