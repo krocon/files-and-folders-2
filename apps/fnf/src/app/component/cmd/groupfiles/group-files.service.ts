@@ -5,6 +5,8 @@ import { PanelIndex } from '../../../domain/panel-index';
 import { ActionEvent } from '../../../domain/cmd/action-event';
 import { CommandService } from '../../../service/cmd/command.service';
 import { FileItemIf } from '@fnf/fnf-data';
+import { GroupFilesDialogData } from './data/group-files-dialog.data';
+import { GroupFilesResult } from './data/group-files-result';
 
 @Injectable({
   providedIn: 'root'
@@ -39,4 +41,311 @@ export class GroupFilesService {
     return actions;
   }
 
+  /**
+   * Updates the table model based on the first letter of the file names
+   * @param para The group files data
+   * @param selectedFiles The selected files
+   * @returns The group files result
+   */
+  updateTableModelFirstLetter(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
+    const rows: any[] = [];
+    let i: number;
+    const groups: string[] = [];
+    const targetDir = para.useSourceDir ? dialogData.sourceDir : dialogData.targetDir;
+    let groupCount = 0;
+    let idx = 0;
+
+    const twoLetters = para.modus.indexOf('two') > -1;
+    const letterCount = twoLetters ? 2 : 1;
+
+    for (i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i];
+      let dir = file.base;
+      if (para.ignoreBrackets) {
+        dir = dir
+          .replace(/\[[\w\d\s]+\]/g, '')
+          .replace(/\([\w\d\s]+\)/g, '');
+      }
+      dir = dir
+        .replace(/(^[\s_-]+|[\s_-]+$)/g, '')
+        .substr(0, letterCount);
+
+      if (para.modus.indexOf('lower') > -1) dir = dir.toLowerCase();
+      if (para.modus.indexOf('upper') > -1) dir = dir.toUpperCase();
+
+      if (dir) {
+        if (groups.indexOf(dir) === -1) groups.push(dir);
+        rows.push({
+          id: idx++,
+          base: file.base,
+          src: file,
+          dir: dir,
+          target: {
+            dir: targetDir + '/' + dir,
+            base: file.base
+          }
+        });
+      }
+    }
+    return new GroupFilesResult(groups.length, rows);
+  }
+
+  /**
+   * Updates the table model based on the minus separator in the file names
+   * @param para The group files data
+   * @param selectedFiles The selected files
+   * @returns The group files result
+   */
+  updateTableModelMinusSeparator(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
+    const rows: any[] = [];
+    let i: number, m: RegExpMatchArray | null;
+    const groups: { [key: string]: FileItemIf[] } = {};
+    const minGroupSize = para.minsize;
+    const targetDir = para.useSourceDir ? dialogData.sourceDir : dialogData.targetDir;
+    let groupCount = 0;
+    let idx = 0;
+
+    for (i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i];
+      let name = file.base;
+      let folder: string | null = null;
+      if (para.ignoreBrackets) {
+        name = name
+          .replace(/\[[^\]]+\]/g, '')
+          .replace(/\([^\)]+\)/g, '');
+      }
+      m = name.match(/(.+) - (.+)/);
+      if (m) {
+        folder = m[1];
+      } else {
+        m = name.match(/(.+)-(.+)/);
+        if (m) {
+          folder = m[1];
+        }
+      }
+
+      if (folder) {
+        folder = folder.replace(/(^[\.\s_-]+|[\.\s_-]+$)/g, '');
+        if (!groups[folder]) groups[folder] = [];
+        groups[folder].push(file);
+      }
+    }
+
+    for (const dir in groups) {
+      if (groups.hasOwnProperty(dir)) {
+        const files = groups[dir];
+
+        if (files.length >= minGroupSize) {
+          groupCount++;
+          for (i = 0; i < files.length; i++) {
+            const f = files[i];
+            rows.push({
+              id: idx++,
+              base: f.base,
+              src: f,
+              dir: dir,
+              target: {
+                dir: targetDir + '/' + dir,
+                base: f.base
+              }
+            });
+          }
+        }
+      }
+    }
+
+    return new GroupFilesResult(groupCount, rows);
+  }
+
+  /**
+   * Updates the table model based on the first word of the file names
+   * @param para The group files data
+   * @param selectedFiles The selected files
+   * @returns The group files result
+   */
+  updateTableModelFirstWord(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
+    const rows: any[] = [];
+    let i: number, m: RegExpMatchArray | null;
+    const groups: { [key: string]: FileItemIf[] } = {};
+    const minGroupSize = para.minsize;
+    const targetDir = para.useSourceDir ? dialogData.sourceDir : dialogData.targetDir;
+    let groupCount = 0;
+    let idx = 0;
+
+    for (i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i];
+      let name = file.base;
+      let folder: string | null = null;
+      if (para.ignoreBrackets) {
+        name = name
+          .replace(/\[[^\]]+\]/g, '')
+          .replace(/\([^\)]+\)/g, '');
+      }
+      m = name.match(/(\w+)\W(.+)/);
+      if (m) {
+        folder = m[1];
+      }
+
+      try {
+        if (folder) {
+          folder = folder.replace(/(^[\.\s_-]+|[\.\s_-]+$)/g, '');
+          if (!groups[folder]) groups[folder] = [];
+          groups[folder].push(file);
+        }
+      } catch (e) {
+        console.warn(e);
+        console.warn('m', m);
+        console.warn('can set property "' + folder + '"!');
+      }
+    }
+
+    for (const dir in groups) {
+      if (groups.hasOwnProperty(dir)) {
+        const files = groups[dir];
+
+        if (files.length >= minGroupSize) {
+          groupCount++;
+          for (i = 0; i < files.length; i++) {
+            const f = files[i];
+            rows.push({
+              id: idx++,
+              base: f.base,
+              src: f,
+              dir: dir,
+              target: {
+                dir: targetDir + '/' + dir,
+                base: f.base
+              }
+            });
+          }
+        }
+      }
+    }
+    return new GroupFilesResult(groupCount, rows);
+  }
+
+  /**
+   * Updates the table model based on running numbers in the file names
+   * @param para The group files data
+   * @param selectedFiles The selected files
+   * @returns The group files result
+   */
+  updateTableModelRunningNumber(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
+    const rows: any[] = [];
+    let i: number;
+    const groups: { [key: string]: FileItemIf[] } = {};
+    const minGroupSize = para.minsize;
+    const targetDir = para.useSourceDir ? dialogData.sourceDir : dialogData.targetDir;
+    let groupCount = 0;
+    let idx = 0;
+
+    for (i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i];
+      let name = file.base;
+
+      if (para.ignoreBrackets) {
+        name = name
+          .replace(/\[[^\]]+\]/g, '')
+          .replace(/\([^\)]+\)/g, '');
+      }
+
+      const digits = name.match(/(\d)+/g);
+      const words = name.match(/(\D)+/g);
+
+      if (digits && digits.length >= 1 && words && words.length >= 2) {
+        let folder = words[0];
+        folder = folder
+          .replace(/#/g, '')
+          .replace(/ Band /g, '')
+          .replace(/'/g, '')
+          .replace(/(^[\.\s_-]+|[\.\s_-]+$)/g, '');
+
+        if (folder) {
+          if (!groups[folder]) groups[folder] = [];
+          groups[folder].push(file);
+        }
+      }
+    }
+
+    for (const dir in groups) {
+      if (groups.hasOwnProperty(dir)) {
+        const files = groups[dir];
+
+        if (files.length >= minGroupSize) {
+          groupCount++;
+          for (i = 0; i < files.length; i++) {
+            const f = files[i];
+            rows.push({
+              id: idx++,
+              base: f.base,
+              src: f,
+              dir: dir,
+              target: {
+                dir: targetDir + '/' + dir,
+                base: f.base
+              }
+            });
+          }
+        }
+      }
+    }
+    return new GroupFilesResult(groupCount, rows);
+  }
+
+  /**
+   * Updates the table model based on a new folder
+   * @param para The group files data
+   * @param selectedFiles The selected files
+   * @returns The group files result
+   */
+  updateTableModelNewFolder(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
+    const rows: any[] = [];
+    let i: number;
+    const targetDir = para.useSourceDir ? dialogData.sourceDir : dialogData.targetDir;
+    const dir = para.newFolder ? para.newFolder.toString() : '';
+
+    if (dir) {
+      for (i = 0; i < selectedFiles.length; i++) {
+        const f = selectedFiles[i];
+        rows.push({
+          id: i,
+          base: f.base,
+          src: f,
+          dir: dir,
+          target: {
+            dir: targetDir + '/' + dir,
+            base: f.base
+          }
+        });
+      }
+    }
+    return new GroupFilesResult(1, rows);
+  }
+
+  /**
+   * Updates the table model based on the selected mode
+   * @param para The group files data
+   * @param selectedFiles The selected files
+   * @returns The group files result
+   */
+  updateTableModel(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
+    if (para.modus === 'new_folder') {
+      return this.updateTableModelNewFolder(para, selectedFiles, dialogData);
+    }
+    if (para.modus === 'running_number') {
+      return this.updateTableModelRunningNumber(para, selectedFiles, dialogData);
+    }
+    if (para.modus === 'minus_separator') {
+      return this.updateTableModelMinusSeparator(para, selectedFiles, dialogData);
+    }
+    if (para.modus === 'first_word') {
+      return this.updateTableModelFirstWord(para, selectedFiles, dialogData);
+    }
+    if (para.modus.indexOf('letter') > -1) {
+      return this.updateTableModelFirstLetter(para, selectedFiles, dialogData);
+    }
+
+    console.warn('updateTableModel. Unknown mode:', para.modus);
+    return new GroupFilesResult(0, []);
+  }
 }
