@@ -34,7 +34,7 @@ export class ChangeCellRendererComponent implements ComponentRendererIf<FileOper
 
     const fileOperationParams: FileOperationParams = areaModel.getRowByIndex(rowIndex);
 
-    if (fileOperationParams.source.base !== fileOperationParams.target.base){
+    if (fileOperationParams?.source?.base !== fileOperationParams?.target?.base){
       this.text = '→';
     } else{
       this.text = '=';

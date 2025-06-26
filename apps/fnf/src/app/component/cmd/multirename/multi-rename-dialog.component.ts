@@ -29,17 +29,13 @@ import {
   TableOptions,
   TableOptionsIf
 } from "@guiexpert/table";
-import {NameCellRendererComponent} from "../../main/filetable/renderer/name-cell-renderer.component";
-import {fileNameComparator} from "../../main/filetable/comparator/name-comparator";
-import {extComparator} from "../../main/filetable/comparator/ext-comparator";
-import {SizeCellRendererComponent} from "../../main/filetable/renderer/size-cell-renderer.component";
-import {sizeComparator} from "../../main/filetable/comparator/size-comparator";
-import {DateCellRendererComponent} from "../../main/filetable/renderer/date-cell-renderer.component";
-import {dateComparator} from "../../main/filetable/comparator/date-comparator";
+
 import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
 import {CommandService} from "../../../service/cmd/command.service";
 import {ChangeCellRendererComponent} from "./change-cell-renderer.component";
 import {MultiRenameNameCellRendererComponent} from "./multi-rename-name-cell-renderer.component";
+import {MultiRenameService} from "./multi-rename.service";
+import {debounceTime} from "rxjs";
 
 @Component({
   selector: "fnf-multi-rename-dialog",
@@ -58,7 +54,6 @@ import {MultiRenameNameCellRendererComponent} from "./multi-rename-name-cell-ren
     MatLabel,
     MatCheckbox,
     TableComponent,
-    NameCellRendererComponent
   ],
   styleUrls: ["./multi-rename-dialog.component.css"]
 })
@@ -70,6 +65,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
   options: MultiRenameOptions;
 
   tableModel?: TableModelIf;
+  rows: FileOperationParams[];
 
   private readonly rowHeight = 34;
 
@@ -99,9 +95,8 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
 
 
   private tableApi: TableApi | undefined;
-
-
   private alive = true;
+
 
   constructor(
     public dialogRef: MatDialogRef<MultiRenameDialogComponent>,
@@ -109,6 +104,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
     private readonly formBuilder: FormBuilder,
     private readonly rwf: RenderWrapperFactory,
     private readonly cdr: ChangeDetectorRef,
+    private readonly multiRenameService: MultiRenameService,
   ) {
     console.info(multiRenameDialogData);
     this.data = multiRenameDialogData.data;
@@ -150,7 +146,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
     //     //
     //   });
 
-    const rows: FileOperationParams[] = multiRenameDialogData.rows.map(
+    this.rows = multiRenameDialogData.rows.map(
       r => new FileOperationParams(
         r,
         0,
@@ -158,6 +154,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
         0,
         multiRenameDialogData.rows.length > CommandService.BULK_LOWER_LIMIT)
     );
+    console.info('this.rows', this.rows);
     const columnDefs = [
       ColumnDef.create({
         property: "source",
@@ -196,7 +193,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
       }),
     ];
     this.tableModel = TableFactory.createTableModel({
-      rows,
+      rows: this.rows,
       columnDefs,
       tableOptions: this.tableOptions,
     });
@@ -212,6 +209,20 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.alive = true;
+    this.formGroup.valueChanges
+      .pipe(
+        takeWhile(() => this.alive),
+        debounceTime(300),
+      )
+      .subscribe(evt => {
+        console.info('----------');
+        console.info(evt);
+        //console.info(this.rows,);
+        // this.multiRenameService.updateTargets(this.rows, this.formGroup.getRawValue());
+        // this.tableApi?.setRows(this.rows);
+        this.tableApi?.repaint();
+        console.info(this.rows);
+      });
   }
 
   onOkClicked() {

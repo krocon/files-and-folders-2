@@ -73,7 +73,7 @@ export class MultiRenameNameCellRendererComponent implements ComponentRendererIf
     this.tooltip = fileItem.dir + '/' + fileItem.base;
     this.iconClass = this.getIconClass(fileItem);
 
-    let name = fileItem.base;
+    let name = fileItem.base??'';
 
 
     if (name === DOT_DOT) {
@@ -90,18 +90,21 @@ export class MultiRenameNameCellRendererComponent implements ComponentRendererIf
     } else {
       // File:
       if (fileItem.abs) {
-        this.text = fileItem.dir + '/' + fileItem.base.replace(fileItem.ext, '');
-        this.text = this.text.substring(1); // hack, because of rtl css bug
+        this.text = fileItem.dir + '/' + fileItem.base;
+        //this.text = this.text.substring(1); // hack, because of rtl css bug
       } else {
-        const base = fileItem.base ? fileItem.base.substring(0, fileItem.base.length - fileItem.ext.length ) : '';
-        this.text = `${base}`;
+        this.text = `${fileItem.base}`;
       }
     }
 
     return undefined;
   }
 
+
+
   private getIconClass(fileItem: FileItemIf): string {
+    if (!fileItem) return '';
+    
     if (fileItem.isDir) {
       if (fileItem.base === DOT_DOT) {
         return "fa fa-angle-left width-10px";
