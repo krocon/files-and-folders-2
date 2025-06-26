@@ -49,7 +49,7 @@ export class GroupFilesTargetCellRendererComponent implements ComponentRendererI
 
     const fileItem = cellValue;
     this.dir = fileItem.dir + '/';
-    this.base = fileItem.base;
+    this.base = fileItem.isDir ?  '['+fileItem.base+']' : fileItem.base;
 
     return undefined;
   }

@@ -771,8 +771,8 @@ export class AppService {
     const sourceTabData = this.getActiveTabOnActivePanel();
     const targetTabData = this.getOtherPanelSelectedTabData();
     const rows = this.getSelectedOrFocussedData(srcPanelIndex)
-      .filter(item => item.base !== DOT_DOT)
-      .filter(item => !item.isDir);
+      .filter(item => item.base !== DOT_DOT);
+      // .filter(item => !item.isDir);
 
     if (rows?.length) {
       const data = new GroupFilesDialogData(

@@ -164,7 +164,9 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
         sortIconVisible: () => true,
       }),
     ];
+
     this.updateTableRows();
+
     this.tableModel = TableFactory.createTableModel({
       rows: this.rows,
       columnDefs,
@@ -214,6 +216,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
       dialogData.targetPanelIndex
     );
     this.groupCount = updateModel.groupCount;
+    console.info('this.rows', this.rows);
   }
 
   private clone<T>(r: T): T {

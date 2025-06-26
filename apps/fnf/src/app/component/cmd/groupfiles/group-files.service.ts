@@ -83,7 +83,7 @@ export class GroupFilesService {
           file.base,
           file,
           dir,
-          new FileItem(targetDir + '/' + dir, file.base)
+          new FileItem(targetDir + '/' + dir, file.base, file.base.split('.').pop() || '', '', 0, file.isDir)
         ));
       }
     }
@@ -144,7 +144,7 @@ export class GroupFilesService {
               f.base,
               f,
               dir,
-              new FileItem(targetDir + '/' + dir, f.base)
+              new FileItem(targetDir + '/' + dir, f.base, f.base.split('.').pop() || '', '', 0, f.isDir)
             ));
           }
         }
@@ -209,7 +209,7 @@ export class GroupFilesService {
               f.base,
               f,
               dir,
-              new FileItem(targetDir + '/' + dir, f.base)
+              new FileItem(targetDir + '/' + dir, f.base, f.base.split('.').pop() || '', '', 0, f.isDir)
             ));
           }
         }
@@ -274,7 +274,7 @@ export class GroupFilesService {
               f.base,
               f,
               dir,
-              new FileItem(targetDir + '/' + dir, f.base)
+              new FileItem(targetDir + '/' + dir, f.base, f.base.split('.').pop() || '', '', 0, f.isDir)
             ));
           }
         }
@@ -303,7 +303,7 @@ export class GroupFilesService {
           f.base,
           f,
           dir,
-          new FileItem(targetDir + '/' + dir, f.base)
+          new FileItem(targetDir + '/' + dir, f.base, f.base.split('.').pop() || '', '', 0, f.isDir)
         ));
       }
     }
