@@ -4,9 +4,10 @@ import { GroupFilesData } from './data/group-files.data';
 import { PanelIndex } from '../../../domain/panel-index';
 import { ActionEvent } from '../../../domain/cmd/action-event';
 import { CommandService } from '../../../service/cmd/command.service';
-import { FileItemIf } from '@fnf/fnf-data';
+import {FileItem, FileItemIf} from '@fnf/fnf-data';
 import { GroupFilesDialogData } from './data/group-files-dialog.data';
 import { GroupFilesResult } from './data/group-files-result';
+import { GroupFilesRow } from './data/group-files-row';
 
 @Injectable({
   providedIn: 'root'
@@ -48,7 +49,7 @@ export class GroupFilesService {
    * @returns The group files result
    */
   updateTableModelFirstLetter(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
-    const rows: any[] = [];
+    const rows: GroupFilesRow[] = [];
     let i: number;
     const groups: string[] = [];
     const targetDir = para.useSourceDir ? dialogData.sourceDir : dialogData.targetDir;
@@ -75,16 +76,21 @@ export class GroupFilesService {
 
       if (dir) {
         if (groups.indexOf(dir) === -1) groups.push(dir);
-        rows.push({
-          id: idx++,
-          base: file.base,
-          src: file,
-          dir: dir,
-          target: {
+        rows.push(new GroupFilesRow(
+          idx++,
+          file.base,
+          file,
+          dir,
+          {
             dir: targetDir + '/' + dir,
-            base: file.base
+            base: file.base,
+            ext: '',
+            size: 0,
+            date: '',
+            isDir: false,
+            abs: false
           }
-        });
+        ));
       }
     }
     return new GroupFilesResult(groups.length, rows);
@@ -97,7 +103,7 @@ export class GroupFilesService {
    * @returns The group files result
    */
   updateTableModelMinusSeparator(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
-    const rows: any[] = [];
+    const rows: GroupFilesRow[] = [];
     let i: number, m: RegExpMatchArray | null;
     const groups: { [key: string]: FileItemIf[] } = {};
     const minGroupSize = para.minsize;
@@ -139,16 +145,21 @@ export class GroupFilesService {
           groupCount++;
           for (i = 0; i < files.length; i++) {
             const f = files[i];
-            rows.push({
-              id: idx++,
-              base: f.base,
-              src: f,
-              dir: dir,
-              target: {
+            rows.push(new GroupFilesRow(
+              idx++,
+              f.base,
+              f,
+              dir,
+              {
                 dir: targetDir + '/' + dir,
-                base: f.base
+                base: f.base,
+                ext: '',
+                size: 0,
+                date: '',
+                isDir: false,
+                abs: false
               }
-            });
+            ));
           }
         }
       }
@@ -164,7 +175,7 @@ export class GroupFilesService {
    * @returns The group files result
    */
   updateTableModelFirstWord(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
-    const rows: any[] = [];
+    const rows: GroupFilesRow[] = [];
     let i: number, m: RegExpMatchArray | null;
     const groups: { [key: string]: FileItemIf[] } = {};
     const minGroupSize = para.minsize;
@@ -207,16 +218,21 @@ export class GroupFilesService {
           groupCount++;
           for (i = 0; i < files.length; i++) {
             const f = files[i];
-            rows.push({
-              id: idx++,
-              base: f.base,
-              src: f,
-              dir: dir,
-              target: {
+            rows.push(new GroupFilesRow(
+              idx++,
+              f.base,
+              f,
+              dir,
+              {
                 dir: targetDir + '/' + dir,
-                base: f.base
+                base: f.base,
+                ext: '',
+                size: 0,
+                date: '',
+                isDir: false,
+                abs: false
               }
-            });
+            ));
           }
         }
       }
@@ -231,7 +247,7 @@ export class GroupFilesService {
    * @returns The group files result
    */
   updateTableModelRunningNumber(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
-    const rows: any[] = [];
+    const rows: GroupFilesRow[] = [];
     let i: number;
     const groups: { [key: string]: FileItemIf[] } = {};
     const minGroupSize = para.minsize;
@@ -275,16 +291,21 @@ export class GroupFilesService {
           groupCount++;
           for (i = 0; i < files.length; i++) {
             const f = files[i];
-            rows.push({
-              id: idx++,
-              base: f.base,
-              src: f,
-              dir: dir,
-              target: {
+            rows.push(new GroupFilesRow(
+              idx++,
+              f.base,
+              f,
+              dir,
+              {
                 dir: targetDir + '/' + dir,
-                base: f.base
+                base: f.base,
+                ext: '',
+                size: 0,
+                date: '',
+                isDir: false,
+                abs: false
               }
-            });
+            ));
           }
         }
       }
@@ -299,7 +320,7 @@ export class GroupFilesService {
    * @returns The group files result
    */
   updateTableModelNewFolder(para: GroupFilesData, selectedFiles: FileItemIf[], dialogData: GroupFilesDialogData): GroupFilesResult {
-    const rows: any[] = [];
+    const rows: GroupFilesRow[] = [];
     let i: number;
     const targetDir = para.useSourceDir ? dialogData.sourceDir : dialogData.targetDir;
     const dir = para.newFolder ? para.newFolder.toString() : '';
@@ -307,16 +328,13 @@ export class GroupFilesService {
     if (dir) {
       for (i = 0; i < selectedFiles.length; i++) {
         const f = selectedFiles[i];
-        rows.push({
-          id: i,
-          base: f.base,
-          src: f,
-          dir: dir,
-          target: {
-            dir: targetDir + '/' + dir,
-            base: f.base
-          }
-        });
+        rows.push(new GroupFilesRow(
+          i,
+          f.base,
+          f,
+          dir,
+          new FileItem(targetDir + '/' + dir, f.base)
+        ));
       }
     }
     return new GroupFilesResult(1, rows);
