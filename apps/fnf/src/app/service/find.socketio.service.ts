@@ -49,6 +49,7 @@ export class FindSocketService {
     this.cancellings[findData.emmitCancelKey] = this.socket
       .fromEvent<DirEvent, string>(findData.emmitDataKey)
       .subscribe(wd => {
+        console.info("find", wd);
         this.cache[findData.emmitDataKey] = wd;
         callback(wd);
       });

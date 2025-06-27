@@ -24,54 +24,57 @@ export class FindGateway {
    */
   @SubscribeMessage("find")
   find(@MessageBody() findData: FindData): void {
-    const findDialogData = findData.findDialogData;
-    const directoriesOnly = findDialogData.directoriesOnly;
-    const dirs: string[] = findDialogData.folders ? findDialogData.folders : [findDialogData.folder];
-    const allItems: FileItem[] = [];
-    let first = true;
-    while (dirs.length) {
-      if (this.cancellings[findData.emmitCancelKey]) {
-        return;
-      }
-      const dir = dirs.pop();
-      const items: FileItem[] = [];
-      const ffs = fs.readdirSync(dir);
-      ffs.forEach(f => {
-        const f2 = path.join(dir, f);
-        if (fs.existsSync(f2)) {
-          const stats2 = fs.statSync(f2);
-          if (stats2.isDirectory()) {
-            dirs.push(f2);
+    (function (findData: FindData, cancellings: {}, server: Server) {
 
-          } else {
-            if (!directoriesOnly) {
-              const dir = path.dirname(f2);
-              const base = path.basename(f2);
+      const findDialogData = findData.findDialogData;
+      const directoriesOnly = findDialogData.directoriesOnly;
+      const dirs: string[] = findDialogData.folders ? findDialogData.folders : [findDialogData.folder];
+      const allItems: FileItem[] = [];
+      let first = true;
+      while (dirs.length) {
+        if (cancellings[findData.emmitCancelKey]) {
+          return;
+        }
+        const dir = dirs.pop();
+        const items: FileItem[] = [];
+        const ffs = fs.readdirSync(dir);
+        ffs.forEach(f => {
+          const f2 = path.join(dir, f);
+          if (fs.existsSync(f2)) {
+            const stats2 = fs.statSync(f2);
+            if (stats2.isDirectory()) {
+              dirs.push(f2);
 
-              // console.log(path.join(dir, base)+ ", openFindDialog "+findDialogData.pattern + ',   ' +
-              //   (micromatch.isMatch(path.join(dir, base), findDialogData.pattern))
-              // );
-              if (micromatch.isMatch(path.join(dir, base), findDialogData.pattern)) {
-                const ext = path.extname(f2);
-                const fileItem = new FileItem(dir, base, ext);
+            } else {
+              if (!directoriesOnly) {
+                const dir = path.dirname(f2);
+                const base = path.basename(f2);
 
-                stats2FileItem(stats2, fileItem);
-                fileItem.abs = true;
-                items.push(fileItem);
-                allItems.push(fileItem);
+                // console.log(path.join(dir, base) + ", openFindDialog " + findDialogData.pattern + ',   ' +
+                //   (micromatch.isMatch(path.join(dir, base), findDialogData.pattern))
+                // );
+                if (micromatch.isMatch(path.join(dir, base), findDialogData.pattern)) {
+                  const ext = path.extname(f2);
+                  const fileItem = new FileItem(dir, base, ext);
+
+                  stats2FileItem(stats2, fileItem);
+                  fileItem.abs = true;
+                  items.push(fileItem);
+                  allItems.push(fileItem);
+                }
               }
             }
           }
+        });
+        if (items.length) {
+          const dirEvent = new DirEvent(findData.dirTabKey, items, first, false, items.length, "", "list");
+          server.emit(findData.emmitDataKey, dirEvent);
+          first = false;
         }
-      });
-      if (items.length) {
-        const dirEvent = new DirEvent(findData.dirTabKey, items, first, false, items.length, "", "list");
-        this.server.emit(findData.emmitDataKey, dirEvent);
-        first = false;
       }
-    }
-    const dirEvent = new DirEvent(findData.dirTabKey, allItems, true, true, allItems.length, "", "list");
-    this.server.emit(findData.emmitDataKey, dirEvent);
+      const dirEvent = new DirEvent(findData.dirTabKey, allItems, true, true, allItems.length, "", "list");
+      server.emit(findData.emmitDataKey, dirEvent);
+    })(findData, this.cancellings, this.server);
   }
 
   @SubscribeMessage("cancelfind")

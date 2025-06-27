@@ -698,6 +698,7 @@ export class AppService {
   }
 
   requestFindings(findData: FindData) {
+    console.info('requestFindings', findData);
     this.findSocketService
       .find(findData, event => {
         const currentMap = this.dirEvents$.getValue();

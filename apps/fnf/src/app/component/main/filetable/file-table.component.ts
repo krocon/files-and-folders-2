@@ -335,7 +335,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
     if (findData) {
       if (this.findDataOld) {
-        this.appService.cancelFind(findData);
+        // TODO this.appService.cancelFind(findData);
       }
       this.findDataOld = structuredClone(findData);
       // request findings:
@@ -345,7 +345,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
       // request directory entries
       try {
         await this.appService.fetchDir(this.dirPara);
-        // The effect in ngOnInit will handle the directory events
       } catch (e) {
         console.error(e);
       }
