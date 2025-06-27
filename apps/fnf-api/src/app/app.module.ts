@@ -22,7 +22,7 @@ const config = new Config(
   process.env.FNF_INCOMPATIBLE_PATHS ? process.env.FNF_INCOMPATIBLE_PATHS.split(",") : [],
   process.env.FNF_CONTAINER_PATHS ? process.env.FNF_CONTAINER_PATHS.split(",") : [],
   process.env.FNF_START_PATH ? process.env.FNF_START_PATH :
-    process.env.FNF_CONTAINER_PATHS ? process.env.FNF_CONTAINER_PATHS.split(",")[0] : '/',
+  process.env.FNF_CONTAINER_PATHS ? process.env.FNF_CONTAINER_PATHS.split(",")[0] : '/',
   process.env.FNF_DOCKER_ROOT ? process.env.FNF_DOCKER_ROOT : undefined,
 );
 

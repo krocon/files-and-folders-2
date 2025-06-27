@@ -6,6 +6,7 @@ import {slash2backSlash} from "./common/slash-2-backslash.fn";
 import {clone} from "./common/clone";
 import {Logger} from "@nestjs/common";
 import {executeCommand} from "./common/execute-command";
+import {fileUrl2CheckOrAddDirEvents} from "./common/file-url-chopper.fn";
 
 const platform = os.platform();
 const osx = platform === "darwin";
@@ -17,12 +18,12 @@ const logger = new Logger("fn-copy");
 export async function copy(para: FilePara): Promise<DirEventIf[]> {
 
 
-  function createRet(targetUrl: string, para: FilePara): DirEventIf[] {
+  function createRet(targetDir:string, targetUrl: string, para: FilePara): DirEventIf[] {
     const item = clone<FileItemIf>(para.source);
     item.dir = targetUrl;
-    const ret: DirEventIf[] = [];
+    const ret: DirEventIf[] = fileUrl2CheckOrAddDirEvents(targetUrl, para.targetPanelIndex);
     ret.push(new DirEvent(para.source.dir, [para.source], false, false, 1, "", "unselect"));
-    ret.push(new DirEvent(targetUrl, [item], false, false, 1, "", item.isDir ? "addDir" : "add"));
+    ret.push(new DirEvent(targetDir, [item], false, false, 1, "", item.isDir ? "addDir" : "add"));
     return ret;
   }
 
@@ -96,14 +97,14 @@ export async function copy(para: FilePara): Promise<DirEventIf[]> {
 
   try {
     await executeCommand(cmd);
-    return createRet(targetUrl, para);
+    return createRet(ptarget.dir, targetUrl, para);
 
   } catch (error) {
     // second try:
     logger.error(error);
     const to = path.join(targetUrl, "/", para.source.base);
     await fse.copy(sourceUrl, to);
-    return createRet(targetUrl, para);
+    return createRet(ptarget.dir, targetUrl, para);
   }
 
 }

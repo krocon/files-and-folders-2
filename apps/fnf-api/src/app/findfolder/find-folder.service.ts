@@ -3,16 +3,41 @@ import {Config, FindFolderPara} from '@fnf/fnf-data';
 import * as fs from "fs-extra";
 
 
+/**
+ * Service responsible for finding folders in a file system based on specified search criteria.
+ * Provides functionality to recursively search directories up to a specified depth,
+ * with optional pattern matching for folder names.
+ */
 @Injectable()
 export class FindFolderService {
 
   static config: Config = new Config();
 
+  /**
+   * Gets the current configuration settings for the FindFolder service.
+   * @returns {Config} The current configuration instance.
+   */
   get config(): Config {
     return FindFolderService.config;
   }
 
 
+  /**
+   * Recursively searches for folders in specified directories based on given parameters.
+   *
+   * @param para - Search parameters containing:
+   *   - startDirs: Array of initial directories to start the search from
+   *   - folderDeep: Maximum depth level for recursive search
+   *   - pattern: Optional search pattern to filter folder names (case-insensitive)
+   *
+   * @returns Promise resolving to an array of full paths to matching folders
+   *
+   * @remarks
+   * - Implements depth-first search with cycle detection
+   * - Skips hidden folders (starting with '.')
+   * - Handles file system errors gracefully with warning logs
+   * - Respects maximum depth limit specified in parameters
+   */
   async findFolders(para: FindFolderPara): Promise<string[]> {
     const found: string[] = [];
     const dirs = [...para.startDirs];

@@ -19,7 +19,7 @@ export async function unpacklist(file: string): Promise<DirEventIf[]> {
     if (entry.isDirectory || entry.isFile) {
       let dir = (zipDir + ":/" + entryDir).replace(/::/g, ":");
       if (dir.endsWith("/.")) {
-        dir = dir.substr(0, dir.length - 2);
+        dir = dir.substring(0, dir.length - 2);
       }
       fileItems.push(new FileItem(dir, entryBase, "", "", entry.size, entry.isDirectory, false));
     }

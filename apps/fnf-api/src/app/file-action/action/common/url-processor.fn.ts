@@ -1,5 +1,8 @@
 import * as path from "path";
 
+export interface DirBaseIf{dir: string ; base: string ;}
+
+
 /**
  * Processes a file URL by iteratively splitting it into base and path components.
  * For each iteration, it returns an object containing the current directory path and the base component.
@@ -7,17 +10,17 @@ import * as path from "path";
  * Example:
  * For the URL "/Users/marckronberg/Pictures/__test/i/index.html"
  * It will process:
- * 1. { url: "/Users/marckronberg/Pictures/__test/i", base: "index.html" }
- * 2. { url: "/Users/marckronberg/Pictures/__test", base: "i" }
- * 3. { url: "/Users/marckronberg/Pictures", base: "__test" }
- * 4. { url: "/Users/marckronberg", base: "Pictures" }
- * 5. { url: "/Users", base: "marckronberg" }
+ * 1. { dir: "/Users/marckronberg/Pictures/__test/i", base: "index.html" }
+ * 2. { dir: "/Users/marckronberg/Pictures/__test", base: "i" }
+ * 3. { dir: "/Users/marckronberg/Pictures", base: "__test" }
+ * 4. { dir: "/Users/marckronberg", base: "Pictures" }
+ * 5. { dir: "/Users", base: "marckronberg" }
  * 
  * @param fileUrl The complete file URL to process
  * @returns An array of objects, each containing the url and base components
  */
-export function processFileUrl(fileUrl: string): Array<{url: string, base: string}> {
-  const result: Array<{url: string, base: string}> = [];
+export function processFileUrl(fileUrl: string): Array<DirBaseIf> {
+  const result: Array<DirBaseIf> = [];
   
   // Initialize with the full path
   let currentUrl = fileUrl;
@@ -32,7 +35,7 @@ export function processFileUrl(fileUrl: string): Array<{url: string, base: strin
     // Add to result if we have a valid base
     if (base) {
       result.push({
-        url: dirPath,
+        dir: dirPath,
         base: base
       });
     }
@@ -56,7 +59,7 @@ export function demonstrateUrlProcessing(): void {
   
   results.forEach((item, index) => {
     console.log(`Iteration ${index + 1}:`);
-    console.log(`   ${item.url}`);
+    console.log(`   ${item.dir}`);
     console.log(`   ${item.base}`);
     console.log("---");
   });

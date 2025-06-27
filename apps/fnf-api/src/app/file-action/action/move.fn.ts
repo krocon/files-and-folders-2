@@ -1,4 +1,4 @@
-import {DirEvent, DirEventIf, FileItem, FileItemIf, FilePara, fixPath} from "@fnf/fnf-data";
+import {DirEvent, DirEventIf, FileItemIf, FilePara, fixPath} from "@fnf/fnf-data";
 import * as os from "os";
 import * as path from "path";
 import * as fse from "fs-extra";
@@ -6,8 +6,7 @@ import {slash2backSlash} from "./common/slash-2-backslash.fn";
 import {clone} from "./common/clone";
 import {Logger} from "@nestjs/common";
 import {executeCommand} from "./common/execute-command";
-import {fileExt} from "./common/fielext";
-import {processFileUrl} from "./common/url-processor.fn";
+import {fileUrl2CheckOrAddDirEvents} from "./common/file-url-chopper.fn";
 
 const platform = os.platform();
 const osx = platform === "darwin";
@@ -19,28 +18,15 @@ const logger = new Logger("fn-move");
 export async function move(para: FilePara): Promise<DirEventIf[]> {
 
   function createRet(targetUrl: string, para: FilePara): DirEventIf[] {
-    const item = clone<FileItemIf>(para.source);
-    const targetDir = path.dirname(targetUrl);
-    item.dir = targetDir;
-    const ret: DirEventIf[] = [];
     const isDir = para.source.isDir;
+    const targetDir = path.dirname(targetUrl);
+    const item = clone<FileItemIf>(para.source);
+    item.dir = targetDir;
 
+    const ret: DirEventIf[] = fileUrl2CheckOrAddDirEvents(targetDir, para.targetPanelIndex);
     ret.push(new DirEvent(para.source.dir, [para.source], false, false, 1, "", isDir ? "unlinkDir" : "unlink", para.sourcePanelIndex));
     ret.push(new DirEvent(targetDir, [item], false, false, 1, "", isDir ? "addDir" : "add", para.targetPanelIndex));
 
-    const arr: {url:string, base:string}[] = processFileUrl(targetDir);
-    for (let i = 0; i < arr.length; i++) {
-      const item = arr[i];
-      ret.push(new DirEvent(
-        item.url,
-        [new FileItem(item.url, item.base, i==0 ? fileExt(item.base): '', '', 0, true, false)],
-        i==0,
-        i ===arr.length-1,
-        1,
-        "",
-        "checkOrAddDir",
-        para.targetPanelIndex));
-    }
     return ret;
   }
 
@@ -99,7 +85,7 @@ export async function move(para: FilePara): Promise<DirEventIf[]> {
 
   const stats = await fse.stat(sourceUrl);
   if (!stats) {
-    throw new Error("Could not get stats for source file");
+    throw new Error("Could not get stats for the source file");
   }
 
   const sourceIsDirectory = stats.isDirectory(); // source only, target not exists!
