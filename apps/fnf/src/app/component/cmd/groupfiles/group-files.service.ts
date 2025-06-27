@@ -37,14 +37,15 @@ export class GroupFilesService {
 
     for (const row of rows) {
       if (row.source && row.target && this.isFileRelevant(row.source, row.target)) {
+        let fop:FileOperationParams = {
+          bulk: rows.length > CommandService.BULK_LOWER_LIMIT,
+          source: row.source,
+          srcPanelIndex: row.srcPanelIndex,
+          targetPanelIndex: groupFilesDialogData.data.useSourceDir ? row.srcPanelIndex: row.targetPanelIndex,
+          target: row.target
+        };
         actions.push(
-          this.commandService.move({
-            bulk: rows.length > CommandService.BULK_LOWER_LIMIT,
-            source: row.source,
-            srcPanelIndex: groupFilesDialogData.sourcePanelIndex,
-            targetPanelIndex: groupFilesDialogData.data.useSourceDir ? groupFilesDialogData.sourcePanelIndex: groupFilesDialogData.sourcePanelIndex,
-            target: row.target
-          })
+          this.commandService.move(fop)
         );
       }
     }
