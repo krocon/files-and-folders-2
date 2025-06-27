@@ -139,7 +139,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
   private filterActive = false;
   private dirPara?: DirPara;
   private focusRowCriterea: Partial<FileItemIf> | null = null;
-
+  private findDataOld: FindData | undefined;
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
@@ -261,7 +261,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
     return states;
   }
 
-
   ngOnInit(): void {
     this.appService.setBodyAreaModel(this._panelIndex, this.bodyAreaModel);
     this.appService.setSelectionManagers(this._panelIndex, this.selectionManager);
@@ -335,6 +334,10 @@ export class FileTableComponent implements OnInit, OnDestroy {
     }
 
     if (findData) {
+      if (this.findDataOld) {
+        this.appService.cancelFind(findData);
+      }
+      this.findDataOld = structuredClone(findData);
       // request findings:
       this.appService.requestFindings(findData);
 
@@ -350,7 +353,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
 
-
   handleDirEvent(dirEvents: DirEventIf[]): void {
     if (this.tableApi && dirEvents && this.dirPara) {
       for (let i = 0; i < dirEvents.length; i++) {
@@ -364,7 +366,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
       }
     }
   }
-
 
 
   onTableReady(tableApi: TableApi) {
@@ -573,8 +574,9 @@ export class FileTableComponent implements OnInit, OnDestroy {
   private handleRelevantDirEvent(dirEvent: DirEventIf, zi: ZipUrlInfo) {
     if (!this.tableApi || !dirEvent || !this.dirPara) return;
 
-    if (this.panelIndex===1) {
-      console.info('dirEvent -->  ' + dirEvent.action, JSON.stringify(dirEvent, null, 4)); // TODO del
+    if (this.panelIndex === 0) {
+      // console.info('dirEvent -->  ' + dirEvent.action, JSON.stringify(dirEvent, null, 4)); // TODO del
+      console.info('dirEvent -->  ' + dirEvent.action, dirEvent); // TODO del
     }
 
     if (dirEvent.action === "list") {
@@ -613,7 +615,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
           );
         this.selectionChanged.next(selectionLabelData);
       }
-      // console.info('handleDirEvent ' + this.panelIndex, dirEvents);
+
       if (dirEvent.end) {
         this.appService.resetFocusRowCriterea();
       }
@@ -624,7 +626,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
       this.selectionManager.updateSelection();
 
     } else if (dirEvent.action === "checkOrAddDir" || dirEvent.action === "checkOrAddFile") {
-      const exists:boolean = this.tableApi
+      const exists: boolean = this.tableApi
         .findRows(
           dirEvent.items,
           (a, b) => a.base === b.base && a.dir === b.dir).length > 0;

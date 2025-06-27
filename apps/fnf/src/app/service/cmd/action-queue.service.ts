@@ -6,7 +6,7 @@ import {Observable} from 'rxjs';
 import {QueueProgress} from "../../domain/cmd/queue.progress";
 import {Queue} from "../../domain/cmd/queue";
 import {FileActionService} from "./file-action.service";
-import {DirEvent, DirEventIf, DoEventIf, OnDoResponseType} from "@fnf/fnf-data";
+import {DirEvent, OnDoResponseType} from "@fnf/fnf-data";
 import {NotifyService} from "./notify-service";
 import {NotifyEvent} from "../../domain/cmd/notify-event";
 
@@ -149,9 +149,9 @@ export class ActionQueueService {
             .subscribe({
               next: (res: OnDoResponseType) => {
 
-                console.info('------------------------- ');
-                console.info('Action ', action);
-                console.info('Action response', res);
+                console.info('-----------------');
+                console.info('Action queue    :', action);
+                console.info('Action response :', res);
 
                 queue.status = this.QUEUE_STATUS_IDLE;
                 action.status = this.ACTION_STATUS_SUCCESS;

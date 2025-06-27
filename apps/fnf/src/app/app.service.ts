@@ -693,6 +693,10 @@ export class AppService {
       });
   }
 
+  cancelFind(findData: FindData) {
+    this.findSocketService.cancelFind(findData.emmitCancelKey);
+  }
+
   requestFindings(findData: FindData) {
     this.findSocketService
       .find(findData, event => {

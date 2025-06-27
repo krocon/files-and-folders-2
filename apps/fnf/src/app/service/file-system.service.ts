@@ -31,9 +31,9 @@ export class FileSystemService {
   private readonly cache: { [key: string]: DirEventIf[] } = {};
   private readonly lastCalls: { [key: string]: DirPara } = {};
 
-  private watching = false;
+  // private watching = false;
 
-  private watcherObservable: Observable<DirEventIf[]>;
+  // private watcherObservable: Observable<DirEventIf[]>;
   private doneObservable: Observable<DirEventIf[]>;
   private errorObservable: Observable<FilePara>;
 
@@ -42,11 +42,11 @@ export class FileSystemService {
     private readonly socket: Socket,
     private readonly httpClient: HttpClient
   ) {
-    this.watcherObservable = this.socket
-      .fromEvent<DirEventIf, string>("watchingxxx") // disabled xxx
-      .pipe(
-        map(o => [o]),
-      );
+    // this.watcherObservable = this.socket
+    //   .fromEvent<DirEventIf, string>("watchingxxx") // disabled xxx
+    //   .pipe(
+    //     map(o => [o]),
+    //   );
 
     this.doneObservable = this.socket
       .fromEvent<DirEventIf[], string>(keys.ON_MULTI_DO_DONE);
@@ -71,10 +71,10 @@ export class FileSystemService {
     this.lastCalls[para.componentId] = para;
 
     const obsRead: Observable<DirEventIf[]> = this.httpClient.post<DirEventIf[]>(FileSystemService.config.readDirUrl, para);
-    const obsWatcher: Observable<DirEventIf[]> = this.watcherObservable;
+    // const obsWatcher: Observable<DirEventIf[]> = this.watcherObservable;
     const obsDone: Observable<DirEventIf[]> = this.doneObservable;
 
-    return of(obsRead, obsWatcher, obsDone)
+    return of(obsRead, /*obsWatcher,*/ obsDone)
       .pipe(
         mergeAll()
       )
@@ -164,11 +164,11 @@ export class FileSystemService {
   }
 
   private unwatch(para: DirPara) {
-    this.socket.emit("unwatch", para);
+    // this.socket.emit("unwatch", para);
   }
 
   private watchDir(para: DirPara) {
-    this.socket.emit("watch", para);
+    // this.socket.emit("watch", para);
   }
 
   private readDirFileByFile(

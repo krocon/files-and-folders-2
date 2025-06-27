@@ -129,7 +129,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
         0,
         groupFilesDialogData.rows.length > CommandService.BULK_LOWER_LIMIT)
     );
-    console.info('this.rows', this.rows);
+
     const columnDefs = [
       ColumnDef.create({
         property: "source",
@@ -223,7 +223,6 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
       dialogData.targetPanelIndex
     );
     this.groupCount = updateModel.groupCount;
-    console.info('this.rows', this.rows);
   }
 
   private clone<T>(r: T): T {

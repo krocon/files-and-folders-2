@@ -146,7 +146,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
         0,
         multiRenameDialogData.rows.length > CommandService.BULK_LOWER_LIMIT)
     );
-    console.info('##',this.rows)
+
     const columnDefs = [
       ColumnDef.create({
         property: "source",
