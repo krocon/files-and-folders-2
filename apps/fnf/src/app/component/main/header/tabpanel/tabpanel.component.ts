@@ -1,18 +1,6 @@
-import {
-  Component,
-  effect,
-  EventEmitter,
-  inject,
-  Injector,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-  runInInjectionContext,
-  ViewChild
-} from '@angular/core';
+import {Component, EventEmitter, inject, Injector, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {CommonModule} from "@angular/common";
-import {PanelIndex} from "../../../../domain/panel-index";
+import {PanelIndex, Sysinfo, SysinfoIf} from "@fnf/fnf-data";
 import {TabsPanelData} from "../../../../domain/filepagedata/data/tabs-panel.data";
 import {TabComponent} from "./tab/tab.component";
 import {MatMenuModule} from "@angular/material/menu";
@@ -21,7 +9,6 @@ import {MatTabsModule} from "@angular/material/tabs";
 import {FavsAndLatestComponent} from "./filemenu/favs-and-latest.component";
 import {MatButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
-import {Sysinfo, SysinfoIf} from "@fnf/fnf-data";
 import {FormsModule} from "@angular/forms";
 import {AppService} from "../../../../app.service";
 import {MatTooltipModule} from "@angular/material/tooltip";

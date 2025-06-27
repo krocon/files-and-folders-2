@@ -21,8 +21,9 @@ export async function move(para: FilePara): Promise<DirEventIf[]> {
     item.dir = targetUrl;
     const ret: DirEventIf[] = [];
     const isDir = para.source.isDir;
-    ret.push(new DirEvent(para.source.dir, [para.source], false, false, 1, "", isDir ? "unlinkDir" : "unlink"));
-    ret.push(new DirEvent(targetUrl, [item], false, false, 1, "", isDir ? "addDir" : "add"));
+
+    ret.push(new DirEvent(para.source.dir, [para.source], false, false, 1, "", isDir ? "unlinkDir" : "unlink", para.sourcePanelIndex));
+    ret.push(new DirEvent(targetUrl, [item], false, false, 1, "", isDir ? "addDir" : "add", para.targetPanelIndex));
     return ret;
   }
 

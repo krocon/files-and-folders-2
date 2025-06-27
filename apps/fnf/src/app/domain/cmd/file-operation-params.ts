@@ -1,5 +1,4 @@
-import {FileItemIf} from "@fnf/fnf-data";
-import {PanelIndex} from "../panel-index";
+import {FileItemIf, PanelIndex} from "@fnf/fnf-data";
 
 /**
  * Parameters for file operations like copy, move, and rename
@@ -9,7 +8,7 @@ export class FileOperationParams {
     public source: FileItemIf,
     public srcPanelIndex: PanelIndex,
     public target: FileItemIf,
-    public targetPanelIndex?: PanelIndex,
+    public targetPanelIndex: PanelIndex,
     public bulk: boolean = false
   ) {
   }

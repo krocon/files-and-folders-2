@@ -30,12 +30,11 @@ import {CommonModule} from "@angular/common";
 import {FilePageData} from "./domain/filepagedata/data/file-page.data";
 import {BreadcrumbComponent} from "./component/main/header/breadcrumb/breadcrumb.component";
 import {TabpanelComponent} from "./component/main/header/tabpanel/tabpanel.component";
-import {PanelIndex} from "./domain/panel-index";
+import {PanelIndex} from "@fnf/fnf-data";
 import {PanelSelectionService} from "./domain/filepagedata/service/panel-selection.service";
 import {SummaryLabel} from "./component/main/footer/summarylabel/summary-label";
 import {TabsPanelData} from "./domain/filepagedata/data/tabs-panel.data";
 import {SelectionEvent} from "./domain/filepagedata/data/selection-event";
-import {createHarmonizedShortcutByKeyboardEvent} from "@guiexpert/table";
 
 
 const CONFIG: ResizeConfig = {

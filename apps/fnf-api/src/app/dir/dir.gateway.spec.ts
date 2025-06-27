@@ -17,6 +17,7 @@ const prepareDemoFolder = async (): Promise<DirEventIf[]> => {
   const para = new FilePara(
     new FileItem(testDir + "/", "demo.zip"),
     new FileItem(testDir + "/"),
+    0,0,
     "unpack");
 
   return unpack(para);

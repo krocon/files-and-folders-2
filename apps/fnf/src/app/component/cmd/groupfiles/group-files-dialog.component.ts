@@ -37,7 +37,6 @@ import {GroupFilesService} from "./group-files.service";
 import {debounceTime} from "rxjs";
 import {GroupFilesResult} from "./data/group-files-result";
 import {GroupFilesTargetCellRendererComponent} from "./group-files-target-cell-renderer.component";
-import {fileNameComparator} from "../../main/filetable/comparator/name-comparator";
 import {fileItemComparator} from "../../../common/comparator/file-item-comparator";
 
 @Component({
@@ -198,8 +197,12 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
   }
 
   onOkClicked() {
-    // TODO const actionEvents = this.multiRenameService.createActionEvents(this.rows, this.groupFilesDialogData.panelIndex);
-    // this.dialogRef.close(actionEvents);
+    this.groupFilesDialogData.data = this.formGroup.getRawValue();
+    const actionEvents = this.groupFilesService.createActionEvents(
+      this.rows,
+      this.groupFilesDialogData,
+      );
+    this.dialogRef.close(actionEvents);
   }
 
   onCancelClicked() {

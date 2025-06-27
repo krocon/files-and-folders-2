@@ -35,6 +35,7 @@ export * from './models/file/zip-matcher';
 export * from './models/file/fix-slash.fn';
 export * from './models/file/fix-path.fn';
 export * from './models/file/on-do-response-type';
+export * from './models/file/panel-index';
 
 export * from './models/filetype/filetype-extensions.if';
 

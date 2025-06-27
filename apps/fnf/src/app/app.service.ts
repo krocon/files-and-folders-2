@@ -20,7 +20,7 @@ import {
 } from "@fnf-data";
 import {BehaviorSubject, firstValueFrom, Subject} from "rxjs";
 import {ActionEvent} from "./domain/cmd/action-event";
-import {PanelIndex} from "./domain/panel-index";
+import {PanelIndex} from "@fnf/fnf-data";
 import {FilePageData} from "./domain/filepagedata/data/file-page.data";
 import {DockerRootDeletePipe} from "./component/main/header/tabpanel/filemenu/docker-root-delete.pipe";
 import {PanelSelectionService} from "./domain/filepagedata/service/panel-selection.service";
@@ -604,7 +604,7 @@ export class AppService {
     }
     if (fileItem) {
       const actionEvent = this.commandService.open(
-        new FileOperationParams(fileItem, srcPanelIndex, fileItem)
+        new FileOperationParams(fileItem, srcPanelIndex, fileItem, srcPanelIndex)
       );
       this.commandService.addActions([actionEvent]);
     }
@@ -739,7 +739,7 @@ export class AppService {
         .open(data, (result: RenameDialogResultData | undefined) => {
           if (result) {
             const actionEvent = this.commandService.rename(
-              new FileOperationParams(result.source, srcPanelIndex, result.target)
+              new FileOperationParams(result.source, srcPanelIndex, result.target, srcPanelIndex)
             );
             this.commandService.addActions([actionEvent]);
           }
@@ -756,8 +756,6 @@ export class AppService {
       this.multiRenameDialogService
         .open(data, (arr: ActionEvent[] | undefined) => {
           if (arr) {
-            console.info('multiRename ActionEvents:', arr); // TODO del
-            // const events: ActionEvent[] = arr.map(r => this.commandService.rename(r));
             this.commandService.addActions(arr);
           }
         });
@@ -786,7 +784,6 @@ export class AppService {
         .open(data, (arr: ActionEvent[] | undefined) => {
           if (arr) {
             console.info('groupFiles ActionEvents:', arr); // TODO del
-            // const events: ActionEvent[] = arr.map(r => this.commandService.rename(r));
             this.commandService.addActions(arr);
           }
         });

@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {PanelIndex} from "../../../../domain/panel-index";
+import {PanelIndex} from "@fnf/fnf-data";
 import {CommonModule} from "@angular/common";
 import {SelectionEvent} from "../../../../domain/filepagedata/data/selection-event";
 import {MatTooltipModule} from "@angular/material/tooltip";

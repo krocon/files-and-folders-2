@@ -1,6 +1,6 @@
 import {Injectable, signal, Signal} from "@angular/core";
 import {TypedDataService} from "../../../common/typed-data.service";
-import {PanelIndex} from "../../panel-index";
+import {PanelIndex} from "@fnf/fnf-data";
 
 
 @Injectable({

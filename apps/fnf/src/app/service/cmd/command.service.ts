@@ -1,9 +1,8 @@
 import {Injectable} from '@angular/core';
 import {ActionEvent} from "../../domain/cmd/action-event";
 import {ActionEventType} from "../../domain/cmd/action-event.type";
-import {DirEvent, FileItem, FileItemIf, FileItemMeta, FilePara, OnDoResponseType} from "@fnf/fnf-data";
+import {DirEvent, FileItemIf, FileItemMeta, FilePara, OnDoResponseType, PanelIndex} from "@fnf/fnf-data";
 import {QueueStatus} from "../../domain/cmd/queue-status";
-import {PanelIndex} from "../../domain/panel-index";
 import {ActionQueueService} from "./action-queue.service";
 import {FileOperationParams} from "../../domain/cmd/file-operation-params";
 import {NotifyService} from "./notify-service";
@@ -29,29 +28,25 @@ export class CommandService {
     console.info('        > CommandService initialized');
   }
 
-  /**
-   * Creates an action event
-   * @param key The action type
-   * @param source The source file item
-   * @param target The target file item
-   * @param panelIndex The panel index
-   * @param bulk Whether this is a bulk operation
-   */
+
   createActionEvent(
     key: ActionEventType,
     source: FileItemIf,
     target: FileItemIf,
-    panelIndex: PanelIndex,
+    sourcePanelIndex: PanelIndex,
+    targetPanelIndex: PanelIndex,
     bulk: boolean = false
   ): ActionEvent {
     const filePara = new FilePara(
       source,
       target,
+      sourcePanelIndex,
+      targetPanelIndex,
       key as unknown as any
     );
 
     return new ActionEvent(
-      panelIndex,
+      targetPanelIndex,
       filePara,
       this.ACTION_STATUS_NEW,
       bulk,
@@ -69,6 +64,7 @@ export class CommandService {
       {} as FileItemIf,
       {} as FileItemIf,
       panelIndex,
+      panelIndex,
       false
     );
   }
@@ -82,6 +78,7 @@ export class CommandService {
       this.actionQueueService.ACTION_MKDIR,
       {} as FileItemIf,
       {dir: para.dir, base: para.base} as FileItemIf,
+      para.panelIndex,
       para.panelIndex,
       false
     );
@@ -112,6 +109,7 @@ export class CommandService {
       source,
       null as unknown as FileItemIf,
       srcPanelIndex,
+      srcPanelIndex,
       bulk
     );
   }
@@ -126,6 +124,7 @@ export class CommandService {
       para.source,
       null as unknown as FileItemIf,
       para.srcPanelIndex,
+      para.srcPanelIndex,
       false
     );
   }
@@ -137,6 +136,7 @@ export class CommandService {
   copy(para: FileOperationParams): ActionEvent {
     const source = para.source;
     const srcPanelIndex = para.srcPanelIndex;
+    const targetPanelIndex = para.targetPanelIndex;
     const target = para.target;
     const bulk = para.bulk || false;
 
@@ -145,6 +145,7 @@ export class CommandService {
       source,
       target,
       srcPanelIndex,
+      targetPanelIndex,
       bulk
     );
   }
@@ -164,6 +165,7 @@ export class CommandService {
       source,
       target,
       srcPanelIndex,
+      para.targetPanelIndex,
       bulk
     );
   }
@@ -197,6 +199,7 @@ export class CommandService {
       source,
       target,
       srcPanelIndex,
+      para.targetPanelIndex,
       bulk
     );
   }
@@ -222,6 +225,7 @@ export class CommandService {
       source,
       target,
       srcPanelIndex,
+      para.targetPanelIndex,
       bulk
     );
   }

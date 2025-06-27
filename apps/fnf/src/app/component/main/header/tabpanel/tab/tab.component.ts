@@ -1,10 +1,9 @@
 import {Component, Input} from '@angular/core';
-import {PanelIndex} from "../../../../../domain/panel-index";
+import {FileItemIf, PanelIndex} from "@fnf/fnf-data";
 import {FilePageData} from "../../../../../domain/filepagedata/data/file-page.data";
 import {TabData} from "../../../../../domain/filepagedata/data/tab.data";
 import {CommonModule} from "@angular/common";
 import {path2FileItems} from "../../../../../common/fn/path-to-file-items";
-import {FileItemIf} from "@fnf/fnf-data";
 import {MatIcon} from "@angular/material/icon";
 import {MatTooltip} from "@angular/material/tooltip";
 

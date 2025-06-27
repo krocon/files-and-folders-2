@@ -1,6 +1,6 @@
 import {Component, Input, ViewChild} from "@angular/core";
 import {ChangeDirEvent} from "../../../../../service/change-dir-event";
-import {PanelIndex} from "../../../../../domain/panel-index";
+import {PanelIndex} from "@fnf/fnf-data";
 import {CommonModule} from "@angular/common";
 import {MatMenuModule, MatMenuTrigger} from "@angular/material/menu";
 import {MatIconModule} from "@angular/material/icon";

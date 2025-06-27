@@ -3,9 +3,7 @@ import {TypedDataService} from "../../common/typed-data.service";
 import {FilePageData} from "./data/file-page.data";
 import {TabData} from "./data/tab.data";
 import {BehaviorSubject} from "rxjs";
-import {PanelIndex} from "../panel-index";
-import {TypeDataDefaultOptions} from "../../common/type-data-default-options";
-
+import {PanelIndex} from "@fnf/fnf-data";
 
 @Injectable({
   providedIn: "root"

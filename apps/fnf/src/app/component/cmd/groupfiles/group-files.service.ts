@@ -1,10 +1,9 @@
 import {Injectable} from '@angular/core';
 import {FileOperationParams} from '../../../domain/cmd/file-operation-params';
 import {GroupFilesData} from './data/group-files.data';
-import {PanelIndex} from '../../../domain/panel-index';
+import {FileItem, FileItemIf, PanelIndex} from "@fnf/fnf-data";
 import {ActionEvent} from '../../../domain/cmd/action-event';
 import {CommandService} from '../../../service/cmd/command.service';
-import {FileItem, FileItemIf} from '@fnf/fnf-data';
 import {GroupFilesDialogData} from './data/group-files-dialog.data';
 import {GroupFilesResult} from './data/group-files-result';
 import {GroupFilesRow} from './data/group-files-row';
@@ -15,7 +14,7 @@ import {GroupFilesRow} from './data/group-files-row';
 export class GroupFilesService {
 
   constructor(
-    // private readonly commandService: CommandService
+    private readonly commandService: CommandService
   ) {
   }
 
@@ -32,15 +31,30 @@ export class GroupFilesService {
     });
   }
 
-  /**
-   * Creates action events for multi-rename operations
-   * @param rows The file operation parameters
-   * @param panelIndex The panel index
-   * @returns An array of action events
-   */
-  createActionEvents(rows: FileOperationParams[], panelIndex: PanelIndex): ActionEvent[] {
+
+  createActionEvents(rows: FileOperationParams[], groupFilesDialogData: GroupFilesDialogData): ActionEvent[] {
     const actions: ActionEvent[] = [];
+
+    for (const row of rows) {
+      if (row.source && row.target && this.isFileRelevant(row.source, row.target)) {
+        actions.push(
+          this.commandService.move({
+            bulk: rows.length > CommandService.BULK_LOWER_LIMIT,
+            source: row.source,
+            srcPanelIndex: groupFilesDialogData.sourcePanelIndex,
+            targetPanelIndex: groupFilesDialogData.data.useSourceDir ? groupFilesDialogData.sourcePanelIndex: groupFilesDialogData.sourcePanelIndex,
+            target: row.target
+          })
+        );
+      }
+    }
     return actions;
+  }
+
+  private isFileRelevant(source: FileItemIf, target: FileItemIf): boolean {
+    return source.base === target.base
+      && source.dir !== target.dir
+      && !!target.dir;
   }
 
   /**

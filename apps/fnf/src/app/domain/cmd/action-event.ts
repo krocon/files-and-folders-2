@@ -1,5 +1,4 @@
-import {PanelIndex} from "../panel-index";
-import {FileItemIf, FilePara} from "@fnf/fnf-data";
+import {FileItemIf, FilePara, PanelIndex} from "@fnf/fnf-data";
 import {QueueStatus} from "./queue-status";
 import {ActionEventType} from "./action-event.type";
 

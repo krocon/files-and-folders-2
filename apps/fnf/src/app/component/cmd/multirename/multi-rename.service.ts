@@ -1,11 +1,10 @@
-import { Injectable } from '@angular/core';
-import { FileOperationParams } from '../../../domain/cmd/file-operation-params';
-import { MultiRenameData } from './data/multi-rename.data';
-import { PanelIndex } from '../../../domain/panel-index';
-import { ActionEvent } from '../../../domain/cmd/action-event';
-import { CommandService } from '../../../service/cmd/command.service';
-import { FileItemIf } from '@fnf/fnf-data';
-import { ReplacementItem } from './data/replacement.item';
+import {Injectable} from '@angular/core';
+import {FileOperationParams} from '../../../domain/cmd/file-operation-params';
+import {MultiRenameData} from './data/multi-rename.data';
+import {FileItemIf, PanelIndex} from "@fnf/fnf-data";
+import {ActionEvent} from '../../../domain/cmd/action-event';
+import {CommandService} from '../../../service/cmd/command.service';
+import {ReplacementItem} from './data/replacement.item';
 
 @Injectable({
   providedIn: 'root'

@@ -31,7 +31,7 @@ describe('FileActionController', () => {
     it('should create directory and return no error', async () => {
       const target = new FileItem(testDir, 'specbox', '');
       target.isDir = true;
-      const filePara = new FilePara(null, target, 'mkdir');
+      const filePara = new FilePara(null, target, 0,0,'mkdir');
 
       const res = await appController.onDo(filePara);
 
@@ -50,7 +50,7 @@ describe('FileActionController', () => {
     it('should create directory and return no error', async () => {
       const target = new FileItem(testDir + '/specbox', 'testmkdir2', '');
       target.isDir = true;
-      const filePara = new FilePara(null, target, 'mkdir');
+      const filePara = new FilePara(null, target, 0,0,'mkdir');
 
       const res = await appController.onDo(filePara);
 
@@ -98,7 +98,7 @@ describe('FileActionController', () => {
     it('should delete directory and return no error', async () => {
       const source = new FileItem(testDir + '/specbox', '', '');
       source.isDir = true;
-      const filePara = new FilePara(source, null, 'remove');
+      const filePara = new FilePara(source, null, 0,0,'remove');
 
       const res = await appController.onDo(filePara);
 
@@ -128,7 +128,7 @@ describe('FileActionController', () => {
     it("should unpack zip file-content demo.zip", async () => {
       const source = new FileItem(testDir, 'demo.zip', 'zip');
       const target = new FileItem(testDir, '', '', '',  0, true);
-      const filePara = new FilePara(source, target, 'unpack');
+      const filePara = new FilePara(source, target, 0,0,'unpack');
 
       await expect(appController.onDo(filePara)).resolves.toEqual(20);
     });
@@ -472,7 +472,7 @@ describe('FileActionController', () => {
     it('should delete directory and return no error', async () => {
       const source = new FileItem(testDir + '/demo', '', '');
       source.isDir = true;
-      const filePara = new FilePara(source, null, 'remove');
+      const filePara = new FilePara(source, null, 0,0,'remove');
 
       const expected = [{
         'action': 'unlinkDir',

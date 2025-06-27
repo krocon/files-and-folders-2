@@ -31,13 +31,13 @@ import {
   isSameDir,
   isZipBase,
   isZipUrl,
+  PanelIndex,
   ZipUrlInfo,
 } from "@fnf/fnf-data";
 import {fileNameComparator} from "./comparator/name-comparator";
 import {extComparator} from "./comparator/ext-comparator";
 import {sizeComparator} from "./comparator/size-comparator";
 import {dateComparator} from "./comparator/date-comparator";
-import {PanelIndex} from "../../../domain/panel-index";
 import {AppService} from "../../../app.service";
 import {ChangeDirEvent} from "../../../service/change-dir-event";
 import {SelectionManagerForObjectModels} from "./selection-manager";
