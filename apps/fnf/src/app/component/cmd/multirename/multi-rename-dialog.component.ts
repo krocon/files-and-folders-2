@@ -161,7 +161,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
         sortIconVisible: () => true,
       }),
       ColumnDef.create({
-        property: "target",
+        property: "targetPanelIndex", /* a dummy prop */
         headerLabel: " ",
         width: new Size(30, 'px'),
         minWidth: new Size(30, 'px'),

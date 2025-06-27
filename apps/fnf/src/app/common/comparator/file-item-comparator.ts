@@ -2,6 +2,7 @@ import {DOT_DOT, FileItemIf} from "@fnf/fnf-data";
 
 
 export function fileItemComparator(value1: FileItemIf, value2: FileItemIf, row1?: any, row2?: any, f?: number): number {
+
   if (f === undefined || f === null) f = 1;
 
   if (!value1) return 1;
