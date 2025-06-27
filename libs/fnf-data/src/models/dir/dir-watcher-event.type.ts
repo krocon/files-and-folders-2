@@ -5,6 +5,8 @@ export type DirWatcherEventType =
   | "error"
   | "add"
   | "addDir"
+  | "checkOrAddFile"
+  | "checkOrAddDir"
   | "unlinkDir"
   | "unlink"
   | "change"

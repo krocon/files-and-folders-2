@@ -623,6 +623,18 @@ export class FileTableComponent implements OnInit, OnDestroy {
       this.repaintTable();
       this.selectionManager.updateSelection();
 
+    } else if (dirEvent.action === "checkOrAddDir" || dirEvent.action === "checkOrAddFile") {
+      const exists:boolean = this.tableApi
+        .findRows(
+          dirEvent.items,
+          (a, b) => a.base === b.base && a.dir === b.dir).length > 0;
+
+      if (!exists) {
+        this.tableApi.addRows(dirEvent.items);
+        this.repaintTable();
+        this.selectionManager.updateSelection();
+      }
+
     } else if (dirEvent.action === "unlink" || dirEvent.action === "unlinkDir") {
       this.tableApi.removeRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
       this.bodyAreaModel.focusedRowIndex = Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.focusedRowIndex);
