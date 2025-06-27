@@ -9,6 +9,7 @@ import {MatTooltip} from "@angular/material/tooltip";
   template: `
     <i [attr.class]="iconClass"></i>
     <div
+        [matTooltipShowDelay]="2000"
         [matTooltip]="tooltip"
         class="ffn-name-cell-label"
         [class.rtl]="rtl"

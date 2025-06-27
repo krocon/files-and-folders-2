@@ -10,6 +10,7 @@ import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
   template: `
     <i [attr.class]="iconClass"></i>
     <div
+        [matTooltipShowDelay]="2000"
         [matTooltip]="tooltip"
         class="ffn-name-cell-label"
         [class.rtl]="rtl"
