@@ -41,11 +41,11 @@ importers:
         specifier: ^20.0.0
         version: 20.0.0(@angular/common@20.0.0)(@angular/core@20.0.0)(@angular/platform-browser@20.0.0)(rxjs@7.8.2)
       '@guiexpert/angular-table':
-        specifier: ^20.1.72
-        version: 20.1.72(@angular/common@20.0.0)(@angular/core@20.0.0)
+        specifier: ^20.1.74
+        version: 20.1.74(@angular/common@20.0.0)(@angular/core@20.0.0)
       '@guiexpert/table':
-        specifier: ^1.1.69
-        version: 1.1.69
+        specifier: ^1.1.74
+        version: 1.1.74
       hammerjs:
         specifier: ^2.0.8
         version: 2.0.8
@@ -82,10 +82,10 @@ importers:
         version: 29.7.0
       jest-preset-angular:
         specifier: ^13.1.0
-        version: 13.1.6(@angular-devkit/build-angular@20.0.0)(@angular/compiler-cli@20.0.0)(@angular/core@20.0.0)(@angular/platform-browser-dynamic@20.0.0)(@babel/core@7.27.1)(jest@29.7.0)(typescript@5.8.3)
+        version: 13.1.6(@angular-devkit/build-angular@20.0.0)(@angular/compiler-cli@20.0.0)(@angular/core@20.0.0)(@angular/platform-browser-dynamic@20.0.0)(@babel/core@7.27.4)(jest@29.7.0)(typescript@5.8.3)
       ts-jest:
         specifier: ^29.1.0
-        version: 29.3.4(@babel/core@7.27.1)(esbuild@0.25.5)(jest@29.7.0)(typescript@5.8.3)
+        version: 29.3.4(@babel/core@7.27.4)(esbuild@0.25.5)(jest@29.7.0)(typescript@5.8.3)
       typescript:
         specifier: ~5.8.3
         version: 5.8.3
@@ -2541,8 +2541,8 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
-  /@guiexpert/angular-table@20.1.72(@angular/common@20.0.0)(@angular/core@20.0.0):
-    resolution: {integrity: sha512-tu0w7Hp+Ywcu+PcFKokxiKKqwUojhEddAXPkNM8zc+LrqKoIMXHNwgLaB7M+Ft/EfcKmQRonYoGlmj9qwpnyUw==}
+  /@guiexpert/angular-table@20.1.74(@angular/common@20.0.0)(@angular/core@20.0.0):
+    resolution: {integrity: sha512-LKeL4cbUNd+SLgxVHBi1ybKPRC6oVN5RXKDwra66I8QB2hDtnaPquhk9X7d+ouKwyjclpgQYjrsbh/vbgo1znQ==}
     peerDependencies:
       '@angular/common': ^20.0.0
       '@angular/core': ^20.0.0
@@ -2552,8 +2552,8 @@ packages:
       tslib: 2.8.1
     dev: false
 
-  /@guiexpert/table@1.1.69:
-    resolution: {integrity: sha512-+OWJIHhAwKai6GaXYgxXFNUHrCMqWVhZ7xqezO53ZxzyNInh6rPTZjZbYEi1tkdWth6ejkfsYj+1mKmMvdfm+A==}
+  /@guiexpert/table@1.1.74:
+    resolution: {integrity: sha512-zF6UqHslfnRPmLgl8I6L1C80r1vOhAc8JpIiNkypixSPICZR99gwdodV0X67oqhneYRqS8eNSOcTIPgtsI+Xow==}
     dependencies:
       tslib: 2.8.1
     dev: false
@@ -8115,7 +8115,7 @@ packages:
       jest-resolve: 29.7.0
     dev: true
 
-  /jest-preset-angular@13.1.6(@angular-devkit/build-angular@20.0.0)(@angular/compiler-cli@20.0.0)(@angular/core@20.0.0)(@angular/platform-browser-dynamic@20.0.0)(@babel/core@7.27.1)(jest@29.7.0)(typescript@5.8.3):
+  /jest-preset-angular@13.1.6(@angular-devkit/build-angular@20.0.0)(@angular/compiler-cli@20.0.0)(@angular/core@20.0.0)(@angular/platform-browser-dynamic@20.0.0)(@babel/core@7.27.4)(jest@29.7.0)(typescript@5.8.3):
     resolution: {integrity: sha512-0pXSm6168Qn+qKp7DpzYoaIp0uyMHdQaWYVp8jlw7Mh+NEBtrBjKqts3kLeBHgAhGMQArp07S2IxZ6eCr8fc7Q==}
     engines: {node: ^14.15.0 || >=16.10.0}
     peerDependencies:
@@ -8136,7 +8136,7 @@ packages:
       jest-environment-jsdom: 29.7.0
       jest-util: 29.7.0
       pretty-format: 29.7.0
-      ts-jest: 29.3.4(@babel/core@7.27.1)(esbuild@0.25.5)(jest@29.7.0)(typescript@5.8.3)
+      ts-jest: 29.3.4(@babel/core@7.27.4)(esbuild@0.25.5)(jest@29.7.0)(typescript@5.8.3)
       typescript: 5.8.3
     optionalDependencies:
       esbuild: 0.25.5
@@ -11040,7 +11040,7 @@ packages:
       typescript: 5.4.5
     dev: true
 
-  /ts-jest@29.3.4(@babel/core@7.27.1)(esbuild@0.25.5)(jest@29.7.0)(typescript@5.8.3):
+  /ts-jest@29.3.4(@babel/core@7.27.4)(esbuild@0.25.5)(jest@29.7.0)(typescript@5.8.3):
     resolution: {integrity: sha512-Iqbrm8IXOmV+ggWHOTEbjwyCf2xZlUMv5npExksXohL+tk8va4Fjhb+X2+Rt9NBmgO7bJ8WpnMLOwih/DnMlFA==}
     engines: {node: ^14.15.0 || ^16.10.0 || ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -11064,7 +11064,7 @@ packages:
       esbuild:
         optional: true
     dependencies:
-      '@babel/core': 7.27.1
+      '@babel/core': 7.27.4
       bs-logger: 0.2.6
       ejs: 3.1.10
       esbuild: 0.25.5
@@ -11108,7 +11108,7 @@ packages:
       bs-logger: 0.2.6
       ejs: 3.1.10
       fast-json-stable-stringify: 2.1.0
-      jest: 29.7.0(@types/node@20.17.50)(ts-node@10.9.2)
+      jest: 29.7.0(@types/node@20.17.50)
       jest-util: 29.7.0
       json5: 2.2.3
       lodash.memoize: 4.1.2

@@ -15,7 +15,7 @@ import {GroupFilesRow} from './data/group-files-row';
 export class GroupFilesService {
 
   constructor(
-    private readonly commandService: CommandService
+    // private readonly commandService: CommandService
   ) {
   }
 
@@ -319,19 +319,19 @@ export class GroupFilesService {
   ): GroupFilesResult {
     let mode = dialogData.data.modus;
     if (mode === 'new_folder') {
-      return this.updateTableModelNewFolder( dialogData);
+      return this.updateTableModelNewFolder(dialogData);
     }
     if (mode === 'running_number') {
-      return this.updateTableModelRunningNumber( dialogData);
+      return this.updateTableModelRunningNumber(dialogData);
     }
     if (mode === 'minus_separator') {
-      return this.updateTableModelMinusSeparator( dialogData);
+      return this.updateTableModelMinusSeparator(dialogData);
     }
     if (mode === 'first_word') {
-      return this.updateTableModelFirstWord( dialogData);
+      return this.updateTableModelFirstWord(dialogData);
     }
     if (mode.indexOf('letter') > -1) {
-      return this.updateTableModelFirstLetter( dialogData);
+      return this.updateTableModelFirstLetter(dialogData);
     }
 
     console.warn('updateTableModel. Unknown mode:', dialogData.data.modus);
@@ -341,10 +341,10 @@ export class GroupFilesService {
   getFileOperationParams(
     rows: GroupFilesRow[],
     srcPanelIndex: PanelIndex,
-    targetPanelIndex: PanelIndex): FileOperationParams[]{
+    targetPanelIndex: PanelIndex): FileOperationParams[] {
 
     return rows.map(r => new FileOperationParams(
-      r.src, srcPanelIndex, r.target, targetPanelIndex, rows.length>  CommandService.BULK_LOWER_LIMIT
+      r.src, srcPanelIndex, r.target, targetPanelIndex, rows.length > CommandService.BULK_LOWER_LIMIT
     ));
   }
 }

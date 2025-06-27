@@ -36,6 +36,7 @@ import {ChangeCellRendererComponent} from "./change-cell-renderer.component";
 import {MultiRenameNameCellRendererComponent} from "./multi-rename-name-cell-renderer.component";
 import {MultiRenameService} from "./multi-rename.service";
 import {debounceTime} from "rxjs";
+import {fileItemComparator} from "../../../common/comparator/file-item-comparator";
 
 @Component({
   selector: "fnf-multi-rename-dialog",
@@ -104,7 +105,6 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
     private readonly multiRenameService: MultiRenameService,
     private readonly zone: NgZone,
   ) {
-    console.info(multiRenameDialogData);
     this.data = multiRenameDialogData.data;
     this.options = multiRenameDialogData.options;
 
@@ -146,7 +146,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
         0,
         multiRenameDialogData.rows.length > CommandService.BULK_LOWER_LIMIT)
     );
-    console.info('this.rows', this.rows);
+    console.info('##',this.rows)
     const columnDefs = [
       ColumnDef.create({
         property: "source",
@@ -156,7 +156,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
         bodyRenderer: this.rwf.create(MultiRenameNameCellRendererComponent, this.cdr),
         headerClasses: ["ge-table-text-align-left"],
         bodyClasses: ["ge-table-text-align-left"],
-        // sortComparator: fileNameComparator,
+        sortComparator: fileItemComparator,
         sortable: () => true,
         sortIconVisible: () => true,
       }),
@@ -168,8 +168,8 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
         headerClasses: ["ge-table-text-align-left"],
         bodyClasses: ["ge-table-text-align-left"],
         bodyRenderer: this.rwf.create(ChangeCellRendererComponent, this.cdr),
-        sortable: () => true,
-        sortIconVisible: () => true,
+        sortable: () => false,
+        sortIconVisible: () => false,
       }),
       ColumnDef.create({
         property: "target",
@@ -179,7 +179,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
         headerClasses: ["ge-table-text-align-left"],
         bodyClasses: ["ge-table-text-align-left"],
         bodyRenderer: this.rwf.create(MultiRenameNameCellRendererComponent, this.cdr),
-        // sortComparator: fileNameComparator,
+        sortComparator: fileItemComparator,
         sortable: () => true,
         sortIconVisible: () => true,
       }),

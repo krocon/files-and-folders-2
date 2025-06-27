@@ -37,6 +37,8 @@ import {GroupFilesService} from "./group-files.service";
 import {debounceTime} from "rxjs";
 import {GroupFilesResult} from "./data/group-files-result";
 import {GroupFilesTargetCellRendererComponent} from "./group-files-target-cell-renderer.component";
+import {fileNameComparator} from "../../main/filetable/comparator/name-comparator";
+import {fileItemComparator} from "../../../common/comparator/file-item-comparator";
 
 @Component({
   selector: "fnf-group-files-dialog",
@@ -140,6 +142,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
         bodyClasses: ["ge-table-text-align-left"],
         sortable: () => true,
         sortIconVisible: () => true,
+        sortComparator: fileItemComparator,
       }),
       // ColumnDef.create({
       //   property: "target",
@@ -162,6 +165,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
         bodyRenderer: this.rwf.create(GroupFilesTargetCellRendererComponent, this.cdr),
         sortable: () => true,
         sortIconVisible: () => true,
+        sortComparator: fileItemComparator,
       }),
     ];
 
