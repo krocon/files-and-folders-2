@@ -50,7 +50,7 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
   tableModel?: TableModelIf;
   rows: CdRowIf[] = [];
 
-  private readonly rowHeight = 34;
+  private readonly rowHeight = 20;
   readonly tableOptions: TableOptionsIf = {
     ...new TableOptions(),
     hoverColumnVisible: false,
@@ -117,9 +117,11 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
       .findFolders(para)
       .subscribe(
         arr => {
-          this.rows = arr.map(s => {
-            return {dir: s};
-          });
+          this.rows = arr
+            .sort()
+            .map(s => {
+              return {dir: s.substring(this.changeDirDialogData.sourceDir.length)};
+            });
           this.tableApi?.setRows(this.rows);
           this.tableApi?.repaintHard();
           console.info("this.rows:", this.rows);

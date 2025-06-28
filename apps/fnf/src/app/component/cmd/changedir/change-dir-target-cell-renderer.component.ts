@@ -6,7 +6,7 @@ import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
 @Component({
   selector: 'multi-rename-target-cell-renderer',
   template: `
-    <div class="ffn-name-cell-label">{{ base }}<b>{{ dir }}</b></div>
+    <div class="ffn-name-cell-label"><pre>{{ dir }}<span class="base">{{ base }}</span></pre></div>
   `,
   styles: [`
       :host {
@@ -24,13 +24,25 @@ import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
       }
 
       .ffn-name-cell-label {
+          height: 20px;
           white-space: nowrap;
           overflow: clip;
           display: flex;
           flex-direction: row-reverse;
           max-width: calc(100% - 10px);
-          font-family: monospace;
+          font-family: monospace !important;
+          font-size: 16px !important;
+          line-height: 16px !important;
+          
+          pre {
+              margin: 0;
+          }
       }
+
+      .ffn-name-cell-label:hover .base {
+          font-weight: bold;
+      }
+      
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -47,15 +59,19 @@ export class ChangeDirTargetCellRendererComponent implements ComponentRendererIf
     areaModel: AreaModelIf,
     cellValue: string): RendererCleanupFnType | undefined {
 
-    this.dir = cellValue.split('/').map(w => '|    ').join('');
-    this.base = this.getBase(cellValue);
+    this.dir = cellValue
+      .split('/')
+      .map(w => '    |')
+      .join('')
+      .substring(5);
+    this.base = '---' + this.getBase(cellValue);
 
     return undefined;
   }
 
   private getBase(fileName: string): string {
     const lastSlashIndex = fileName.lastIndexOf("/");
-    return fileName.substring(lastSlashIndex);
+    return fileName.substring(lastSlashIndex+1);
   }
 
 }
