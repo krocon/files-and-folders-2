@@ -27,7 +27,6 @@
             height: 100%;
             display: grid;
             grid-template-rows: 1fr;
-            background-color: #4be20b;
         }
     }
     .mat-mdc-form-field-subscript-wrapper {

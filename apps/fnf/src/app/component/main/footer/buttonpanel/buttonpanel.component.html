@@ -46,7 +46,10 @@
                 mat-menu-item> Find...
               <fnf-shortcut [keys]="getShortcutsByAction('OPEN_FIND_DLG')"></fnf-shortcut>
             </button>
-            <!--TODO button mat-menu-item>  Change Dir...      <fnf-shortcut [keys]="['alt', 'F10']"></fnf-shortcut>  </button-->
+            <button
+                (click)="triggerAction('OPEN_CHDIR_DLG')"
+                mat-menu-item> Change Dir...<fnf-shortcut [keys]="getShortcutsByAction('OPEN_CHDIR_DLG')"></fnf-shortcut>
+            </button>
             <button
                 (click)="triggerAction('TOGGLE_FILTER')"
                 mat-menu-item> Toggle Filter...

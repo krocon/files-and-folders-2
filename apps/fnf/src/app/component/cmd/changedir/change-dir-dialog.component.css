@@ -1,0 +1,30 @@
+
+.mat-mdc-dialog-content {
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr;
+
+    .table-div {
+        height: 100%;
+        display: grid;
+        grid-template-rows: 1fr;
+    }
+}
+
+.change-dir-table {
+    height: 100%;
+}
+
+.mat-mdc-form-field {
+    /*width: 100%;*/
+}
+
+.mat-mdc-dialog-actions {
+    justify-content: flex-end;
+
+    .mdc-button {
+        min-width: 200px;
+    }
+}
+
+

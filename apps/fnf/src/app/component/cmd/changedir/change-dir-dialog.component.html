@@ -1,0 +1,34 @@
+<h2
+    data-test-id="page-subtitle-h2"
+    mat-dialog-title>Change Dir</h2>
+
+<mat-dialog-content>
+
+
+  <div class="table-div">
+    <guiexpert-table
+        (tableReady)="onTableReady($event)"
+        [debounceMouseClickDelay]="150"
+        [tableModel]="tableModel"
+        [tableOptions]="tableOptions"
+        class="ge-table change-dir-table"></guiexpert-table>
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button
+      (click)="onCancelClicked()"
+      data-test-id="dialog-cancel-button"
+      mat-raised-button>
+    Cancel
+  </button>
+
+  <button
+      (click)="onOkClicked()"
+      color="primary"
+      data-test-id="dialog-ok-button"
+      mat-raised-button>
+    Change Dir
+  </button>
+</mat-dialog-actions>

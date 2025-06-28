@@ -58,6 +58,8 @@ import {MultiRenameDialogService} from "./component/cmd/multirename/multi-rename
 import {MultiRenameDialogData} from "./component/cmd/multirename/data/multi-rename-dialog.data";
 import {GroupFilesDialogData} from "./component/cmd/groupfiles/data/group-files-dialog.data";
 import {GroupFilesDialogService} from "./component/cmd/groupfiles/group-files-dialog.service";
+import {ChangeDirDialogService} from "./component/cmd/changedir/change-dir-dialog.service";
+import {ChangeDirDialogData} from "./component/cmd/changedir/data/change-dir-dialog.data";
 
 
 @Injectable({
@@ -111,6 +113,7 @@ export class AppService {
     private readonly findSocketService: FindSocketService,
     private readonly multiRenameDialogService: MultiRenameDialogService,
     private readonly groupFilesDialogService: GroupFilesDialogService,
+    private readonly changeDirDialogService: ChangeDirDialogService,
   ) {
     // Set config to services:
     ConfigService.forRoot(environment.config);
@@ -341,6 +344,9 @@ export class AppService {
 
     } else if (id === "OPEN_GROUPFILES_DLG") {
       this.groupFiles();
+
+    } else if (id === "OPEN_CHDIR_DLG") {
+      this.openChangeDirDialog();
 
     } else if (id === "OPEN_FIND_DLG") {
       this.openFindDialog();
@@ -689,6 +695,21 @@ export class AppService {
             tabData.findData = findData;
             this.updateFilePageData(this.filePageData);
           }
+        }
+      });
+  }
+
+  public openChangeDirDialog() {
+    this.changeDirDialogService
+      .open(
+        new ChangeDirDialogData(
+          this.getActiveTabOnActivePanel().path,
+          this.getActivePanelIndex()
+        ),
+        (result: ChangeDirEvent | undefined) => {
+        if (result) {
+          console.info(result); // TODO
+          this.changeDir(result)
         }
       });
   }
