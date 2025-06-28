@@ -7,6 +7,7 @@
 
   <div class="table-div">
     <guiexpert-table
+        (mouseClicked)="onMouseClicked($event)"
         (tableReady)="onTableReady($event)"
         [debounceMouseClickDelay]="150"
         [tableModel]="tableModel"

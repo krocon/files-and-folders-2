@@ -15,6 +15,7 @@ import {RenderWrapperFactory, TableComponent} from "@guiexpert/angular-table";
 import {
   AutoRestoreOptions,
   ColumnDef,
+  GeMouseEvent,
   Size,
   TableApi,
   TableFactory,
@@ -24,7 +25,6 @@ import {
 } from "@guiexpert/table";
 import {ChangeDirTargetCellRendererComponent} from "./change-dir-target-cell-renderer.component";
 import {GotoAnythingDialogService} from "../gotoanything/goto-anything-dialog.service";
-import {CdRowIf} from "../../../domain/changedir/cd-row.if";
 import {createAsciiTree} from "../../../common/fn/ascii-tree.fn";
 
 
@@ -46,7 +46,7 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
 
   tableModel?: TableModelIf;
-  rows: CdRowIf[] = [];
+  rows: {path:string, label:string}[] = [];
 
   private readonly rowHeight = 20;
   readonly tableOptions: TableOptionsIf = {
@@ -86,7 +86,7 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
     const columnDefs = [
       ColumnDef.create({
-        property: "dir",
+        property: "label",
         headerLabel: "",
         width: new Size(100, 'weight'),
         bodyClasses: ["ge-table-text-align-left"],
@@ -118,10 +118,7 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
           this.rows =
             createAsciiTree(
               arr.map(s => s.substring(this.changeDirDialogData.sourceDir.length))
-            )
-              .map(s => {
-                return {dir: s};
-              });
+            );
           this.tableApi?.setRows(this.rows);
           this.tableApi?.repaintHard();
         }
@@ -155,5 +152,10 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
   private clone<T>(r: T): T {
     return JSON.parse(JSON.stringify(r));
+  }
+
+
+  onMouseClicked(evt: GeMouseEvent) {
+    console.info('evt', evt);
   }
 }

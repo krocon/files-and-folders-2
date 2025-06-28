@@ -1,9 +1,9 @@
 /**
  * Converts an array of directory paths into an ASCII tree representation
- * @param rows Array of CdRowIf objects containing directory paths
- * @returns Array of strings representing the ASCII tree
+ * @param rows Array of strings containing directory paths
+ * @returns Array of objects with path and label properties
  */
-export function createAsciiTree(rows: string[]): string[] {
+export function createAsciiTree(rows: string[]): {path: string, label: string}[] {
   if (!rows || rows.length === 0) {
     return [];
   }
@@ -37,15 +37,20 @@ export function createAsciiTree(rows: string[]): string[] {
   markLeafNodes(tree);
 
   // Convert the tree to ASCII representation
-  const result: string[] = [];
-  renderTree(tree, '', '', result);
+  const asciiLines: string[] = [];
+  renderTree(tree, '', '', asciiLines);
 
   // Remove the root node (empty string) if it exists
-  if (result.length > 0 && result[0].trim() === '') {
-    result.shift();
+  if (asciiLines.length > 0 && asciiLines[0].trim() === '') {
+    asciiLines.shift();
   }
 
-  return result;
+  // Map the ASCII lines to objects with path and label properties
+  return asciiLines.map((label, index) => {
+    // Use the original path if available, otherwise use an empty string
+    const path = index < sortedRows.length ? sortedRows[index] : '';
+    return { path, label };
+  });
 }
 
 /**
