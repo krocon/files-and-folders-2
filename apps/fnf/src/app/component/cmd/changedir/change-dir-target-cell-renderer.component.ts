@@ -1,7 +1,6 @@
 import {ComponentRendererIf} from "@guiexpert/angular-table";
 import {ChangeDetectionStrategy, Component} from "@angular/core";
 import {AreaIdent, AreaModelIf, RendererCleanupFnType} from "@guiexpert/table";
-import {FileItemIf} from "@fnf/fnf-data";
 import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
 
 @Component({
@@ -30,6 +29,7 @@ import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
           display: flex;
           flex-direction: row-reverse;
           max-width: calc(100% - 10px);
+          font-family: monospace;
       }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -45,14 +45,17 @@ export class ChangeDirTargetCellRendererComponent implements ComponentRendererIf
     columnIndex: number,
     areaIdent: AreaIdent,
     areaModel: AreaModelIf,
-    cellValue: FileItemIf): RendererCleanupFnType | undefined {
+    cellValue: string): RendererCleanupFnType | undefined {
 
-    const fileItem = cellValue;
-    this.dir = fileItem.dir + '/';
-    this.base = fileItem.isDir ? '[' + fileItem.base + ']' : fileItem.base;
+    this.dir = cellValue.split('/').map(w => '|    ').join('');
+    this.base = this.getBase(cellValue);
 
     return undefined;
   }
 
+  private getBase(fileName: string): string {
+    const lastSlashIndex = fileName.lastIndexOf("/");
+    return fileName.substring(lastSlashIndex);
+  }
 
 }

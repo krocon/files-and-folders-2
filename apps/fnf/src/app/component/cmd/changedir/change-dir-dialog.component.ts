@@ -8,7 +8,7 @@ import {
   MatDialogRef,
   MatDialogTitle
 } from "@angular/material/dialog";
-import {FileItemIf} from "@fnf/fnf-data";
+import {FileItemIf, FindFolderPara} from "@fnf/fnf-data";
 import {MatButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {RenderWrapperFactory, TableComponent} from "@guiexpert/angular-table";
@@ -22,10 +22,13 @@ import {
   TableOptions,
   TableOptionsIf
 } from "@guiexpert/table";
-
-import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
 import {ChangeDirTargetCellRendererComponent} from "./change-dir-target-cell-renderer.component";
-import {fileItemComparator} from "../../../common/comparator/file-item-comparator";
+import {GotoAnythingDialogService} from "../gotoanything/goto-anything-dialog.service";
+
+export interface CdRowIf {
+  dir: string;
+}
+
 
 @Component({
   selector: "fnf-change-dir-dialog",
@@ -45,7 +48,7 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
 
   tableModel?: TableModelIf;
-  rows: FileOperationParams[] = [];
+  rows: CdRowIf[] = [];
 
   private readonly rowHeight = 34;
   readonly tableOptions: TableOptionsIf = {
@@ -80,25 +83,21 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public changeDirDialogData: ChangeDirDialogData,
     private readonly rwf: RenderWrapperFactory,
     private readonly cdr: ChangeDetectorRef,
+    private readonly gotoAnythingDialogService: GotoAnythingDialogService,
   ) {
-
+    // console.info("changeDirDialogData:", changeDirDialogData);
 
     const columnDefs = [
       ColumnDef.create({
-        property: "target",
+        property: "dir",
         headerLabel: "",
-        width: new Size(50, 'weight'),
-        minWidth: new Size(200, 'px'),
-        // headerClasses: ["ge-table-text-align-left"],
+        width: new Size(100, 'weight'),
         bodyClasses: ["ge-table-text-align-left"],
         bodyRenderer: this.rwf.create(ChangeDirTargetCellRendererComponent, this.cdr),
         sortable: () => true,
         sortIconVisible: () => true,
-        sortComparator: fileItemComparator,
       }),
     ];
-
-    this.updateTableRows();
 
     this.tableModel = TableFactory.createTableModel({
       rows: [],
@@ -107,13 +106,25 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
     });
   }
 
-
   ngOnDestroy(): void {
     this.alive = false;
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.alive = true;
+    const para = new FindFolderPara([this.changeDirDialogData.sourceDir], '', 20);
+    this.gotoAnythingDialogService
+      .findFolders(para)
+      .subscribe(
+        arr => {
+          this.rows = arr.map(s => {
+            return {dir: s};
+          });
+          this.tableApi?.setRows(this.rows);
+          this.tableApi?.repaintHard();
+          console.info("this.rows:", this.rows);
+        }
+      );
   }
 
   onOkClicked() {
@@ -126,7 +137,8 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
   }
 
   onTableReady(tableApi: TableApi) {
-    this.tableApi = tableApi
+    this.tableApi = tableApi;
+    console.info("this.tableApi:", this.tableApi);
   }
 
   private updateTableRows() {

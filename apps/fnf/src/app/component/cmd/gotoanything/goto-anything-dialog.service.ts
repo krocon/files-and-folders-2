@@ -5,7 +5,7 @@ import {takeWhile} from "rxjs/operators";
 import {MatDialog} from "@angular/material/dialog";
 import {GotoAnythingDialogConfig} from "./goto-anything-dialog.config";
 import {GotoAnythingOptionData} from "./goto-anything-option.data";
-import {firstValueFrom} from "rxjs";
+import {firstValueFrom, Observable} from "rxjs";
 import {FindFolderPara} from "@fnf/fnf-data";
 import {HttpClient} from "@angular/common/http";
 
@@ -18,16 +18,15 @@ export class GotoAnythingDialogService {
     findFoldersUrl: "/api/findfolders",
   };
 
-  static forRoot(config: { [key: string]: string }) {
-    Object.assign(GotoAnythingDialogService.config, config);
-  }
-
   constructor(
     public readonly dialog: MatDialog,
     private readonly httpClient: HttpClient,
   ) {
   }
 
+  static forRoot(config: { [key: string]: string }) {
+    Object.assign(GotoAnythingDialogService.config, config);
+  }
 
   public open(data: GotoAnythingDialogData, cb: (target: GotoAnythingOptionData | undefined) => void) {
     let alive = true;
@@ -64,6 +63,10 @@ export class GotoAnythingDialogService {
       console.error('Error fetching folders:', error);
     }
     return [];
+  }
+
+  findFolders(para: FindFolderPara):Observable<string[]> {
+    return this.httpClient.post<string[]>(GotoAnythingDialogService.config.findFoldersUrl, para);
   }
 
 }
