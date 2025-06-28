@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit} from "@angular/core";
-import {ReactiveFormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {ChangeDirDialogData} from "./data/change-dir-dialog.data";
 import {
   MAT_DIALOG_DATA,
@@ -25,9 +25,11 @@ import {
 } from "@guiexpert/table";
 import {ChangeDirTargetCellRendererComponent} from "./change-dir-target-cell-renderer.component";
 import {GotoAnythingDialogService} from "../gotoanything/goto-anything-dialog.service";
-import {createAsciiTree} from "../../../common/fn/ascii-tree.fn";
+import {createAsciiTree, filterAsciiTree} from "../../../common/fn/ascii-tree.fn";
 import {takeWhile} from "rxjs/operators";
 import {ChangeDirEvent} from "../../../service/change-dir-event";
+import {MatFormField, MatInput, MatLabel} from "@angular/material/input";
+import {debounceTime, distinctUntilChanged, Subject} from "rxjs";
 
 
 @Component({
@@ -41,14 +43,19 @@ import {ChangeDirEvent} from "../../../service/change-dir-event";
     MatButton,
     MatDialogActions,
     TableComponent,
+    MatFormField,
+    MatInput,
+    MatLabel,
+    FormsModule,
   ],
   styleUrls: ["./change-dir-dialog.component.css"]
 })
 export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
-
+  filterText = '';
   tableModel?: TableModelIf;
-  rows: {path:string, label:string}[] = [];
+  rows: { path: string, label: string }[] = [];
+  filteredRows: { path: string, label: string }[] = [];
 
   private readonly rowHeight = 20;
   readonly tableOptions: TableOptionsIf = {
@@ -77,6 +84,8 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
   private tableApi: TableApi | undefined;
   private alive = true;
 
+  private filterTextChanged = new Subject<string>();
+
 
   constructor(
     public dialogRef: MatDialogRef<ChangeDirDialogComponent>,
@@ -103,6 +112,8 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
       columnDefs,
       tableOptions: this.tableOptions,
     });
+
+
   }
 
   ngOnDestroy(): void {
@@ -123,13 +134,20 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
             createAsciiTree(
               arr.map(s => s.substring(this.changeDirDialogData.sourceDir.length))
             );
-          // this.rows=filterAsciiTree(this.rows, (row=> row.label.includes('Resolve')))
-          this.tableApi?.setRows(this.rows);
-          this.tableApi?.repaintHard();
+          this.applyFilter();
         }
       );
-  }
 
+    this.filterTextChanged
+      .pipe(
+        takeWhile(() => this.alive),
+        debounceTime(300),
+        distinctUntilChanged()
+      )
+      .subscribe(filterText => {
+        this.applyFilter()
+      });
+  }
 
   onCancelClicked() {
     this.dialogRef.close(undefined);
@@ -139,12 +157,11 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
     this.tableApi = tableApi;
   }
 
-
   onMouseClicked(evt: GeMouseEvent) {
     if (this.tableApi) {
       const row = this.tableApi.getBodyModel().getRowByIndex(evt.rowIndex);
       if (row) {
-        let path = this.changeDirDialogData.sourceDir + (row.path??'');
+        const path = this.changeDirDialogData.sourceDir + (row.path ?? '');
         this.dialogRef.close(
           new ChangeDirEvent(this.changeDirDialogData.sourcePanelIndex, path)
         );
@@ -152,4 +169,47 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
     }
   }
 
+  onFilterChangedByUser(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.filterTextChanged.next(input.value);
+  }
+
+  private applyFilter() {
+    const fr = filterAsciiTree(this.rows, this.filterPredicate.bind(this));
+    this.filteredRows = createAsciiTree(
+      fr.map(s => s.path)
+    );
+    this.tableApi?.setRows(this.filteredRows);
+    this.tableApi?.repaintHard();
+  }
+
+  private filterPredicate(r: { path: string, label: string }): boolean {
+    if (!this.filterText) return true;
+
+    const fs = this.filterText.toLowerCase().split(' ');
+
+    const negs = fs?.filter(f => f.startsWith('-'))
+      .map(f => f.substring(1).trim())
+      .filter(f => f);
+
+    const poss = fs?.filter(f => !f.startsWith('-'))
+      .map(f => f.replace(/^\+/g, '').trim())
+      .filter(f => f);
+
+    return poss.every(f => {
+        if (f.includes('|')) {
+          const ors = f.split('|');
+          return ors.some(or => r.path.toLowerCase().includes(or));
+        }
+        return r.path.toLowerCase().includes(f)
+      })
+      &&
+      negs.every(f => {
+        if (f.includes('|')) {
+          const ors = f.split('|');
+          return !ors.some(or => r.path.toLowerCase().includes(or));
+        }
+        return !r.path.toLowerCase().includes(f);
+      });
+  }
 }

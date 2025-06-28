@@ -4,10 +4,15 @@
     display: grid;
     grid-template-rows: 1fr;
 
+    .filter-container {
+        display: grid;
+        grid-template-columns: 1fr auto;
+    }
+
     .table-div {
         height: 100%;
         display: grid;
-        grid-template-rows: 1fr;
+        grid-template-rows: auto 1fr;
     }
 }
 

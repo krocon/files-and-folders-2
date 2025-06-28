@@ -30,8 +30,8 @@ import {AreaIdent, AreaModelIf, RendererCleanupFnType} from "@guiexpert/table";
           flex-direction: row-reverse;
           max-width: calc(100% - 10px);
           font-family: monospace !important;
-          font-size: 16px !important;
-          line-height: 16px !important;
+          font-size: 17px !important;
+          line-height: 17px !important;
           
           pre {
               margin: 0;

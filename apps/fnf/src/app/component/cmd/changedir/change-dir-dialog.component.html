@@ -6,6 +6,17 @@
 
 
   <div class="table-div">
+    <div class="filter-container">
+      <mat-form-field>
+        <mat-label>Filter</mat-label>
+        <input
+            (change)="onFilterChangedByUser($event)"
+            (keyup)="onFilterChangedByUser($event)"
+            [(ngModel)]="filterText"
+            matInput
+            placeholder="Filter"/>
+      </mat-form-field>
+    </div>
     <guiexpert-table
         (mouseClicked)="onMouseClicked($event)"
         (tableReady)="onTableReady($event)"
