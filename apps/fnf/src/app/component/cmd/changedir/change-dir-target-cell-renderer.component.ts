@@ -1,12 +1,11 @@
 import {ComponentRendererIf} from "@guiexpert/angular-table";
 import {ChangeDetectionStrategy, Component} from "@angular/core";
 import {AreaIdent, AreaModelIf, RendererCleanupFnType} from "@guiexpert/table";
-import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
 
 @Component({
   selector: 'multi-rename-target-cell-renderer',
   template: `
-    <div class="ffn-name-cell-label"><pre>{{ dir }}<span class="base">{{ base }}</span></pre></div>
+    <div class="ffn-name-cell-label"><pre>{{ text }}</pre></div>
   `,
   styles: [`
       :host {
@@ -46,11 +45,9 @@ import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ChangeDirTargetCellRendererComponent implements ComponentRendererIf<FileOperationParams> {
+export class ChangeDirTargetCellRendererComponent implements ComponentRendererIf<string> {
 
-  dir: string = '';
-  base: string = '';
-
+  text: string = '';
 
   setData(
     rowIndex: number,
@@ -59,19 +56,10 @@ export class ChangeDirTargetCellRendererComponent implements ComponentRendererIf
     areaModel: AreaModelIf,
     cellValue: string): RendererCleanupFnType | undefined {
 
-    this.dir = cellValue
-      .split('/')
-      .map(w => '    |')
-      .join('')
-      .substring(5);
-    this.base = '---' + this.getBase(cellValue);
+    this.text = cellValue;
 
     return undefined;
   }
 
-  private getBase(fileName: string): string {
-    const lastSlashIndex = fileName.lastIndexOf("/");
-    return fileName.substring(lastSlashIndex+1);
-  }
 
 }

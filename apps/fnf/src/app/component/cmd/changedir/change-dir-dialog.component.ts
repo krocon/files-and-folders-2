@@ -24,10 +24,8 @@ import {
 } from "@guiexpert/table";
 import {ChangeDirTargetCellRendererComponent} from "./change-dir-target-cell-renderer.component";
 import {GotoAnythingDialogService} from "../gotoanything/goto-anything-dialog.service";
-
-export interface CdRowIf {
-  dir: string;
-}
+import {CdRowIf} from "../../../domain/changedir/cd-row.if";
+import {createAsciiTree} from "../../../common/fn/ascii-tree.fn";
 
 
 @Component({
@@ -85,7 +83,6 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
     private readonly cdr: ChangeDetectorRef,
     private readonly gotoAnythingDialogService: GotoAnythingDialogService,
   ) {
-    // console.info("changeDirDialogData:", changeDirDialogData);
 
     const columnDefs = [
       ColumnDef.create({
@@ -117,14 +114,16 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
       .findFolders(para)
       .subscribe(
         arr => {
-          this.rows = arr
-            .sort()
-            .map(s => {
-              return {dir: s.substring(this.changeDirDialogData.sourceDir.length)};
-            });
+          console.info('arr', arr);
+          this.rows =
+            createAsciiTree(
+              arr.map(s => s.substring(this.changeDirDialogData.sourceDir.length))
+            )
+              .map(s => {
+                return {dir: s};
+              });
           this.tableApi?.setRows(this.rows);
           this.tableApi?.repaintHard();
-          console.info("this.rows:", this.rows);
         }
       );
   }
