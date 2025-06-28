@@ -800,7 +800,7 @@ export class AppService {
     this.updateFocusRowCriterea(this.getActivePanelIndex(), focusRowCriterea);
   }
 
-  private updateFocusRowCriterea(panelIndex: PanelIndex, focusRowCriterea: Partial<FileItemIf> | null) {
+  updateFocusRowCriterea(panelIndex: PanelIndex, focusRowCriterea: Partial<FileItemIf> | null) {
     const filePageDataValue = this.clone(this.filePageDataService.getValue());
     const panelData = filePageDataValue.tabRows[panelIndex];
     panelData.tabs[panelData.selectedTabIndex].focusRowCriterea = focusRowCriterea;

@@ -27,34 +27,41 @@ export class WalkGateway {
    */
   @SubscribeMessage("walkdir")
   walkdir(@MessageBody() walkParaData: WalkParaData): void {
-    const walkData = new WalkData();
-    const stepsPerMessage = walkParaData.stepsPerMessage;
-    const buf = [...walkParaData.files];
-    let step = 0;
-    while (buf.length) {
-      if (this.cancellings[walkParaData.emmitCancelKey]) {
-        return;
-      }
-      step++;
-      const ff = buf.pop();
-      const stats = fs.statSync(ff);
-      if (stats.isDirectory()) {
-        walkData.folderCount++;
-        if (step % stepsPerMessage === 0) {
-          this.server.emit(walkParaData.emmitDataKey, walkData);
+
+    (function (walkParaData: WalkParaData, cancellings: {}, server: Server) {
+
+      const walkData = new WalkData();
+      const stepsPerMessage = walkParaData.stepsPerMessage;
+      const buf = [...walkParaData.files];
+      let step = 0;
+      while (buf.length) {
+        if (cancellings[walkParaData.emmitCancelKey]) {
+          return;
         }
-        const ffs = fs.readdirSync(ff);
-        ffs.forEach(f => buf.push(path.join(ff, f)));
-      } else if (stats.isFile()) {
-        walkData.fileCount++;
-        walkData.sizeSum = walkData.sizeSum + stats.size;
-        if (step % stepsPerMessage === 0) {
-          this.server.emit(walkParaData.emmitDataKey, walkData);
+        step++;
+        const ff = buf.pop();
+        const stats = fs.statSync(ff);
+
+        if (stats.isDirectory()) {
+          walkData.folderCount++;
+          if (step % stepsPerMessage === 0) {
+            server.emit(walkParaData.emmitDataKey, walkData);
+          }
+          const ffs = fs.readdirSync(ff);
+          ffs.forEach(f => buf.push(path.join(ff, f)));
+
+        } else if (stats.isFile()) {
+          walkData.fileCount++;
+          walkData.sizeSum = walkData.sizeSum + stats.size;
+          if (step % stepsPerMessage === 0) {
+            server.emit(walkParaData.emmitDataKey, walkData);
+          }
         }
       }
-    }
-    walkData.last = true;
-    this.server.emit(walkParaData.emmitDataKey, walkData);
+      walkData.last = true;
+      server.emit(walkParaData.emmitDataKey, walkData);
+
+    })(walkParaData, this.cancellings, this.server);
   }
 
   @SubscribeMessage("cancelwalk")

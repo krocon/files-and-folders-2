@@ -56,6 +56,7 @@ import {FnfActionLabels} from "../../../domain/action/fnf-action-labels";
 import {NotifyService} from "../../../service/cmd/notify-service";
 import {NotifyEventIf} from "../../../domain/cmd/notify-event.if";
 import {SelectionDialogData} from "../../cmd/selection/selection-dialog.data";
+import {getParentDir} from "../../../common/fn/get-parent-dir.fn";
 
 @Component({
   standalone: true,
@@ -729,6 +730,17 @@ export class FileTableComponent implements OnInit, OnDestroy {
       return; // skip
     }
     if (fileItem.isDir) {
+
+      // update focus criteria:
+      if (fileItem.base === DOT_DOT) {
+        const p = getParentDir(this.dirPara?.path??'');
+        this.focusRowCriterea = {dir: p.dir, base:p.base };
+        this.appService.updateFocusRowCriterea(this.panelIndex, this.focusRowCriterea);
+      } else {
+        this.focusRowCriterea = {dir: fileItem.dir, base:DOT_DOT };
+        this.appService.updateFocusRowCriterea(this.panelIndex, this.focusRowCriterea);
+      }
+
       if (fileItem.base === DOT_DOT) {
         this.changeDirNext(fileItem.dir);
       } else {
