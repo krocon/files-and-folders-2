@@ -123,6 +123,7 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
             createAsciiTree(
               arr.map(s => s.substring(this.changeDirDialogData.sourceDir.length))
             );
+          // this.rows=filterAsciiTree(this.rows, (row=> row.label.includes('Resolve')))
           this.tableApi?.setRows(this.rows);
           this.tableApi?.repaintHard();
         }

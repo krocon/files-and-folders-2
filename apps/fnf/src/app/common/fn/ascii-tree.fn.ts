@@ -116,3 +116,48 @@ interface TreeNode {
   isLeaf: boolean;
   path: string;
 }
+
+
+/**
+ * Filters an ASCII tree based on a predicate function
+ * If a row matches the predicate, all its parent rows will also be included in the result
+ * @param rows Array of objects with path and label properties
+ * @param predicate Function that determines if a row should be included
+ * @returns Filtered array of objects with path and label properties
+ */
+export function filterAsciiTree(
+  rows: {path: string, label: string}[],
+  predicate: (row: {path: string, label: string}) => boolean,
+  ):{path: string, label: string}[] {
+
+  if (!rows || rows.length === 0) {
+    return [];
+  }
+
+  // First, find all rows that match the predicate
+  const matchingRows = rows.filter(row => predicate(row));
+
+  // If no rows match, return empty array
+  if (matchingRows.length === 0) {
+    return [];
+  }
+
+  // Create a set of paths that should be included in the result
+  const pathsToInclude = new Set<string>();
+
+  // For each matching row, add its path and all parent paths to the set
+  matchingRows.forEach(row => {
+    // Add the current path
+    pathsToInclude.add(row.path);
+
+    // Add all parent paths
+    let currentPath = row.path;
+    while (currentPath.lastIndexOf('/') > 0) {
+      currentPath = currentPath.substring(0, currentPath.lastIndexOf('/'));
+      pathsToInclude.add(currentPath);
+    }
+  });
+
+  // Filter the original rows to include only those with paths in the set
+  return rows.filter(row => pathsToInclude.has(row.path));
+}
