@@ -9,24 +9,26 @@ export function createAsciiTree(rows: string[]): {path: string, label: string}[]
   }
 
   // Create a tree structure from the directory paths
-  const tree: TreeNode = { name: '', children: {}, isLeaf: false };
+  const tree: TreeNode = { name: '', children: {}, isLeaf: false, path: '' };
 
   // Sort the rows to ensure consistent output
   const sortedRows = [...rows].sort((a, b) => a.localeCompare(b));
 
   // Build the tree structure
   for (const row of sortedRows) {
-    const path = row;
-    const parts = path.split('/').filter(part => part.length > 0);
+    const parts = row.split('/').filter(part => part.length > 0);
 
     let currentNode = tree;
+    let currentPath = '';
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
+      currentPath += '/' + part;
       if (!currentNode.children[part]) {
         currentNode.children[part] = {
           name: part,
           children: {},
-          isLeaf: false // Initialize as non-leaf
+          isLeaf: false, // Initialize as non-leaf
+          path: currentPath
         };
       }
       currentNode = currentNode.children[part];
@@ -36,21 +38,16 @@ export function createAsciiTree(rows: string[]): {path: string, label: string}[]
   // Mark leaf nodes (directories that don't have children)
   markLeafNodes(tree);
 
-  // Convert the tree to ASCII representation
-  const asciiLines: string[] = [];
-  renderTree(tree, '', '', asciiLines);
+  // Convert the tree to ASCII representation with paths
+  const result: {path: string, label: string}[] = [];
+  renderTree(tree, '', '', result);
 
   // Remove the root node (empty string) if it exists
-  if (asciiLines.length > 0 && asciiLines[0].trim() === '') {
-    asciiLines.shift();
+  if (result.length > 0 && result[0].label.trim() === '') {
+    result.shift();
   }
 
-  // Map the ASCII lines to objects with path and label properties
-  return asciiLines.map((label, index) => {
-    // Use the original path if available, otherwise use an empty string
-    const path = index < sortedRows.length ? sortedRows[index] : '';
-    return { path, label };
-  });
+  return result;
 }
 
 /**
@@ -78,11 +75,14 @@ function markLeafNodes(node: TreeNode): boolean {
 /**
  * Recursively renders a tree node and its children as ASCII art
  */
-function renderTree(node: TreeNode, prefix: string, childPrefix: string, result: string[]): void {
+function renderTree(node: TreeNode, prefix: string, childPrefix: string, result: {path: string, label: string}[]): void {
   // Skip the root node
   if (node.name !== '') {
-    // Display the node with its prefix
-    result.push(`${prefix}${node.name}`);
+    // Display the node with its prefix and store its path
+    result.push({
+      path: node.path,
+      label: `${prefix}${node.name}`
+    });
   }
 
   const childrenKeys = Object.keys(node.children);
@@ -114,4 +114,5 @@ interface TreeNode {
   name: string;
   children: { [key: string]: TreeNode };
   isLeaf: boolean;
+  path: string;
 }

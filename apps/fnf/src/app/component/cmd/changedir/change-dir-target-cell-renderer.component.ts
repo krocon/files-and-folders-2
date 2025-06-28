@@ -38,7 +38,7 @@ import {AreaIdent, AreaModelIf, RendererCleanupFnType} from "@guiexpert/table";
           }
       }
 
-      .ffn-name-cell-label:hover .base {
+      .ffn-name-cell-label:hover {
           font-weight: bold;
       }
       

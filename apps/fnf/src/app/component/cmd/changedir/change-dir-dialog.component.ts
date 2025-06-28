@@ -26,6 +26,8 @@ import {
 import {ChangeDirTargetCellRendererComponent} from "./change-dir-target-cell-renderer.component";
 import {GotoAnythingDialogService} from "../gotoanything/goto-anything-dialog.service";
 import {createAsciiTree} from "../../../common/fn/ascii-tree.fn";
+import {takeWhile} from "rxjs/operators";
+import {ChangeDirEvent} from "../../../service/change-dir-event";
 
 
 @Component({
@@ -91,8 +93,8 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
         width: new Size(100, 'weight'),
         bodyClasses: ["ge-table-text-align-left"],
         bodyRenderer: this.rwf.create(ChangeDirTargetCellRendererComponent, this.cdr),
-        sortable: () => true,
-        sortIconVisible: () => true,
+        sortable: () => false,
+        sortIconVisible: () => false,
       }),
     ];
 
@@ -112,9 +114,11 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
     const para = new FindFolderPara([this.changeDirDialogData.sourceDir], '', 20);
     this.gotoAnythingDialogService
       .findFolders(para)
+      .pipe(
+        takeWhile(() => this.alive),
+      )
       .subscribe(
         arr => {
-          console.info('arr', arr);
           this.rows =
             createAsciiTree(
               arr.map(s => s.substring(this.changeDirDialogData.sourceDir.length))
@@ -125,10 +129,6 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
       );
   }
 
-  onOkClicked() {
-    // TODO onOkClicked
-    // this.dialogRef.close();
-  }
 
   onCancelClicked() {
     this.dialogRef.close(undefined);
@@ -136,26 +136,19 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
   onTableReady(tableApi: TableApi) {
     this.tableApi = tableApi;
-    console.info("this.tableApi:", this.tableApi);
-  }
-
-  private updateTableRows() {
-    // const dialogData = this.clone<ChangeDirDialogData>(this.changeDirDialogData);
-    // dialogData.data = this.formGroup.getRawValue();
-    // const updateModel: ChangeDirResult = this.changeDirService.getUpdateModel(dialogData);
-    // this.rows = this.changeDirService.getFileOperationParams(
-    //   updateModel.rows,
-    //   dialogData.sourcePanelIndex,
-    //   dialogData.targetPanelIndex
-    // );
-  }
-
-  private clone<T>(r: T): T {
-    return JSON.parse(JSON.stringify(r));
   }
 
 
   onMouseClicked(evt: GeMouseEvent) {
-    console.info('evt', evt);
+    if (this.tableApi) {
+      const row = this.tableApi.getBodyModel().getRowByIndex(evt.rowIndex);
+      if (row) {
+        let path = this.changeDirDialogData.sourceDir + (row.path??'');
+        this.dialogRef.close(
+          new ChangeDirEvent(this.changeDirDialogData.sourcePanelIndex, path)
+        );
+      }
+    }
   }
+
 }
