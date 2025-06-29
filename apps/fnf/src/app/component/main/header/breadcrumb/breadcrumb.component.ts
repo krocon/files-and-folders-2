@@ -7,12 +7,14 @@ import {TabsPanelData} from "../../../../domain/filepagedata/data/tabs-panel.dat
 import {TabData} from "../../../../domain/filepagedata/data/tab.data";
 import {MatTooltip} from "@angular/material/tooltip";
 import {AppService} from "../../../../app.service";
+import {FavToggleComponent} from "./fav.component";
 
 @Component({
   selector: 'app-breadcrumb',
   imports: [
     CommonModule,
-    MatTooltip
+    MatTooltip,
+    FavToggleComponent
   ],
   templateUrl: './breadcrumb.component.html',
   styleUrl: './breadcrumb.component.css',
@@ -75,5 +77,9 @@ export class BreadcrumbComponent {
       };
       this.appService.openFindDialog(findDialogData);
     }
+  }
+
+  onFavClicked() {
+
   }
 }

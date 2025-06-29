@@ -1,11 +1,10 @@
-
-
 @if (this.pattern) {
   <div
       (dblclick)="onSearchDblClicked()"
       class="search-div"
-      [matTooltipShowDelay]="2000" [matTooltip]="tabDataItem?.findData|json">
-    Search:&nbsp;"{{this.pattern}}"
+      [matTooltipShowDelay]="2000"
+      [matTooltip]="tabDataItem?.findData|json">
+    Search:&nbsp;"{{ this.pattern }}"
   </div>
 }
 
@@ -18,6 +17,12 @@
           class="file-item-div">{{ item.base }}/
       </div>
     }
-    <div class="file-item-div w-100">&nbsp;</div>
+
+
+    <div class="fav-div">
+      <app-fav-toggle [fileItem]="fileItem"></app-fav-toggle>
+    </div>
+
+    <div class="file-item-div w-100"></div>
   </div>
 }

@@ -128,7 +128,12 @@ export class AppService {
 
     this.favDataService
       .valueChanges()
-      .subscribe(o => this.favs = (o.filter((his, i, arr) => arr.indexOf(his) === i)));
+      .subscribe(o => {
+        console.log('> o:', o);
+         this.favs = (o.filter((his, i, arr) => arr.indexOf(his) === i));
+         // console.log('> favs:', this.favs);
+         // this.cdr.detectChanges();
+      });
 
     this.latestDataService
       .valueChanges()
@@ -152,6 +157,13 @@ export class AppService {
         this.setPathToActiveTabInGivenPanel(changeDirEvent.path, changeDirEvent.panelIndex);
       }
     });
+  }
+
+  favs$(){
+    return this.favDataService.valueChanges()
+  }
+  latest$(){
+    return this.latestDataService.valueChanges()
   }
 
   filePageDataChanges() {

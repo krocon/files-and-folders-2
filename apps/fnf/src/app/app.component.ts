@@ -68,8 +68,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
   // Using signals directly from appService
   readonly winDrives = this.appService.winDrives;
   readonly sysinfo = this.appService.sysinfo;
-  readonly latest = this.appService.latest;
-  readonly favs = this.appService.favs;
+  latest:string[] = this.appService.latest;
+  favs:string[] = this.appService.favs;
   readonly dockerRoot = this.appService.dockerRoot;
 
   readonly panelIndices: PanelIndex[] = [0, 1];
@@ -114,11 +114,27 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
       this.cdr.detectChanges();
     });
 
-    this.appService.filePageDataChanges().subscribe(fd => {
-      this.normalizeFilePageData(fd);
-      this.filePageData = {...fd};
-      this.cdr.detectChanges();
-    });
+    this.appService
+      .filePageDataChanges()
+      .subscribe(fd => {
+        this.normalizeFilePageData(fd);
+        this.filePageData = {...fd};
+        this.cdr.detectChanges();
+      });
+
+    this.appService
+      .favs$()
+      .subscribe(favs => {
+        this.favs = favs;
+        this.cdr.detectChanges();
+      });
+
+    this.appService
+      .latest$()
+      .subscribe(latest => {
+        this.latest = latest;
+        this.cdr.detectChanges();
+      });
   }
 
   onSelectionChanged(selectionLabelData: SelectionEvent, panelIndex: PanelIndex) {
