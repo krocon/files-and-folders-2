@@ -47,14 +47,14 @@ export class WalkSocketService {
     return cancelKey;
   }
 
-  public setupSocketConnection() {
-    // nix
-  }
-
-  public disconnect() {
-    if (this.socket) {
-      this.socket.disconnect();
-    }
-  }
+  // public setupSocketConnection() {
+  //   // nix
+  // }
+  //
+  // public disconnect() {
+  //   if (this.socket) {
+  //     this.socket.disconnect();
+  //   }
+  // }
 
 }

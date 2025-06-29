@@ -32,34 +32,71 @@ export class WalkGateway {
 
       const walkData = new WalkData();
       const stepsPerMessage = walkParaData.stepsPerMessage;
-      const buf = [...walkParaData.files];
+      const files = [...walkParaData.files];
       let step = 0;
-      while (buf.length) {
+
+      /**
+       * Helper function to emit data with a small delay to ensure the event is processed
+       * @param key Event key
+       * @param data Data to emit
+       * @param callback Function to call after the emit has been processed
+       */
+      const emitWithDelay = (key: string, data: any, callback: () => void) => {
+        server.emit(key, data);
+        // Use setImmediate to give the event loop a chance to process the emit
+        setImmediate(() => {
+          callback();
+        });
+      };
+
+      const processNextFile = () => {
+        if (!files.length) {
+          walkData.last = true;
+          emitWithDelay(walkParaData.emmitDataKey, walkData, () => {
+            // Final emit completed
+          });
+          return;
+        }
+
         if (cancellings[walkParaData.emmitCancelKey]) {
           return;
         }
+
         step++;
-        const ff = buf.pop();
-        const stats = fs.statSync(ff);
+        const ff = files.pop();
 
-        if (stats.isDirectory()) {
-          walkData.folderCount++;
-          if (step % stepsPerMessage === 0) {
-            server.emit(walkParaData.emmitDataKey, walkData);
-          }
-          const ffs = fs.readdirSync(ff);
-          ffs.forEach(f => buf.push(path.join(ff, f)));
+        try {
+          const stats = fs.statSync(ff);
 
-        } else if (stats.isFile()) {
-          walkData.fileCount++;
-          walkData.sizeSum = walkData.sizeSum + stats.size;
-          if (step % stepsPerMessage === 0) {
-            server.emit(walkParaData.emmitDataKey, walkData);
+          if (stats.isDirectory()) {
+            walkData.folderCount++;
+            if (step % stepsPerMessage === 0) {
+              //console.log(walkData);
+              emitWithDelay(walkParaData.emmitDataKey, walkData, processNextFile);
+              return;
+            }
+            const ffs = fs.readdirSync(ff);
+            ffs.forEach(f => files.push(path.join(ff, f)));
+
+          } else if (stats.isFile()) {
+            walkData.fileCount++;
+            walkData.sizeSum = walkData.sizeSum + stats.size;
+            if (step % stepsPerMessage === 0) {
+              //console.log("emit: " + ff);
+              emitWithDelay(walkParaData.emmitDataKey, walkData, processNextFile);
+              return;
+            }
           }
+        } catch (e) {
+          // ignore
         }
-      }
-      walkData.last = true;
-      server.emit(walkParaData.emmitDataKey, walkData);
+
+        // Process next file
+        processNextFile();
+      };
+
+      // Start processing files
+      processNextFile();
 
     })(walkParaData, this.cancellings, this.server);
   }

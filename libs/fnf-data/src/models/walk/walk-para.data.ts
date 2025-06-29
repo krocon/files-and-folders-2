@@ -4,7 +4,7 @@ export class WalkParaData {
     public files: string[] = [],
     public emmitDataKey = '',
     public emmitCancelKey = '',
-    public stepsPerMessage = 10
+    public stepsPerMessage = 500
   ) {
   }
 

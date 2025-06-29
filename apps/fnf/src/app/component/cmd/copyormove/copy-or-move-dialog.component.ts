@@ -1,4 +1,4 @@
-import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
+import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {CopyOrMoveDialogData} from "./copy-or-move-dialog.data";
 import {
@@ -43,6 +43,7 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
   error = "";
   errorMesasage = "";
   walkData = new WalkData(0, 0, 0, false);
+  walkCancelKey = '';
 
   title = "Copy";
   source = "";
@@ -56,7 +57,8 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
     public dialogRef: MatDialogRef<CopyOrMoveDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: CopyOrMoveDialogData,
     private readonly formBuilder: FormBuilder,
-    private readonly walkSocketService: WalkSocketService
+    private readonly walkSocketService: WalkSocketService,
+    private readonly cdr: ChangeDetectorRef,
   ) {
     this.title = this.getTitleByKey(data?.fileOperation);
     this.deleteMode = data?.fileOperation === "delete";
@@ -92,21 +94,29 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.alive = false;
+    this.walkSocketService.cancelWalkDir(this.walkCancelKey);
   }
 
   ngOnInit(): void {
     this.alive = true;
-    this.walkSocketService.walkDir(this.data.source, (walkData: WalkData) => this.walkData = walkData);
-
+    this.walkCancelKey = this.walkSocketService
+      .walkDir(
+        this.data.source,
+        (walkData: WalkData) => {
+          this.walkData = walkData;
+          this.cdr.detectChanges();
+        });
   }
 
   onOkClicked() {
     const fileItem = new FileItem(this.data.target, this.formGroup.getRawValue().name, "");
     fileItem.isDir = true;
+    this.walkSocketService.cancelWalkDir(this.walkCancelKey);
     this.dialogRef.close(fileItem);
   }
 
   onCancelClicked() {
+    this.walkSocketService.cancelWalkDir(this.walkCancelKey);
     this.dialogRef.close(undefined);
   }
 
