@@ -204,6 +204,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
   @Input() set tabsPanelData(value: TabsPanelData) {
+    console.info('filetable, set tabsPanelData', value);
     this._tabsPanelData = value;
 
     const selectedTabData = this._tabsPanelData.tabs[this._tabsPanelData.selectedTabIndex];
@@ -212,6 +213,11 @@ export class FileTableComponent implements OnInit, OnDestroy {
     const filterChanged = this.filterText !== selectedTabData.filterText || this.filterActive !== selectedTabData.filterActive;
     this.filterText = selectedTabData.filterText ?? '';
     this.filterActive = selectedTabData.filterActive ?? false;
+
+    // console.info('panelIndex', this.panelIndex);
+    // console.info('filterChanged', filterChanged);
+    // console.info('this.filterText', this.filterText);
+    // console.info('this.filterActive', this.filterActive);
 
     if (!this.dirPara
       || this.dirPara?.path !== selectedTabData.path) {
@@ -233,12 +239,11 @@ export class FileTableComponent implements OnInit, OnDestroy {
         this.dirPara = new DirPara(selectedTabData.path, `file-panel-${this._panelIndex}`);
         this.requestRows();
       }
-
-      if (filterChanged && this.tableApi) {
-        this.tableApi.externalFilterChanged();
-        this.tableApi.reSort();
-        this.tableApi.repaintHard();
-      }
+    }
+    if (filterChanged && this.tableApi) {
+      this.tableApi.externalFilterChanged();
+      this.tableApi.reSort();
+      this.tableApi.repaintHard();
     }
   }
 
