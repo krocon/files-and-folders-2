@@ -94,26 +94,24 @@ export class FindFolderService {
       if (depth >= para.folderDeep) continue;
 
       try {
-        if (fs.existsSync(dir)) {
-          const entries = await fs.readdir(dir, {withFileTypes: true});
-          for (const entry of entries) {
-            const item = entry.name;
+        const entries = await fs.readdir(dir, {withFileTypes: true});
+        for (const entry of entries) {
+          const item = entry.name;
 
-            if (!item.startsWith('.')) {
-              const fullPath = path.join(dir, item);
+          if (!item.startsWith('.')) {
+            const fullPath = path.join(dir, item);
 
-              if (entry.isDirectory()) {
-                if (!para.pattern || item.toLowerCase().includes(para.pattern)) {
-                  found.push(fullPath);
-                }
-                dirs.push(fullPath);
-                currentDepth.set(fullPath, depth + 1);
+            if (entry.isDirectory()) {
+              if (!para.pattern || item.toLowerCase().includes(para.pattern)) {
+                found.push(fullPath);
               }
+              dirs.push(fullPath);
+              currentDepth.set(fullPath, depth + 1);
             }
           }
         }
       } catch (dirError) {
-        console.warn(`Failed to read directory ${dir}:`, dirError);
+        // console.warn(`Failed to read directory ${dir}:`, dirError);
       }
     }
 
