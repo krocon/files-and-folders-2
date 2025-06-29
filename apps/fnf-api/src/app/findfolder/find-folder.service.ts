@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {Config, FindFolderPara} from '@fnf/fnf-data';
 import * as fs from "fs-extra";
-
+import * as os from "os";
 
 /**
  * Service responsible for finding folders in a file system based on specified search criteria.
@@ -12,6 +12,31 @@ import * as fs from "fs-extra";
 export class FindFolderService {
 
   static config: Config = new Config();
+
+  private homeDir = os.homedir();
+  private ignoreDirs = new Set([
+    '/System',
+    '/private',
+    '/dev',
+    '/Volumes',
+    '/Network',
+    '/cores',
+    '/tmp',
+    '/var',
+    this.homeDir+'/Library',
+    this.homeDir+'/.Trash',
+    this.homeDir+'/.ssh',
+    this.homeDir+'/.npm',
+    this.homeDir+'/.cache',
+    this.homeDir+'/Applications'
+  ]);
+
+  private ignoreDirs2 = new Set([
+    '/node_modules/',
+    '/Library/',
+    '.app/',
+    '/.gallery/'
+  ]);
 
   /**
    * Gets the current configuration settings for the FindFolder service.
@@ -51,6 +76,9 @@ export class FindFolderService {
     while (dirs.length) {
       const dir = dirs.pop();
       if (!dir || visitedPaths.has(dir)) continue;
+      if ([...this.ignoreDirs].some(ignorePath => dir.startsWith(ignorePath) )) continue;
+      if ([...this.ignoreDirs2].some(ignorePath => dir.includes(ignorePath) )) continue;
+
 
       visitedPaths.add(dir);
       const depth = currentDepth.get(dir) || 0;
@@ -60,12 +88,13 @@ export class FindFolderService {
       try {
         if (fs.existsSync(dir)) {
           const items: string[] = await fs.readdir(dir);
+          //const fileWithType: any[] = await fs.readdir(dir, { withFileTypes: true });
           for (const item of items) {
 
             if (!item.startsWith('.')) {
               const fullPath = dir + '/' + item; // path.join(dir, item);
               try {
-                const stats = await fs.stat(fullPath);
+                const stats = await fs.lstat(fullPath);
                 if (stats.isDirectory()) {
                   if (!para.pattern || item.toLowerCase().includes(para.pattern)) {
                     found.push(fullPath);

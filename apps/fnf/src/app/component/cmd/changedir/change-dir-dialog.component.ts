@@ -122,7 +122,7 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     this.alive = true;
-    const para = new FindFolderPara([this.changeDirDialogData.sourceDir], '', 20);
+    const para = new FindFolderPara([this.changeDirDialogData.sourceDir], '', 5);
     this.gotoAnythingDialogService
       .findFolders(para)
       .pipe(
