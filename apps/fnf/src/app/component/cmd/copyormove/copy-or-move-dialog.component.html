@@ -11,7 +11,11 @@
     </div>
 
     <div>
-      Implicit:
+      @if (walkData.last) {
+        Implicit:
+      } @else {
+        Scanning...
+      }
       <b>{{ walkData.folderCount }}</b> (sub)folders,
       <b>{{ walkData.fileCount }}</b> files,
       <b>{{ walkData.sizeSum | fnfFileSize }}</b>
