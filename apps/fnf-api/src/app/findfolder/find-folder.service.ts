@@ -88,31 +88,29 @@ export class FindFolderService {
       if ([...this.ignoreDirs].some(ignorePath => dir.startsWith(ignorePath) )) continue;
       if ([...this.ignoreDirs2].some(ignorePath => dir.includes(ignorePath) )) continue;
 
-
       visitedPaths.add(dir);
-      const depth = currentDepth.get(dir) || 0;
 
+      const depth = currentDepth.get(dir) || 0;
       if (depth >= para.folderDeep) continue;
 
       try {
         if (fs.existsSync(dir)) {
-          const items: string[] = await fs.readdir(dir);
-          //const fileWithType: any[] = await fs.readdir(dir, { withFileTypes: true });
-          for (const item of items) {
+          const entries = await fs.readdir(dir, { withFileTypes: true });
+          for (const entry of entries) {
+            const item = entry.name;
 
             if (!item.startsWith('.')) {
               const fullPath = dir + '/' + item; // path.join(dir, item);
               try {
-                const stats = await fs.lstat(fullPath);
-                if (stats.isDirectory()) {
+                if (entry.isDirectory()) {
                   if (!para.pattern || item.toLowerCase().includes(para.pattern)) {
                     found.push(fullPath);
                   }
                   dirs.push(fullPath);
                   currentDepth.set(fullPath, depth + 1);
                 }
-              } catch (statError) {
-                console.warn(`Failed to stat ${fullPath}:`, statError);
+              } catch (error) {
+                console.warn(`Failed to process ${fullPath}:`, error);
               }
             }
           }
