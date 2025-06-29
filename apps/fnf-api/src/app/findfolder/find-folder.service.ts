@@ -3,6 +3,8 @@ import {Config, FindFolderPara} from '@fnf/fnf-data';
 import * as fs from "fs-extra";
 import * as os from "os";
 
+// TODO siehe test.js
+
 /**
  * Service responsible for finding folders in a file system based on specified search criteria.
  * Provides functionality to recursively search directories up to a specified depth,
