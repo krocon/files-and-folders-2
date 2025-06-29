@@ -71,7 +71,6 @@ export class WalkGateway {
           if (stats.isDirectory()) {
             walkData.folderCount++;
             if (step % stepsPerMessage === 0) {
-              //console.log(walkData);
               emitWithDelay(walkParaData.emmitDataKey, walkData, processNextFile);
               return;
             }
@@ -82,7 +81,6 @@ export class WalkGateway {
             walkData.fileCount++;
             walkData.sizeSum = walkData.sizeSum + stats.size;
             if (step % stepsPerMessage === 0) {
-              //console.log("emit: " + ff);
               emitWithDelay(walkParaData.emmitDataKey, walkData, processNextFile);
               return;
             }
