@@ -2,6 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {Config, FindFolderPara} from '@fnf/fnf-data';
 import * as fs from "fs-extra";
 import * as os from "os";
+import * as path from 'path';
 
 // TODO siehe test.js
 
@@ -25,12 +26,18 @@ export class FindFolderService {
     '/cores',
     '/tmp',
     '/var',
-    this.homeDir+'/Library',
-    this.homeDir+'/.Trash',
-    this.homeDir+'/.ssh',
-    this.homeDir+'/.npm',
-    this.homeDir+'/.cache',
-    this.homeDir+'/Applications'
+    path.join(this.homeDir, 'Library'),
+    path.join(this.homeDir, '.Trash'),
+    path.join(this.homeDir, '.ssh'),
+    path.join(this.homeDir, '.npm'),
+    path.join(this.homeDir, '.cache'),
+    path.join(this.homeDir, 'Applications'),
+    // this.homeDir+'/Library',
+    // this.homeDir+'/.Trash',
+    // this.homeDir+'/.ssh',
+    // this.homeDir+'/.npm',
+    // this.homeDir+'/.cache',
+    // this.homeDir+'/Applications'
   ]);
 
   private ignoreDirs2 = new Set([
