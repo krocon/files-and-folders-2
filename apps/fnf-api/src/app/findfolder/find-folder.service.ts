@@ -85,8 +85,8 @@ export class FindFolderService {
     while (dirs.length) {
       const dir = dirs.pop();
       if (!dir || visitedPaths.has(dir)) continue;
-      if ([...this.ignoreDirs].some(ignorePath => dir.startsWith(ignorePath) )) continue;
-      if ([...this.ignoreDirs2].some(ignorePath => dir.includes(ignorePath) )) continue;
+      if ([...this.ignoreDirs].some(ignorePath => dir.startsWith(ignorePath))) continue;
+      if ([...this.ignoreDirs2].some(ignorePath => dir.includes(ignorePath))) continue;
 
       visitedPaths.add(dir);
 
@@ -95,22 +95,19 @@ export class FindFolderService {
 
       try {
         if (fs.existsSync(dir)) {
-          const entries = await fs.readdir(dir, { withFileTypes: true });
+          const entries = await fs.readdir(dir, {withFileTypes: true});
           for (const entry of entries) {
             const item = entry.name;
 
             if (!item.startsWith('.')) {
-              const fullPath = dir + '/' + item; // path.join(dir, item);
-              try {
-                if (entry.isDirectory()) {
-                  if (!para.pattern || item.toLowerCase().includes(para.pattern)) {
-                    found.push(fullPath);
-                  }
-                  dirs.push(fullPath);
-                  currentDepth.set(fullPath, depth + 1);
+              const fullPath = path.join(dir, item);
+
+              if (entry.isDirectory()) {
+                if (!para.pattern || item.toLowerCase().includes(para.pattern)) {
+                  found.push(fullPath);
                 }
-              } catch (error) {
-                console.warn(`Failed to process ${fullPath}:`, error);
+                dirs.push(fullPath);
+                currentDepth.set(fullPath, depth + 1);
               }
             }
           }
