@@ -4,7 +4,7 @@ import {Server} from "socket.io";
 import * as path from "path";
 import * as fs from "fs-extra";
 import {environment} from "../../environments/environment";
-import {WalkData, WalkParaData} from "@fnf/fnf-data";
+import {FileItem, FileItemIf, WalkData, WalkParaData} from "@fnf/fnf-data";
 
 @WebSocketGateway(environment.websocketPort, environment.websocketOptions)
 export class WalkGateway {
@@ -28,11 +28,16 @@ export class WalkGateway {
   @SubscribeMessage("walkdir")
   walkdir(@MessageBody() walkParaData: WalkParaData): void {
 
+    const fileItems: FileItemIf[] = walkParaData.files.map(f => {
+      // Assume all initial entries are directories as per previous implementation
+      return new FileItem(f, '', '', '', 0, true);
+    });
+
     (function (walkParaData: WalkParaData, cancellings: {}, server: Server) {
 
       const walkData = new WalkData();
       const stepsPerMessage = walkParaData.stepsPerMessage;
-      const files = [...walkParaData.files];
+      const files: FileItemIf[] = [...fileItems];
       let step = 0;
 
       /**
@@ -63,23 +68,36 @@ export class WalkGateway {
         }
 
         step++;
-        const ff = files.pop();
+        const item = files.pop();
 
         try {
-          const stats = fs.statSync(ff);
-
-          if (stats.isDirectory()) {
+          if (item.isDir) {
             walkData.folderCount++;
             if (step % stepsPerMessage === 0) {
               emitWithDelay(walkParaData.emmitDataKey, walkData, processNextFile);
               return;
             }
-            const ffs = fs.readdirSync(ff);
-            ffs.forEach(f => files.push(path.join(ff, f)));
 
-          } else if (stats.isFile()) {
+            const entries = fs.readdirSync(item.dir, {withFileTypes: true});
+            entries.forEach(entry => {
+              const fullPath = path.join(item.dir, entry.name);
+              const isDir = entry.isDirectory();
+              // Get file size using lstatSync for files
+              const size = isDir ? 0 : fs.lstatSync(fullPath).size;
+              files.push(new FileItem(
+                fullPath,
+                entry.name,
+                '', // ext
+                '', // date
+                size,  // size from lstatSync for files
+                isDir,
+                false // abs
+              ));
+            });
+          } else {
+            // It's a file
             walkData.fileCount++;
-            walkData.sizeSum = walkData.sizeSum + stats.size;
+            walkData.sizeSum = walkData.sizeSum + item.size;
             if (step % stepsPerMessage === 0) {
               emitWithDelay(walkParaData.emmitDataKey, walkData, processNextFile);
               return;
