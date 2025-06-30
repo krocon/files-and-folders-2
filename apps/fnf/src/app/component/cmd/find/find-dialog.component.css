@@ -18,5 +18,8 @@
         min-width: 200px;
     }
 }
-
+.glob-pattern-info{
+    text-align: left;
+    margin-right: auto;
+}
 
