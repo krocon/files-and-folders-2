@@ -14,6 +14,7 @@ import {FnfAutofocusDirective} from "../../../common/fnf-autofocus.directive";
 import {FindDialogData} from "@fnf/fnf-data";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatCheckbox} from "@angular/material/checkbox";
+import {SearchTemplateDropdownComponent} from "../../common/search-template-dropdown.component";
 
 @Component({
   selector: "fnf-openFindDialog-dialog",
@@ -29,7 +30,8 @@ import {MatCheckbox} from "@angular/material/checkbox";
     MatDialogActions,
     MatFormField,
     FnfAutofocusDirective,
-    MatCheckbox
+    MatCheckbox,
+    SearchTemplateDropdownComponent,
   ],
   styleUrls: ["./find-dialog.component.css"]
 })
@@ -42,27 +44,28 @@ export class FindDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: FindDialogData,
     private readonly formBuilder: FormBuilder,
   ) {
-    const folder = data.folder?data.folder:data.folders?.join(',');
-    this.formGroup = this.formBuilder.group(
-      {
-        folder: new FormControl(
-          folder,
-          {
-            validators: [
-              Validators.required,
-            ]
-          }),
-        pattern: new FormControl(
-          data.pattern,
-          {
-            validators: [
-              Validators.required,
-            ]
-          }),
-        directoriesOnly: new FormControl(data.directoriesOnly, {}),
-        newtab: new FormControl(data.newtab, {})
-      }
-    );
+    const folder = data.folder ? data.folder : data.folders?.join(',');
+    this.formGroup = this.formBuilder
+      .group(
+        {
+          folder: new FormControl(
+            folder,
+            {
+              validators: [
+                Validators.required,
+              ]
+            }),
+          pattern: new FormControl(
+            data.pattern,
+            {
+              validators: [
+                Validators.required,
+              ]
+            }),
+          directoriesOnly: new FormControl(data.directoriesOnly, {}),
+          newtab: new FormControl(data.newtab, {})
+        }
+      );
   }
 
   ngOnInit(): void {
@@ -78,4 +81,14 @@ export class FindDialogComponent implements OnInit {
   }
 
 
+  onSearchTemplateSelected(evt: string) {
+    const p = '{'
+      + evt
+        .split('|')
+        .map(s => '**/*' + s)
+        .join(',')
+      + '}';
+
+    this.formGroup?.get('pattern')?.setValue(p, {emitEvent: true});
+  }
 }

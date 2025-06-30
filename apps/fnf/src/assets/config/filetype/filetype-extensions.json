@@ -11,3 +11,4 @@
   {"label": "design", "extensions": [".psd", ".ai", ".xd", ".sketch", ".fig", ".indd", ".cdr"]},
   {"label": "3d", "extensions": [".obj", ".fbx", ".stl", ".dae", ".3ds", ".blend"]}
 ]
+

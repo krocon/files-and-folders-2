@@ -16,6 +16,7 @@
             formControlName="folder"
             matInput
             placeholder="Search in"/>
+        <!--fnf-fav-menu matSuffix></fnf-fav-menu-->
       </mat-form-field>
 
       <mat-form-field>
@@ -26,6 +27,10 @@
             formControlName="pattern"
             matInput
             placeholder="Search for"/>
+        <fnf-search-template-dropdown
+            (onSelected)="onSearchTemplateSelected($event)"
+            matSuffix>arrow_drop_down
+        </fnf-search-template-dropdown>
       </mat-form-field>
 
       <mat-checkbox formControlName="directoriesOnly">
