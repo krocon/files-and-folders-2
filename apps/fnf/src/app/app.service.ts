@@ -301,6 +301,7 @@ export class AppService {
 
   public updateFilePageData(fileData: FilePageData) {
     // Update both the signal and the service
+    // console.info(JSON.stringify(fileData, null, 4));
     this.filePageData = this.clone(fileData);
     this.filePageDataService.update(fileData);
   }

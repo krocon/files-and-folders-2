@@ -28,18 +28,46 @@ import {FnfAutofocusDirective} from "../../../../../common/fnf-autofocus.directi
   ]
 })
 export class FavsAndLatestComponent {
-
   @Input() panelIndex: PanelIndex = 0;
-  @Input() winDrives: string[] = [];
-  @Input() favs: string[] = [];
-  @Input() latest: string[] = [];
   @Input() dockerRoot: string = '/';
-
   @ViewChild('clickHoverMenuTrigger') clickHoverMenuTrigger?: MatMenuTrigger;
 
   constructor(
     private readonly appService: AppService
   ) {
+  }
+
+  private _winDrives: string[] = [];
+
+  get winDrives(): string[] {
+    return this._winDrives;
+  }
+
+  @Input() set winDrives(value: string[]) {
+    this._winDrives = value;
+    this.filterDoubles();
+  }
+
+  private _favs: string[] = [];
+
+  get favs(): string[] {
+    return this._favs;
+  }
+
+  @Input() set favs(value: string[]) {
+    this._favs = value;
+    this.filterDoubles();
+  }
+
+  private _latest: string[] = [];
+
+  get latest(): string[] {
+    return this._latest;
+  }
+
+  @Input() set latest(value: string[]) {
+    this._latest = value;
+    this.filterDoubles();
   }
 
   public openMenu(open: boolean) {
@@ -48,11 +76,15 @@ export class FavsAndLatestComponent {
     } else {
       this.clickHoverMenuTrigger?.closeMenu();
     }
-
   }
 
   onItemClicked(path: string) {
     this.appService.changeDir(new ChangeDirEvent(this.panelIndex, path));
+  }
+
+  private filterDoubles() {
+    this._favs = this._favs.filter((v, i, a) => a.indexOf(v) === i && this._winDrives.indexOf(v) === -1);
+    this._latest = this._latest.filter((v, i, a) => a.indexOf(v) === i && this._winDrives.indexOf(v) === -1 && this._favs.indexOf(v) === -1);
   }
 
 }
