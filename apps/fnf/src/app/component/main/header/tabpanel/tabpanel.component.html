@@ -22,6 +22,7 @@
         <ng-template mat-tab-label>
           @if (tabsPanelData) {
             <app-tab
+                (click)="try2RemoveTab(i, $event)"
                 [activeAndSelected]="selected && i === tabsPanelData.selectedTabIndex"
                 [class.active]="i === tabsPanelData.selectedTabIndex"
                 [panelIndex]="panelIndex"

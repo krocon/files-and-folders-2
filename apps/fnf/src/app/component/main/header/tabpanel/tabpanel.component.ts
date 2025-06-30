@@ -143,4 +143,20 @@ export class TabpanelComponent implements OnInit, OnDestroy {
   private clone<T>(o: T): T {
     return JSON.parse(JSON.stringify(o));
   }
+
+  try2RemoveTab(i: number, evt: MouseEvent) {
+    if (evt.shiftKey) {
+      evt.preventDefault();
+
+      if (this.tabsPanelData) {
+        if (this.tabsPanelData.tabs.length > 1) {
+          this.tabsPanelData.tabs.splice(i, 1);
+          if (this.tabsPanelData.selectedTabIndex > 0) {
+            this.tabsPanelData.selectedTabIndex--;
+          }
+          this.dataChanged.next(this.tabsPanelData);
+        }
+      }
+    }
+  }
 }
