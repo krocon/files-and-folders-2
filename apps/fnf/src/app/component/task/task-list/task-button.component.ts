@@ -41,7 +41,7 @@ export class TaskButtonComponent implements OnInit, OnDestroy {
   @Output() onClick = new EventEmitter<number>();
 
   queueProgress: QueueProgress;
-  status: StatusIconType = 'busy';
+  status: StatusIconType = 'idle';
 
   private alive = true;
 
@@ -76,6 +76,9 @@ export class TaskButtonComponent implements OnInit, OnDestroy {
 
   private updateUi() {
     this.queueProgress = this.actionQueueService.getQueueProgress(0);
+    this.status = this.queueProgress.finished ? 'idle':
+      this.queueProgress.errors ? 'error' : 'busy';
+
     this.cdr.detectChanges();
 
     console.info('--------------');
