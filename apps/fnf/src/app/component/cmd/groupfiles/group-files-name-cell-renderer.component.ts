@@ -6,7 +6,7 @@ import {MatTooltip} from "@angular/material/tooltip";
 import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
 
 @Component({
-  selector: 'multi-rename-name-cell-renderer',
+  selector: 'multi-group-files-name-cell-renderer',
   template: `
     <i [attr.class]="iconClass"></i>
     <div

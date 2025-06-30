@@ -654,6 +654,10 @@ export class AppService {
     this.selectionDialogService.open(data, cb);
   }
 
+  getSelectedData(panelIndex: PanelIndex): FileItemIf[] {
+    return  this.selectionManagers[panelIndex]?.getSelectedRows() ?? [];
+  }
+
   getSelectedOrFocussedData(panelIndex: PanelIndex): FileItemIf[] {
     let ret = this.selectionManagers[panelIndex]?.getSelectedRows() ?? [];
     if (!ret?.length && this.bodyAreaModels[panelIndex]) {
@@ -692,6 +696,7 @@ export class AppService {
       data = new FindDialogData('', '**/*.ts', true, false);
       data.folders = this.getRelevantDirsFromActiveTab();
     }
+    // console.info(JSON.stringify( data, null,4));
     this.findDialogService
       .open(data, (result: FindDialogData | undefined) => {
         if (result) {
@@ -889,6 +894,9 @@ export class AppService {
     return tabsPanelData.tabs[tabsPanelData.selectedTabIndex];
   }
 
+  private getSelectedDataForActivePanel(): FileItemIf[] {
+    return this.getSelectedData(this.getActivePanelIndex());
+  }
   private getSelectedOrFocussedDataForActivePanel(): FileItemIf[] {
     return this.getSelectedOrFocussedData(this.getActivePanelIndex());
   }
@@ -903,7 +911,10 @@ export class AppService {
   }
 
   private getRelevantDirsFromActiveTab(): string[] {
-    const fileItems = this.getSelectedOrFocussedDataForActivePanel().filter(fi => fi.isDir);
+    let fileItems = this.getSelectedDataForActivePanel().filter(fi => fi.isDir);
+    if (fileItems.length===1 && fileItems[0].base===DOT_DOT) {
+      fileItems = [];
+    }
     if (fileItems.length) {
       return fileItems.map(fi => `${fi.dir}/${fi.base}`);
     }
