@@ -25,7 +25,6 @@ import {takeWhile} from "rxjs/operators";
     MatIconModule,
     MatButtonModule,
     MatDividerModule,
-
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -36,8 +35,10 @@ export class SelectFolderDropdownComponent implements OnInit, OnDestroy {
   folders: string[] = [];
 
   private alive = true;
+
   private favs: string[] = [];
   private latest: string[] = [];
+  private allHistories: string[] = [];
 
 
   constructor(
@@ -47,6 +48,16 @@ export class SelectFolderDropdownComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.appService
+      .getAllHistories$()
+      .pipe(
+        takeWhile(() => this.alive)
+      )
+      .subscribe(arr => {
+        this.allHistories = arr;
+        this.mergeDirs();
+      });
+
     this.appService
       .favs$()
       .pipe(
@@ -77,7 +88,7 @@ export class SelectFolderDropdownComponent implements OnInit, OnDestroy {
   }
 
   private mergeDirs() {
-    this.folders = [...new Set([...this.favs, ...this.latest])].sort();
+    this.folders = [...new Set([...this.favs, ...this.latest, ...this.allHistories])].sort();
     this.cdr.detectChanges();
   }
 

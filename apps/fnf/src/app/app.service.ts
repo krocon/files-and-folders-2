@@ -18,7 +18,7 @@ import {
   Sysinfo,
   SysinfoIf
 } from "@fnf-data";
-import {BehaviorSubject, firstValueFrom, Subject} from "rxjs";
+import {BehaviorSubject, firstValueFrom, Observable, Subject} from "rxjs";
 import {ActionEvent} from "./domain/cmd/action-event";
 import {PanelIndex} from "@fnf/fnf-data";
 import {FilePageData} from "./domain/filepagedata/data/file-page.data";
@@ -60,6 +60,7 @@ import {GroupFilesDialogData} from "./component/cmd/groupfiles/data/group-files-
 import {GroupFilesDialogService} from "./component/cmd/groupfiles/group-files-dialog.service";
 import {ChangeDirDialogService} from "./component/cmd/changedir/change-dir-dialog.service";
 import {ChangeDirDialogData} from "./component/cmd/changedir/data/change-dir-dialog.data";
+import {map} from "rxjs/operators";
 
 
 @Injectable({
@@ -131,8 +132,6 @@ export class AppService {
       .subscribe(o => {
         console.log('> o:', o);
         this.favs = (o.filter((his, i, arr) => arr.indexOf(his) === i));
-        // console.log('> favs:', this.favs);
-        // this.cdr.detectChanges();
       });
 
     this.latestDataService
@@ -147,11 +146,9 @@ export class AppService {
       .valueChanges()
       .subscribe(data => this.filePageData = data);
 
-    // Connect changeDirEventService to changeDirRequest$ observable
     this.changeDirEventService.valueChanges()
       .subscribe(event => this.changeDirRequest$.next(event));
 
-    // Handle directory change requests
     this.changeDirRequest$.subscribe(changeDirEvent => {
       if (changeDirEvent) {
         this.setPathToActiveTabInGivenPanel(changeDirEvent.path, changeDirEvent.panelIndex);
@@ -165,6 +162,66 @@ export class AppService {
 
   latest$() {
     return this.latestDataService.valueChanges()
+  }
+
+  /**
+   * Retrieves a unique list of history entries from all tabs across all panels.
+   *
+   * This method observes changes in the file page data and processes the history
+   * entries from all tabs in both panels. It eliminates duplicate entries to
+   * provide a consolidated history list.
+   *
+   * The method works by:
+   * 1. Subscribing to file page data changes
+   * 2. Extracting history entries from each tab in each panel
+   * 3. Removing duplicate entries from the combined history
+   *
+   * @returns An Observable that emits an array of unique history entries (paths)
+   *
+   * @example
+   * // Subscribe to history changes
+   * this.getAllHistories$().subscribe(histories => {
+   *   console.log('Current unique histories:', histories);
+   *   // Example output: ['/home/user', '/usr/local', '/etc']
+   * });
+   *
+   * // Using with async pipe in template
+   * @Component({
+   *   template: `
+   *     <ul>
+   *       <li *ngFor="let history of getAllHistories$() | async">
+   *         {{ history }}
+   *       </li>
+   *     </ul>
+   *   `
+   * })
+   *
+   * @usageNotes
+   * - The history entries are typically file system paths that have been visited
+   * - The method automatically handles updates when tabs are added, removed, or modified
+   * - Duplicate entries are automatically removed, keeping only the first occurrence
+   * - The returned Observable continues to emit new values whenever the file page data changes
+   */
+  getAllHistories$(): Observable<string[]> {
+    return this.filePageDataService.valueChanges()
+      .pipe(
+        map(filePageData => {
+          const ret: string[] = [];
+          filePageData.tabRows
+            .forEach(tabRow => {
+              tabRow.tabs
+                .forEach((tab) => {
+                  ret.push(tab.path);
+                  ret.push(...tab.history);
+                })
+            });
+          return ret.filter((his, i, arr) =>
+            his
+            && arr.indexOf(his) === i
+            && !his.startsWith('tabfind')
+          );
+        })
+      );
   }
 
   filePageDataChanges() {
@@ -655,7 +712,7 @@ export class AppService {
   }
 
   getSelectedData(panelIndex: PanelIndex): FileItemIf[] {
-    return  this.selectionManagers[panelIndex]?.getSelectedRows() ?? [];
+    return this.selectionManagers[panelIndex]?.getSelectedRows() ?? [];
   }
 
   getSelectedOrFocussedData(panelIndex: PanelIndex): FileItemIf[] {
@@ -897,6 +954,7 @@ export class AppService {
   private getSelectedDataForActivePanel(): FileItemIf[] {
     return this.getSelectedData(this.getActivePanelIndex());
   }
+
   private getSelectedOrFocussedDataForActivePanel(): FileItemIf[] {
     return this.getSelectedOrFocussedData(this.getActivePanelIndex());
   }
@@ -912,7 +970,7 @@ export class AppService {
 
   private getRelevantDirsFromActiveTab(): string[] {
     let fileItems = this.getSelectedDataForActivePanel().filter(fi => fi.isDir);
-    if (fileItems.length===1 && fileItems[0].base===DOT_DOT) {
+    if (fileItems.length === 1 && fileItems[0].base === DOT_DOT) {
       fileItems = [];
     }
     if (fileItems.length) {
