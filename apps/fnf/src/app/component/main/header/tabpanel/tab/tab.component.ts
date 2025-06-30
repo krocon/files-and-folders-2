@@ -6,13 +6,15 @@ import {CommonModule} from "@angular/common";
 import {path2FileItems} from "../../../../../common/fn/path-to-file-items";
 import {MatIcon} from "@angular/material/icon";
 import {MatTooltip} from "@angular/material/tooltip";
+import {LongPressDirective} from "../../../../../common/directive/long-press.directive";
 
 @Component({
   selector: 'app-tab',
   imports: [
     CommonModule,
     MatIcon,
-    MatTooltip
+    MatTooltip,
+    LongPressDirective
   ],
   templateUrl: './tab.component.html',
   styleUrl: './tab.component.css'
@@ -49,5 +51,10 @@ export class TabComponent {
       return fi.base.replace('tabfind', 'F');
     }
     return fi.base;
+  }
+
+  onLongPress(evt: MouseEvent | TouchEvent) {
+    // TODO longpress
+    console.info(' TODO onLongPress', evt);
   }
 }

@@ -7,7 +7,13 @@
 @if (fileItem && this.tabfind) {
   <div
       class="fnf-header-fg-color not-selectable"
-      [matTooltipShowDelay]="2000" [matTooltip]="'Search '+pattern"
+
+      appLongPress
+      [pressDuration]="1000"
+      (longPress)="onLongPress($event)"
+
+      [matTooltipShowDelay]="2000"
+      [matTooltip]="'Search '+pattern"
       [class.fnf-activepanel-header-fg-color]="activeAndSelected">
     <mat-icon>search</mat-icon>
   </div>
