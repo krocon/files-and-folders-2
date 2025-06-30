@@ -8,7 +8,7 @@ import {TypedDataService} from "../../../common/typed-data.service";
 })
 export class LatestDataService {
 
-  public static MAX_ITEM_COUNT = 6;
+  public static MAX_ITEM_COUNT = 10;
 
   private static readonly innerService =
     new TypedDataService<string[]>("latest", []);

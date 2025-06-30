@@ -130,7 +130,6 @@ export class AppService {
     this.favDataService
       .valueChanges()
       .subscribe(o => {
-        console.log('> o:', o);
         this.favs = (o.filter((his, i, arr) => arr.indexOf(his) === i));
       });
 
@@ -157,11 +156,11 @@ export class AppService {
   }
 
   favs$() {
-    return this.favDataService.valueChanges()
+    return this.favDataService.valueChanges();
   }
 
   latest$() {
-    return this.latestDataService.valueChanges()
+    return this.latestDataService.valueChanges();
   }
 
   /**
