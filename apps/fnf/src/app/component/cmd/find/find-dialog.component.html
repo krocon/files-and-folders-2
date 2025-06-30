@@ -16,7 +16,9 @@
             formControlName="folder"
             matInput
             placeholder="Search in"/>
-        <!--fnf-fav-menu matSuffix></fnf-fav-menu-->
+        <fnf-select-folder-dropdown
+            (onSelected)="onFolderClicked($event)"
+            matSuffix></fnf-select-folder-dropdown>
       </mat-form-field>
 
       <mat-form-field>
@@ -29,8 +31,7 @@
             placeholder="Search for"/>
         <fnf-search-template-dropdown
             (onSelected)="onSearchTemplateSelected($event)"
-            matSuffix>arrow_drop_down
-        </fnf-search-template-dropdown>
+            matSuffix></fnf-search-template-dropdown>
       </mat-form-field>
 
       <mat-checkbox formControlName="directoriesOnly">
@@ -50,7 +51,11 @@
 <mat-dialog-actions>
 
   <div class="glob-pattern-info">
-    See: <a href="https://code.visualstudio.com/docs/editor/glob-patterns" target="_blank">Glob Patterns</a>
+    See:
+    <a
+        href="https://code.visualstudio.com/docs/editor/glob-patterns"
+        target="_blank">Glob Patterns
+    </a>
   </div>
 
   <button

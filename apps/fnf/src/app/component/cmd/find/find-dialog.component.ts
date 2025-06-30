@@ -14,7 +14,8 @@ import {FnfAutofocusDirective} from "../../../common/fnf-autofocus.directive";
 import {FindDialogData} from "@fnf/fnf-data";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatCheckbox} from "@angular/material/checkbox";
-import {SearchTemplateDropdownComponent} from "../../common/search-template-dropdown.component";
+import {SearchTemplateDropdownComponent} from "../../common/searchtemplatedropdown/search-template-dropdown.component";
+import {SelectFolderDropdownComponent} from "../../common/selectfolderdropdown/select-folder-dropdown.component";
 
 @Component({
   selector: "fnf-openFindDialog-dialog",
@@ -32,6 +33,7 @@ import {SearchTemplateDropdownComponent} from "../../common/search-template-drop
     FnfAutofocusDirective,
     MatCheckbox,
     SearchTemplateDropdownComponent,
+    SelectFolderDropdownComponent,
   ],
   styleUrls: ["./find-dialog.component.css"]
 })
@@ -90,5 +92,9 @@ export class FindDialogComponent implements OnInit {
       + '}';
 
     this.formGroup?.get('pattern')?.setValue(p, {emitEvent: true});
+  }
+
+  onFolderClicked(evt: string) {
+    this.formGroup?.get('folder')?.setValue(evt, {emitEvent: true});
   }
 }

@@ -1,0 +1,19 @@
+<button
+    [matMenuTriggerFor]="menuFileTypes"
+    mat-icon-button>
+  <mat-icon class="fnf-header-fg-color">expand_more</mat-icon>
+</button>
+
+<mat-menu
+    #menuFileTypes="matMenu"
+    class="fnf-select-folder-menu">
+
+  @for (ft of folders; track ft) {
+    <button
+        (click)="onItemClicked(ft)"
+        mat-menu-item>
+      <span [innerText]="ft"></span>
+    </button>
+  }
+
+</mat-menu>
