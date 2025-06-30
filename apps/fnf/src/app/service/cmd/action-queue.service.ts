@@ -40,13 +40,12 @@ export class ActionQueueService {
   readonly ACTION_RENAME: ActionEventType = 'rename';
 
   // Events
-  readonly REFRESH_JOB_QUEUE_TABLE: ActionEventType = 'refresh_job_queue_table';
+  public static readonly REFRESH_JOB_QUEUE_TABLE: ActionEventType = 'refresh_job_queue_table';
 
   private queues: Queue[] = [];
   private jobId = 0;
   private refreshQueueTableTimer: any;
 
-  //private eventService = new TypedEventService<any>();
 
   constructor(
     private readonly fileActionService: FileActionService,
@@ -277,7 +276,7 @@ export class ActionQueueService {
       clearTimeout(this.refreshQueueTableTimer);
     }
     this.refreshQueueTableTimer = setTimeout(() => {
-      this.eventService.next(new NotifyEvent(this.REFRESH_JOB_QUEUE_TABLE, []));
+      this.eventService.next(new NotifyEvent(ActionQueueService.REFRESH_JOB_QUEUE_TABLE, []));
     }, 1111);
   }
 

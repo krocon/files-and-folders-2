@@ -15,6 +15,7 @@ import {MatList} from "@angular/material/list";
 import {NotifyService} from "../../../../service/cmd/notify-service";
 import {NotifyEventIf} from "../../../../domain/cmd/notify-event.if";
 import {ActionQueueService} from "../../../../service/cmd/action-queue.service";
+import {TaskButtonComponent} from "../../../task/task-list/task-button.component";
 
 @Component({
   selector: 'app-button-panel',
@@ -29,6 +30,7 @@ import {ActionQueueService} from "../../../../service/cmd/action-queue.service";
     MatMenuItem,
     MatDivider,
     MatList,
+    TaskButtonComponent,
   ],
   templateUrl: './buttonpanel.component.html',
   styleUrls: ['./buttonpanel.component.css']
