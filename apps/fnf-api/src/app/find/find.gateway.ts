@@ -31,6 +31,7 @@ export class FindGateway {
       const dirs: string[] = findDialogData.folders ? findDialogData.folders : [findDialogData.folder];
       const allItems: FileItem[] = [];
       let first = true;
+
       while (dirs.length) {
         if (cancellings[findData.emmitCancelKey]) {
           return;

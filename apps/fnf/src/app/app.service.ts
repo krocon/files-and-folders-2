@@ -130,9 +130,9 @@ export class AppService {
       .valueChanges()
       .subscribe(o => {
         console.log('> o:', o);
-         this.favs = (o.filter((his, i, arr) => arr.indexOf(his) === i));
-         // console.log('> favs:', this.favs);
-         // this.cdr.detectChanges();
+        this.favs = (o.filter((his, i, arr) => arr.indexOf(his) === i));
+        // console.log('> favs:', this.favs);
+        // this.cdr.detectChanges();
       });
 
     this.latestDataService
@@ -159,10 +159,11 @@ export class AppService {
     });
   }
 
-  favs$(){
+  favs$() {
     return this.favDataService.valueChanges()
   }
-  latest$(){
+
+  latest$() {
     return this.latestDataService.valueChanges()
   }
 
@@ -316,7 +317,7 @@ export class AppService {
     } else if (id === 'TOGGLE_FILTER') {
       const value = this.filePageDataService.getValue();
       const tabsPanelData = value.tabRows[this.panelSelectionService.getValue()];
-      let tab = tabsPanelData.tabs[tabsPanelData.selectedTabIndex];
+      const tab = tabsPanelData.tabs[tabsPanelData.selectedTabIndex];
       tab.filterActive = !tab.filterActive;
       this.filePageDataService.update(value);
 
@@ -361,7 +362,7 @@ export class AppService {
       this.openChangeDirDialog();
 
     } else if (id === "OPEN_FIND_DLG") {
-      this.openFindDialog();
+      this.openFindDialog(null);
 
     } else if (id === "OPEN_MKDIR_DLG") {
       this.mkdir();
@@ -424,7 +425,7 @@ export class AppService {
 
   copy() {
     const selectedData: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
-    let sources: string[] = this.getSourcePaths(selectedData);
+    const sources: string[] = this.getSourcePaths(selectedData);
     this.copyOrMoveDialogService
       .open(
         new CopyOrMoveDialogData(sources, this.getOtherPanelSelectedTabData().path, "copy"),
@@ -684,15 +685,21 @@ export class AppService {
   }
 
   public openFindDialog(
-    data: FindDialogData = new FindDialogData(this.getActiveTabOnActivePanel().path, '**/*.ts', true, false)
+    data: FindDialogData | null
   ) {
     const srcPanelIndex = this.getActivePanelIndex();
-    const tabData = this.getActiveTabOnActivePanel();
-
+    if (!data) {
+      data = new FindDialogData('', '**/*.ts', true, false);
+      data.folders = this.getRelevantDirsFromActiveTab();
+    }
     this.findDialogService
       .open(data, (result: FindDialogData | undefined) => {
         if (result) {
-          let findData: FindData = this.findSocketService.createFindData(result);
+          if (result.folder) {
+            result.folders = result.folder.split(',');
+            result.folder = '';
+          }
+          const findData: FindData = this.findSocketService.createFindData(result);
 
           if (findData.findDialogData.newtab) {
             const tabDataFindings = new TabData(findData.dirTabKey);
@@ -719,11 +726,11 @@ export class AppService {
           this.getActivePanelIndex()
         ),
         (result: ChangeDirEvent | undefined) => {
-        if (result) {
-          console.info(result); // TODO
-          this.changeDir(result)
-        }
-      });
+          if (result) {
+            console.info(result); // TODO
+            this.changeDir(result)
+          }
+        });
   }
 
   cancelFind(findData: FindData) {
@@ -744,6 +751,13 @@ export class AppService {
   // private updateFocusRowCritereaOnInactivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
   //   this.updateFocusRowCriterea(this.getInactivePanelIndex(), focusRowCriterea);
   // }
+
+  updateFocusRowCriterea(panelIndex: PanelIndex, focusRowCriterea: Partial<FileItemIf> | null) {
+    const filePageDataValue = this.clone(this.filePageDataService.getValue());
+    const panelData = filePageDataValue.tabRows[panelIndex];
+    panelData.tabs[panelData.selectedTabIndex].focusRowCriterea = focusRowCriterea;
+    this.updateFilePageData(filePageDataValue);
+  }
 
   private removeTab() {
     const value = this.filePageDataService.getValue();
@@ -800,7 +814,6 @@ export class AppService {
     }
   }
 
-
   private groupFiles() {
     const srcPanelIndex = this.getActivePanelIndex();
     const targetPanelIndex = this.getInActivePanelIndex();
@@ -808,7 +821,7 @@ export class AppService {
     const targetTabData = this.getOtherPanelSelectedTabData();
     const rows = this.getSelectedOrFocussedData(srcPanelIndex)
       .filter(item => item.base !== DOT_DOT);
-      // .filter(item => !item.isDir);
+    // .filter(item => !item.isDir);
 
     if (rows?.length) {
       const data = new GroupFilesDialogData(
@@ -828,16 +841,8 @@ export class AppService {
     }
   }
 
-
   private updateFocusRowCritereaOnActivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
     this.updateFocusRowCriterea(this.getActivePanelIndex(), focusRowCriterea);
-  }
-
-  updateFocusRowCriterea(panelIndex: PanelIndex, focusRowCriterea: Partial<FileItemIf> | null) {
-    const filePageDataValue = this.clone(this.filePageDataService.getValue());
-    const panelData = filePageDataValue.tabRows[panelIndex];
-    panelData.tabs[panelData.selectedTabIndex].focusRowCriterea = focusRowCriterea;
-    this.updateFilePageData(filePageDataValue);
   }
 
   private createFileOperationParams(target: FileItemIf): FileOperationParams[] {
@@ -895,5 +900,13 @@ export class AppService {
       return frd ?? null;
     }
     return null;
+  }
+
+  private getRelevantDirsFromActiveTab(): string[] {
+    const fileItems = this.getSelectedOrFocussedDataForActivePanel().filter(fi => fi.isDir);
+    if (fileItems.length) {
+      return fileItems.map(fi => `${fi.dir}/${fi.base}`);
+    }
+    return [this.getActiveTabOnActivePanel().path];
   }
 }

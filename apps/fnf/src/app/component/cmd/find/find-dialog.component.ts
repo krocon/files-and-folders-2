@@ -42,10 +42,11 @@ export class FindDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: FindDialogData,
     private readonly formBuilder: FormBuilder,
   ) {
+    const folder = data.folder?data.folder:data.folders?.join(',');
     this.formGroup = this.formBuilder.group(
       {
         folder: new FormControl(
-          data.folder,
+          folder,
           {
             validators: [
               Validators.required,
