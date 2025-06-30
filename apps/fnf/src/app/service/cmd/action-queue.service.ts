@@ -99,6 +99,7 @@ export class ActionQueueService {
     action.id = ++this.jobId;
     queue.actions.push(action);
     queue.jobId = this.jobId;
+    this.triggerJobQueueTableUpdate();
     this.triggerProgress();
   }
 
@@ -117,6 +118,7 @@ export class ActionQueueService {
       action.id = this.jobId;
       queue.actions.push(action);
     }
+    this.triggerJobQueueTableUpdate();
     this.triggerProgress();
   }
 

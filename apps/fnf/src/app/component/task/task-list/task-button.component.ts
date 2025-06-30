@@ -1,33 +1,39 @@
-import {Component, EventEmitter, OnDestroy, OnInit, Output} from "@angular/core";
+import {ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output} from "@angular/core";
 import {CommonModule} from "@angular/common";
 
 import {MatButton} from "@angular/material/button";
-import {MatIcon} from "@angular/material/icon";
-import {AppService} from "../../../app.service";
 import {ActionQueueService} from "../../../service/cmd/action-queue.service";
 import {takeWhile} from "rxjs/operators";
 import {QueueProgress} from "../../../domain/cmd/queue.progress";
 import {MatTooltip} from "@angular/material/tooltip";
+import {BusyBeeComponent, StatusIconType} from "../../common/busy-bee.component";
+import {MatIcon} from "@angular/material/icon";
 
 
 @Component({
   selector: "fnf-task-button",
   template: `
 
+
     <button
         (click)="onClicked()"
         class="panel-button row-reverse"
         [matTooltip]="queueProgress.getInfoText()"
         mat-stroked-button>
+      
       Tasks
-      <mat-icon>menu</mat-icon>
+      <mat-icon>
+        <app-busy-bee [status]="status"></app-busy-bee>
+      </mat-icon>
+        
     </button>
   `,
   imports: [
     CommonModule,
     MatButton,
-    MatIcon,
     MatTooltip,
+    BusyBeeComponent,
+    MatIcon,
   ]
 })
 export class TaskButtonComponent implements OnInit, OnDestroy {
@@ -35,12 +41,13 @@ export class TaskButtonComponent implements OnInit, OnDestroy {
   @Output() onClick = new EventEmitter<number>();
 
   queueProgress: QueueProgress;
+  status: StatusIconType = 'busy';
 
   private alive = true;
 
   constructor(
-    private readonly appService: AppService,
     private readonly actionQueueService: ActionQueueService,
+    private readonly cdr: ChangeDetectorRef,
   ) {
     this.queueProgress = actionQueueService.getQueueProgress(0);
   }
@@ -69,6 +76,9 @@ export class TaskButtonComponent implements OnInit, OnDestroy {
 
   private updateUi() {
     this.queueProgress = this.actionQueueService.getQueueProgress(0);
+    this.cdr.detectChanges();
+
+    console.info('--------------');
     console.info(this.queueProgress.getInfoText());
     console.info(JSON.stringify(this.queueProgress, null, 4));
   }
