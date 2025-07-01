@@ -29,6 +29,7 @@ export type IconType =
   'zip' |
   'packed' |
 
+  'xml' |
   'markdown' |
   'document' |
   'pdf' |

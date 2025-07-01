@@ -111,6 +111,9 @@ import {IconType} from "./icon.type";
     } @else if (icon==='log') {
       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M240-80q-50 0-85-35t-35-85v-120h120v-560h600v680q0 50-35 85t-85 35H240Zm480-80q17 0 28.5-11.5T760-200v-600H320v480h360v120q0 17 11.5 28.5T720-160ZM360-600v-80h360v80H360Zm0 120v-80h360v80H360ZM240-160h360v-80H200v40q0 17 11.5 28.5T240-160Zm0 0h-40 400-360Z"/></svg>
       
+    } @else if (icon==='xml') {
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M320-240 80-480l240-240 57 57-184 184 183 183-56 56Zm320 0-57-57 184-184-183-183 56-56 240 240-240 240Z"/></svg>
+      
     } @else if (icon==='other') {
       <!--svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg-->
       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M200-200q-33 0-56.5-23.5T120-280v-400q0-33 23.5-56.5T200-760h560q33 0 56.5 23.5T840-680v400q0 33-23.5 56.5T760-200H200Zm0-80h560v-400H200v400Zm0 0v-400 400Z"/></svg>
@@ -262,11 +265,12 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
     if (ext.match(/\.js$/)) return "js";
     if (ext.match(/\.html$/)) return "html";
     if (ext.match(/\.json$/)) return "json";
-    if (ext.match(/\.xml$|\.java$|\.k$/)) return "code";
+    if (ext.match(/\.java$|\.k$/)) return "code";
 
     if (ext.match(/\.zip$/)) return "zip";
     if (ext.match(/\.rarp$|\.7z$/)) return "packed";
 
+    if (ext.match(/\.xml$/)) return "xml";
     if (ext.match(/\.md$|\.yaml$/)) return "markdown";
     if (ext.match(/\.bak$|\.backup$/)) return "backup";
 
