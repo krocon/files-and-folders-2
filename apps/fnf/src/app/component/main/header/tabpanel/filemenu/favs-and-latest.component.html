@@ -19,6 +19,22 @@
     </button>
   }
 
+  @if (!hasDockerRoot()) {
+    @if (volumes.length) {
+      <mat-list-item>
+        <div class="fnf-menu-label">Volumes:</div>
+      </mat-list-item>
+    }
+    @for (drv of volumes; track drv) {
+      <button
+          (click)="onItemClicked(drv)"
+          mat-menu-item>
+        <mat-icon>save</mat-icon>
+        <span [innerText]="drv | deleteDockerRoot"></span>
+      </button>
+    }
+  }
+
   @if (winDrives.length) {
     <mat-list-item>
       <div class="fnf-menu-label">Windows Drives:</div>

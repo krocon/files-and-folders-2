@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit} from "@angular/core";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {ChangeDirDialogData} from "./data/change-dir-dialog.data";
 import {
@@ -51,12 +51,13 @@ import {MatSlider, MatSliderThumb} from "@angular/material/slider";
     MatSlider,
     MatSliderThumb,
   ],
-  styleUrls: ["./change-dir-dialog.component.css"]
+  styleUrls: ["./change-dir-dialog.component.css"],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
   filterText = '';
-  deep:number=10;
+  deep: number = 10;
 
   tableModel?: TableModelIf;
   rows: { path: string, label: string }[] = [];
@@ -117,15 +118,13 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
       columnDefs,
       tableOptions: this.tableOptions,
     });
-
-
   }
 
   ngOnDestroy(): void {
     this.alive = false;
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.alive = true;
     const para = new FindFolderPara([this.changeDirDialogData.sourceDir], '', 10);
     this.gotoAnythingDialogService
@@ -181,12 +180,15 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
   applyFilter() {
     const fr = filterAsciiTree(
-      this.rows.filter(r=> r.path.split('/').length <= this.deep),
+      this.rows.filter(r => r.path.split('/').length <= this.deep),
       this.filterPredicate.bind(this)
     );
-    this.filteredRows = createAsciiTree(
-      fr.map(s => s.path)
-    );
+    this.filteredRows = [
+      //...this.volumes.map(v => ({ path: v, label: v })),
+      ...createAsciiTree(
+        fr.map(s => s.path)
+      )
+    ];
     this.tableApi?.setRows(this.filteredRows);
     this.tableApi?.repaintHard();
   }

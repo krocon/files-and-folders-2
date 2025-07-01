@@ -1,4 +1,14 @@
-import {Component, effect, Inject, inject, Injector, OnInit, runInInjectionContext, signal,} from "@angular/core";
+import {
+  Component,
+  effect,
+  Inject,
+  inject,
+  Injector,
+  OnDestroy,
+  OnInit,
+  runInInjectionContext,
+  signal,
+} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {GotoAnythingDialogData} from "./goto-anything-dialog.data";
 import {
@@ -22,6 +32,8 @@ import {UpperCasePipe} from "@angular/common";
 import {GotoAnythingOptionData} from "./goto-anything-option.data";
 import {HttpClient} from "@angular/common/http";
 import {GotoAnythingDialogService} from "./goto-anything-dialog.service";
+import {takeWhile} from "rxjs/operators";
+import {AppService} from "../../../app.service";
 
 
 @Component({
@@ -45,23 +57,28 @@ import {GotoAnythingDialogService} from "./goto-anything-dialog.service";
   ],
   styleUrls: ["./goto-anything-dialog.component.css"]
 })
-export class GotoAnythingDialogComponent implements OnInit {
+export class GotoAnythingDialogComponent implements OnInit, OnDestroy {
 
   formGroup: FormGroup;
   error = "";
   errorMesasage = "";
   target = "";
 
+  public alive = true;
+
   filteredOptions = signal<GotoAnythingOptionData[]>([]);
   searchTerm = signal<string>('');
+  volumes: string[] = [];
 
   private readonly openTabDirsOptions: GotoAnythingOptionData[] = [];
   private localResults = signal<GotoAnythingOptionData[]>([]);
   private remoteResults = signal<GotoAnythingOptionData[]>([]);
   private commandsResults = signal<GotoAnythingOptionData[]>([]);
-
+  private volumesResults = signal<GotoAnythingOptionData[]>([]);
   private injector = inject(Injector);
   private result: GotoAnythingOptionData = new GotoAnythingOptionData('cd', '');
+
+
 
   constructor(
     public dialogRef: MatDialogRef<GotoAnythingDialogComponent>,
@@ -69,6 +86,7 @@ export class GotoAnythingDialogComponent implements OnInit {
     private readonly formBuilder: FormBuilder,
     private readonly httpClient: HttpClient,
     private readonly gotoAnythingDialogService: GotoAnythingDialogService,
+    private readonly appService: AppService,
   ) {
     this.openTabDirsOptions.push(...data.dirs.map(s => new GotoAnythingOptionData('cd', s)))
     this.formGroup = this.formBuilder.group(
@@ -77,6 +95,7 @@ export class GotoAnythingDialogComponent implements OnInit {
       }
     );
   }
+
 
   get hasError(): boolean {
     return false;
@@ -95,6 +114,10 @@ export class GotoAnythingDialogComponent implements OnInit {
   }
 
 
+  ngOnDestroy(): void {
+    this.alive = false;
+  }
+
   ngOnInit(): void {
     runInInjectionContext(this.injector, () => {
       // Set up effect to combine results whenever either source changes
@@ -102,12 +125,23 @@ export class GotoAnythingDialogComponent implements OnInit {
         this.filteredOptions.set([
           ...this.commandsResults(),
           ...this.localResults(),
-          ...this.remoteResults()
+          ...this.remoteResults(),
+          ...this.volumesResults()
         ]);
       });
     });
     // Initialize with empty search
     this.updateSearchTerm(this.data.firstInput);
+
+    this.appService
+      .getVolumes$()
+      .pipe(
+        takeWhile(() => this.alive),
+      )
+      .subscribe(volumes => {
+        this.volumes = volumes;
+        this.volumesResults.set(volumes.map(v => new GotoAnythingOptionData('cd', v)));
+      });
   }
 
   onOptionSelected(evt: MatAutocompleteSelectedEvent) {
