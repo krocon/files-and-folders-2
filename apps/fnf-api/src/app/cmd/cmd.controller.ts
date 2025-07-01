@@ -18,7 +18,9 @@ export class ConfigController {
     const execPromise = promisify(exec);
 
     for (const cmd of cmds) {
-      const c = (cmd.cmd + ' ' + cmd.para)
+      let para = cmd.para;
+      if (para.includes(' ')) para = `"${para}"`;
+      const c = (cmd.cmd + ' ' + para)
         .replace(/\$__dirname/g, __dirname)
         .replace(/\$clidir/g, clidir);
 
