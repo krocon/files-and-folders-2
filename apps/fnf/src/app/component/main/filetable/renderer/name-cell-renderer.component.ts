@@ -120,6 +120,15 @@ import {IconType} from "./icon.type";
     } @else if (icon==='terminal') {
       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-400H160v400Zm140-40-56-56 103-104-104-104 57-56 160 160-160 160Zm180 0v-80h240v80H480Z"/></svg>
       
+    } @else if (icon==='build') {
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M686-132 444-376q-20 8-40.5 12t-43.5 4q-100 0-170-70t-70-170q0-36 10-68.5t28-61.5l146 146 72-72-146-146q29-18 61.5-28t68.5-10q100 0 170 70t70 170q0 23-4 43.5T584-516l244 242q12 12 12 29t-12 29l-84 84q-12 12-29 12t-29-12Zm29-85 27-27-256-256q18-20 26-46.5t8-53.5q0-60-38.5-104.5T386-758l74 74q12 12 12 28t-12 28L332-500q-12 12-28 12t-28-12l-74-74q9 57 53.5 95.5T360-440q26 0 52-8t47-25l256 256ZM472-488Z"/></svg>
+      
+    } @else if (icon==='font') {
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M680-360q-17 0-28.5-11.5T640-400v-160q0-17 11.5-28.5T680-600h120q17 0 28.5 11.5T840-560v40h-60v-20h-80v120h80v-20h60v40q0 17-11.5 28.5T800-360H680Zm-300 0v-240h160q17 0 28.5 11.5T580-560v40q0 17-11.5 28.5T540-480q17 0 28.5 11.5T580-440v40q0 17-11.5 28.5T540-360H380Zm60-150h80v-30h-80v30Zm0 90h80v-30h-80v30Zm-320 60v-200q0-17 11.5-28.5T160-600h120q17 0 28.5 11.5T320-560v200h-60v-60h-80v60h-60Zm60-120h80v-60h-80v60Z"/></svg>
+      
+    } @else if (icon==='svg') {
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M600-80v-100L320-320H120v-240h172l108-124v-196h240v240H468L360-516v126l240 120v-50h240v240H600ZM480-720h80v-80h-80v80ZM200-400h80v-80h-80v80Zm480 240h80v-80h-80v80ZM520-760ZM240-440Zm480 240Z"/></svg>
+      
     } @else if (icon==='other') {
       <!--svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg-->
       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M200-200q-33 0-56.5-23.5T120-280v-400q0-33 23.5-56.5T200-760h560q33 0 56.5 23.5T840-680v400q0 33-23.5 56.5T760-200H200Zm0-80h560v-400H200v400Zm0 0v-400 400Z"/></svg>
@@ -235,14 +244,17 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
     if (fileItem.meta.error && fileItem.meta.error['code'] === "EPERM") return "hidden";
 
     const base = fileItem.base;
+    const ext = fileItem?.ext?.toLowerCase() ??'';
+
     if (base==='.DS_Store') return "ios";
     if (base.startsWith('.zshrc')) return "terminal";
     if (base.startsWith('.')) return "hidden";
+    if (base.startsWith('package') && ext==='.json') return "build";
 
     // No extension:
-    if (!fileItem.ext) return "question";
+    if (!ext) return "question";
 
-    const ext = fileItem.ext.toLowerCase();
+
     if (ext.match(/\.avi$|\.mkv$|\.wmv$|\.mp4$|\.mov$|\.ram$/)) return "video";
     if (ext.match(/\.wav$|\.flac$|\.mp3$/)) return "audio";
     if (ext.match(/\.avc$/)) return "avc";
@@ -255,7 +267,8 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
     if (ext.match(/\.epub$|\.rtf$/)) return "book";
     if (ext.match(/\.cbr$|\.cbz$|\.cb7$/)) return "comic";
 
-    if (ext.match(/\.bmp$|\.jpg$/)) return "image";
+    if (ext.match(/\.bmp$|\.jpg$|\.ico$|\.jpeg$/)) return "image";
+    if (ext.match(/\.svg$/)) return "svg";
     if (ext.match(/\.gif$/)) return "gif";
     if (ext.match(/\.png$/)) return "png";
 
@@ -269,7 +282,7 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
 
     if (ext.match(/\.log/)) return "log";
     if (ext.match(/\.php$/)) return "php";
-    if (ext.match(/\.js$/)) return "js";
+    if (ext.match(/\.js$|\.ts$/)) return "js";
     if (ext.match(/\.html$/)) return "html";
     if (ext.match(/\.css$|\.less$|\.sass$|\.scss$/)) return "css";
     if (ext.match(/\.json$/)) return "json";
@@ -282,7 +295,8 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
     if (ext.match(/\.md$|\.yaml$/)) return "markdown";
     if (ext.match(/\.bak$|\.backup$/)) return "backup";
 
-    if (ext.match(/\.app$|.exe$|\.bat$|\.cmd$|\.sh$/)) return "executable";
+    if (ext.match(/\.app$|.exe$|\.bat$|\.cmd$|\.sh$|\.msi$/)) return "executable";
+    if (ext.match(/\.woff2$|.eot$|\.ttf$|\.woff$/)) return "font";
 
 
 

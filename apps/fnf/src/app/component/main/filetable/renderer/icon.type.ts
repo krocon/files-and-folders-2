@@ -13,6 +13,7 @@ export type IconType =
   'book' |
   'comic' |
 
+  'svg' |
   'png' |
   'gif' |
   'image' |
@@ -22,6 +23,8 @@ export type IconType =
   'other' |
   'hidden' |
   'question' |
+  'build' |
+  'font' |
 
 
   'executable' |
