@@ -3,49 +3,7 @@ import {ChangeDetectionStrategy, Component} from "@angular/core";
 import {AreaIdent, AreaModelIf, RendererCleanupFnType} from "@guiexpert/table";
 import {DOT_DOT, FileItemIf} from "@fnf/fnf-data";
 import {MatTooltip} from "@angular/material/tooltip";
-
-export type IconType = 
-  'audio'|
-  'video'|
-  'hevc'|
-  'avc'|
-
-  'csv'|
-  'txt'|
-  'odt'|
-  'table'|
-  'book'|
-  'comic'|
-
-  'png'|
-  'gif'|
-  'image'|
-
-  'folder'|
-  'file'|
-  'other'|
-  'hidden'|
-  'question'|
-
-
-  'executable'|
-  'backup'|
-  'zip'|
-  'packed'|
-
-  'markdown'|
-  'document'|
-  'pdf'|
-  'presentation'|
-  'signature'|
-
-  'php'|
-  'json'|
-  'code'|
-  'html'|
-  'js'
-
-;
+import {IconType} from "./icon.type";
 
 
 @Component({
@@ -146,6 +104,12 @@ export type IconType =
       
     } @else if (icon==='executable') {
       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M520-40v-240l-84-80-40 176-276-56 16-80 192 40 64-324-72 28v136h-80v-188l158-68q35-15 51.5-19.5T480-720q21 0 39 11t29 29l40 64q26 42 70.5 69T760-520v80q-66 0-123.5-27.5T540-540l-24 120 84 80v300h-80Zm20-700q-33 0-56.5-23.5T460-820q0-33 23.5-56.5T540-900q33 0 56.5 23.5T620-820q0 33-23.5 56.5T540-740Z"/></svg>
+      
+    } @else if (icon==='ios') {
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M160-600v-80h80v80h-80Zm0 320v-240h80v240h-80Zm280 0h-80q-33 0-56.5-23.5T280-360v-240q0-33 23.5-56.5T360-680h80q33 0 56.5 23.5T520-600v240q0 33-23.5 56.5T440-280Zm-80-80h80v-240h-80v240Zm200 80v-80h160v-80h-80q-33 0-56.5-23.5T560-520v-80q0-33 23.5-56.5T640-680h160v80H640v80h80q33 0 56.5 23.5T800-440v80q0 33-23.5 56.5T720-280H560Z"/></svg>
+      
+    } @else if (icon==='log') {
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M240-80q-50 0-85-35t-35-85v-120h120v-560h600v680q0 50-35 85t-85 35H240Zm480-80q17 0 28.5-11.5T760-200v-600H320v480h360v120q0 17 11.5 28.5T720-160ZM360-600v-80h360v80H360Zm0 120v-80h360v80H360ZM240-160h360v-80H200v40q0 17 11.5 28.5T240-160Zm0 0h-40 400-360Z"/></svg>
       
     } @else if (icon==='other') {
       <!--svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg-->
@@ -262,13 +226,13 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
     if (fileItem.meta.error && fileItem.meta.error['code'] === "EPERM") return "hidden";
 
     const base = fileItem.base;
-    if (base==='.DS_Store') return "hidden";
+    if (base==='.DS_Store') return "ios";
     if (base.startsWith('.')) return "hidden";
 
     // No extension:
     if (!fileItem.ext) return "question";
 
-    const ext = fileItem.ext;
+    const ext = fileItem.ext.toLowerCase();
     if (ext.match(/\.avi$|\.mkv$|\.wmv$|\.mp4$|\.mov$|\.ram$/)) return "video";
     if (ext.match(/\.wav$|\.flac$|\.mp3$/)) return "audio";
     if (ext.match(/\.avc$/)) return "avc";
@@ -293,6 +257,7 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
     if (ext.match(/\.ppt(x)?$/)) return "presentation";
 
 
+    if (ext.match(/\.log/)) return "log";
     if (ext.match(/\.php$/)) return "php";
     if (ext.match(/\.js$/)) return "js";
     if (ext.match(/\.html$/)) return "html";
