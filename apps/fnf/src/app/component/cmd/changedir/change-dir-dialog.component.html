@@ -16,6 +16,20 @@
             matInput
             placeholder="Filter"/>
       </mat-form-field>
+
+      <div class="slider-container">
+        <mat-label>Deep: {{deep}}</mat-label>
+        <mat-slider
+            [max]="10"
+            [min]="2"
+            [step]="1"
+            [discrete]="true"
+            [showTickMarks]="true">
+          <input
+              (valueChange)="applyFilter()"
+              matSliderThumb [(ngModel)]="deep">
+        </mat-slider>
+      </div>
     </div>
     <guiexpert-table
         (mouseClicked)="onMouseClicked($event)"

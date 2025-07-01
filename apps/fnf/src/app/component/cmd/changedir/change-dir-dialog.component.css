@@ -6,8 +6,18 @@
 
     .filter-container {
         display: grid;
-        grid-template-columns: 1fr auto;
+        grid-template-columns: 1fr 1fr auto;
+        grid-gap: 24px;
+
+        .slider-container {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            mat-label {
+                padding-left: 8px;
+            }
+        }
     }
+
 
     .table-div {
         height: 100%;

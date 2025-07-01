@@ -21,7 +21,6 @@ export class FindFolderService {
     '/System',
     '/private',
     '/dev',
-    '/Volumes',
     '/Network',
     '/cores',
     '/tmp',
