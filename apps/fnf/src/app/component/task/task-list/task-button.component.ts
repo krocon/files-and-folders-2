@@ -6,8 +6,9 @@ import {ActionQueueService} from "../../../service/cmd/action-queue.service";
 import {takeWhile} from "rxjs/operators";
 import {QueueProgress} from "../../../domain/cmd/queue.progress";
 import {MatTooltip} from "@angular/material/tooltip";
-import {BusyBeeComponent, StatusIconType} from "../../common/busy-bee.component";
+import {BusyBeeComponent} from "../../common/busy-bee.component";
 import {MatIcon} from "@angular/material/icon";
+import {StatusIconType} from "../../common/status-icon.type";
 
 
 @Component({
