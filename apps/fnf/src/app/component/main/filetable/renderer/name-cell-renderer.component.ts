@@ -114,6 +114,12 @@ import {IconType} from "./icon.type";
     } @else if (icon==='xml') {
       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M320-240 80-480l240-240 57 57-184 184 183 183-56 56Zm320 0-57-57 184-184-183-183 56-56 240 240-240 240Z"/></svg>
       
+    } @else if (icon==='css') {
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M420-360q-17 0-28.5-11.5T380-400v-40h60v20h80v-40H420q-17 0-28.5-11.5T380-500v-60q0-17 11.5-28.5T420-600h120q17 0 28.5 11.5T580-560v40h-60v-20h-80v40h100q17 0 28.5 11.5T580-460v60q0 17-11.5 28.5T540-360H420Zm260 0q-17 0-28.5-11.5T640-400v-40h60v20h80v-40H680q-17 0-28.5-11.5T640-500v-60q0-17 11.5-28.5T680-600h120q17 0 28.5 11.5T840-560v40h-60v-20h-80v40h100q17 0 28.5 11.5T840-460v60q0 17-11.5 28.5T800-360H680Zm-520 0q-17 0-28.5-11.5T120-400v-160q0-17 11.5-28.5T160-600h120q17 0 28.5 11.5T320-560v40h-60v-20h-80v120h80v-20h60v40q0 17-11.5 28.5T280-360H160Z"/></svg>
+      
+    } @else if (icon==='terminal') {
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-400H160v400Zm140-40-56-56 103-104-104-104 57-56 160 160-160 160Zm180 0v-80h240v80H480Z"/></svg>
+      
     } @else if (icon==='other') {
       <!--svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg-->
       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M200-200q-33 0-56.5-23.5T120-280v-400q0-33 23.5-56.5T200-760h560q33 0 56.5 23.5T840-680v400q0 33-23.5 56.5T760-200H200Zm0-80h560v-400H200v400Zm0 0v-400 400Z"/></svg>
@@ -230,6 +236,7 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
 
     const base = fileItem.base;
     if (base==='.DS_Store') return "ios";
+    if (base.startsWith('.zshrc')) return "terminal";
     if (base.startsWith('.')) return "hidden";
 
     // No extension:
@@ -264,6 +271,7 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
     if (ext.match(/\.php$/)) return "php";
     if (ext.match(/\.js$/)) return "js";
     if (ext.match(/\.html$/)) return "html";
+    if (ext.match(/\.css$|\.less$|\.sass$|\.scss$/)) return "css";
     if (ext.match(/\.json$/)) return "json";
     if (ext.match(/\.java$|\.k$/)) return "code";
 
@@ -275,6 +283,7 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
     if (ext.match(/\.bak$|\.backup$/)) return "backup";
 
     if (ext.match(/\.app$|.exe$|\.bat$|\.cmd$|\.sh$/)) return "executable";
+
 
 
     return "other";

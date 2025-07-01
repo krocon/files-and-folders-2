@@ -25,6 +25,7 @@ export type IconType =
 
 
   'executable' |
+  'terminal' |
   'backup' |
   'zip' |
   'packed' |
@@ -36,6 +37,7 @@ export type IconType =
   'presentation' |
   'signature' |
 
+  'css' |
   'log' |
   'php' |
   'json' |
