@@ -42,11 +42,12 @@ export class FileSystemService {
     private readonly socket: Socket,
     private readonly httpClient: HttpClient
   ) {
-    // this.watcherObservable = this.socket
-    //   .fromEvent<DirEventIf, string>("watchingxxx") // disabled xxx
-    //   .pipe(
-    //     map(o => [o]),
-    //   );
+    this.socket
+      .fromEvent<string[], string>("volumes") // disabled xxx
+      .subscribe(
+        v=>console.info('        > volumes: ', v.join(',  '))
+      );
+    this.socket.emit("getvolumes");
 
     this.doneObservable = this.socket
       .fromEvent<DirEventIf[], string>(keys.ON_MULTI_DO_DONE);
