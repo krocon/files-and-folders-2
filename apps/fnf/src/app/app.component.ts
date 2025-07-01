@@ -135,6 +135,13 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
         this.latest = latest;
         this.cdr.detectChanges();
       });
+
+    this.appService
+      .getVolumes$()
+      .subscribe(volumes => {
+        console.info('        > volumes: ', volumes.join(', '));
+        // TODO --> var
+      })
   }
 
   onSelectionChanged(selectionLabelData: SelectionEvent, panelIndex: PanelIndex) {

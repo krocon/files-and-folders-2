@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {Socket} from "ngx-socket-io";
-import {Observable, of, tap} from "rxjs";
+import {BehaviorSubject, Observable, of, tap} from "rxjs";
 import {
   ActionGatewayKeys as keys,
   DirEvent,
@@ -36,16 +36,18 @@ export class FileSystemService {
   // private watcherObservable: Observable<DirEventIf[]>;
   private doneObservable: Observable<DirEventIf[]>;
   private errorObservable: Observable<FilePara>;
+  private readonly volumeObservable: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
 
 
   constructor(
     private readonly socket: Socket,
     private readonly httpClient: HttpClient
   ) {
+
     this.socket
-      .fromEvent<string[], string>("volumes") // disabled xxx
+      .fromEvent<string[], string>("volumes")
       .subscribe(
-        v=>console.info('        > volumes: ', v.join(',  '))
+        arr=> this.volumeObservable.next(arr)
       );
     this.socket.emit("getvolumes");
 
@@ -62,6 +64,9 @@ export class FileSystemService {
     Object.assign(FileSystemService.config, config);
   }
 
+  public getVolumes$(): Observable<string[]> {
+    return this.volumeObservable;
+  }
 
   public fetchDir(para: DirPara): Observable<DirEventIf[]> {
     para.path = fixPath(para.path);

@@ -155,6 +155,10 @@ export class AppService {
     });
   }
 
+  public getVolumes$(): Observable<string[]> {
+    return this.fileSystemService.getVolumes$();
+  }
+
   favs$() {
     return this.favDataService.valueChanges();
   }
