@@ -28,9 +28,11 @@ export class WalkGateway {
   @SubscribeMessage("walkdir")
   walkdir(@MessageBody() walkParaData: WalkParaData): void {
 
+
     const fileItems: FileItemIf[] = walkParaData.files.map(f => {
       // Assume all initial entries are directories as per previous implementation
-      return new FileItem(f, '', '', '', 0, true);
+      const stats = fs.statSync(f);
+      return new FileItem(f, '', '', '', stats.size, stats.isDirectory());
     });
 
     (function (walkParaData: WalkParaData, cancellings: {}, server: Server) {
@@ -98,18 +100,21 @@ export class WalkGateway {
             // It's a file
             walkData.fileCount++;
             walkData.sizeSum = walkData.sizeSum + item.size;
-            if (step % stepsPerMessage === 0) {
-              emitWithDelay(walkParaData.emmitDataKey, walkData, processNextFile);
-              return;
-            }
           }
         } catch (e) {
           // ignore
         }
 
-        // Process next file
-        processNextFile();
+        if (step % stepsPerMessage === 0) {
+          emitWithDelay(walkParaData.emmitDataKey, walkData, processNextFile);
+        } else {
+          // Process next file
+          processNextFile();
+        }
+
+
       };
+
 
       // Start processing files
       processNextFile();

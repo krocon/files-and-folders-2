@@ -99,6 +99,7 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.alive = true;
+
     this.walkCancelKey = this.walkSocketService
       .walkDir(
         this.data.source,

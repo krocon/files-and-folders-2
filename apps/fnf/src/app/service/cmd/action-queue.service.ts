@@ -163,7 +163,13 @@ export class ActionQueueService {
                 });
 
                 // next action:
-                this.next(queue);
+                // TODO this.next(queue);
+
+                // just a test for ui
+                setTimeout(()=>{
+                  this.next(queue);
+                }, 1000*30);
+
                 this.triggerJobQueueTableUpdate();
               },
               error: (err) => {

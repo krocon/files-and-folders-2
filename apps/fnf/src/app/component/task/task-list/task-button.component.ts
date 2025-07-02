@@ -77,13 +77,16 @@ export class TaskButtonComponent implements OnInit, OnDestroy {
 
   private updateUi() {
     this.queueProgress = this.actionQueueService.getQueueProgress(0);
-    this.status = this.queueProgress.finished ? 'idle':
-      this.queueProgress.errors ? 'error' : 'busy';
 
+    let status:StatusIconType = 'idle';
+    if (this.queueProgress.unfinished) {
+      status = this.queueProgress.errors ? 'error' : 'busy';
+    }
+    this.status = status;
     this.cdr.detectChanges();
 
     console.info('--------------');
-    console.info(this.queueProgress.getInfoText());
-    console.info(JSON.stringify(this.queueProgress, null, 4));
+    console.info(this.queueProgress.getInfoText()); // "3 / 9"
+    console.info(JSON.stringify(this.queueProgress, null, 4)); // {"unfinished": 6, "finished": 3, "errors": 0, "class": "text-info"}
   }
 }
