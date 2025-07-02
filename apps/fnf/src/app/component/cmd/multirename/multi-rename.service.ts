@@ -81,6 +81,7 @@ export class MultiRenameService {
     const ext = source.base.split('.').pop() || '';
     const name = source.base.substr(0, source.base.lastIndexOf(ext) - 1) || source.base;
     const parent = this.getParentDir(source.dir);
+    const parentOfParent = this.getParentDir(parent);
 
     let processedName = this.applyCapitalization(name, data.capitalizeMode);
 
@@ -103,7 +104,8 @@ export class MultiRenameService {
     let base = pattern
       .replace(/\[N\]/g, processedName)
       .replace(/\[E\]/g, ext)
-      .replace(/\[P\]/g, parent);
+      .replace(/\[P\]/g, parent)
+      .replace(/\[Q\]/g, parentOfParent);
 
     // Process name ranges
     base = this.processNameRanges(base, name);
