@@ -165,10 +165,10 @@ export class ActionQueueService {
                 // next action:
                 // TODO this.next(queue);
 
-                // just a test for ui
+                // just a test for ui TODO !!!!!!!!!!
                 setTimeout(()=>{
                   this.next(queue);
-                }, 1000*30);
+                }, 1000*15);
 
                 this.triggerJobQueueTableUpdate();
               },
