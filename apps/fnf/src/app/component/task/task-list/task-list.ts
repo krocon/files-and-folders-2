@@ -9,12 +9,14 @@ import {BusyBeeComponent} from "../../common/busy-bee.component";
 import {Queue} from "../../../domain/cmd/queue";
 import {QueueStatus} from "../../../domain/cmd/queue-status";
 import {QueueActionEvent} from "../../../domain/cmd/queue-action-event";
+import {MatTooltip} from "@angular/material/tooltip";
 
 
 @Component({
   selector: 'app-task-list',
   imports: [
     BusyBeeComponent,
+    MatTooltip,
   ],
   templateUrl: './task-list.html',
   styleUrl: './task-list.css',

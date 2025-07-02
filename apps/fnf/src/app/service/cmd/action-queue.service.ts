@@ -137,6 +137,7 @@ export class ActionQueueService {
 
         if (action.action === this.ACTION_REFRESH_PANEL) {
           action.status = this.ACTION_STATUS_SUCCESS;
+
           this.eventService.next(
             new QueueNotifyEvent(
               this.ACTION_REFRESH_PANEL,

@@ -22,7 +22,7 @@
         <td>CMD:{{action.filePara.cmd.toLowerCase()}}</td>
         <td>{{getBeeStatus(action.status)}}</td>
         <td>
-          <app-busy-bee [status]="getBeeStatus(action.status)"></app-busy-bee>
+          <app-busy-bee [matTooltip]="action.status" [status]="getBeeStatus(action.status)"></app-busy-bee>
         </td>
         <td>{{getFileName(action)}}</td>
       </tr>
