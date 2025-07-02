@@ -1,34 +1,14 @@
-<mat-nav-list>
-  <a
-      (click)="openLink($event)"
-      href="https://keep.google.com/"
-      mat-list-item>
-    <span matListItemTitle>Placeholder Keep</span>
-    <span matLine>Add to a note</span>
-  </a>
-
-  <a
-      (click)="openLink($event)"
-      href="https://docs.google.com/"
-      mat-list-item>
-    <span matListItemTitle>Placeholder Docs</span>
-    <span matLine>Embed in a document</span>
-  </a>
-
-  <a
-      (click)="openLink($event)"
-      href="https://plus.google.com/"
-      mat-list-item>
-    <span matListItemTitle>Placeholder Plus</span>
-    <span matLine>Share with your friends</span>
-  </a>
-
-  <a
-      (click)="openLink($event)"
-      href="https://hangouts.google.com/"
-      mat-list-item>
-    <span matListItemTitle>Placeholder Hangouts</span>
-    <span matLine>Show to your coworkers</span>
-  </a>
-</mat-nav-list>
+<div class="task-list-div">
+  <div class="header">
+    Overall:
+    <app-busy-bee [status]="status"></app-busy-bee>
+    {{ queueProgress.getInfoText() }}
+  </div>
+  <div class="body">
+    TODO List
+  </div>
+  <div class="footer">
+    TODO button
+  </div>
+</div>
 

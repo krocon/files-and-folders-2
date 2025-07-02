@@ -31,6 +31,7 @@ export class ActionQueueService {
 
   // Action Event Keys
   readonly ACTION_REFRESH_PANEL: ActionEventType = 'refresh_panel';
+
   readonly ACTION_MKDIR: ActionEventType = 'mkdir';
   readonly ACTION_OPEN: ActionEventType = 'open';
   readonly ACTION_COPY: ActionEventType = 'copy';
@@ -41,6 +42,7 @@ export class ActionQueueService {
 
   // Events
   public static readonly REFRESH_JOB_QUEUE_TABLE: ActionEventType = 'refresh_job_queue_table';
+  public static readonly OPEN_JOB_QUEUE_TABLE: ActionEventType = 'open_job_queue_table';
 
   private queues: Queue[] = [];
   private jobId = 0;
@@ -168,7 +170,7 @@ export class ActionQueueService {
                 // just a test for ui TODO !!!!!!!!!!
                 setTimeout(()=>{
                   this.next(queue);
-                }, 1000*15);
+                }, 1000* 5);
 
                 this.triggerJobQueueTableUpdate();
               },
@@ -305,5 +307,9 @@ export class ActionQueueService {
 
   private executeAction(action: ActionEvent): Observable<OnDoResponseType> {
     return this.fileActionService.do(action.filePara);
+  }
+
+  openJobTable() {
+    this.eventService.next(new NotifyEvent(ActionQueueService.OPEN_JOB_QUEUE_TABLE, []));
   }
 }

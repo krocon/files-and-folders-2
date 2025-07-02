@@ -16,9 +16,10 @@
       } @else {
         Scanning...
       }
-      <b>{{ walkData.folderCount }}</b> (sub)folders,
+
       <b>{{ walkData.fileCount }}</b> files,
-      <b>{{ walkData.sizeSum | fnfFileSize }}</b>
+      <b>{{ walkData.sizeSum | fnfFileSize }}</b> and
+      <b>{{ walkData.folderCount }}</b> folders
     </div>
 
     @if (!deleteMode) {

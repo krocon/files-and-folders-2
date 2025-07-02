@@ -208,9 +208,13 @@ export class CommandService {
    * Adds actions to the queue
    * @param actions The actions to add
    * @param queueIndex The queue index
+   * @param openJobTable Opens the Task Manager (Job table UI)
    */
-  addActions(actions: ActionEvent[], queueIndex: number = 0): void {
+  addActions(actions: ActionEvent[], queueIndex: number = 0, openJobTable:boolean = true): void {
     this.actionQueueService.addActions(actions, queueIndex);
+    if (openJobTable){
+      this.actionQueueService.openJobTable();
+    }
   }
 
 

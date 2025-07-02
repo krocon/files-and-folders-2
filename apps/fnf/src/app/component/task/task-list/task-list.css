@@ -1,0 +1,15 @@
+
+.task-list-div {
+    min-height: 400px;
+    min-width: 400px;
+
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-gap: 16px;
+
+    .header {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-gap: 16px;
+    }
+}

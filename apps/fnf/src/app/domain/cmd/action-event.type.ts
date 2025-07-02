@@ -7,6 +7,7 @@ export const actionEventTypes = [
   'delempty',
   'rename',
   'refresh_job_queue_table',
+  'open_job_queue_table',
   'update',
   'created',
   'open'

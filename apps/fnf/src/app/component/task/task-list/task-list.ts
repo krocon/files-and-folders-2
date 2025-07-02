@@ -1,22 +1,26 @@
-import {Component, inject, OnInit} from '@angular/core';
-import {MatListItem, MatNavList} from "@angular/material/list";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit} from '@angular/core';
 import {MatBottomSheetRef} from "@angular/material/bottom-sheet";
-import {MatLine} from "@angular/material/core";
 import {ActionQueueService} from "../../../service/cmd/action-queue.service";
 import {NotifyService} from "../../../service/cmd/notify-service";
 import {NotifyEventIf} from "../../../domain/cmd/notify-event.if";
+import {StatusIconType} from "../../common/status-icon.type";
+import {QueueProgress} from "../../../domain/cmd/queue.progress";
+import {BusyBeeComponent} from "../../common/busy-bee.component";
 
 @Component({
   selector: 'app-task-list',
   imports: [
-    MatNavList,
-    MatListItem,
-    MatLine,
+    BusyBeeComponent,
   ],
   templateUrl: './task-list.html',
-  styleUrl: './task-list.css'
+  styleUrl: './task-list.css',
+  changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class TaskList implements OnInit {
+
+  queueProgress: QueueProgress;
+  status: StatusIconType = 'idle';
+
 
   private _bottomSheetRef =
     inject<MatBottomSheetRef<TaskList>>(MatBottomSheetRef);
@@ -25,20 +29,20 @@ export class TaskList implements OnInit {
   constructor(
     private readonly actionQueueService: ActionQueueService,
     private readonly notifyService: NotifyService,
+    private readonly cdr: ChangeDetectorRef,
   ) {
+    this.queueProgress = actionQueueService.getQueueProgress(0);
   }
 
   ngOnInit(): void {
-    // this.actionQueueService.
     let queues = this.actionQueueService.getQueues();
-    console.info(queues);
+    console.info('queues', queues);
 
     this.notifyService
       .valueChanges()
       .subscribe(
         (evt: NotifyEventIf) => {
-          console.info('NotifyEventIf', evt);
-          console.info(this.actionQueueService.getQueues());
+          this.updateUi();
         }
       )
   }
@@ -46,5 +50,20 @@ export class TaskList implements OnInit {
   openLink(event: MouseEvent): void {
     this._bottomSheetRef.dismiss();
     event.preventDefault();
+  }
+
+  private updateUi() {
+    this.queueProgress = this.actionQueueService.getQueueProgress(0);
+
+    let status:StatusIconType = 'idle';
+    if (this.queueProgress.unfinished) {
+      status = this.queueProgress.errors ? 'error' : 'busy';
+    }
+    this.status = status;
+    this.cdr.detectChanges();
+
+    console.info('--------------');
+    console.info(this.queueProgress.getInfoText()); // "3 / 9"
+    console.info(JSON.stringify(this.queueProgress, null, 4)); // {"unfinished": 6, "finished": 3, "errors": 0, "class": "text-info"}
   }
 }

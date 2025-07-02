@@ -1,4 +1,12 @@
-import {ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output} from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  Output
+} from "@angular/core";
 import {CommonModule} from "@angular/common";
 
 import {MatButton} from "@angular/material/button";
@@ -35,7 +43,8 @@ import {StatusIconType} from "../../common/status-icon.type";
     MatTooltip,
     BusyBeeComponent,
     MatIcon,
-  ]
+  ],
+  changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class TaskButtonComponent implements OnInit, OnDestroy {
 
@@ -68,7 +77,18 @@ export class TaskButtonComponent implements OnInit, OnDestroy {
           console.info('refresh job queue table');
           this.updateUi();
         }
+      );
+    this.actionQueueService
+      .onEvent(ActionQueueService.OPEN_JOB_QUEUE_TABLE)
+      .pipe(
+        takeWhile(() => this.alive)
       )
+      .subscribe(
+        () => {
+          console.info('open job queue table');
+          this.onClicked();
+        }
+      );
   }
 
   onClicked() {
