@@ -54,7 +54,7 @@ import {GotoAnythingOptionData} from "../../cmd/gotoanything/goto-anything-optio
 import {ActionId, actionIds} from "../../../domain/action/fnf-action.enum";
 import {FnfActionLabels} from "../../../domain/action/fnf-action-labels";
 import {NotifyService} from "../../../service/cmd/notify-service";
-import {NotifyEventIf} from "../../../domain/cmd/notify-event.if";
+import {QueueNotifyEventIf} from "../../../domain/cmd/queue-notify-event.if";
 import {SelectionDialogData} from "../../cmd/selection/selection-dialog.data";
 import {getParentDir} from "../../../common/fn/get-parent-dir.fn";
 
@@ -297,7 +297,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
     this.notifyService
       .valueChanges()
       .subscribe(
-        (evt: NotifyEventIf) => {
+        (evt: QueueNotifyEventIf) => {
           if (Array.isArray(evt.data)) {
             const arr = evt.data as Array<DirEventIf>;
             this.handleDirEvent(arr);

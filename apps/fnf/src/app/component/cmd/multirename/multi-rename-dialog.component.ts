@@ -30,7 +30,7 @@ import {
   TableOptionsIf
 } from "@guiexpert/table";
 
-import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
+import {QueueFileOperationParams} from "../../../domain/cmd/queue-file-operation-params";
 import {CommandService} from "../../../service/cmd/command.service";
 import {ChangeCellRendererComponent} from "./change-cell-renderer.component";
 import {MultiRenameNameCellRendererComponent} from "./multi-rename-name-cell-renderer.component";
@@ -66,7 +66,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
   options: MultiRenameOptions;
 
   tableModel?: TableModelIf;
-  rows: FileOperationParams[];
+  rows: QueueFileOperationParams[];
 
   private readonly rowHeight = 34;
   readonly tableOptions: TableOptionsIf = {
@@ -139,7 +139,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
 
 
     this.rows = multiRenameDialogData.rows.map(
-      r => new FileOperationParams(
+      r => new QueueFileOperationParams(
         r,
         0,
         this.clone(r),

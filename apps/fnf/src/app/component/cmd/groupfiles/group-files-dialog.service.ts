@@ -4,7 +4,7 @@ import {GroupFilesDialogComponent} from "./group-files-dialog.component";
 import {takeWhile} from "rxjs/operators";
 import {MatDialog} from "@angular/material/dialog";
 import {GroupFilesDialogConfig} from "./group-files-dialog.config";
-import {ActionEvent} from "../../../domain/cmd/action-event";
+import {QueueActionEvent} from "../../../domain/cmd/queue-action-event";
 
 @Injectable({
   providedIn: "root"
@@ -18,12 +18,12 @@ export class GroupFilesDialogService {
   }
 
 
-  public open(data: GroupFilesDialogData, cb: (target: ActionEvent[] | undefined) => void) {
+  public open(data: GroupFilesDialogData, cb: (target: QueueActionEvent[] | undefined) => void) {
     let alive = true;
     const config = new GroupFilesDialogConfig(data);
 
     return this.dialog
-      .open<GroupFilesDialogComponent, GroupFilesDialogData, ActionEvent[] | undefined>(GroupFilesDialogComponent, config)
+      .open<GroupFilesDialogComponent, GroupFilesDialogData, QueueActionEvent[] | undefined>(GroupFilesDialogComponent, config)
       .afterClosed()
       .pipe(takeWhile(() => alive))
       .subscribe(item => {

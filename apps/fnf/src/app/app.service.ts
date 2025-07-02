@@ -19,7 +19,7 @@ import {
   SysinfoIf
 } from "@fnf-data";
 import {BehaviorSubject, firstValueFrom, Observable, Subject} from "rxjs";
-import {ActionEvent} from "./domain/cmd/action-event";
+import {QueueActionEvent} from "./domain/cmd/queue-action-event";
 import {PanelIndex} from "@fnf/fnf-data";
 import {FilePageData} from "./domain/filepagedata/data/file-page.data";
 import {DockerRootDeletePipe} from "./component/main/header/tabpanel/filemenu/docker-root-delete.pipe";
@@ -42,7 +42,7 @@ import {RenameDialogService} from "./component/cmd/rename/rename-dialog.service"
 import {RenameDialogData} from "./component/cmd/rename/rename-dialog.data";
 import {CommandService} from "./service/cmd/command.service";
 import {RenameDialogResultData} from "./component/cmd/rename/rename-dialog-result.data";
-import {FileOperationParams} from "./domain/cmd/file-operation-params";
+import {QueueFileOperationParams} from "./domain/cmd/queue-file-operation-params";
 import {MkdirDialogService} from "./component/cmd/mkdir/mkdir-dialog.service";
 import {MkdirDialogData} from "./component/cmd/mkdir/mkdir-dialog.data";
 import {MkdirDialogResultData} from "./component/cmd/mkdir/mkdir-dialog-result.data";
@@ -492,7 +492,7 @@ export class AppService {
         new CopyOrMoveDialogData(sources, this.getOtherPanelSelectedTabData().path, "copy"),
         (target) => {
           if (target) {
-            const paras: FileOperationParams[] = this.createFileOperationParams(target);
+            const paras: QueueFileOperationParams[] = this.createFileOperationParams(target);
             const actionEvents = paras.map(item => this.commandService.copy(item));
             this.commandService.addActions(actionEvents);
           }
@@ -510,7 +510,7 @@ export class AppService {
         new CopyOrMoveDialogData(sources, targetPath, "move"),
         (target) => {
           if (target) {
-            const paras: FileOperationParams[] = this.createFileOperationParams(target);
+            const paras: QueueFileOperationParams[] = this.createFileOperationParams(target);
             const actionEvents = paras.map(item => this.commandService.move(item));
             this.commandService.addActions(actionEvents);
           }
@@ -527,7 +527,7 @@ export class AppService {
         new CopyOrMoveDialogData(sources, "", "delete"),
         (target) => {
           if (target) {
-            const paras: FileOperationParams[] = this.createFileOperationParams(target);
+            const paras: QueueFileOperationParams[] = this.createFileOperationParams(target);
             const actionEvents = paras.map(item => this.commandService.del(item));
             const panelIndex = this.getActivePanelIndex();
             const bodyAreaModel = this.bodyAreaModels[panelIndex];
@@ -684,7 +684,7 @@ export class AppService {
     }
     if (fileItem) {
       const actionEvent = this.commandService.open(
-        new FileOperationParams(fileItem, srcPanelIndex, fileItem, srcPanelIndex)
+        new QueueFileOperationParams(fileItem, srcPanelIndex, fileItem, srcPanelIndex)
       );
       this.commandService.addActions([actionEvent]);
     }
@@ -857,7 +857,7 @@ export class AppService {
         .open(data, (result: RenameDialogResultData | undefined) => {
           if (result) {
             const actionEvent = this.commandService.rename(
-              new FileOperationParams(result.source, srcPanelIndex, result.target, srcPanelIndex)
+              new QueueFileOperationParams(result.source, srcPanelIndex, result.target, srcPanelIndex)
             );
             this.commandService.addActions([actionEvent]);
           }
@@ -872,7 +872,7 @@ export class AppService {
     if (rows?.length) {
       const data = new MultiRenameDialogData(rows, srcPanelIndex);
       this.multiRenameDialogService
-        .open(data, (arr: ActionEvent[] | undefined) => {
+        .open(data, (arr: QueueActionEvent[] | undefined) => {
           if (arr) {
             this.commandService.addActions(arr);
           }
@@ -898,7 +898,7 @@ export class AppService {
         targetPanelIndex
       );
       this.groupFilesDialogService
-        .open(data, (arr: ActionEvent[] | undefined) => {
+        .open(data, (arr: QueueActionEvent[] | undefined) => {
           if (arr) {
             console.info('groupFiles ActionEvents:', arr); // TODO del
             this.commandService.addActions(arr);
@@ -911,12 +911,12 @@ export class AppService {
     this.updateFocusRowCriterea(this.getActivePanelIndex(), focusRowCriterea);
   }
 
-  private createFileOperationParams(target: FileItemIf): FileOperationParams[] {
+  private createFileOperationParams(target: FileItemIf): QueueFileOperationParams[] {
     const selectedData = this.getSelectedOrFocussedDataForActivePanel();
     const srcPanelIndex = this.getActivePanelIndex();
     const targetPanelIndex = this.getInactivePanelIndex();
     return selectedData.map(item =>
-      new FileOperationParams(item, srcPanelIndex, target, targetPanelIndex, selectedData.length > 1)
+      new QueueFileOperationParams(item, srcPanelIndex, target, targetPanelIndex, selectedData.length > 1)
     );
   }
 

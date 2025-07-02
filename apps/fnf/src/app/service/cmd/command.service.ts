@@ -1,13 +1,13 @@
 import {Injectable} from '@angular/core';
-import {ActionEvent} from "../../domain/cmd/action-event";
-import {ActionEventType} from "../../domain/cmd/action-event.type";
+import {QueueActionEvent} from "../../domain/cmd/queue-action-event";
+import {QueueActionEventType} from "../../domain/cmd/queue-action-event.type";
 import {DirEvent, FileItemIf, FileItemMeta, FilePara, OnDoResponseType, PanelIndex} from "@fnf/fnf-data";
 import {QueueStatus} from "../../domain/cmd/queue-status";
 import {ActionQueueService} from "./action-queue.service";
-import {FileOperationParams} from "../../domain/cmd/file-operation-params";
+import {QueueFileOperationParams} from "../../domain/cmd/queue-file-operation-params";
 import {NotifyService} from "./notify-service";
-import {NotifyEventIf} from "../../domain/cmd/notify-event.if";
-import {NotifyEvent} from "../../domain/cmd/notify-event";
+import {QueueNotifyEventIf} from "../../domain/cmd/queue-notify-event.if";
+import {QueueNotifyEvent} from "../../domain/cmd/queue-notify-event";
 
 @Injectable({
   providedIn: 'root'
@@ -30,13 +30,13 @@ export class CommandService {
 
 
   createActionEvent(
-    key: ActionEventType,
+    key: QueueActionEventType,
     source: FileItemIf,
     target: FileItemIf,
     sourcePanelIndex: PanelIndex,
     targetPanelIndex: PanelIndex,
     bulk: boolean = false
-  ): ActionEvent {
+  ): QueueActionEvent {
     const filePara = new FilePara(
       source,
       target,
@@ -45,7 +45,7 @@ export class CommandService {
       key as unknown as any
     );
 
-    return new ActionEvent(
+    return new QueueActionEvent(
       targetPanelIndex,
       filePara,
       this.ACTION_STATUS_NEW,
@@ -58,7 +58,7 @@ export class CommandService {
    * Refreshes a panel
    * @param panelIndex The panel index
    */
-  refreshPanel(panelIndex: PanelIndex): ActionEvent {
+  refreshPanel(panelIndex: PanelIndex): QueueActionEvent {
     return this.createActionEvent(
       this.actionQueueService.ACTION_REFRESH_PANEL,
       {} as FileItemIf,
@@ -73,7 +73,7 @@ export class CommandService {
    * Creates a directory
    * @param para The parameters for the mkdir operation
    */
-  mkdir(para: { dir: string; base: string; panelIndex: PanelIndex }): ActionEvent {
+  mkdir(para: { dir: string; base: string; panelIndex: PanelIndex }): QueueActionEvent {
     return this.createActionEvent(
       this.actionQueueService.ACTION_MKDIR,
       {} as FileItemIf,
@@ -88,7 +88,7 @@ export class CommandService {
    * Deletes a file or directory
    * @param para The parameters for the delete operation
    */
-  del(para: { source: FileItemIf; srcPanelIndex: PanelIndex; bulk?: boolean }): ActionEvent {
+  del(para: { source: FileItemIf; srcPanelIndex: PanelIndex; bulk?: boolean }): QueueActionEvent {
     const source = para.source;
     const srcPanelIndex = para.srcPanelIndex;
     const bulk = para.bulk || false;
@@ -118,7 +118,7 @@ export class CommandService {
    * Deletes an empty directory
    * @param para The parameters for the delempty operation
    */
-  delempty(para: { source: FileItemIf; srcPanelIndex: PanelIndex }): ActionEvent {
+  delempty(para: { source: FileItemIf; srcPanelIndex: PanelIndex }): QueueActionEvent {
     return this.createActionEvent(
       this.actionQueueService.ACTION_DELEMPTY,
       para.source,
@@ -133,7 +133,7 @@ export class CommandService {
    * Copies a file or directory
    * @param para The parameters for the copy operation
    */
-  copy(para: FileOperationParams): ActionEvent {
+  copy(para: QueueFileOperationParams): QueueActionEvent {
     const source = para.source;
     const srcPanelIndex = para.srcPanelIndex;
     const targetPanelIndex = para.targetPanelIndex;
@@ -154,7 +154,7 @@ export class CommandService {
    * Moves a file or directory
    * @param para The parameters for the move operation
    */
-  move(para: FileOperationParams): ActionEvent {
+  move(para: QueueFileOperationParams): QueueActionEvent {
     const source = para.source;
     const srcPanelIndex = para.srcPanelIndex;
     const target = para.target;
@@ -175,7 +175,7 @@ export class CommandService {
    * Renames a file or directory
    * @param para The parameters for the rename operation
    */
-  rename(para: FileOperationParams): ActionEvent {
+  rename(para: QueueFileOperationParams): QueueActionEvent {
     const source = para.source;
     const srcPanelIndex = para.srcPanelIndex;
     const target = para.target;
@@ -189,7 +189,7 @@ export class CommandService {
             {...source, meta: new FileItemMeta('', 'temp', true)}
             //new FileItem(source.dir, source.base, '', '', 0, false, false, new FileItemMeta('', 'temp', true))
           ])];
-        let o: NotifyEventIf = new NotifyEvent('update', item)
+        let o: QueueNotifyEventIf = new QueueNotifyEvent('update', item)
         this.eventService.next(o);
       }
     }
@@ -210,7 +210,7 @@ export class CommandService {
    * @param queueIndex The queue index
    * @param openJobTable Opens the Task Manager (Job table UI)
    */
-  addActions(actions: ActionEvent[], queueIndex: number = 0, openJobTable:boolean = true): void {
+  addActions(actions: QueueActionEvent[], queueIndex: number = 0, openJobTable:boolean = true): void {
     this.actionQueueService.addActions(actions, queueIndex);
     if (openJobTable){
       this.actionQueueService.openJobTable();
@@ -218,7 +218,7 @@ export class CommandService {
   }
 
 
-  open(para: FileOperationParams): ActionEvent {
+  open(para: QueueFileOperationParams): QueueActionEvent {
     const source = para.source;
     const srcPanelIndex = para.srcPanelIndex;
     const target = para.target;

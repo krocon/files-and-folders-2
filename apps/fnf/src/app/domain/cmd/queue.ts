@@ -1,10 +1,10 @@
 import {QueueStatus} from "./queue-status";
-import {ActionEvent} from "./action-event";
+import {QueueActionEvent} from "./queue-action-event";
 import {QueueProgress} from "./queue.progress";
 
 export interface Queue {
   status: QueueStatus;
-  actions: ActionEvent[];
+  actions: QueueActionEvent[];
   jobId: number;
   progress: QueueProgress;
 }

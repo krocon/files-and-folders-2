@@ -30,7 +30,7 @@ import {
   TableOptionsIf
 } from "@guiexpert/table";
 
-import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
+import {QueueFileOperationParams} from "../../../domain/cmd/queue-file-operation-params";
 import {CommandService} from "../../../service/cmd/command.service";
 import {GroupFilesNameCellRendererComponent} from "./group-files-name-cell-renderer.component";
 import {GroupFilesService} from "./group-files.service";
@@ -67,7 +67,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
   groupCount: number = 0;
 
   tableModel?: TableModelIf;
-  rows: FileOperationParams[];
+  rows: QueueFileOperationParams[];
 
   private readonly rowHeight = 34;
   readonly tableOptions: TableOptionsIf = {
@@ -122,7 +122,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
 
 
     this.rows = groupFilesDialogData.rows.map(
-      r => new FileOperationParams(
+      r => new QueueFileOperationParams(
         r,
         0,
         this.clone<FileItemIf>(r),

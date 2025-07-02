@@ -1,9 +1,7 @@
 import {ComponentRendererIf} from "@guiexpert/angular-table";
 import {ChangeDetectionStrategy, Component} from "@angular/core";
 import {AreaIdent, AreaModelIf, RendererCleanupFnType} from "@guiexpert/table";
-import {DOT_DOT, FileItemIf} from "@fnf/fnf-data";
-import {MatTooltip} from "@angular/material/tooltip";
-import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
+import {QueueFileOperationParams} from "../../../domain/cmd/queue-file-operation-params";
 
 @Component({
   selector: 'change-cell-renderer',
@@ -19,7 +17,7 @@ import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ChangeCellRendererComponent implements ComponentRendererIf<FileOperationParams> {
+export class ChangeCellRendererComponent implements ComponentRendererIf<QueueFileOperationParams> {
 
 
   text: string = '';
@@ -32,7 +30,7 @@ export class ChangeCellRendererComponent implements ComponentRendererIf<FileOper
     areaModel: AreaModelIf,
     cellValue: any): RendererCleanupFnType | undefined {
 
-    const fileOperationParams: FileOperationParams = areaModel.getRowByIndex(rowIndex);
+    const fileOperationParams: QueueFileOperationParams = areaModel.getRowByIndex(rowIndex);
 
     if (fileOperationParams?.source?.base !== fileOperationParams?.target?.base){
       this.text = '→';

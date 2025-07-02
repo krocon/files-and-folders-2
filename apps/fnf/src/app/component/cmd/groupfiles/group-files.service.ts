@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
-import {FileOperationParams} from '../../../domain/cmd/file-operation-params';
+import {QueueFileOperationParams} from '../../../domain/cmd/queue-file-operation-params';
 import {GroupFilesData} from './data/group-files.data';
 import {FileItem, FileItemIf, PanelIndex} from "@fnf/fnf-data";
-import {ActionEvent} from '../../../domain/cmd/action-event';
+import {QueueActionEvent} from '../../../domain/cmd/queue-action-event';
 import {CommandService} from '../../../service/cmd/command.service';
 import {GroupFilesDialogData} from './data/group-files-dialog.data';
 import {GroupFilesResult} from './data/group-files-result';
@@ -23,7 +23,7 @@ export class GroupFilesService {
    * @param rows The file operation parameters to update
    * @param data The multi-rename configuration data
    */
-  updateTargets(rows: FileOperationParams[], data: GroupFilesData): void {
+  updateTargets(rows: QueueFileOperationParams[], data: GroupFilesData): void {
     rows.forEach((row, index) => {
       if (row.source) {
         // row.target = this.rename(row.source, data, index);
@@ -32,12 +32,12 @@ export class GroupFilesService {
   }
 
 
-  createActionEvents(rows: FileOperationParams[], groupFilesDialogData: GroupFilesDialogData): ActionEvent[] {
-    const actions: ActionEvent[] = [];
+  createActionEvents(rows: QueueFileOperationParams[], groupFilesDialogData: GroupFilesDialogData): QueueActionEvent[] {
+    const actions: QueueActionEvent[] = [];
 
     for (const row of rows) {
       if (row.source && row.target && this.isFileRelevant(row.source, row.target)) {
-        let fop:FileOperationParams = {
+        let fop:QueueFileOperationParams = {
           bulk: rows.length > CommandService.BULK_LOWER_LIMIT,
           source: row.source,
           srcPanelIndex: row.srcPanelIndex,
@@ -356,9 +356,9 @@ export class GroupFilesService {
   getFileOperationParams(
     rows: GroupFilesRow[],
     srcPanelIndex: PanelIndex,
-    targetPanelIndex: PanelIndex): FileOperationParams[] {
+    targetPanelIndex: PanelIndex): QueueFileOperationParams[] {
 
-    return rows.map(r => new FileOperationParams(
+    return rows.map(r => new QueueFileOperationParams(
       r.src, srcPanelIndex, r.target, targetPanelIndex, rows.length > CommandService.BULK_LOWER_LIMIT
     ));
   }

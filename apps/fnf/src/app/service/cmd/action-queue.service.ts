@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
-import {ActionEvent} from '../../domain/cmd/action-event';
-import {ActionEventType} from '../../domain/cmd/action-event.type';
+import {QueueActionEvent} from '../../domain/cmd/queue-action-event';
+import {QueueActionEventType} from '../../domain/cmd/queue-action-event.type';
 import {QueueStatus} from '../../domain/cmd/queue-status';
 import {Observable} from 'rxjs';
 import {QueueProgress} from "../../domain/cmd/queue.progress";
@@ -8,7 +8,7 @@ import {Queue} from "../../domain/cmd/queue";
 import {FileActionService} from "./file-action.service";
 import {DirEvent, OnDoResponseType} from "@fnf/fnf-data";
 import {NotifyService} from "./notify-service";
-import {NotifyEvent} from "../../domain/cmd/notify-event";
+import {QueueNotifyEvent} from "../../domain/cmd/queue-notify-event";
 
 @Injectable({
   providedIn: 'root'
@@ -30,19 +30,19 @@ export class ActionQueueService {
   readonly ACTION_STATUS_ABORT: QueueStatus = 'ABORT';
 
   // Action Event Keys
-  readonly ACTION_REFRESH_PANEL: ActionEventType = 'refresh_panel';
+  readonly ACTION_REFRESH_PANEL: QueueActionEventType = 'refresh_panel';
 
-  readonly ACTION_MKDIR: ActionEventType = 'mkdir';
-  readonly ACTION_OPEN: ActionEventType = 'open';
-  readonly ACTION_COPY: ActionEventType = 'copy';
-  readonly ACTION_MOVE: ActionEventType = 'move';
-  readonly ACTION_REMOVE: ActionEventType = 'remove';
-  readonly ACTION_DELEMPTY: ActionEventType = 'delempty';
-  readonly ACTION_RENAME: ActionEventType = 'rename';
+  readonly ACTION_MKDIR: QueueActionEventType = 'mkdir';
+  readonly ACTION_OPEN: QueueActionEventType = 'open';
+  readonly ACTION_COPY: QueueActionEventType = 'copy';
+  readonly ACTION_MOVE: QueueActionEventType = 'move';
+  readonly ACTION_REMOVE: QueueActionEventType = 'remove';
+  readonly ACTION_DELEMPTY: QueueActionEventType = 'delempty';
+  readonly ACTION_RENAME: QueueActionEventType = 'rename';
 
   // Events
-  public static readonly REFRESH_JOB_QUEUE_TABLE: ActionEventType = 'refresh_job_queue_table';
-  public static readonly OPEN_JOB_QUEUE_TABLE: ActionEventType = 'open_job_queue_table';
+  public static readonly REFRESH_JOB_QUEUE_TABLE: QueueActionEventType = 'refresh_job_queue_table';
+  public static readonly OPEN_JOB_QUEUE_TABLE: QueueActionEventType = 'open_job_queue_table';
 
   private queues: Queue[] = [];
   private jobId = 0;
@@ -95,7 +95,7 @@ export class ActionQueueService {
    * @param action The action to add
    * @param queueIndex The index of the queue to add the action to
    */
-  addAction(action: ActionEvent, queueIndex: number = 0): void {
+  addAction(action: QueueActionEvent, queueIndex: number = 0): void {
     const queue = this.getQueue(queueIndex);
     action.status = this.ACTION_STATUS_NEW;
     action.id = ++this.jobId;
@@ -110,7 +110,7 @@ export class ActionQueueService {
    * @param actions The actions to add
    * @param queueIndex The index of the queue to add the actions to
    */
-  addActions(actions: ActionEvent[], queueIndex: number = 0): void {
+  addActions(actions: QueueActionEvent[], queueIndex: number = 0): void {
     this.jobId++;
     const queue = this.getQueue(queueIndex);
     queue.jobId = this.jobId;
@@ -130,7 +130,7 @@ export class ActionQueueService {
    */
   next(queue: Queue = this.getQueue(0)): void {
     for (let i = 0; i < queue.actions.length; i++) {
-      const action: ActionEvent = queue.actions[i];
+      const action: QueueActionEvent = queue.actions[i];
       if (action.status === this.ACTION_STATUS_NEW) {
         queue.status = this.QUEUE_STATUS_RUNNING;
         action.status = this.ACTION_STATUS_PROCESSING;
@@ -138,7 +138,7 @@ export class ActionQueueService {
         if (action.action === this.ACTION_REFRESH_PANEL) {
           action.status = this.ACTION_STATUS_SUCCESS;
           this.eventService.next(
-            new NotifyEvent(
+            new QueueNotifyEvent(
               this.ACTION_REFRESH_PANEL,
               [
                 {...new DirEvent('', []), panelIndex: action.panelIndex}
@@ -286,7 +286,7 @@ export class ActionQueueService {
       clearTimeout(this.refreshQueueTableTimer);
     }
     this.refreshQueueTableTimer = setTimeout(() => {
-      this.eventService.next(new NotifyEvent(ActionQueueService.REFRESH_JOB_QUEUE_TABLE, []));
+      this.eventService.next(new QueueNotifyEvent(ActionQueueService.REFRESH_JOB_QUEUE_TABLE, []));
     }, 1111);
   }
 
@@ -305,11 +305,11 @@ export class ActionQueueService {
   }
 
 
-  private executeAction(action: ActionEvent): Observable<OnDoResponseType> {
+  private executeAction(action: QueueActionEvent): Observable<OnDoResponseType> {
     return this.fileActionService.do(action.filePara);
   }
 
   openJobTable() {
-    this.eventService.next(new NotifyEvent(ActionQueueService.OPEN_JOB_QUEUE_TABLE, []));
+    this.eventService.next(new QueueNotifyEvent(ActionQueueService.OPEN_JOB_QUEUE_TABLE, []));
   }
 }

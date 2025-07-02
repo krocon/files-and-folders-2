@@ -1,9 +1,9 @@
 import {FileItemIf, FilePara, PanelIndex} from "@fnf/fnf-data";
 import {QueueStatus} from "./queue-status";
-import {ActionEventType} from "./action-event.type";
+import {QueueActionEventType} from "./queue-action-event.type";
 
 
-export class ActionEvent {
+export class QueueActionEvent {
 
   constructor(
     public panelIndex: PanelIndex,
@@ -15,8 +15,8 @@ export class ActionEvent {
   }
 
   // Getters to maintain compatibility with existing code
-  get action(): ActionEventType {
-    return this.filePara.cmd as unknown as ActionEventType;
+  get action(): QueueActionEventType {
+    return this.filePara.cmd as unknown as QueueActionEventType;
   }
 
   get src(): FileItemIf {

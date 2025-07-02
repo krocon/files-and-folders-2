@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
-import {FileOperationParams} from '../../../domain/cmd/file-operation-params';
+import {QueueFileOperationParams} from '../../../domain/cmd/queue-file-operation-params';
 import {MultiRenameData} from './data/multi-rename.data';
 import {FileItemIf, PanelIndex} from "@fnf/fnf-data";
-import {ActionEvent} from '../../../domain/cmd/action-event';
+import {QueueActionEvent} from '../../../domain/cmd/queue-action-event';
 import {CommandService} from '../../../service/cmd/command.service';
 import {ReplacementItem} from './data/replacement.item';
 
@@ -20,7 +20,7 @@ export class MultiRenameService {
    * @param rows The file operation parameters to update
    * @param data The multi-rename configuration data
    */
-  updateTargets(rows: FileOperationParams[], data: MultiRenameData): void {
+  updateTargets(rows: QueueFileOperationParams[], data: MultiRenameData): void {
     rows.forEach((row, index) => {
       if (row.source) {
         row.target = this.rename(row.source, data, index);
@@ -34,8 +34,8 @@ export class MultiRenameService {
    * @param panelIndex The panel index
    * @returns An array of action events
    */
-  createActionEvents(rows: FileOperationParams[], panelIndex: PanelIndex): ActionEvent[] {
-    const actions: ActionEvent[] = [];
+  createActionEvents(rows: QueueFileOperationParams[], panelIndex: PanelIndex): QueueActionEvent[] {
+    const actions: QueueActionEvent[] = [];
 
     for (const row of rows) {
       if (row.source && row.target && this.isFileChanged(row.source, row.target)) {

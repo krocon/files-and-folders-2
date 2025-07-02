@@ -1,4 +1,4 @@
-export const actionEventTypes = [
+export const queueActionEventTypes = [
   'refresh_panel',
   'mkdir',
   'copy',
@@ -13,4 +13,4 @@ export const actionEventTypes = [
   'open'
 ] as const;
 
-export type ActionEventType = typeof actionEventTypes[number];
+export type QueueActionEventType = typeof queueActionEventTypes[number];

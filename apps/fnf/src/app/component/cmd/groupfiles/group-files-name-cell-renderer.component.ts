@@ -3,7 +3,7 @@ import {ChangeDetectionStrategy, Component} from "@angular/core";
 import {AreaIdent, AreaModelIf, RendererCleanupFnType} from "@guiexpert/table";
 import {DOT_DOT, FileItemIf} from "@fnf/fnf-data";
 import {MatTooltip} from "@angular/material/tooltip";
-import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
+import {QueueFileOperationParams} from "../../../domain/cmd/queue-file-operation-params";
 
 @Component({
   selector: 'multi-group-files-name-cell-renderer',
@@ -53,7 +53,7 @@ import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GroupFilesNameCellRendererComponent implements ComponentRendererIf<FileOperationParams> {
+export class GroupFilesNameCellRendererComponent implements ComponentRendererIf<QueueFileOperationParams> {
 
   iconClass: string = '';
   text: string = '';
@@ -67,7 +67,7 @@ export class GroupFilesNameCellRendererComponent implements ComponentRendererIf<
     areaModel: AreaModelIf,
     cellValue: FileItemIf): RendererCleanupFnType | undefined {
 
-    //const fop: FileOperationParams = areaModel.getRowByIndex(rowIndex);
+    //const fop: QueueFileOperationParams = areaModel.getRowByIndex(rowIndex);
     const fileItem = cellValue;
     this.rtl = fileItem.abs;
 

@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {TypedEventService} from "../../common/typed-event.service";
-import {NotifyEventIf} from "../../domain/cmd/notify-event.if";
+import {QueueNotifyEventIf} from "../../domain/cmd/queue-notify-event.if";
 
 @Injectable({
   providedIn: 'root'
 })
-export class NotifyService extends TypedEventService<NotifyEventIf>{
+export class NotifyService extends TypedEventService<QueueNotifyEventIf>{
 
 
 }

@@ -2,7 +2,7 @@ import {ComponentRendererIf} from "@guiexpert/angular-table";
 import {ChangeDetectionStrategy, Component} from "@angular/core";
 import {AreaIdent, AreaModelIf, RendererCleanupFnType} from "@guiexpert/table";
 import {FileItemIf} from "@fnf/fnf-data";
-import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
+import {QueueFileOperationParams} from "../../../domain/cmd/queue-file-operation-params";
 
 @Component({
   selector: 'multi-rename-target-cell-renderer',
@@ -34,7 +34,7 @@ import {FileOperationParams} from "../../../domain/cmd/file-operation-params";
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GroupFilesTargetCellRendererComponent implements ComponentRendererIf<FileOperationParams> {
+export class GroupFilesTargetCellRendererComponent implements ComponentRendererIf<QueueFileOperationParams> {
 
   dir: string = '';
   base: string = '';
