@@ -1,1 +1,1 @@
-export type StatusIconType = 'idle' | 'busy' | 'error';
+export type StatusIconType =  'idle' | 'busy' | 'error' | 'success';

@@ -5,7 +5,21 @@
     {{ queueProgress.getInfoText() }}
   </div>
   <div class="body">
-    TODO List
+
+    <table>
+    @for (action of queue.actions; track action) {
+      <tr class="row">
+        <td>{{action.id}}</td>
+        <td>CMD:{{action.filePara.cmd.toLowerCase()}}</td>
+        <td>{{getBeeStatus(action.status)}}</td>
+        <td>
+          <app-busy-bee [status]="getBeeStatus(action.status)"></app-busy-bee>
+        </td>
+        <td>{{action.filePara.target?.base ?? action.filePara.source?.base ?? ''}}</td>
+      </tr>
+    }
+    </table>
+
   </div>
   <div class="footer">
     TODO button
