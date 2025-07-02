@@ -9,6 +9,11 @@ import {AppModule} from './app/app.module';
 import {AppService} from './app/app.service';
 import {HttpExceptionFilter} from './app/http-exception.filter';
 import {environment} from './environments/environment';
+import * as events from 'events';
+
+// Increase the max listeners to prevent the MaxListenersExceededWarning
+// Default is 10, setting to 20 to accommodate the application's needs
+events.EventEmitter.defaultMaxListeners = 20;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

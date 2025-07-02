@@ -60,8 +60,4 @@ const config = new Config(
     AppService
   ]
 })
-export class AppModule {
-  // constructor() {
-  //   console.debug(config);
-  // }
-}
+export class AppModule {}

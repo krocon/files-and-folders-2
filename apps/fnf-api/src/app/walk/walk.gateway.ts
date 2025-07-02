@@ -12,6 +12,7 @@ export class WalkGateway {
   @WebSocketServer() server: Server;
   private readonly cancellings = {};
 
+
   /**
    * Traverses directories and emits events containing information about the processed files and directories.
    * The method processes directories and files, updating statistical data, and emits updates periodically
