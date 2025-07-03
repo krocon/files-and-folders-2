@@ -40,6 +40,18 @@ export class MultiRenameData {
       }
     },
     {
+      cat: 'Extract words',
+      title: 'Movies with yyyy',
+      example: '"white.snow.1959.german.1080p.web.h264.mkv" -> "white snow (1959).mkv"',
+      data: {
+        textFrom: '/([\\D]*)[ \\[.\\-\\(](\\d\\d\\d\\d).*/g',
+        regExpr: true,
+        textTo: '$1 ($2)',
+        ifFlag: true,
+        ifMatch: '/\\d\\d\\d\\d/'
+      }
+    },
+    {
       cat: 'Reorder words',
       title: 'prename name - title -> name, prename - title',
       example: '"Sebastian Fitzek - Das Joshua-Profil.epub" -> "Fitzek, Sebastian - Das Joshua-Profil.epub"',
