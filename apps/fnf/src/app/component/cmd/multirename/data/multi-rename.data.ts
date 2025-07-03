@@ -44,7 +44,7 @@ export class MultiRenameData {
       title: 'Movies with yyyy',
       example: '"white.snow.1959.german.1080p.web.h264.mkv" -> "white snow (1959).mkv"',
       data: {
-        textFrom: '/([\\D]*)[ \\[.\\-\\(](\\d\\d\\d\\d).*/g',
+        textFrom: '/([\\D]*)[ \\[.\\-\\(](\\d{4}).*/g',
         regExpr: true,
         textTo: '$1 ($2)',
         ifFlag: true,
