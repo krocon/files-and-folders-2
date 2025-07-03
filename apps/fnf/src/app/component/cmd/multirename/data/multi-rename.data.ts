@@ -1,13 +1,10 @@
-
 import {ReplacementItem} from "./replacement.item";
 import {Makro} from "./makro";
 import {CapitalizeMode} from "./capitalize.mode";
 
 
-
 export class MultiRenameData {
 
-  okEnabled: boolean = true;
 
   name: string = '[N].[E]';
   counterStart: number = 1;
@@ -16,12 +13,13 @@ export class MultiRenameData {
 
   replacementsChecked: boolean = false;
   replacements: ReplacementItem[] = [
-    {checked: false, textFrom: '', textTo: '', regExpr: false, ifFlag: false, ifMatch: ''},
+    {checked: false, textFrom: '/[\\._\\-]/g', textTo: ' ', regExpr: true, ifFlag: false, ifMatch: ''},
     {checked: false, textFrom: '', textTo: '', regExpr: false, ifFlag: false, ifMatch: ''},
     {checked: false, textFrom: '', textTo: '', regExpr: false, ifFlag: false, ifMatch: ''},
     {checked: false, textFrom: '', textTo: '', regExpr: false, ifFlag: false, ifMatch: ''}
   ];
 
+  ignoreExtension: boolean = true;
   replaceGermanUmlauts: boolean = false;
   replaceRiskyChars: boolean = false;
   replaceSpaceToUnderscore: boolean = false;

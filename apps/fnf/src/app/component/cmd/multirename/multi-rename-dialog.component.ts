@@ -69,6 +69,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
   rows: QueueFileOperationParams[];
 
   private readonly rowHeight = 34;
+
   readonly tableOptions: TableOptionsIf = {
     ...new TableOptions(),
     hoverColumnVisible: false,
@@ -105,6 +106,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
     private readonly multiRenameService: MultiRenameService,
     private readonly zone: NgZone,
   ) {
+    console.info(multiRenameDialogData.rows); // TODO del
     this.data = multiRenameDialogData.data;
     this.options = multiRenameDialogData.options;
 
@@ -116,6 +118,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
         counterStep: new FormControl(this.data.counterStep, []),
         counterDigits: new FormControl(this.data.counterDigits, []),
 
+        ignoreExtension: new FormControl(this.data.ignoreExtension, []),
         replaceGermanUmlauts: new FormControl(this.data.replaceGermanUmlauts, []),
         replaceRiskyChars: new FormControl(this.data.replaceRiskyChars, []),
         replaceSpaceToUnderscore: new FormControl(this.data.replaceSpaceToUnderscore, []),

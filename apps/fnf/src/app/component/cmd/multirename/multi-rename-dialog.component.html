@@ -72,11 +72,13 @@
         [E#-#] Part of Ext,
         [C] Counter,
         [P] Parent Dir,
-        [Q] Parent of Parent Dir
+        [Q] Parent<sup>2</sup>,
+        [R] Parent<sup>3</sup>
       </label>
     </div>
 
     <div class="row-3">
+      <mat-checkbox formControlName="ignoreExtension">Ignore Extension</mat-checkbox>
       <mat-checkbox formControlName="replaceGermanUmlauts">Fix german umlauts</mat-checkbox>
       <mat-checkbox formControlName="replaceRiskyChars">Replace risky chars</mat-checkbox>
       <mat-checkbox formControlName="replaceSpaceToUnderscore">Space to underscore</mat-checkbox>

@@ -13,7 +13,8 @@ export class MultiRenameService {
 
   constructor(
     private readonly commandService: CommandService
-  ) { }
+  ) {
+  }
 
   /**
    * Updates the target property of each row based on the multi-rename configuration
@@ -59,29 +60,34 @@ export class MultiRenameService {
   }
 
   /**
-   * Checks if a file has been changed
-   * @param source The source file
-   * @param target The target file
-   * @returns True if the file has been changed
-   */
-  private isFileChanged(source: FileItemIf, target: FileItemIf): boolean {
-    return source.base !== target.base;
-  }
-
-  /**
    * Renames a file according to the multi-rename configuration
    * @param source The file to rename
    * @param data The multi-rename configuration
    * @param index The index of the file in the list
    * @returns The renamed file
    */
-  rename(source: FileItemIf, data: MultiRenameData, index: number): FileItemIf {
+  private rename(source: FileItemIf, data: MultiRenameData, index: number): FileItemIf {
     const target = {...source};
     const pattern = data.name;
+    const ignoreExtension = data.ignoreExtension;
+
     const ext = source.base.split('.').pop() || '';
-    const name = source.base.substr(0, source.base.lastIndexOf(ext) - 1) || source.base;
+    const name = (source.base.substring(0, source.base.lastIndexOf(ext) - 1));
+
     const parent = this.getParentDir(source.dir);
-    const parentOfParent = this.getParentDir(parent);
+    const parentOfParent = this.getParentDir(source.dir, 2);
+    const parentOfParentOfParent = this.getParentDir(source.dir, 3);
+
+    // console.info('source', source);
+    // console.info('target', target);
+    // console.info('pattern', pattern);
+    // console.info('name', name);
+    // console.info('ext', ext);
+    // console.info('parent', parent);
+    // console.info('parentOfParent', parentOfParent);
+    // console.info('index', index);
+    // console.info('data', data);
+    // console.info('data.counterStart', data.counterStart);
 
     let processedName = this.applyCapitalization(name, data.capitalizeMode);
 
@@ -105,7 +111,8 @@ export class MultiRenameService {
       .replace(/\[N\]/g, processedName)
       .replace(/\[E\]/g, ext)
       .replace(/\[P\]/g, parent)
-      .replace(/\[Q\]/g, parentOfParent);
+      .replace(/\[Q\]/g, parentOfParent)
+      .replace(/\[R\]/g, parentOfParentOfParent);
 
     // Process name ranges
     base = this.processNameRanges(base, name);
@@ -130,7 +137,7 @@ export class MultiRenameService {
     // Process replacements
     if (data.replacementsChecked) {
       for (const replacement of data.replacements) {
-        base = this.replace(base, replacement);
+        base = this.replace(base, ext, replacement);
       }
     }
 
@@ -141,13 +148,24 @@ export class MultiRenameService {
   }
 
   /**
+   * Checks if a file has been changed
+   * @param source The source file
+   * @param target The target file
+   * @returns True if the file has been changed
+   */
+  private isFileChanged(source: FileItemIf, target: FileItemIf): boolean {
+    return source.base !== target.base;
+  }
+
+  /**
    * Gets the parent directory from a path
    * @param dir The directory path
+   * @param generation 1=parent, 2= parent of parent
    * @returns The parent directory name
    */
-  private getParentDir(dir: string): string {
+  private getParentDir(dir: string, generation: number = 1): string {
     const parts = dir.split('/').filter(p => p.length > 0);
-    return parts.length > 0 ? parts[parts.length - 1] : '';
+    return parts.length > (generation - 1) ? parts[parts.length - generation] : parts[0];
   }
 
   /**
@@ -179,7 +197,7 @@ export class MultiRenameService {
    */
   private processNameRanges(base: string, name: string): string {
     let result = base;
-
+// TODO N as parameter. can also be: P Q R E
     // [N#-#] - Part of name from index # to index #
     let m = result.match(/\[N(\d+)\-(\d+)\]/);
     if (m) {
@@ -319,21 +337,28 @@ export class MultiRenameService {
   /**
    * Performs text replacements
    * @param base The base string
+   * @param ext the file extension without dot!
    * @param rep The replacement configuration
    * @returns The processed string
    */
-  private replace(base: string, rep: ReplacementItem): string {
+  private replace(base: string, ext: string, rep: ReplacementItem): string {
     base = base.replace(/\s+/g, " "); // replace whitespaces to normal spaces
-
     if (rep.checked) {
       if (!rep.ifFlag || this.ifmatch(rep.ifMatch, base)) {
         const match = rep.textFrom.match(new RegExp('^/(.*?)/([gimy]*)$'));
+        const xl = ext ? ext.length+1 : 0; // for 'bat' we have to remove '.bat'!
+        let _base = base.substring(0, base.length - xl);
         if (match && rep.regExpr) {
-          const regex = new RegExp(match[1], match[2]);
-          base = base.replace(regex, rep.textTo).replace(/,,/g, ',');
+          try {
+            const regex = new RegExp(match[1], match[2]);
+            _base = _base.replace(regex, rep.textTo).replace(/,,/g, ',');
+          } catch {
+            _base = 'ERROR';
+          }
         } else {
-          base = base.replace(rep.textFrom, rep.textTo);
+          _base = _base.replace(rep.textFrom, rep.textTo);
         }
+        base = _base + (ext ? '.' + ext : '');
       }
     }
 

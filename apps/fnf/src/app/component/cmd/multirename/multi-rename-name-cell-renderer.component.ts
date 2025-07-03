@@ -74,29 +74,31 @@ export class MultiRenameNameCellRendererComponent implements ComponentRendererIf
     this.tooltip = fileItem.dir + '/' + fileItem.base;
     this.iconClass = this.getIconClass(fileItem);
 
-    let name = fileItem.base??'';
+    this.text = `${fileItem.base}`;
 
-
-    if (name === DOT_DOT) {
-      this.text = `..`;
-
-    } else if (fileItem.isDir) {
-      // Directory:
-      if (fileItem.abs) {
-        this.text = fileItem.dir + '/' + fileItem.base;
-      } else {
-        this.text = `[${name}]`;
-      }
-
-    } else {
-      // File:
-      if (fileItem.abs) {
-        this.text = fileItem.dir + '/' + fileItem.base;
-        //this.text = this.text.substring(1); // hack, because of rtl css bug
-      } else {
-        this.text = `${fileItem.base}`;
-      }
-    }
+    // let name = fileItem.base??'';
+    //
+    //
+    // if (name === DOT_DOT) {
+    //   this.text = `..`;
+    //
+    // } else if (fileItem.isDir) {
+    //   // Directory:
+    //   if (fileItem.abs) {
+    //     this.text = fileItem.dir + '/' + fileItem.base;
+    //   } else {
+    //     this.text = `[${name}]`;
+    //   }
+    //
+    // } else {
+    //   // File:
+    //   if (fileItem.abs) {
+    //     this.text = fileItem.dir + '/' + fileItem.base;
+    //     //this.text = this.text.substring(1); // hack, because of rtl css bug
+    //   } else {
+    //     this.text = `${fileItem.base}`;
+    //   }
+    // }
 
     return undefined;
   }
