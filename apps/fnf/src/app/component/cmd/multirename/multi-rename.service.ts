@@ -68,7 +68,7 @@ export class MultiRenameService {
    */
   private rename(source: FileItemIf, data: MultiRenameData, index: number): FileItemIf {
     const target = {...source};
-    const pattern = data.name;
+    const pattern = data.renameTemplate;
     const ignoreExtension = data.ignoreExtension;
 
     let ext = source.base.split('.').pop() || '';
@@ -78,16 +78,16 @@ export class MultiRenameService {
     const parentOfParent = this.getParentDir(source.dir, 2);
     const parentOfParentOfParent = this.getParentDir(source.dir, 3);
 
-    // console.info('source', source);
-    // console.info('target', target);
-    // console.info('pattern', pattern);
-    // console.info('name', name);
-    // console.info('ext', ext);
-    // console.info('parent', parent);
-    // console.info('parentOfParent', parentOfParent);
-    // console.info('index', index);
-    // console.info('data', data);
-    // console.info('data.counterStart', data.counterStart);
+    console.info('source', source);
+    console.info('target', target);
+    console.info('pattern', pattern);
+    console.info('name', name);
+    console.info('ext', ext);
+    console.info('parent', parent);
+    console.info('parentOfParent', parentOfParent);
+    console.info('index', index);
+    console.info('data', data);
+    console.info('data.counterStart', data.counterStart);
 
     let processedName = this.applyCapitalization(name, data.capitalizeMode);
     if (!ignoreExtension) ext = this.applyCapitalization(ext, data.capitalizeMode);
@@ -113,46 +113,46 @@ export class MultiRenameService {
       if (!ignoreExtension) ext = ext.replace(parent, '');
     }
 
-    let base = pattern
-      .replace(/\[N\]/g, processedName)
-      .replace(/\[E\]/g, ext)
-      .replace(/\[P\]/g, parent)
-      .replace(/\[Q\]/g, parentOfParent)
-      .replace(/\[R\]/g, parentOfParentOfParent);
+    let targetName = pattern
+      .replace(/\[N]/g, processedName)
+      .replace(/\[E]/g, ext)
+      .replace(/\[P]/g, parent)
+      .replace(/\[Q]/g, parentOfParent)
+      .replace(/\[R]/g, parentOfParentOfParent);
 
     // Process name ranges
-    base = this.processPlaceholder(base, name, 'N');
+    targetName = this.processPlaceholder(targetName, name, 'N');
 
     // Process extension ranges
-    base = this.processPlaceholder(base, ext, 'E');
+    targetName = this.processPlaceholder(targetName, ext, 'E');
 
     // Process parent dir ranges
-    base = this.processPlaceholder(base, parent, 'P');
-    base = this.processPlaceholder(base, parentOfParent, 'Q');
-    base = this.processPlaceholder(base, parentOfParentOfParent, 'R');
+    targetName = this.processPlaceholder(targetName, parent, 'P');
+    targetName = this.processPlaceholder(targetName, parentOfParent, 'Q');
+    targetName = this.processPlaceholder(targetName, parentOfParentOfParent, 'R');
     
 
     // Process counter
-    if (base.indexOf('[C]') > -1) {
+    if (targetName.indexOf('[C]') > -1) {
       const counterStart = parseInt(data.counterStart.toString());
       const counterStep = parseInt(data.counterStep.toString());
       const counterDigits = parseInt(data.counterDigits.toString());
       const n = counterStart + (index * counterStep);
       const s = this.pad(n.toString(), counterDigits);
 
-      base = base.replace(/\[C\]/g, s);
+      targetName = targetName.replace(/\[C]/g, s);
     }
 
     // Process replacements
     if (data.replacementsChecked) {
       for (const replacement of data.replacements) {
-        base = this.replace(base, ext, replacement);
+        targetName = this.replace(targetName, ext, replacement);
       }
     }
 
     target.dir = source.dir;
-    target.base = base;
-    target.ext = base.includes('.') ? '.' + base.split('.').pop() : '';
+    target.base = targetName;
+    target.ext = targetName.includes('.') ? '.' + targetName.split('.').pop() : '';
     return target;
   }
 
@@ -235,19 +235,19 @@ export class MultiRenameService {
    */
   private processPlaceholder(base: string, name: string, letter: 'N'|'E'|'P'|'Q'|'R'): string {
     let result = base;
-    // [letter#-#] - Part of name from index # to index #
+    // [N#-#] - Part of name from index # to index #
     let m = result.match(new RegExp(`\\[${letter}(\\d+)\\-(\\d+)\\]`));
     if (m) {
       result = result.replace(m[0], name.substring(parseInt(m[1]), parseInt(m[2])));
     }
 
-    // [letter#-] - Part of name from index # to end
+    // [N#-] - Part of name from index # to end
     m = result.match(new RegExp(`\\[${letter}(\\d+)\\-\\]`));
     if (m) {
       result = result.replace(m[0], name.substring(parseInt(m[1])));
     }
 
-    // [letter-#] - Part of name from start to index #
+    // [N-#] - Part of name from start to index #
     m = result.match(new RegExp(`\\[${letter}\\-(\\d+)\\]`));
     if (m) {
       result = result.replace(m[0], name.substring(0, parseInt(m[1])));
@@ -375,7 +375,7 @@ export class MultiRenameService {
     };
 
     const upper = (word: string): string => {
-      return word.substr(0, 1).toUpperCase() + word.substr(1);
+      return word.substring(0, 1).toUpperCase() + word.substr(1);
     };
 
     while (true) {

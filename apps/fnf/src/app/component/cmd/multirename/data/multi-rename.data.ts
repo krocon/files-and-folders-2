@@ -6,7 +6,7 @@ import {CapitalizeMode} from "./capitalize.mode";
 export class MultiRenameData {
 
 
-  name: string = '[N].[E]';
+  renameTemplate: string = '[N].[E]';
   counterStart: number = 1;
   counterStep: number = 1;
   counterDigits: number = 4;

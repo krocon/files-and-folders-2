@@ -112,7 +112,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
 
     this.formGroup = this.formBuilder.group(
       {
-        name: new FormControl(this.data.name, [Validators.required, Validators.minLength(1)]),
+        renameTemplate: new FormControl(this.data.renameTemplate, [Validators.required, Validators.minLength(1)]),
         capitalizeMode: new FormControl(this.data.capitalizeMode, []),
         counterStart: new FormControl(this.data.counterStart, []),
         counterStep: new FormControl(this.data.counterStep, []),

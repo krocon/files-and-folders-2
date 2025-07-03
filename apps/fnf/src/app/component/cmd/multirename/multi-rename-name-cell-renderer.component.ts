@@ -42,10 +42,6 @@ import {QueueFileOperationParams} from "../../../domain/cmd/queue-file-operation
           text-overflow: ellipsis;
           display: inline-block;
           max-width: calc(100% - 40px);
-          
-          &.rtl {
-              direction: rtl;
-          }
       }
   `],
   imports: [
@@ -75,30 +71,6 @@ export class MultiRenameNameCellRendererComponent implements ComponentRendererIf
     this.iconClass = this.getIconClass(fileItem);
 
     this.text = `${fileItem.base}`;
-
-    // let name = fileItem.base??'';
-    //
-    //
-    // if (name === DOT_DOT) {
-    //   this.text = `..`;
-    //
-    // } else if (fileItem.isDir) {
-    //   // Directory:
-    //   if (fileItem.abs) {
-    //     this.text = fileItem.dir + '/' + fileItem.base;
-    //   } else {
-    //     this.text = `[${name}]`;
-    //   }
-    //
-    // } else {
-    //   // File:
-    //   if (fileItem.abs) {
-    //     this.text = fileItem.dir + '/' + fileItem.base;
-    //     //this.text = this.text.substring(1); // hack, because of rtl css bug
-    //   } else {
-    //     this.text = `${fileItem.base}`;
-    //   }
-    // }
 
     return undefined;
   }
