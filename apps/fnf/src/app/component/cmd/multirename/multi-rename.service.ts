@@ -71,7 +71,7 @@ export class MultiRenameService {
     const pattern = data.name;
     const ignoreExtension = data.ignoreExtension;
 
-    const ext = source.base.split('.').pop() || '';
+    let ext = source.base.split('.').pop() || '';
     const name = (source.base.substring(0, source.base.lastIndexOf(ext) - 1));
 
     const parent = this.getParentDir(source.dir);
@@ -90,21 +90,27 @@ export class MultiRenameService {
     // console.info('data.counterStart', data.counterStart);
 
     let processedName = this.applyCapitalization(name, data.capitalizeMode);
+    if (!ignoreExtension) ext = this.applyCapitalization(ext, data.capitalizeMode);
+
 
     if (data.replaceGermanUmlauts) {
       processedName = this.replaceUmlauts(processedName);
+      if (!ignoreExtension) ext  = this.replaceUmlauts(ext);
     }
 
     if (data.replaceRiskyChars) {
       processedName = processedName.replace(/[^a-zA-Z0-9_ \[\]\(\)\-\.]/g, '');
+      if (!ignoreExtension) ext.replace(/[^a-zA-Z0-9_ \[\]\(\)\-\.]/g, '');
     }
 
     if (data.replaceSpaceToUnderscore) {
       processedName = processedName.replace(/ /g, '_');
+      if (!ignoreExtension) ext = ext.replace(/ /g, '_');
     }
 
     if (data.replaceParentDir) {
       processedName = processedName.replace(parent, '');
+      if (!ignoreExtension) ext = ext.replace(parent, '');
     }
 
     let base = pattern
@@ -115,13 +121,16 @@ export class MultiRenameService {
       .replace(/\[R\]/g, parentOfParentOfParent);
 
     // Process name ranges
-    base = this.processNameRanges(base, name);
+    base = this.processPlaceholder(base, name, 'N');
 
     // Process extension ranges
-    base = this.processExtensionRanges(base, ext);
+    base = this.processPlaceholder(base, ext, 'E');
 
     // Process parent dir ranges
-    base = this.processParentRanges(base, parent);
+    base = this.processPlaceholder(base, parent, 'P');
+    base = this.processPlaceholder(base, parentOfParent, 'Q');
+    base = this.processPlaceholder(base, parentOfParentOfParent, 'R');
+    
 
     // Process counter
     if (base.indexOf('[C]') > -1) {
@@ -190,28 +199,56 @@ export class MultiRenameService {
   }
 
   /**
-   * Processes name ranges in the pattern
-   * @param base The base pattern
-   * @param name The name to process
-   * @returns The processed pattern
+   * Processes placeholder patterns in a string for file name manipulation.
+   * This function handles three different types of placeholder patterns for extracting substrings:
+   * 
+   * 1. `[letter#-#]` - Extracts a substring from index # to index #
+   * 2. `[letter#-]` - Extracts a substring from index # to the end
+   * 3. `[letter-#]` - Extracts a substring from start to index #
+   * 
+   * Where 'letter' can be one of the following:
+   * - 'N': File name
+   * - 'E': File extension
+   * - 'P': Parent directory name
+   * - 'Q': Parent of parent directory name
+   * - 'R': Parent of parent of parent directory name
+   * 
+   * @example
+   * // For a file named "document.txt" in "/home/user/docs" directory:
+   * 
+   * // Example 1: Extract characters 1-3 from filename
+   * processPlaceholder("prefix_[N1-3]_suffix", "document", 'N')
+   * // Returns: "prefix_ocu_suffix"
+   * 
+   * // Example 2: Extract from index 2 to the end of extension
+   * processPlaceholder("[E2-]", "txt", 'E')
+   * // Returns: "t"
+   * 
+   * // Example 3: Extract first 2 characters of parent directory
+   * processPlaceholder("dir_[P-2]", "docs", 'P')
+   * // Returns: "dir_do"
+   * 
+   * @param base - The string containing the placeholder pattern
+   * @param name - The source string from which to extract (filename, extension, or directory name)
+   * @param letter - The type of placeholder ('N'|'E'|'P'|'Q'|'R')
+   * @returns The processed string with placeholders replaced by the extracted substrings
    */
-  private processNameRanges(base: string, name: string): string {
+  private processPlaceholder(base: string, name: string, letter: 'N'|'E'|'P'|'Q'|'R'): string {
     let result = base;
-// TODO N as parameter. can also be: P Q R E
-    // [N#-#] - Part of name from index # to index #
-    let m = result.match(/\[N(\d+)\-(\d+)\]/);
+    // [letter#-#] - Part of name from index # to index #
+    let m = result.match(new RegExp(`\\[${letter}(\\d+)\\-(\\d+)\\]`));
     if (m) {
       result = result.replace(m[0], name.substring(parseInt(m[1]), parseInt(m[2])));
     }
 
-    // [N#-] - Part of name from index # to end
-    m = result.match(/\[N(\d+)\-\]/);
+    // [letter#-] - Part of name from index # to end
+    m = result.match(new RegExp(`\\[${letter}(\\d+)\\-\\]`));
     if (m) {
       result = result.replace(m[0], name.substring(parseInt(m[1])));
     }
 
-    // [N-#] - Part of name from start to index #
-    m = result.match(/\[N\-(\d+)\]/);
+    // [letter-#] - Part of name from start to index #
+    m = result.match(new RegExp(`\\[${letter}\\-(\\d+)\\]`));
     if (m) {
       result = result.replace(m[0], name.substring(0, parseInt(m[1])));
     }
@@ -219,65 +256,6 @@ export class MultiRenameService {
     return result;
   }
 
-  /**
-   * Processes extension ranges in the pattern
-   * @param base The base pattern
-   * @param ext The extension to process
-   * @returns The processed pattern
-   */
-  private processExtensionRanges(base: string, ext: string): string {
-    let result = base;
-
-    // [E#-#] - Part of extension from index # to index #
-    let m = result.match(/\[E(\d+)\-(\d+)\]/);
-    if (m) {
-      result = result.replace(m[0], ext.substring(parseInt(m[1]), parseInt(m[2])));
-    }
-
-    // [E#-] - Part of extension from index # to end
-    m = result.match(/\[E(\d+)\-\]/);
-    if (m) {
-      result = result.replace(m[0], ext.substring(parseInt(m[1])));
-    }
-
-    // [E-#] - Part of extension from start to index #
-    m = result.match(/\[E\-(\d+)\]/);
-    if (m) {
-      result = result.replace(m[0], ext.substring(0, parseInt(m[1])));
-    }
-
-    return result;
-  }
-
-  /**
-   * Processes parent directory ranges in the pattern
-   * @param base The base pattern
-   * @param parent The parent directory to process
-   * @returns The processed pattern
-   */
-  private processParentRanges(base: string, parent: string): string {
-    let result = base;
-
-    // [P#-#] - Part of parent from index # to index #
-    let m = result.match(/\[P(\d+)\-(\d+)\]/);
-    if (m) {
-      result = result.replace(m[0], parent.substring(parseInt(m[1]), parseInt(m[2])));
-    }
-
-    // [P#-] - Part of parent from index # to end
-    m = result.match(/\[P(\d+)\-\]/);
-    if (m) {
-      result = result.replace(m[0], parent.substring(parseInt(m[1])));
-    }
-
-    // [P-#] - Part of parent from start to index #
-    m = result.match(/\[P\-(\d+)\]/);
-    if (m) {
-      result = result.replace(m[0], parent.substring(0, parseInt(m[1])));
-    }
-
-    return result;
-  }
 
   /**
    * Pads a string with zeros
