@@ -1,6 +1,6 @@
 export interface FileItemMetaIf {
 
-  error?: string;
+  error?: string|any;
   status?: string;
   selected?: boolean;
 

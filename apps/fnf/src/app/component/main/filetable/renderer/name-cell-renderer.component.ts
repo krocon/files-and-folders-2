@@ -9,9 +9,18 @@ import {IconType} from "./icon.type";
 @Component({
   selector: 'name-cell-renderer',
   template: `
-    <!--i [attr.class]="iconClass"></i-->
-
-    @if (icon==='audio') {
+    <div
+        [matTooltipShowDelay]="2000"
+        [matTooltip]="tooltip"
+        [attr.class]="'icon-'+icon">
+      
+    @if (icon==='selectedfile') {
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="m438-240 226-226-58-58-169 169-84-84-57 57 142 142ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg>
+      
+    } @else if (icon==='selectedfolder') {
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="m434-297 226-227-56-56-170 170-85-85-57 57 142 141ZM160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h240l80 80h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Zm0-80h640v-400H447l-80-80H160v480Zm0 0v-480 480Z"/></svg>
+      
+    } @else if (icon==='audio') {
       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" ><path d="M430-200q38 0 64-26t26-64v-150h120v-80H480v155q-11-8-23.5-11.5T430-380q-38 0-64 26t-26 64q0 38 26 64t64 26ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg>
    
     } @else if (icon==='video') {
@@ -130,13 +139,10 @@ import {IconType} from "./icon.type";
       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M600-80v-100L320-320H120v-240h172l108-124v-196h240v240H468L360-516v126l240 120v-50h240v240H600ZM480-720h80v-80h-80v80ZM200-400h80v-80h-80v80Zm480 240h80v-80h-80v80ZM520-760ZM240-440Zm480 240Z"/></svg>
       
     } @else if (icon==='other') {
-      <!--svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg-->
-      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M200-200q-33 0-56.5-23.5T120-280v-400q0-33 23.5-56.5T200-760h560q33 0 56.5 23.5T840-680v400q0 33-23.5 56.5T760-200H200Zm0-80h560v-400H200v400Zm0 0v-400 400Z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg>
     }
-    
+    </div>
     <div
-        [matTooltipShowDelay]="2000"
-        [matTooltip]="tooltip"
         class="ffn-name-cell-label"
         [class.rtl]="rtl"
     >{{ text }}</div>
@@ -235,13 +241,16 @@ export class NameCellRendererComponent implements ComponentRendererIf<FileItemIf
       if (fileItem.base === DOT_DOT) {
         return "folder";
       }
+      if (fileItem.meta?.selected) return "selectedfolder";
       return "folder";
     }
 
     // not a dir, it's a file:
 
-    // @ts-ignore
-    if (fileItem.meta.error && fileItem.meta.error['code'] === "EPERM") return "hidden";
+
+    if (fileItem.meta?.selected) return "selectedfile";
+
+    if (fileItem?.meta?.error && fileItem.meta.error.code === "EPERM") return "hidden";
 
     const base = fileItem.base;
     const ext = fileItem?.ext?.toLowerCase() ??'';
