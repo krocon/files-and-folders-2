@@ -1,5 +1,13 @@
 import {ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit} from "@angular/core";
-import {FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators
+} from "@angular/forms";
 import {MultiRenameDialogData} from "./data/multi-rename-dialog.data";
 import {
   MAT_DIALOG_DATA,
@@ -11,8 +19,8 @@ import {
 import {FileItemIf} from "@fnf/fnf-data";
 
 import {takeWhile} from "rxjs/operators";
-import {MatFormField, MatInput, MatLabel} from "@angular/material/input";
-import {MatButton} from "@angular/material/button";
+import {MatFormField, MatInput, MatLabel, MatSuffix} from "@angular/material/input";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {MultiRenameData} from "./data/multi-rename.data";
 import {MultiRenameOptions} from "./data/multi-rename-options";
@@ -37,6 +45,9 @@ import {MultiRenameNameCellRendererComponent} from "./multi-rename-name-cell-ren
 import {MultiRenameService} from "./multi-rename.service";
 import {debounceTime} from "rxjs";
 import {fileItemComparator} from "../../../common/comparator/file-item-comparator";
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {Makro} from "./data/makro";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: "fnf-multi-rename-dialog",
@@ -55,6 +66,12 @@ import {fileItemComparator} from "../../../common/comparator/file-item-comparato
     MatLabel,
     MatCheckbox,
     TableComponent,
+    MatIconButton,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger,
+    MatSuffix,
+    MatDivider,
   ],
   styleUrls: ["./multi-rename-dialog.component.css"]
 })
@@ -109,6 +126,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
     console.info(multiRenameDialogData.rows); // TODO del
     this.data = multiRenameDialogData.data;
     this.options = multiRenameDialogData.options;
+
 
     this.formGroup = this.formBuilder.group(
       {
@@ -233,5 +251,11 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
 
   private clone(r: FileItemIf): FileItemIf {
     return JSON.parse(JSON.stringify(r));
+  }
+
+
+
+  onMakroClicked(macro: Makro, index:number, replacementForm: AbstractControl<any>) {
+    replacementForm.setValue({...macro.data, checked:true});
   }
 }

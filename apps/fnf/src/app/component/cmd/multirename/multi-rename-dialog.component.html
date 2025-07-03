@@ -82,7 +82,7 @@
       <mat-checkbox formControlName="replaceGermanUmlauts">Fix german umlauts</mat-checkbox>
       <mat-checkbox formControlName="replaceRiskyChars">Replace risky chars</mat-checkbox>
       <mat-checkbox formControlName="replaceSpaceToUnderscore">Space to underscore</mat-checkbox>
-<!--      <mat-checkbox formControlName="replaceParentDir">Remove parent dir</mat-checkbox>-->
+      <mat-checkbox formControlName="replaceParentDir">Remove parent dir</mat-checkbox>
       <div></div>
     </div>
 
@@ -101,6 +101,27 @@
 
             <mat-form-field>
               <input formControlName="textFrom" matInput/>
+              <button
+                  matSuffix
+                  [matMenuTriggerFor]="menuMakros"
+                  mat-icon-button>
+                <mat-icon class="fnf-header-fg-color">expand_more</mat-icon>
+              </button>
+              <mat-menu
+                  #menuMakros="matMenu"
+                  class="fnf-search-template-menu">
+                  @for (ft of data.makros; track ft) {
+                    <button
+                        (click)="onMakroClicked(ft, i, replacementForm)"
+                        mat-menu-item>
+                      <div>
+                        <b [innerText]="ft.title"></b>
+                      </div>
+                      <small [innerText]="ft.example"></small>
+                    </button>
+                    <mat-divider></mat-divider>
+                  }
+              </mat-menu>
             </mat-form-field>
 
             <label>with</label>

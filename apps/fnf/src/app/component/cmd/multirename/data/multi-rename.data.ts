@@ -28,6 +28,18 @@ export class MultiRenameData {
 
   makros: Makro[] = [
     {
+      cat: 'Replace chars',
+      title: 'Replace pseudo delimiter: ._- -> space',
+      example: '"Das-Joshua-Profil.epub" -> "Das Joshua Profil.epub"',
+      data: {
+        textFrom: '/[\\._\\-]/g',
+        regExpr: true,
+        textTo: ' ',
+        ifFlag: false,
+        ifMatch: ''
+      }
+    },
+    {
       cat: 'Reorder words',
       title: 'prename name - title -> name, prename - title',
       example: '"Sebastian Fitzek - Das Joshua-Profil.epub" -> "Fitzek, Sebastian - Das Joshua-Profil.epub"',

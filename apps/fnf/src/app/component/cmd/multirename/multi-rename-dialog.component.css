@@ -30,7 +30,7 @@
         }
         .row-3 {
             display: grid;
-            grid-template-columns: auto auto auto auto 1fr;
+            grid-template-columns: auto auto auto auto auto 1fr;
             grid-gap: 24px;
         }
         .row-5 {
