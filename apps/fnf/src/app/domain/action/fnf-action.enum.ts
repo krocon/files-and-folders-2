@@ -54,6 +54,7 @@ export const actionIds = [
   "OPEN_COPY_DLG",
 
   "TOGGLE_FILTER",
+  "TOGGLE_HIDDEN_FILES",
   "OPEN_SHORTCUT_DLG",
 
   "DO_NOTHING"

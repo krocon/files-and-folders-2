@@ -52,6 +52,19 @@
 
   <div class="fnf-border-bottom filter-div">
     @if (tabsPanelData) {
+
+      <button
+          [matTooltipShowDelay]="2000" [matTooltip]="'TOGGLE_HIDDEN_FILES' | fnfShortcut"
+          class="icon-only-button float-right"
+          (click)="toggleHiddenFilesVisible()"
+          mat-button>
+        @if (tabsPanelData.tabs[tabsPanelData.selectedTabIndex].hiddenFilesVisible) {
+          <mat-icon class="fnf-header-fg-color">visibility_off</mat-icon>
+        } @else {
+          <mat-icon class="fnf-header-fg-color">visibility</mat-icon>
+        }
+      </button>
+
       <button
           [matTooltipShowDelay]="2000" [matTooltip]="'TOGGLE_FILTER' | fnfShortcut"
           class="icon-only-button float-right"
@@ -72,6 +85,9 @@
           class="filter border-0 float-right mr-1"
           matInput
           placeholder="Filter">
+
+
+
     }
   </div>
 </div>

@@ -136,6 +136,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
   private tableApi: TableApi | undefined;
   private alive = true;
   private injector = inject(Injector);
+  private hiddenFilesVisible = true;
   private filterText = "";
   private filterActive = false;
   private dirPara?: DirPara;
@@ -204,20 +205,19 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
   @Input() set tabsPanelData(value: TabsPanelData) {
-    console.info('filetable, set tabsPanelData', value);
     this._tabsPanelData = value;
 
     const selectedTabData = this._tabsPanelData.tabs[this._tabsPanelData.selectedTabIndex];
     this.focusRowCriterea = selectedTabData.focusRowCriterea
 
-    const filterChanged = this.filterText !== selectedTabData.filterText || this.filterActive !== selectedTabData.filterActive;
+    const filterChanged =
+      this.filterText !== selectedTabData.filterText
+      || this.filterActive !== selectedTabData.filterActive
+      || this.hiddenFilesVisible !== selectedTabData.hiddenFilesVisible
+    ;
+    this.hiddenFilesVisible = !!selectedTabData.hiddenFilesVisible;
     this.filterText = selectedTabData.filterText ?? '';
     this.filterActive = selectedTabData.filterActive ?? false;
-
-    // console.info('panelIndex', this.panelIndex);
-    // console.info('filterChanged', filterChanged);
-    // console.info('this.filterText', this.filterText);
-    // console.info('this.filterActive', this.filterActive);
 
     if (!this.dirPara
       || this.dirPara?.path !== selectedTabData.path) {
@@ -377,13 +377,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
     this.tableApi = tableApi
   }
 
-  // removeRows<T>(rows: FileItemIf[], predicate: (a: FileItemIf, b: FileItemIf) => boolean) {
-  //   const am = this.bodyAreaModel
-  //   let allRows1 = am.getAllRows();
-  //   const allRows = allRows1.filter(r => !rows.some(rr => predicate(r, rr)));
-  //   console.info(allRows1.length, allRows.length);
-  //   am.setRows(allRows);
-  // }
 
   actionCall(action: string) {
     if (action === 'RELOAD_DIR') {
@@ -579,11 +572,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
   private handleRelevantDirEvent(dirEvent: DirEventIf, zi: ZipUrlInfo) {
     if (!this.tableApi || !dirEvent || !this.dirPara) return;
 
-    if (this.panelIndex === 0) {
-      // console.info('dirEvent -->  ' + dirEvent.action, JSON.stringify(dirEvent, null, 4)); // TODO del
-      console.info('dirEvent -->  ' + dirEvent.action, dirEvent); // TODO del
-    }
-
     if (dirEvent.action === "list") {
       let rows: FileItemIf[] = [];
 
@@ -774,8 +762,9 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
   private filterFn(value: FileItemIf, index: number, array: FileItemIf[]): boolean {
-    return !this.filterActive
-      || value.base === DOT_DOT
-      || value.base.toLowerCase().includes(this.filterText.toLowerCase());
+    if (value.base === DOT_DOT) return true;
+    return  (!this.filterActive || value.base.toLowerCase().includes(this.filterText.toLowerCase()))
+          && (this.hiddenFilesVisible || !value.base.startsWith('.'))
+      ;
   }
 }

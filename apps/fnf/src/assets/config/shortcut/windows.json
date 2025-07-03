@@ -46,5 +46,6 @@
   "ctrl+pageup": "NAVIGATE_LEVEL_DOWN",
   "ctrl+pagedown": "NAVIGATE_BACK",
   "ctrl+shift+f": "TOGGLE_FILTER",
+  "ctrl+shift+alt-f": "TOGGLE_HIDDEN_FILES",
   "ctrl+enter": "DUMMY_ACTION"
 }

@@ -382,6 +382,13 @@ export class AppService {
       tab.filterActive = !tab.filterActive;
       this.filePageDataService.update(value);
 
+    } else if (id === 'TOGGLE_HIDDEN_FILES') {
+      const value = this.filePageDataService.getValue();
+      const tabsPanelData = value.tabRows[this.panelSelectionService.getValue()];
+      const tab = tabsPanelData.tabs[tabsPanelData.selectedTabIndex];
+      tab.hiddenFilesVisible = !tab.hiddenFilesVisible;
+      this.filePageDataService.update(value);
+
     } else if (id === 'REMOVE_TAB') {
       this.removeTab();
 

@@ -17,6 +17,7 @@ export class FnfActionLabels {
     REMOVE_TAB: "Remove Tab",
     NEXT_TAB: "Toggle Tabs",
     TOGGLE_FILTER: "Toggle Filter Input",
+    TOGGLE_HIDDEN_FILES: "Toggle Hidden Files",
 
     OPEN_JOB_QUEUE_DLG: "Open Action Queue Dialog",
     OPEN_GOTO_ANYTHING_DLG: "Go to anything...",

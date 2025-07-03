@@ -124,6 +124,13 @@ export class TabpanelComponent implements OnInit, OnDestroy {
       this.dataChanged.next(this.tabsPanelData);
     }
   }
+  toggleHiddenFilesVisible() {
+    if (this.tabsPanelData) {
+      const selectedTabData = this.tabsPanelData.tabs[this.tabsPanelData.selectedTabIndex];
+      selectedTabData.hiddenFilesVisible = !selectedTabData.hiddenFilesVisible;
+      this.dataChanged.next(this.tabsPanelData);
+    }
+  }
 
   onFilterChangedByUser() {
     if (this.tabsPanelData) this.dataChanged.next(this.tabsPanelData);

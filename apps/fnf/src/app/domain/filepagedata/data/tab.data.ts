@@ -5,6 +5,7 @@ export class TabData {
   public history: string[] = [];
   public findData: FindData | undefined;
   public filterActive: boolean = false;
+  public hiddenFilesVisible: boolean = false;
   public filterText: string = '';
   public id: number = 0;
 
