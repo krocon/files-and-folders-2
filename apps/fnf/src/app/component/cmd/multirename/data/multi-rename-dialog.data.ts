@@ -6,7 +6,7 @@ import {MultiRenameOptions} from "./multi-rename-options";
 
 export class MultiRenameDialogData {
 
-  data = new MultiRenameData();
+  data:MultiRenameData|null = null;
   options: Options = new MultiRenameOptions();
 
   constructor(

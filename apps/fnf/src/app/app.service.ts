@@ -871,6 +871,7 @@ export class AppService {
 
     if (rows?.length) {
       const data = new MultiRenameDialogData(rows, srcPanelIndex);
+      //data.data =
       this.multiRenameDialogService
         .open(data, (arr: QueueActionEvent[] | undefined) => {
           if (arr) {

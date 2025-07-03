@@ -48,6 +48,7 @@ import {fileItemComparator} from "../../../common/comparator/file-item-comparato
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {Makro} from "./data/makro";
 import {MatDivider} from "@angular/material/divider";
+import {TypedDataService} from "../../../common/typed-data.service";
 
 @Component({
   selector: "fnf-multi-rename-dialog",
@@ -113,6 +114,8 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
   private tableApi: TableApi | undefined;
   private alive = true;
 
+  private static readonly innerServiceMultiRenameData = new TypedDataService<MultiRenameData>("multiRenameData", new MultiRenameData());
+
 
   constructor(
     public dialogRef: MatDialogRef<MultiRenameDialogComponent>,
@@ -123,8 +126,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
     private readonly multiRenameService: MultiRenameService,
     private readonly zone: NgZone,
   ) {
-    console.info(multiRenameDialogData.rows); // TODO del
-    this.data = multiRenameDialogData.data;
+    this.data = multiRenameDialogData.data  ? multiRenameDialogData.data : MultiRenameDialogComponent.innerServiceMultiRenameData.getValue();
     this.options = multiRenameDialogData.options;
 
 
@@ -229,7 +231,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
       )
       .subscribe(evt => {
         this.zone.runOutsideAngular(() => {
-          this.multiRenameService.updateTargets(this.rows, this.formGroup.getRawValue());
+          this.multiRenameService.updateTargets(this.rows, {...new MultiRenameData(), ...this.formGroup.getRawValue()});
           this.tableApi?.setRows(this.rows);
           this.tableApi?.repaint();
         });
@@ -237,8 +239,22 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
   }
 
   onOkClicked() {
+    if (this.multiRenameDialogData.data===null) {
+      MultiRenameDialogComponent.innerServiceMultiRenameData.update(
+        {...new MultiRenameData(), ...this.formGroup.getRawValue()}
+      );
+    }
     const actionEvents = this.multiRenameService.createActionEvents(this.rows, this.multiRenameDialogData.panelIndex);
     this.dialogRef.close(actionEvents);
+  }
+
+  onResetClicked(){
+    this.data = new MultiRenameData();
+    MultiRenameDialogComponent.innerServiceMultiRenameData.update(this.data);
+    this.formGroup.reset(this.data);
+    this.multiRenameService.updateTargets(this.rows, this.data);
+    this.tableApi?.setRows(this.rows);
+    this.tableApi?.repaint();
   }
 
   onCancelClicked() {

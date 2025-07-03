@@ -157,6 +157,15 @@
 
 <mat-dialog-actions>
   <button
+      (click)="onResetClicked()"
+      data-test-id="dialog-reset-button"
+      mat-raised-button>
+    Reset
+  </button>
+
+  <div></div>
+
+  <button
       (click)="onCancelClicked()"
       data-test-id="dialog-cancel-button"
       mat-raised-button>
