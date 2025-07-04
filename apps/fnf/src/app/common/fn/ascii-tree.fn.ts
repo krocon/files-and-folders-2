@@ -147,14 +147,12 @@ export function filterAsciiTree(
 
   // For each matching row, add its path and all parent paths to the set
   matchingRows.forEach(row => {
-    // Add the current path
-    pathsToInclude.add(row.path);
-
-    // Add all parent paths
-    let currentPath = row.path;
-    while (currentPath.lastIndexOf('/') > 0) {
-      currentPath = currentPath.substring(0, currentPath.lastIndexOf('/'));
-      pathsToInclude.add(currentPath);
+    
+    // Add the current path, if the leaf is ok for predicate filter
+    const lastSegment = row.path.split('/').filter(p => p).pop() || '';
+    let r = {path:lastSegment, label:''};
+    if (predicate(r)) {
+      pathsToInclude.add(row.path);
     }
   });
 
