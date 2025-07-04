@@ -56,7 +56,7 @@ import {MatSlider, MatSliderThumb} from "@angular/material/slider";
 })
 export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
-  maxDeep = 5
+  maxDeep = 15
 
   filterText = '';
   deep: number = this.maxDeep;
@@ -128,14 +128,21 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.alive = true;
-    const para = new FindFolderPara([this.changeDirDialogData.sourceDir], '', this.maxDeep);
+    this.initFetchDirectories(1);
+    this.initFetchDirectories(5);
+    this.initFetchDirectories(this.maxDeep);
+    this.initTextChangeListener();
+  }
+
+  private initFetchDirectories(deep:number=5) {
+    const para = new FindFolderPara([this.changeDirDialogData.sourceDir], '', deep);
     this.gotoAnythingDialogService
       .findFolders(para)
       .pipe(
         takeWhile(() => this.alive),
       )
-      .subscribe(
-        arr => {
+      .subscribe(arr => {
+          console.info('_______', arr);
           this.rows =
             createAsciiTree(
               arr.map(s => s.substring(this.changeDirDialogData.sourceDir.length))
@@ -143,7 +150,9 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
           this.applyFilter();
         }
       );
+  }
 
+  private initTextChangeListener() {
     this.filterTextChanged
       .pipe(
         takeWhile(() => this.alive),
