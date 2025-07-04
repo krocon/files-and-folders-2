@@ -14,7 +14,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
-import {MatIconModule} from '@angular/material/icon';
+import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatCardModule} from '@angular/material/card';
 import {MatDividerModule} from '@angular/material/divider';
@@ -99,8 +99,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
     private readonly panelSelectionService: PanelSelectionService,
     //
     private readonly cdr: ChangeDetectorRef,
+    private readonly matIconReg: MatIconRegistry,
   ) {
-
+    this.matIconReg.setDefaultFontSetClass('material-symbols-outlined');
   }
 
   ngOnInit(): void {

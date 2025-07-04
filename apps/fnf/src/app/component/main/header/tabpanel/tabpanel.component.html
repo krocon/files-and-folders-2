@@ -36,10 +36,12 @@
               </button>
               <mat-divider></mat-divider>
               <button mat-menu-item>
-                <mat-icon>tab</mat-icon><span>Move to {{panelIndex===0?'right':'left'}} panel</span>
+                <mat-icon>tab_move</mat-icon><span>Move to {{panelIndex===0?'right':'left'}} panel</span>
               </button>
               <button mat-menu-item>
-                <mat-icon>tab</mat-icon><span>Open on {{panelIndex===0?'right':'left'}} panel</span>
+                <mat-icon
+                [class.mat-icon-rtl-mirror]="panelIndex===1"
+                >tab_new_right</mat-icon><span>Open on {{panelIndex===0?'right':'left'}} panel</span>
               </button>
             </mat-menu>
             <app-tab
