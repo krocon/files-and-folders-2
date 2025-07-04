@@ -45,6 +45,7 @@
             <app-tab
                 (click)="onTabClicked(i, $event, matMenuTrigger)"
                 (pointerdown)="onTabPointerDown(i, $event, matMenuTrigger)"
+                (contextmenu)="onTabContextMenu(i, $event, matMenuTrigger)"
                 [activeAndSelected]="selected && i === tabsPanelData.selectedTabIndex"
                 [class.active]="i === tabsPanelData.selectedTabIndex"
                 [panelIndex]="panelIndex"

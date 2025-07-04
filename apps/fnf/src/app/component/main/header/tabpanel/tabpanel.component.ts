@@ -157,9 +157,7 @@ export class TabpanelComponent implements OnInit, OnDestroy {
 
   onTabClicked(i: number, evt: MouseEvent, matMenuTrigger: MatMenuTrigger) {
     if (evt.button === 2) {
-      evt.preventDefault();
-      matMenuTrigger.openMenu();
-
+      //
     } else if (evt.shiftKey) {
       this.try2RemoveTab(i, evt);
     }
@@ -168,7 +166,12 @@ export class TabpanelComponent implements OnInit, OnDestroy {
   onTabPointerDown(i: number, evt: PointerEvent, matMenuTrigger: MatMenuTrigger) {
     this.onTabClicked(i, evt, matMenuTrigger);
   }
-  
+
+  onTabContextMenu(i: number, evt: MouseEvent, matMenuTrigger: MatMenuTrigger) {
+    evt.preventDefault();
+    matMenuTrigger.openMenu();
+  }
+
   private try2RemoveTab(i: number, evt: MouseEvent) {
       evt.preventDefault();
 
