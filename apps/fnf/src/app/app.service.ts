@@ -1,4 +1,4 @@
-import {inject, Injectable, Injector} from "@angular/core";
+import {Injectable} from "@angular/core";
 import {LookAndFeelService} from "./service/look-and-feel.service";
 import {ShortcutActionMapping, ShortcutService} from "./service/shortcut.service";
 import {SysinfoService} from "./service/sysinfo.service";
@@ -86,8 +86,6 @@ export class AppService {
 
   public bodyAreaModels: [FileTableBodyModel | undefined, FileTableBodyModel | undefined] = [undefined, undefined];
   public selectionManagers: [SelectionManagerForObjectModels<FileItemIf> | undefined, SelectionManagerForObjectModels<FileItemIf> | undefined] = [undefined, undefined];
-
-  private injector = inject(Injector);
   private defaultTools: CmdIf[] = [];
 
 
@@ -105,7 +103,6 @@ export class AppService {
     private readonly copyOrMoveDialogService: CopyOrMoveDialogService,
     private readonly clipboardService: ClipboardService,
     private readonly renameDialogService: RenameDialogService,
-    //private readonly mkdirDialogService: MkdirDialogService,
     private readonly commandService: CommandService,
     private readonly shortcutDialogService: ShortcutDialogService,
     private readonly toolService: ToolService,
@@ -268,9 +265,6 @@ export class AppService {
         console.info('        > active shortcuts', this.shortcutService.getActiveShortcuts());
       }
     }
-
-    // await this.initTabs();
-
     callback();
   }
 
@@ -313,25 +307,6 @@ export class AppService {
     this.tabsPanelDatas[panelIndex] = this.clone(fileData);
     this.tabsPanelDataService.update(panelIndex, fileData);
   }
-
-  // public async initTabs() {
-  //   // first start ever?
-  //   if (this.tabsPanelDatas.default) {
-  //     console.info('        > Init Tabs.....');
-  //     try {
-  //       const startFolder = await this.sysinfoService.getFirstStartFolder();
-  //       console.info('        > First Start  :', startFolder);
-  //       const v = this.clone(this.tabsPanelDatas);
-  //       v.default = false;
-  //       v.tabRows[0].tabs[0].path = startFolder;
-  //       v.tabRows[1].tabs[0].path = startFolder;
-  //       this.updateTabsPanelData(v);
-  //
-  //     } catch (error) {
-  //       console.error('Error getting first start folder:', error);
-  //     }
-  //   }
-  // }
 
   setPanelActive(panelIndex: PanelIndex) {
     this.panelSelectionService.update(panelIndex);
@@ -486,11 +461,9 @@ export class AppService {
   move() {
     const selectedData: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
     const sources: string[] = this.getSourcePaths(selectedData);
-    const targetPath: string = this.getOtherPanelSelectedTabData().path;
-
     this.copyOrMoveDialogService
       .open(
-        new CopyOrMoveDialogData(sources, targetPath, "move"),
+        new CopyOrMoveDialogData(sources, this.getOtherPanelSelectedTabData().path, "move"),
         (target) => {
           if (target) {
             const paras: QueueFileOperationParams[] = this.createFileOperationParams(target);
@@ -591,10 +564,6 @@ export class AppService {
     }
   }
 
-  // createHarmonizedShortcutByKeyboardEvent(keyboardEvent: KeyboardEvent): string {
-  //   return this.shortcutService.createHarmonizedShortcutByKeyboardEvent(keyboardEvent);
-  // }
-
   setBodyAreaModel(panelIndex: PanelIndex, m: FileTableBodyModel) {
     this.bodyAreaModels[panelIndex] = m;
   }
@@ -653,11 +622,6 @@ export class AppService {
     this.tabsPanelDataService.update(panelIndex, tabsPanelData);
     this.changeDir(new ChangeDirEvent(panelIndex, path));
   }
-
-
-  // resetFocusRowCriterea() {
-  //   this.updateFocusRowCritereaOnActivePanel(null);
-  // }
 
   open(fileItem?: FileItemIf) {
     const srcPanelIndex = this.getActivePanelIndex();
@@ -742,7 +706,6 @@ export class AppService {
       data = new FindDialogData('', '**/*.ts', true, false);
       data.folders = this.getRelevantDirsFromActiveTab();
     }
-    // console.info(JSON.stringify( data, null,4));
     this.findDialogService
       .open(data, (result: FindDialogData | undefined) => {
         if (result) {
@@ -777,18 +740,16 @@ export class AppService {
         ),
         (result: ChangeDirEvent | undefined) => {
           if (result) {
-            console.info(result); // TODO
             this.changeDir(result)
           }
         });
   }
 
-  cancelFind(findData: FindData) {
-    this.findSocketService.cancelFind(findData.emmitCancelKey);
-  }
+  // cancelFind(findData: FindData) {
+  //   this.findSocketService.cancelFind(findData.emmitCancelKey);
+  // }
 
   requestFindings(findData: FindData) {
-    console.info('requestFindings', findData);
     this.findSocketService
       .find(findData, event => {
         const currentMap = this.dirEvents$.getValue();
@@ -798,17 +759,6 @@ export class AppService {
       });
   }
 
-  // private updateFocusRowCritereaOnInactivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
-  //   this.updateFocusRowCriterea(this.getInactivePanelIndex(), focusRowCriterea);
-  // }
-
-  // TODO mk?
-  // updateFocusRowCriterea(panelIndex: PanelIndex, focusRowCriterea: Partial<FileItemIf> | null) {
-  //   const filePageDataValue = this.clone(this.filePageDataService.getValue());
-  //   const panelData = filePageDataValue.tabRows[panelIndex];
-  //   panelData.tabs[panelData.selectedTabIndex].focusRowCriterea = focusRowCriterea;
-  //   this.updateTabsPanelData(filePageDataValue);
-  // }
 
   callActionMkDir(para: { dir: string; base: string; panelIndex: PanelIndex }) {
     const actionEvent = this.commandService.mkdir(para);
@@ -871,10 +821,6 @@ export class AppService {
         });
     }
   }
-
-  // private updateFocusRowCritereaOnActivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
-  //   this.updateFocusRowCriterea(this.getActivePanelIndex(), focusRowCriterea);
-  // }
 
   private groupFiles() {
     const srcPanelIndex = this.getActivePanelIndex();
@@ -950,15 +896,6 @@ export class AppService {
     return this.getSelectedData(this.getActivePanelIndex());
   }
 
-  // private getFocussedData(panelIndex: PanelIndex): FileItemIf | null {
-  //   if (this.bodyAreaModels[panelIndex]) {
-  //     const focusedRowIndex = this.bodyAreaModels[panelIndex]?.focusedRowIndex ?? 0;
-  //     const frd = this.bodyAreaModels[panelIndex]?.getRowByIndex(focusedRowIndex) ?? null;
-  //     return frd ?? null;
-  //   }
-  //   return null;
-  // }
-
   private getSelectedOrFocussedDataForActivePanel(): FileItemIf[] {
     return this.getSelectedOrFocussedData(this.getActivePanelIndex());
   }
@@ -973,6 +910,5 @@ export class AppService {
     }
     return [this.getActiveTabOnActivePanel().path];
   }
-
 
 }
