@@ -1,4 +1,6 @@
-<div class="tabpanel-div">
+<div
+    class="tabpanel-div"
+    [class.filter-active]="tabsPanelData && tabsPanelData.tabs[tabsPanelData.selectedTabIndex].filterActive">
 
   <div class="fnf-border-bottom">
     <fnf-fav-menu

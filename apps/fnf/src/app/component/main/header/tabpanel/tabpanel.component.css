@@ -7,7 +7,12 @@
     display: flex;
 
     mat-tab-group {
-        max-width: calc(100% - 400px)
+        max-width: calc(100% - 260px)
+    }
+    &.filter-active {
+        mat-tab-group {
+            max-width: calc(100% - 400px)
+        }
     }
 }
 
@@ -27,6 +32,7 @@
 
 .hidden {
     visibility: hidden;
+    display: none;
 }
 
 .icon-only-button {
