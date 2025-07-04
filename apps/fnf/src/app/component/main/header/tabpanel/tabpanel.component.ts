@@ -1,11 +1,22 @@
-import {Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {PanelIndex, Sysinfo, SysinfoIf} from "@fnf/fnf-data";
 import {TabsPanelData} from "../../../../domain/filepagedata/data/tabs-panel.data";
 import {TabComponent} from "./tab/tab.component";
 import {MatMenuModule, MatMenuTrigger} from "@angular/material/menu";
 import {MatIconModule} from "@angular/material/icon";
-import {MatTabsModule} from "@angular/material/tabs";
+import {MatTabGroup, MatTabsModule} from "@angular/material/tabs";
 import {FavsAndLatestComponent} from "./filemenu/favs-and-latest.component";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
@@ -36,7 +47,7 @@ import {MatDivider} from "@angular/material/divider";
   templateUrl: './tabpanel.component.html',
   styleUrl: './tabpanel.component.css'
 })
-export class TabpanelComponent implements OnInit, OnDestroy {
+export class TabpanelComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   @Input() panelIndex: PanelIndex = 0;
@@ -52,10 +63,13 @@ export class TabpanelComponent implements OnInit, OnDestroy {
   // @Output() readonly filterChanged = new EventEmitter<TabsPanelData>();
   filterVisible: boolean = false;
   @ViewChild('favMenu') private readonly favMenu!: FavsAndLatestComponent;
+  @ViewChild(MatTabGroup) private tabGroup!: MatTabGroup;
 
   private readonly appService = inject(AppService);
+  private readonly ngZone = inject(NgZone);
   // private readonly injector = inject(Injector);
   private alive = true;
+  private resizeObserver: ResizeObserver | null = null;
 
   private _tabsPanelData?: TabsPanelData;
 
@@ -86,14 +100,77 @@ export class TabpanelComponent implements OnInit, OnDestroy {
       });
   }
 
+  ngAfterViewInit(): void {
+    // Set up ResizeObserver to detect when the component is resized
+    this.ngZone.runOutsideAngular(() => {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.ngZone.run(() => {
+          this.ensureActiveTabVisible();
+        });
+      });
+
+      if (this.tabGroup && this.tabGroup._elementRef && this.tabGroup._elementRef.nativeElement) {
+        this.resizeObserver.observe(this.tabGroup._elementRef.nativeElement);
+      }
+    });
+  }
+
   ngOnDestroy(): void {
     this.alive = false;
+
+    // Clean up the ResizeObserver
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+  }
+
+  /**
+   * Ensures that the active tab is visible in the viewport
+   * This is called after resizing, adding tabs, or changing the selected tab
+   */
+  private ensureActiveTabVisible(): void {
+    if (!this.tabGroup || !this.tabsPanelData) {
+      return;
+    }
+
+    // Use setTimeout to ensure this runs after the view has been updated
+    setTimeout(() => {
+      // Find the tab header element
+      const tabHeader = this.tabGroup._elementRef.nativeElement.querySelector('.mat-mdc-tab-header');
+      if (!tabHeader) return;
+
+      // Find the active tab
+      const activeTabIndex = this.tabsPanelData?.selectedTabIndex || 0;
+      const tabLabels = tabHeader.querySelectorAll('.mat-mdc-tab');
+      if (!tabLabels || activeTabIndex >= tabLabels.length) return;
+
+      const activeTab = tabLabels[activeTabIndex];
+      if (!activeTab) return;
+
+      // Check if the active tab is fully visible
+      const tabHeaderRect = tabHeader.getBoundingClientRect();
+      const activeTabRect = activeTab.getBoundingClientRect();
+
+      // If the active tab is not fully visible, scroll to it
+      if (activeTabRect.left < tabHeaderRect.left || activeTabRect.right > tabHeaderRect.right) {
+        // Use the Material tabs scrollTo method if available
+        if (this.tabGroup._tabHeader && typeof this.tabGroup._tabHeader._scrollToLabel === 'function') {
+          this.tabGroup._tabHeader._scrollToLabel(activeTabIndex);
+        } else {
+          // Fallback: manually scroll the tab into view
+          activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        }
+      }
+    });
   }
 
   onSelectedIndexChanged(n: number) {
     if (this.tabsPanelData && n > -1) {
       this.tabsPanelData!.selectedTabIndex = n;
       this.dataChanged.next(this.tabsPanelData);
+      // Ensure the newly selected tab is visible
+      this.ensureActiveTabVisible();
     }
   }
 
@@ -104,6 +181,8 @@ export class TabpanelComponent implements OnInit, OnDestroy {
       this.tabsPanelData.tabs.push(this.clone(selectedTabData));
       this.tabsPanelData.selectedTabIndex = this.tabsPanelData.tabs.length - 1;
       this.dataChanged.next(this.tabsPanelData);
+      // Ensure the newly added tab is visible
+      this.ensureActiveTabVisible();
     }
   }
 
@@ -117,6 +196,8 @@ export class TabpanelComponent implements OnInit, OnDestroy {
           this.tabsPanelData.selectedTabIndex--;
         }
         this.dataChanged.next(this.tabsPanelData);
+        // Ensure the active tab is visible after removing a tab
+        this.ensureActiveTabVisible();
       }
     }
   }
@@ -177,6 +258,8 @@ export class TabpanelComponent implements OnInit, OnDestroy {
           this.tabsPanelData.selectedTabIndex--;
         }
         this.dataChanged.next(this.tabsPanelData);
+        // Ensure the active tab is visible after closing a tab
+        this.ensureActiveTabVisible();
       }
     }
   }
@@ -188,6 +271,8 @@ export class TabpanelComponent implements OnInit, OnDestroy {
       this.tabsPanelData.tabs[i - 1] = temp;
       this.tabsPanelData.selectedTabIndex = i - 1;
       this.dataChanged.next(this.tabsPanelData);
+      // Ensure the active tab is visible after moving it
+      this.ensureActiveTabVisible();
     }
   }
 
@@ -198,6 +283,8 @@ export class TabpanelComponent implements OnInit, OnDestroy {
       this.tabsPanelData.tabs[i + 1] = temp;
       this.tabsPanelData.selectedTabIndex = i + 1;
       this.dataChanged.next(this.tabsPanelData);
+      // Ensure the active tab is visible after moving it
+      this.ensureActiveTabVisible();
     }
   }
 
@@ -216,6 +303,7 @@ export class TabpanelComponent implements OnInit, OnDestroy {
     const targetPanelIndex = this.panelIndex === 0 ? 1 : 0;
     this.appService.addTab(targetPanelIndex, clone);
     this.onTabCloseClicked(i);
+    // Note: onTabCloseClicked already calls ensureActiveTabVisible
   }
 
   private clone<T>(o: T): T {
@@ -225,5 +313,6 @@ export class TabpanelComponent implements OnInit, OnDestroy {
   private try2RemoveTab(i: number, evt: MouseEvent) {
     evt.preventDefault();
     this.onTabCloseClicked(i);
+    // Note: onTabCloseClicked already calls ensureActiveTabVisible
   }
 }
