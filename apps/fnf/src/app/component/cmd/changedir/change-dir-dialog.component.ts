@@ -56,8 +56,10 @@ import {MatSlider, MatSliderThumb} from "@angular/material/slider";
 })
 export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
+  maxDeep = 5
+
   filterText = '';
-  deep: number = 10;
+  deep: number = this.maxDeep;
 
   tableModel?: TableModelIf;
   rows: { path: string, label: string }[] = [];
@@ -126,7 +128,7 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.alive = true;
-    const para = new FindFolderPara([this.changeDirDialogData.sourceDir], '', 10);
+    const para = new FindFolderPara([this.changeDirDialogData.sourceDir], '', this.maxDeep);
     this.gotoAnythingDialogService
       .findFolders(para)
       .pipe(

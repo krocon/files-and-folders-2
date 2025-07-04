@@ -1,4 +1,4 @@
-import {Component, EventEmitter, inject, Injector, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {PanelIndex, Sysinfo, SysinfoIf} from "@fnf/fnf-data";
 import {TabsPanelData} from "../../../../domain/filepagedata/data/tabs-panel.data";
@@ -38,7 +38,6 @@ import {MatDivider} from "@angular/material/divider";
 })
 export class TabpanelComponent implements OnInit, OnDestroy {
 
-  // @Input() filterText: string = '';
 
   @Input() panelIndex: PanelIndex = 0;
   @Input() selected = false;
@@ -55,7 +54,7 @@ export class TabpanelComponent implements OnInit, OnDestroy {
   @ViewChild('favMenu') private readonly favMenu!: FavsAndLatestComponent;
 
   private readonly appService = inject(AppService);
-  private readonly injector = inject(Injector);
+  // private readonly injector = inject(Injector);
   private alive = true;
 
   private _tabsPanelData?: TabsPanelData;
@@ -70,7 +69,8 @@ export class TabpanelComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.appService.actionEvents$
+    this.appService
+      .actionEvents$
       .pipe(takeWhile(() => this.alive))
       .subscribe(action => {
         if (action === 'SELECT_LEFT_PANEL') {
@@ -128,6 +128,7 @@ export class TabpanelComponent implements OnInit, OnDestroy {
       this.dataChanged.next(this.tabsPanelData);
     }
   }
+
   toggleHiddenFilesVisible() {
     if (this.tabsPanelData) {
       const selectedTabData = this.tabsPanelData.tabs[this.tabsPanelData.selectedTabIndex];
@@ -151,10 +152,6 @@ export class TabpanelComponent implements OnInit, OnDestroy {
     }
   }
 
-  private clone<T>(o: T): T {
-    return JSON.parse(JSON.stringify(o));
-  }
-
   onTabClicked(i: number, evt: MouseEvent, matMenuTrigger: MatMenuTrigger) {
     if (evt.button === 2) {
       //
@@ -172,19 +169,61 @@ export class TabpanelComponent implements OnInit, OnDestroy {
     matMenuTrigger.openMenu();
   }
 
-  private try2RemoveTab(i: number, evt: MouseEvent) {
-      evt.preventDefault();
-
-      if (this.tabsPanelData) {
-        if (this.tabsPanelData.tabs.length > 1) {
-          this.tabsPanelData.tabs.splice(i, 1);
-          if (this.tabsPanelData.selectedTabIndex > 0) {
-            this.tabsPanelData.selectedTabIndex--;
-          }
-          this.dataChanged.next(this.tabsPanelData);
+  onTabCloseClicked(i: number) {
+    if (this.tabsPanelData) {
+      if (this.tabsPanelData.tabs.length > 1) {
+        this.tabsPanelData.tabs.splice(i, 1);
+        if (this.tabsPanelData.selectedTabIndex > 0) {
+          this.tabsPanelData.selectedTabIndex--;
         }
+        this.dataChanged.next(this.tabsPanelData);
       }
     }
+  }
 
+  onTabMoveLeftClicked(i: number) {
+    if (this.tabsPanelData && i > 0) {
+      const temp = this.tabsPanelData.tabs[i];
+      this.tabsPanelData.tabs[i] = this.tabsPanelData.tabs[i - 1];
+      this.tabsPanelData.tabs[i - 1] = temp;
+      this.tabsPanelData.selectedTabIndex = i - 1;
+      this.dataChanged.next(this.tabsPanelData);
+    }
+  }
 
+  onTabMoveRightClicked(i: number) {
+    if (this.tabsPanelData && i < this.tabsPanelData.tabs.length - 1) {
+      const temp = this.tabsPanelData.tabs[i];
+      this.tabsPanelData.tabs[i] = this.tabsPanelData.tabs[i + 1];
+      this.tabsPanelData.tabs[i + 1] = temp;
+      this.tabsPanelData.selectedTabIndex = i + 1;
+      this.dataChanged.next(this.tabsPanelData);
+    }
+  }
+
+  onTabCloneClicked(i: number) {
+    if (!this.tabsPanelData) return; // skip
+
+    const clone = this.clone(this.tabsPanelData.tabs[i]);
+    const targetPanelIndex = this.panelIndex === 0 ? 1 : 0;
+    this.appService.addTab(targetPanelIndex, clone);
+  }
+
+  onTabMoveToOtherPanelClicked(i: number) {
+    if (!this.tabsPanelData) return; // skip
+
+    const clone = this.clone(this.tabsPanelData.tabs[i]);
+    const targetPanelIndex = this.panelIndex === 0 ? 1 : 0;
+    this.appService.addTab(targetPanelIndex, clone);
+    this.onTabCloseClicked(i);
+  }
+
+  private clone<T>(o: T): T {
+    return JSON.parse(JSON.stringify(o));
+  }
+
+  private try2RemoveTab(i: number, evt: MouseEvent) {
+    evt.preventDefault();
+    this.onTabCloseClicked(i);
+  }
 }

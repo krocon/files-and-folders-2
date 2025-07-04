@@ -28,26 +28,52 @@
                 style="width: 0;overflow: clip;margin: 0;padding: 0;"
                 #matMenuTrigger="matMenuTrigger"
                 [matMenuTriggerFor]="menu"
-                aria-label="Example icon-button with a menu">
-            </button>
+                aria-label="Example icon-button with a menu"></button>
+
             <mat-menu #menu="matMenu">
-              <button mat-menu-item>
-                <mat-icon>tab_close</mat-icon><span>Close {{ i }}</span>
+              <button
+                  [disabled]="tabsPanelData.tabs.length < 2"
+                  (click)="onTabCloseClicked(i)"
+                  mat-menu-item>
+                <mat-icon>tab_close</mat-icon>
+                <span>Close this tab</span>
               </button>
 
-              <button mat-menu-item>
-                <mat-icon [class.fnf-rtl-mirror]="panelIndex===1">tab_move</mat-icon><span>Move to {{panelIndex===0?'right':'left'}} panel</span>
+              <button
+                  (click)="onTabMoveToOtherPanelClicked(i)"
+                  [disabled]="tabsPanelData.tabs.length < 2"
+                  mat-menu-item>
+                <mat-icon
+                    [class.fnf-rtl-mirror]="panelIndex===1">tab_move
+                </mat-icon>
+                <span>Move tab to {{ panelIndex === 0 ? 'right' : 'left' }} panel</span>
               </button>
-              <button mat-menu-item>
-                <mat-icon [class.fnf-rtl-mirror]="panelIndex===1" >tab_new_right</mat-icon><span>Open on {{panelIndex===0?'right':'left'}} panel</span>
+
+              <button
+                  (click)="onTabCloneClicked(i)"
+                  mat-menu-item>
+                <mat-icon
+                    [class.fnf-rtl-mirror]="panelIndex===1">tab_new_right
+                </mat-icon>
+                <span>Clone this tab for {{ panelIndex === 0 ? 'right' : 'left' }} panel</span>
               </button>
-              <!--mat-divider></mat-divider>
-              <button mat-menu-item>
-                <mat-icon [class.fnf-rtl-mirror]="true">tab_move</mat-icon><span>Move &larr;</span>
+              <mat-divider></mat-divider>
+
+              <button
+                  [disabled]="i === 0"
+                  (click)="onTabMoveLeftClicked(i)"
+                  mat-menu-item>
+                <mat-icon>west</mat-icon>
+                <span>Move this tab the left</span>
               </button>
-              <button mat-menu-item>
-                <mat-icon [class.fnf-rtl-mirror]="false">tab_move</mat-icon><span>Move &rarr;</span>
-              </button-->
+
+              <button
+                  [disabled]="i >= tabsPanelData.tabs.length -1"
+                  (click)="onTabMoveRightClicked(i)"
+                  mat-menu-item>
+                <mat-icon>east</mat-icon>
+                <span>Move this tab to the right</span>
+              </button>
 
             </mat-menu>
             <app-tab
