@@ -1,4 +1,4 @@
-import {FileItemIf, FindData} from "@fnf/fnf-data";
+import {FindData} from "@fnf/fnf-data";
 
 export class TabData {
 
@@ -12,7 +12,7 @@ export class TabData {
   public historyIndex: number = 0;
 
 
-  public focusRowCriterea: Partial<FileItemIf> | null = null;
+  //public focusRowCriterea: Partial<FileItemIf> | null = null;
 
   constructor(
     public path: string

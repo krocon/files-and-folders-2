@@ -115,8 +115,11 @@ export class ButtonPanelComponent implements OnInit {
     //   this.appService.onEditClicked();
     } else if (action === 'move') {
       this.appService.move();
+
     } else if (action === 'mkdir') {
-      this.appService.mkdir();
+      this.triggerAction('OPEN_MKDIR_DLG');
+      // this.appService.openMakeDirDialog();
+
     } else if (action === 'remove') {
       this.appService.delete();
     }

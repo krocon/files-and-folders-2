@@ -1,4 +1,14 @@
-import {ChangeDetectorRef, Component, inject, Injector, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  inject,
+  Injector,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output
+} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {RenderWrapperFactory, TableComponent} from "@guiexpert/angular-table";
 import {
@@ -56,7 +66,10 @@ import {FnfActionLabels} from "../../../domain/action/fnf-action-labels";
 import {NotifyService} from "../../../service/cmd/notify-service";
 import {QueueNotifyEventIf} from "../../../domain/cmd/queue-notify-event.if";
 import {SelectionDialogData} from "../../cmd/selection/selection-dialog.data";
-import {getParentDir} from "../../../common/fn/get-parent-dir.fn";
+import {FocusLocalStorage} from "./focus-local-storage";
+import {MkdirDialogData} from "../../cmd/mkdir/mkdir-dialog.data";
+import {MkdirDialogResultData} from "../../cmd/mkdir/mkdir-dialog-result.data";
+import {MkdirDialogService} from "../../cmd/mkdir/mkdir-dialog.service";
 
 @Component({
   standalone: true,
@@ -70,7 +83,7 @@ import {getParentDir} from "../../../common/fn/get-parent-dir.fn";
     './file-table.component.css'
   ]
 })
-export class FileTableComponent implements OnInit, OnDestroy {
+export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @Input() selected: boolean = false;
   @Output() selectionChanged = new Subject<SelectionEvent>();
@@ -132,7 +145,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
       getKey: (row: FileItemIf) => row.dir + '/' + row.base,
       equalRows: (a: FileItemIf, b: FileItemIf) => a.base === b.base && a.dir === b.dir,
     });
-  private selectionLocalStorage: SelectionLocalStorage<FileItemIf> | undefined;
+
   private tableApi: TableApi | undefined;
   private alive = true;
   private injector = inject(Injector);
@@ -140,8 +153,10 @@ export class FileTableComponent implements OnInit, OnDestroy {
   private filterText = "";
   private filterActive = false;
   private dirPara?: DirPara;
-  private focusRowCriterea: Partial<FileItemIf> | null = null;
+  //private focusRowCriterea: Partial<FileItemIf> | null = null;
   private findDataOld: FindData | undefined;
+
+  private initialized = false;
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
@@ -149,7 +164,10 @@ export class FileTableComponent implements OnInit, OnDestroy {
     private readonly appService: AppService,
     private readonly gridSelectionCountService: GridSelectionCountService,
     public readonly gotoAnythingDialogService: GotoAnythingDialogService,
-    private readonly notifyService: NotifyService
+    private readonly notifyService: NotifyService,
+    private readonly selectionLocalStorage: SelectionLocalStorage,
+    private readonly focusLocalStorage: FocusLocalStorage,
+    private readonly mkdirDialogService: MkdirDialogService,
   ) {
     this.columnDefs.forEach(def => {
       def.sortable = () => true;
@@ -195,7 +213,6 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
   @Input() set panelIndex(value: PanelIndex) {
     this._panelIndex = value;
-    this.selectionLocalStorage = new SelectionLocalStorage<FileItemIf>(`panel${value}_`, this.selectionManager);
   }
 
   private _tabsPanelData?: TabsPanelData;
@@ -208,7 +225,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
     this._tabsPanelData = value;
 
     const selectedTabData = this._tabsPanelData.tabs[this._tabsPanelData.selectedTabIndex];
-    this.focusRowCriterea = selectedTabData.focusRowCriterea
+    //this.focusRowCriterea = selectedTabData.focusRowCriterea
 
     const filterChanged =
       this.filterText !== selectedTabData.filterText
@@ -245,6 +262,10 @@ export class FileTableComponent implements OnInit, OnDestroy {
       this.tableApi.reSort();
       this.tableApi.repaintHard();
     }
+  }
+
+  ngAfterViewInit(): void {
+    this.initialized = true;
   }
 
   reload() {
@@ -450,6 +471,8 @@ export class FileTableComponent implements OnInit, OnDestroy {
           this.appService.changeDir(new ChangeDirEvent(this._panelIndex, fileItem.dir));
         }
       }
+    } else if (action === "OPEN_MKDIR_DLG") {
+      this.openMakeDirDlg();
 
     } else if (action === 'OPEN_GOTO_ANYTHING_DLG') {
       const activeTabOnActivePanel = this.appService.getActiveTabOnActivePanel();
@@ -492,9 +515,44 @@ export class FileTableComponent implements OnInit, OnDestroy {
     }
   }
 
+  openMakeDirDlg() {
+    const panelIndex = this.panelIndex;
+    const activeTabOnActivePanel = this.appService.getActiveTabOnActivePanel();
+    const dir = this.dirPara?.path ?? activeTabOnActivePanel.path;
+    const focussedData = this.getFocussedData();
+    const data = new MkdirDialogData(dir, focussedData?.base ?? '');
+
+    this.mkdirDialogService
+      .open(data, (result: MkdirDialogResultData | undefined) => {
+        if (result && this.dirPara?.path) {
+          const para = {
+            dir: result.target.dir,
+            base: result.target.base,
+            panelIndex
+          };
+          this.focusLocalStorage.persistFocusCriteria(this.panelIndex,this.dirPara.path,  {dir: para.dir, base: para.base});
+          this.appService.callActionMkDir(para);
+        }
+      });
+  }
+
+  private getFocussedData(): FileItemIf | null {
+    if (this.bodyAreaModel) {
+      const focusedRowIndex = this.bodyAreaModel.focusedRowIndex ?? 0;
+      const frd = this.bodyAreaModel.getRowByIndex(focusedRowIndex) ?? null;
+      return frd ?? null;
+    }
+    return null;
+  }
+
   setFocus2Index(index: number) {
     this.bodyAreaModel.focusedRowIndex = index;
-    this.appService.resetFocusRowCriterea();
+    const partial = this.bodyAreaModel.getCriteriaFromFocussedRow();
+
+    const activeTabOnActivePanel = this.appService.getActiveTabOnActivePanel();
+    const dir = this.dirPara?.path ?? activeTabOnActivePanel.path;
+
+    this.focusLocalStorage.persistFocusCriteria(this.panelIndex, dir, partial);
     this.tableApi?.repaint();
 
     const selectedRows = this.selectionManager.getSelectionValue();
@@ -547,8 +605,8 @@ export class FileTableComponent implements OnInit, OnDestroy {
   }
 
   private calcButtonStates<T>(selectedRows: FileItemIf[]) {
-    if (this.dirPara?.path) {
-      this.selectionLocalStorage?.persistSelection(this.dirPara?.path);
+    if (this.dirPara?.path && this.initialized) {
+      this.selectionLocalStorage.persistSelection(this.panelIndex, this.dirPara.path, this.selectionManager);
     }
     const selectionLabelData: SelectionEvent = this.gridSelectionCountService
       .getSelectionCountData(
@@ -591,7 +649,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
         && !this.dirPara?.path.startsWith('tabfind')
         && !rows.find(r => r.base === DOT_DOT)
       ) {
-        // Adding '..' as first item (parent dir):
+        // Adding '..' as the first item (parent dir):
         rows = [
           new FileItem(getParent(this.dirPara.path), DOT_DOT, "", "", 1, true),
           ...rows
@@ -610,7 +668,7 @@ export class FileTableComponent implements OnInit, OnDestroy {
       }
 
       if (dirEvent.end) {
-        this.appService.resetFocusRowCriterea();
+        //
       }
 
     } else if (dirEvent.action === "add" || dirEvent.action === "addDir") {
@@ -641,8 +699,9 @@ export class FileTableComponent implements OnInit, OnDestroy {
       this.repaintTable();
 
     } else if (dirEvent.action === "focus") {
-      this.focusRowCriterea = dirEvent.items[0];
-      this.updateFocusIndexByCriteria();
+      const focusRowCriterea = dirEvent.items[0];
+      this.focusLocalStorage.persistFocusCriteria(this.panelIndex, this.dirPara?.path, focusRowCriterea);
+      this.focusLocalStorage.applyFocus(this.panelIndex, this.dirPara?.path, this.bodyAreaModel);
       this.repaintTable();
 
     } else if (dirEvent.action === "unselect") {
@@ -685,30 +744,30 @@ export class FileTableComponent implements OnInit, OnDestroy {
   private setRows(fileItems: FileItemIf[]): void {
     if (this.tableApi) {
       this.tableApi.setRows(fileItems);
-      if (this.dirPara?.path) {
-        this.selectionLocalStorage?.apply(this.dirPara?.path);
-      }
       this.tableApi.externalFilterChanged();
       this.tableApi.reSort();
-      this.updateFocusIndexByCriteria();
-      if (this.bodyAreaModel.focusedRowIndex >= this.bodyAreaModel.getRowCount()) {
-        this.setFocus2Index(Math.max(0, this.bodyAreaModel.getRowCount() - 1));
+
+      if (this.dirPara?.path) {
+        this.selectionLocalStorage?.applySelection(this.panelIndex, this.dirPara?.path, this.selectionManager);
+        this.focusLocalStorage.applyFocus(this.panelIndex, this.dirPara?.path, this.bodyAreaModel);
       }
+
       this.tableApi.repaintHard();
     }
   }
 
-  private updateFocusIndexByCriteria() {
-    if (this.focusRowCriterea) {
-      const rowIndex = this.bodyAreaModel.getRowIndexByCriteria(this.focusRowCriterea);
-      this.setFocus2Index(rowIndex ?? 0);
-    }
-  }
+  // private updateFocusIndexByCriteria() {
+  //   if (this.focusRowCriterea) {
+  //     const rowIndex = this.bodyAreaModel.getRowIndexByCriteria(this.focusRowCriterea);
+  //     this.setFocus2Index(rowIndex ?? 0);
+  //   }
+  // }
 
   private repaintTable() {
     if (this.tableApi) {
       this.tableApi.externalFilterChanged();
       this.tableApi.reSort();
+      this.tableApi.repaintHard();
       this.tableApi.repaintHard();
     }
   }
@@ -725,14 +784,14 @@ export class FileTableComponent implements OnInit, OnDestroy {
     if (fileItem.isDir) {
 
       // update focus criteria:
-      if (fileItem.base === DOT_DOT) {
-        const p = getParentDir(this.dirPara?.path??'');
-        this.focusRowCriterea = {dir: p.dir, base:p.base };
-        this.appService.updateFocusRowCriterea(this.panelIndex, this.focusRowCriterea);
-      } else {
-        this.focusRowCriterea = {dir: fileItem.dir, base:DOT_DOT };
-        this.appService.updateFocusRowCriterea(this.panelIndex, this.focusRowCriterea);
-      }
+      // if (fileItem.base === DOT_DOT) {
+      //   const p = getParentDir(this.dirPara?.path ?? '');
+      //   this.focusRowCriterea = {dir: p.dir, base: p.base};
+      //   this.appService.updateFocusRowCriterea(this.panelIndex, this.focusRowCriterea);
+      // } else {
+      //   this.focusRowCriterea = {dir: fileItem.dir, base: DOT_DOT};
+      //   this.appService.updateFocusRowCriterea(this.panelIndex, this.focusRowCriterea);
+      // }
 
       if (fileItem.base === DOT_DOT) {
         this.changeDirNext(fileItem.dir);
@@ -763,8 +822,8 @@ export class FileTableComponent implements OnInit, OnDestroy {
 
   private filterFn(value: FileItemIf, index: number, array: FileItemIf[]): boolean {
     if (value.base === DOT_DOT) return true;
-    return  (!this.filterActive || value.base.toLowerCase().includes(this.filterText.toLowerCase()))
-          && (this.hiddenFilesVisible || !value.base.startsWith('.'))
+    return (!this.filterActive || value.base.toLowerCase().includes(this.filterText.toLowerCase()))
+      && (this.hiddenFilesVisible || !value.base.startsWith('.'))
       ;
   }
 }

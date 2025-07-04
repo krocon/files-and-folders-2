@@ -43,9 +43,6 @@ import {RenameDialogData} from "./component/cmd/rename/rename-dialog.data";
 import {CommandService} from "./service/cmd/command.service";
 import {RenameDialogResultData} from "./component/cmd/rename/rename-dialog-result.data";
 import {QueueFileOperationParams} from "./domain/cmd/queue-file-operation-params";
-import {MkdirDialogService} from "./component/cmd/mkdir/mkdir-dialog.service";
-import {MkdirDialogData} from "./component/cmd/mkdir/mkdir-dialog.data";
-import {MkdirDialogResultData} from "./component/cmd/mkdir/mkdir-dialog-result.data";
 import {ShortcutDialogService} from "./component/shortcut/shortcut-dialog.service";
 import {ToolService} from "./service/tool.service";
 import {ActionShortcutPipe} from "./common/action-shortcut.pipe";
@@ -105,7 +102,7 @@ export class AppService {
     private readonly copyOrMoveDialogService: CopyOrMoveDialogService,
     private readonly clipboardService: ClipboardService,
     private readonly renameDialogService: RenameDialogService,
-    private readonly mkdirDialogService: MkdirDialogService,
+    //private readonly mkdirDialogService: MkdirDialogService,
     private readonly commandService: CommandService,
     private readonly shortcutDialogService: ShortcutDialogService,
     private readonly toolService: ToolService,
@@ -432,9 +429,6 @@ export class AppService {
     } else if (id === "OPEN_FIND_DLG") {
       this.openFindDialog(null);
 
-    } else if (id === "OPEN_MKDIR_DLG") {
-      this.mkdir();
-
     } else if (id === "OPEN_SHORTCUT_DLG") {
       this.shortcutDialogService.open();
 
@@ -469,27 +463,6 @@ export class AppService {
     });
   }
 
-  mkdir() {
-    const panelIndex = this.getActivePanelIndex();
-    const activeTabOnActivePanel = this.getActiveTabOnActivePanel();
-    const dir = activeTabOnActivePanel.path;
-    const focussedData = this.getFocussedData(panelIndex);
-    const data = new MkdirDialogData(dir, focussedData?.base ?? '');
-
-    this.mkdirDialogService
-      .open(data, (result: MkdirDialogResultData | undefined) => {
-        if (result) {
-          const para = {
-            dir: result.target.dir,
-            base: result.target.base,
-            panelIndex
-          };
-          this.updateFocusRowCritereaOnActivePanel({dir: para.dir, base: para.base});
-          const actionEvent = this.commandService.mkdir(para);
-          this.commandService.addActions([actionEvent]);
-        }
-      });
-  }
 
   copy() {
     const selectedData: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
@@ -677,9 +650,9 @@ export class AppService {
   }
 
 
-  resetFocusRowCriterea() {
-    this.updateFocusRowCritereaOnActivePanel(null);
-  }
+  // resetFocusRowCriterea() {
+  //   this.updateFocusRowCritereaOnActivePanel(null);
+  // }
 
   open(fileItem?: FileItemIf) {
     const srcPanelIndex = this.getActivePanelIndex();
@@ -825,12 +798,13 @@ export class AppService {
   //   this.updateFocusRowCriterea(this.getInactivePanelIndex(), focusRowCriterea);
   // }
 
-  updateFocusRowCriterea(panelIndex: PanelIndex, focusRowCriterea: Partial<FileItemIf> | null) {
-    const filePageDataValue = this.clone(this.filePageDataService.getValue());
-    const panelData = filePageDataValue.tabRows[panelIndex];
-    panelData.tabs[panelData.selectedTabIndex].focusRowCriterea = focusRowCriterea;
-    this.updateFilePageData(filePageDataValue);
-  }
+  // TODO mk?
+  // updateFocusRowCriterea(panelIndex: PanelIndex, focusRowCriterea: Partial<FileItemIf> | null) {
+  //   const filePageDataValue = this.clone(this.filePageDataService.getValue());
+  //   const panelData = filePageDataValue.tabRows[panelIndex];
+  //   panelData.tabs[panelData.selectedTabIndex].focusRowCriterea = focusRowCriterea;
+  //   this.updateFilePageData(filePageDataValue);
+  // }
 
   private removeTab() {
     const value = this.filePageDataService.getValue();
@@ -915,9 +889,9 @@ export class AppService {
     }
   }
 
-  private updateFocusRowCritereaOnActivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
-    this.updateFocusRowCriterea(this.getActivePanelIndex(), focusRowCriterea);
-  }
+  // private updateFocusRowCritereaOnActivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
+  //   this.updateFocusRowCriterea(this.getActivePanelIndex(), focusRowCriterea);
+  // }
 
   private createFileOperationParams(target: FileItemIf): QueueFileOperationParams[] {
     const selectedData = this.getSelectedOrFocussedDataForActivePanel();
@@ -971,14 +945,14 @@ export class AppService {
     return this.getSelectedOrFocussedData(this.getActivePanelIndex());
   }
 
-  private getFocussedData(panelIndex: PanelIndex): FileItemIf | null {
-    if (this.bodyAreaModels[panelIndex]) {
-      const focusedRowIndex = this.bodyAreaModels[panelIndex]?.focusedRowIndex ?? 0;
-      const frd = this.bodyAreaModels[panelIndex]?.getRowByIndex(focusedRowIndex) ?? null;
-      return frd ?? null;
-    }
-    return null;
-  }
+  // private getFocussedData(panelIndex: PanelIndex): FileItemIf | null {
+  //   if (this.bodyAreaModels[panelIndex]) {
+  //     const focusedRowIndex = this.bodyAreaModels[panelIndex]?.focusedRowIndex ?? 0;
+  //     const frd = this.bodyAreaModels[panelIndex]?.getRowByIndex(focusedRowIndex) ?? null;
+  //     return frd ?? null;
+  //   }
+  //   return null;
+  // }
 
   private getRelevantDirsFromActiveTab(): string[] {
     let fileItems = this.getSelectedDataForActivePanel().filter(fi => fi.isDir);
@@ -990,4 +964,11 @@ export class AppService {
     }
     return [this.getActiveTabOnActivePanel().path];
   }
+
+  callActionMkDir(para: { dir: string; base: string; panelIndex: PanelIndex }) {
+    const actionEvent = this.commandService.mkdir(para);
+    this.commandService.addActions([actionEvent]);
+  }
+
+
 }

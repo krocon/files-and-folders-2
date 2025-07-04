@@ -1,43 +1,52 @@
 import {SelectionManagerForObjectModels} from "./selection-manager";
 
+import {PanelIndex} from "@fnf/fnf-data";
+import {TypedDataService} from "../../../common/typed-data.service";
+import {Injectable} from "@angular/core";
 
-export class SelectionLocalStorage<T> {
+export type SelectionLocalStorageDataType = [
+  { [key: string]: string[] },
+  { [key: string]: string[] }
+];
 
-  private usedKeys: string[] = [];
 
-  constructor(
-    private keyPrefix: string,
-    private readonly selectionManager: SelectionManagerForObjectModels<T>,
-  ) {
-  }
 
-  persistSelection(tableKey: string) {
-    const selected: T[] = this.selectionManager.getSelectedRows();
+@Injectable({
+  providedIn: "root"
+})
+export class SelectionLocalStorage {
+
+  private readonly innerService = new TypedDataService<SelectionLocalStorageDataType>("selections", [{}, {}]);
+
+
+  persistSelection<T>(panelIndex: PanelIndex, path: string, selectionManager: SelectionManagerForObjectModels<T>) {
+    const selected: T[] = selectionManager.getSelectedRows();
+
     if (selected?.length) {
-      const value = selected.map((row: T) => this.selectionManager.options.getKey(row));
-      localStorage.setItem(this.getStorageKey(tableKey), JSON.stringify(value));
-      this.usedKeys.push(this.getStorageKey(tableKey));
+      const value = selected.map((row: T) => selectionManager.options.getKey(row));
+
+      const data: SelectionLocalStorageDataType = this.innerService.getValue();
+      data[panelIndex][path] = value;
+      this.innerService.update(data);
+
     } else {
-      localStorage.removeItem(this.getStorageKey(tableKey));
+      const data: SelectionLocalStorageDataType = this.innerService.getValue();
+      delete data[panelIndex][path];
+      this.innerService.update(data);
     }
   }
 
-  apply(tableKey: string) {
-    const json = localStorage.getItem(this.getStorageKey(tableKey));
-    if (json) {
-      const selected: T[] = JSON.parse(json);
-      this.selectionManager.applySelection2Model(selected);
+  applySelection<T>(panelIndex: PanelIndex, path: string, selectionManager: SelectionManagerForObjectModels<T>) {
+    const data: SelectionLocalStorageDataType = this.innerService.getValue();
+    const selected: any[]|undefined = data[panelIndex][path];
+    if (selected) {
+      selectionManager.applySelection2Model(selected);
     }
   }
 
   clearAll(): void {
-    for (const usedKey of this.usedKeys) {
-      localStorage.removeItem(usedKey);
-    }
+    this.innerService.update([{}, {}]);
   }
 
-  private getStorageKey(key: string) {
-    return 'selection_' + this.keyPrefix + key;
-  }
 
 }

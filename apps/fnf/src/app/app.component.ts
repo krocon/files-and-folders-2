@@ -105,6 +105,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
   }
 
   ngOnInit(): void {
+    const sorting = JSON.stringify([{"columnIndex":0,"sortState":"asc"}]);
+    localStorage.setItem('fnf-file-table-0-sortingState', sorting);
+    localStorage.setItem('fnf-file-table-1-sortingState', sorting);
+
     console.info('Files and Folders');
     console.info('        > Build Version:', environment.version);
 
