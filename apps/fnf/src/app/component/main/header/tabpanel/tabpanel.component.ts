@@ -3,17 +3,18 @@ import {CommonModule} from "@angular/common";
 import {PanelIndex, Sysinfo, SysinfoIf} from "@fnf/fnf-data";
 import {TabsPanelData} from "../../../../domain/filepagedata/data/tabs-panel.data";
 import {TabComponent} from "./tab/tab.component";
-import {MatMenuModule} from "@angular/material/menu";
+import {MatMenuModule, MatMenuTrigger} from "@angular/material/menu";
 import {MatIconModule} from "@angular/material/icon";
 import {MatTabsModule} from "@angular/material/tabs";
 import {FavsAndLatestComponent} from "./filemenu/favs-and-latest.component";
-import {MatButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
 import {FormsModule} from "@angular/forms";
 import {AppService} from "../../../../app.service";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {ActionShortcutPipe} from "../../../../common/action-shortcut.pipe";
 import {takeWhile} from "rxjs/operators";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'app-tabpanel',
@@ -29,6 +30,8 @@ import {takeWhile} from "rxjs/operators";
     FormsModule,
     MatTooltipModule,
     ActionShortcutPipe,
+    MatIconButton,
+    MatDivider,
   ],
   templateUrl: './tabpanel.component.html',
   styleUrl: './tabpanel.component.css'
@@ -56,6 +59,7 @@ export class TabpanelComponent implements OnInit, OnDestroy {
   private alive = true;
 
   private _tabsPanelData?: TabsPanelData;
+
 
   get tabsPanelData(): TabsPanelData | undefined {
     return this._tabsPanelData;
@@ -151,8 +155,21 @@ export class TabpanelComponent implements OnInit, OnDestroy {
     return JSON.parse(JSON.stringify(o));
   }
 
-  try2RemoveTab(i: number, evt: MouseEvent) {
-    if (evt.shiftKey) {
+  onTabClicked(i: number, evt: MouseEvent, matMenuTrigger: MatMenuTrigger) {
+    if (evt.button === 2) {
+      evt.preventDefault();
+      matMenuTrigger.openMenu();
+
+    } else if (evt.shiftKey) {
+      this.try2RemoveTab(i, evt);
+    }
+  }
+
+  onTabPointerDown(i: number, evt: PointerEvent, matMenuTrigger: MatMenuTrigger) {
+    this.onTabClicked(i, evt, matMenuTrigger);
+  }
+  
+  private try2RemoveTab(i: number, evt: MouseEvent) {
       evt.preventDefault();
 
       if (this.tabsPanelData) {
@@ -165,5 +182,6 @@ export class TabpanelComponent implements OnInit, OnDestroy {
         }
       }
     }
-  }
+
+
 }

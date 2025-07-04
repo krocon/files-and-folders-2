@@ -21,8 +21,29 @@
       <mat-tab>
         <ng-template mat-tab-label>
           @if (tabsPanelData) {
+
+            <button
+                matIconButton
+                style="width: 0;overflow: clip;margin: 0;padding: 0;"
+                #matMenuTrigger="matMenuTrigger"
+                [matMenuTriggerFor]="menu"
+                aria-label="Example icon-button with a menu">
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item>
+                <mat-icon>tab</mat-icon><span>Close {{ i }}</span>
+              </button>
+              <mat-divider></mat-divider>
+              <button mat-menu-item>
+                <mat-icon>tab</mat-icon><span>Move to {{panelIndex===0?'right':'left'}} panel</span>
+              </button>
+              <button mat-menu-item>
+                <mat-icon>tab</mat-icon><span>Open on {{panelIndex===0?'right':'left'}} panel</span>
+              </button>
+            </mat-menu>
             <app-tab
-                (click)="try2RemoveTab(i, $event)"
+                (click)="onTabClicked(i, $event, matMenuTrigger)"
+                (pointerdown)="onTabPointerDown(i, $event, matMenuTrigger)"
                 [activeAndSelected]="selected && i === tabsPanelData.selectedTabIndex"
                 [class.active]="i === tabsPanelData.selectedTabIndex"
                 [panelIndex]="panelIndex"
@@ -36,14 +57,16 @@
   <div class="fnf-border-bottom display-flex">
     <button
         (click)="onAddTabClicked($event)"
-        [matTooltipShowDelay]="2000" [matTooltip]="'ADD_NEW_TAB' | fnfShortcut"
+        [matTooltipShowDelay]="2000"
+        [matTooltip]="'ADD_NEW_TAB' | fnfShortcut"
         class="icon-only-button fix-padding"
         mat-button>
       <mat-icon class="fnf-header-fg-color">add_circle_outline</mat-icon>
     </button>
     <button
         (click)="onRemoveTabClicked($event)"
-        [matTooltipShowDelay]="2000" [matTooltip]="'REMOVE_TAB' | fnfShortcut"
+        [matTooltipShowDelay]="2000"
+        [matTooltip]="'REMOVE_TAB' | fnfShortcut"
         class="icon-only-button fix-padding"
         mat-button>
       <mat-icon class="fnf-header-fg-color">remove_circle_outline</mat-icon>
@@ -54,7 +77,8 @@
     @if (tabsPanelData) {
 
       <button
-          [matTooltipShowDelay]="2000" [matTooltip]="'TOGGLE_HIDDEN_FILES' | fnfShortcut"
+          [matTooltipShowDelay]="2000"
+          [matTooltip]="'TOGGLE_HIDDEN_FILES' | fnfShortcut"
           class="icon-only-button float-right"
           (click)="toggleHiddenFilesVisible()"
           mat-button>
@@ -66,7 +90,8 @@
       </button>
 
       <button
-          [matTooltipShowDelay]="2000" [matTooltip]="'TOGGLE_FILTER' | fnfShortcut"
+          [matTooltipShowDelay]="2000"
+          [matTooltip]="'TOGGLE_FILTER' | fnfShortcut"
           class="icon-only-button float-right"
           (click)="toggleFilterInput()"
           mat-button>
@@ -85,7 +110,6 @@
           class="filter border-0 float-right mr-1"
           matInput
           placeholder="Filter">
-
 
 
     }
