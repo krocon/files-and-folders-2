@@ -1,7 +1,7 @@
 @if (fileItem && !this.tabfind) {
   <div
       class="fnf-header-fg-color not-selectable"
-      [class.fnf-activepanel-header-fg-color]="activeAndSelected">{{ fileItem.base }}
+      [class.fnf-activepanel-header-fg-color]="activeAndSelected">{{ shortenLabel(fileItem.base) }}
   </div>
 }
 @if (fileItem && this.tabfind) {

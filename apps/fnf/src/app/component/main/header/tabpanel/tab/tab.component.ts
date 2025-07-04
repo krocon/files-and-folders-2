@@ -6,6 +6,7 @@ import {path2FileItems} from "../../../../../common/fn/path-to-file-items";
 import {MatIcon} from "@angular/material/icon";
 import {MatTooltip} from "@angular/material/tooltip";
 import {LongPressDirective} from "../../../../../common/directive/long-press.directive";
+import {shortenString} from "../../../../../common/fn/shorten-string.fn";
 
 @Component({
   selector: 'app-tab',
@@ -55,5 +56,9 @@ export class TabComponent {
   onLongPress(evt: MouseEvent | TouchEvent) {
     // TODO longpress
     console.info(' TODO onLongPress', evt);
+  }
+
+  shortenLabel(base: string) {
+    return shortenString(base);
   }
 }
