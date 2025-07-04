@@ -6,8 +6,6 @@ import {
   computed,
   DoCheck,
   ElementRef,
-  inject,
-  Injector,
   OnDestroy,
   OnInit,
   Renderer2,
@@ -86,18 +84,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
   @ViewChild('splitPaneLeft') private readonly splitPaneLeftRef!: ElementRef<HTMLDivElement>;
 
   private doCheckCount = 0;
-  private alive = true;
-  private injector = inject(Injector);
   private idCounter = 0;
 
   constructor(
     private readonly renderer: Renderer2,
     private readonly splitPaneMouseService: SplitPaneMouseService,
     private readonly windowResizeService: WindowResizeService,
-    // business:
     private readonly appService: AppService,
     private readonly panelSelectionService: PanelSelectionService,
-    //
     private readonly cdr: ChangeDetectorRef,
     private readonly matIconReg: MatIconRegistry,
   ) {
