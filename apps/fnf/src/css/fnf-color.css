@@ -12,17 +12,21 @@ fnf-root {
         border-right: solid 1px var(--fnf-header-border-color);
     }
 
+    .mat-mdc-tab-header-pagination,
     .fnf-border-bottom {
-        border-bottom: solid 1px var(--fnf-header-border-color);
+        border-bottom: solid 1px var(--fnf-header-border-color) !important;
     }
 
+
     .fnf-active-panel {
+
         .fnf-border-right {
             border-right: solid 1px var(--fnf-activepanel-header-border-color);
         }
 
+        .mat-mdc-tab-header-pagination,
         .fnf-border-bottom {
-            border-bottom: solid 1px var(--fnf-activepanel-header-border-color);
+            border-bottom: solid 1px var(--fnf-activepanel-header-border-color) !important;
         }
     }
 

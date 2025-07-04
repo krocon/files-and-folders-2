@@ -5,6 +5,10 @@
     overflow: hidden;
     position: relative;
     display: flex;
+
+    mat-tab-group {
+        max-width: calc(100% - 400px)
+    }
 }
 
 .display-flex {
