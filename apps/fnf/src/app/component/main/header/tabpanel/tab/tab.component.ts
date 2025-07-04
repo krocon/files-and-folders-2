@@ -1,6 +1,5 @@
 import {Component, Input} from '@angular/core';
 import {FileItemIf, PanelIndex} from "@fnf/fnf-data";
-import {FilePageData} from "../../../../../domain/filepagedata/data/file-page.data";
 import {TabData} from "../../../../../domain/filepagedata/data/tab.data";
 import {CommonModule} from "@angular/common";
 import {path2FileItems} from "../../../../../common/fn/path-to-file-items";
@@ -27,7 +26,7 @@ export class TabComponent {
   pattern: string = '';
 
   @Input() panelIndex: PanelIndex = 0;
-  @Input() filePageData?: FilePageData;
+  // @Input() tabsPanelData?: TabsPanelData;
   @Input() activeAndSelected: boolean = false;
 
 

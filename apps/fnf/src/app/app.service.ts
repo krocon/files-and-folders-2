@@ -2,7 +2,7 @@ import {inject, Injectable, Injector} from "@angular/core";
 import {LookAndFeelService} from "./service/look-and-feel.service";
 import {ShortcutActionMapping, ShortcutService} from "./service/shortcut.service";
 import {SysinfoService} from "./service/sysinfo.service";
-import {FilePageDataService} from "./domain/filepagedata/file-page-data.service";
+import {TabsPanelDataService} from "./domain/filepagedata/tabs-panel-data.service";
 import {ConfigService} from "./service/config.service";
 import {FileSystemService} from "./service/file-system.service";
 import {environment} from "../environments/environment";
@@ -18,10 +18,9 @@ import {
   Sysinfo,
   SysinfoIf
 } from "@fnf-data";
-import {BehaviorSubject, firstValueFrom, Observable, Subject} from "rxjs";
+import {BehaviorSubject, combineLatest, firstValueFrom, Observable, Subject} from "rxjs";
 import {QueueActionEvent} from "./domain/cmd/queue-action-event";
 import {PanelIndex} from "@fnf/fnf-data";
-import {FilePageData} from "./domain/filepagedata/data/file-page.data";
 import {DockerRootDeletePipe} from "./component/main/header/tabpanel/filemenu/docker-root-delete.pipe";
 import {PanelSelectionService} from "./domain/filepagedata/service/panel-selection.service";
 import {LatestDataService} from "./domain/filepagedata/service/latest-data.service";
@@ -58,6 +57,7 @@ import {GroupFilesDialogService} from "./component/cmd/groupfiles/group-files-di
 import {ChangeDirDialogService} from "./component/cmd/changedir/change-dir-dialog.service";
 import {ChangeDirDialogData} from "./component/cmd/changedir/data/change-dir-dialog.data";
 import {map} from "rxjs/operators";
+import {TabsPanelData} from "./domain/filepagedata/data/tabs-panel.data";
 
 
 @Injectable({
@@ -72,7 +72,10 @@ export class AppService {
   public favs: string[] = [];
   public latest: string[] = [];
   public winDrives: string[] = [];
-  public filePageData: FilePageData = new FilePageData();
+  public tabsPanelDatas: [TabsPanelData, TabsPanelData] = [
+    this.tabsPanelDataService.getValue(0),
+    this.tabsPanelDataService.getValue(1)
+  ];
 
   // Observable properties
   public readonly changeDirRequest$ = new Subject<ChangeDirEvent | null>();
@@ -92,7 +95,7 @@ export class AppService {
     private readonly lookAndFeelService: LookAndFeelService,
     private readonly shortcutService: ShortcutService,
     private readonly sysinfoService: SysinfoService,
-    private readonly filePageDataService: FilePageDataService,
+    private readonly tabsPanelDataService: TabsPanelDataService,
     private readonly configService: ConfigService,
     private readonly fileSystemService: FileSystemService,
     private readonly panelSelectionService: PanelSelectionService,
@@ -138,9 +141,12 @@ export class AppService {
       .getDrives()
       .subscribe(winDrives => this.winDrives = winDrives);
 
-    this.filePageDataService
-      .valueChanges()
-      .subscribe(data => this.filePageData = data);
+    this.tabsPanelDataService
+      .valueChanges(0)
+      .subscribe(data => this.tabsPanelDatas[0] = data);
+    this.tabsPanelDataService
+      .valueChanges(1)
+      .subscribe(data => this.tabsPanelDatas[1] = data);
 
     this.changeDirEventService.valueChanges()
       .subscribe(event => this.changeDirRequest$.next(event));
@@ -203,29 +209,31 @@ export class AppService {
    * - The returned Observable continues to emit new values whenever the file page data changes
    */
   getAllHistories$(): Observable<string[]> {
-    return this.filePageDataService.valueChanges()
+    return combineLatest([
+      this.tabsPanelDataService.valueChanges(0),
+      this.tabsPanelDataService.valueChanges(1)
+    ])
       .pipe(
-        map(filePageData => {
+        map(tabsPanelDatas => {
           const ret: string[] = [];
-          filePageData.tabRows
-            .forEach(tabRow => {
-              tabRow.tabs
-                .forEach((tab) => {
-                  ret.push(tab.path);
-                  ret.push(...tab.history);
-                })
+          tabsPanelDatas.map(tabsPanelData => {
+            tabsPanelData.tabs.forEach(tab => {
+              ret.push(tab.path);
+              ret.push(...tab.history);
             });
-          return ret.filter((his, i, arr) =>
-            his
-            && arr.indexOf(his) === i
-            && !his.startsWith('tabfind')
-          );
-        })
+          });
+          return ret;
+        }),
+        map(histories => histories.filter((his, i, arr) =>
+          his &&
+          arr.indexOf(his) === i &&
+          !his.startsWith('tabfind')
+        ))
       );
   }
 
-  filePageDataChanges() {
-    return this.filePageDataService.valueChanges();
+  filePageDataChanges(panelIndex: PanelIndex): Observable<TabsPanelData> {
+    return this.tabsPanelDataService.valueChanges(panelIndex);
   }
 
   public async init(callback: Function) {
@@ -261,7 +269,7 @@ export class AppService {
       }
     }
 
-    await this.initTabs();
+    // await this.initTabs();
 
     callback();
   }
@@ -299,31 +307,31 @@ export class AppService {
     return await firstValueFrom(this.fileSystemService.checkPath(path));
   }
 
-  public updateFilePageData(fileData: FilePageData) {
+  public updateTabsPanelData(panelIndex: PanelIndex, fileData: TabsPanelData) {
     // Update both the signal and the service
     // console.info(JSON.stringify(fileData, null, 4));
-    this.filePageData = this.clone(fileData);
-    this.filePageDataService.update(fileData);
+    this.tabsPanelDatas[panelIndex] = this.clone(fileData);
+    this.tabsPanelDataService.update(panelIndex, fileData);
   }
 
-  public async initTabs() {
-    // first start ever?
-    if (this.filePageData.default) {
-      console.info('        > Init Tabs.....');
-      try {
-        const startFolder = await this.sysinfoService.getFirstStartFolder();
-        console.info('        > First Start  :', startFolder);
-        const v = this.clone(this.filePageData);
-        v.default = false;
-        v.tabRows[0].tabs[0].path = startFolder;
-        v.tabRows[1].tabs[0].path = startFolder;
-        this.updateFilePageData(v);
-
-      } catch (error) {
-        console.error('Error getting first start folder:', error);
-      }
-    }
-  }
+  // public async initTabs() {
+  //   // first start ever?
+  //   if (this.tabsPanelDatas.default) {
+  //     console.info('        > Init Tabs.....');
+  //     try {
+  //       const startFolder = await this.sysinfoService.getFirstStartFolder();
+  //       console.info('        > First Start  :', startFolder);
+  //       const v = this.clone(this.tabsPanelDatas);
+  //       v.default = false;
+  //       v.tabRows[0].tabs[0].path = startFolder;
+  //       v.tabRows[1].tabs[0].path = startFolder;
+  //       this.updateTabsPanelData(v);
+  //
+  //     } catch (error) {
+  //       console.error('Error getting first start folder:', error);
+  //     }
+  //   }
+  // }
 
   setPanelActive(panelIndex: PanelIndex) {
     this.panelSelectionService.update(panelIndex);
@@ -339,16 +347,17 @@ export class AppService {
 
   getActiveTabOnActivePanel(): TabData {
     const pi = this.getActivePanelIndex();
-    const filePageDataValue = this.filePageDataService.getValue();
-    const tabsPanelDatum = filePageDataValue.tabRows[pi];
-    return tabsPanelDatum.tabs[tabsPanelDatum.selectedTabIndex];
+    const tabsPanelData = this.tabsPanelDataService.getValue(pi);
+    return tabsPanelData.tabs[tabsPanelData.selectedTabIndex];
   }
 
   getAllHistories(): string[] {
     const ret: string[] = [];
-    const filePageDataValue = this.filePageDataService.getValue();
-    filePageDataValue.tabRows.forEach(tabRow => {
-      tabRow.tabs.forEach((tab) => {
+    [
+      this.tabsPanelDataService.getValue(0),
+      this.tabsPanelDataService.getValue(1),
+    ].forEach(panelData => {
+      panelData.tabs.forEach((tab) => {
         ret.push(...tab.history);
       })
     })
@@ -362,29 +371,25 @@ export class AppService {
 
   triggerAction(id: ActionId) {
     // console.log('> triggerAction:', id);
+    const panelIndex = this.panelSelectionService.getValue();
+    const tabsPanelData = this.tabsPanelDataService.getValue(panelIndex);
 
     if (id === 'TOGGLE_PANEL') {
       this.panelSelectionService.toggle();
 
     } else if (id === 'NEXT_TAB') {
-      const value = this.filePageDataService.getValue();
-      const tabsPanelData = value.tabRows[this.panelSelectionService.getValue()];
       tabsPanelData.selectedTabIndex = (tabsPanelData.selectedTabIndex + 1) % tabsPanelData.tabs.length;
-      this.filePageDataService.update(value);
+      this.tabsPanelDataService.update(panelIndex, tabsPanelData);
 
     } else if (id === 'TOGGLE_FILTER') {
-      const value = this.filePageDataService.getValue();
-      const tabsPanelData = value.tabRows[this.panelSelectionService.getValue()];
       const tab = tabsPanelData.tabs[tabsPanelData.selectedTabIndex];
       tab.filterActive = !tab.filterActive;
-      this.filePageDataService.update(value);
+      this.tabsPanelDataService.update(panelIndex, tabsPanelData);
 
     } else if (id === 'TOGGLE_HIDDEN_FILES') {
-      const value = this.filePageDataService.getValue();
-      const tabsPanelData = value.tabRows[this.panelSelectionService.getValue()];
       const tab = tabsPanelData.tabs[tabsPanelData.selectedTabIndex];
       tab.hiddenFilesVisible = !tab.hiddenFilesVisible;
-      this.filePageDataService.update(value);
+      this.tabsPanelDataService.update(panelIndex, tabsPanelData);
 
     } else if (id === 'REMOVE_TAB') {
       this.removeTab();
@@ -433,14 +438,12 @@ export class AppService {
       this.shortcutDialogService.open();
 
     } else {
-
       for (const tool of this.defaultTools) {
         if (tool.id === id) {
           this.execute(tool);
           return;
         }
       }
-
       console.log('> appService this.actionEventsSubject.next(id):', id);
       this.actionEvents$.next(id);
     }
@@ -453,7 +456,7 @@ export class AppService {
     console.info('winDrives\n', JSON.stringify(this.winDrives, null, 4));
     console.info('latest\n', JSON.stringify(this.latest, null, 4));
     console.info('favs\n', JSON.stringify(this.favs, null, 4));
-    console.info('filePageData\n', this.filePageData);
+    console.info('tabsPanelDatas\n', this.tabsPanelDatas);
     this.bodyAreaModels.forEach((bodyAreaModel, i) => {
       if (bodyAreaModel) {
         console.info('bodyAreaModel(' + i + ') focusedRowIndex:', bodyAreaModel.focusedRowIndex);
@@ -533,7 +536,7 @@ export class AppService {
     const tabData = this.getTabDataForPanelIndex(panelIndex);
     if (tabData) {
       if (tabData.path.startsWith('tabfind')) {
-        this.updateFilePageData(this.filePageData);
+        this.updateTabsPanelData(panelIndex, this.tabsPanelDatas[panelIndex]);
 
       } else {
         try {
@@ -561,8 +564,9 @@ export class AppService {
     }
     try {
       const checkedPath: string = await this.checkPath(path);
-      const fileData: FilePageData = this.filePageData;
-      const tabData: TabData = this.getTabDataForPanelIndex(panelIndex);
+
+      const panelData: TabsPanelData = this.tabsPanelDatas[panelIndex];
+      const tabData: TabData = panelData.tabs[panelData.selectedTabIndex];
       tabData.path = checkedPath;
       tabData.findData = undefined;
 
@@ -580,7 +584,7 @@ export class AppService {
         this.addLatest(checkedPath);
       }
       // update ui:
-      this.updateFilePageData(fileData);
+      this.updateTabsPanelData(panelIndex, panelData);
 
     } catch (e) {
       console.error(e);
@@ -601,9 +605,12 @@ export class AppService {
 
   getDirsFromAllTabs(): string[] {
     const ret: string[] = [];
-    const pageData = this.filePageDataService.getValue();
 
-    for (const tabRow of pageData.tabRows) {
+    const tabPanelDatas = [
+      this.tabsPanelDataService.getValue(0),
+      this.tabsPanelDataService.getValue(1),
+    ];
+    for (const tabRow of tabPanelDatas) {
       for (const tab of tabRow.tabs) {
         if (!ret.includes(tab.path)) {
           ret.push(tab.path);
@@ -614,10 +621,9 @@ export class AppService {
   }
 
   navigateBack() {
-    const srcPanelIndex = this.getActivePanelIndex();
-    const filePageDataValue = this.filePageDataService.getValue();
-    const tabsPanelDatum = filePageDataValue.tabRows[srcPanelIndex];
-    const tabData = tabsPanelDatum.tabs[tabsPanelDatum.selectedTabIndex];
+    const panelIndex = this.getActivePanelIndex();
+    const tabsPanelData = this.tabsPanelDataService.getValue(panelIndex);
+    const tabData = tabsPanelData.tabs[tabsPanelData.selectedTabIndex];
 
     if (!tabData.historyIndex) tabData.historyIndex = 0;
     tabData.historyIndex = Math.max(0, tabData.historyIndex + 1);
@@ -625,16 +631,15 @@ export class AppService {
     ChangeDirEventService.skipNextHistoryChange = true;
 
     const path = tabData.history[tabData.historyIndex];
-    this.filePageData = filePageDataValue;
-    this.filePageDataService.update(this.filePageData);
-    this.changeDir(new ChangeDirEvent(srcPanelIndex, path));
+    this.tabsPanelDatas[panelIndex] = tabsPanelData;
+    this.tabsPanelDataService.update(panelIndex, tabsPanelData);
+    this.changeDir(new ChangeDirEvent(panelIndex, path));
   }
 
   navigateForward() {
-    const srcPanelIndex = this.getActivePanelIndex();
-    const filePageDataValue = this.filePageDataService.getValue();
-    const tabsPanelDatum = filePageDataValue.tabRows[srcPanelIndex];
-    const tabData = tabsPanelDatum.tabs[tabsPanelDatum.selectedTabIndex];
+    const panelIndex = this.getActivePanelIndex();
+    const tabsPanelData = this.tabsPanelDataService.getValue(panelIndex);
+    const tabData = tabsPanelData.tabs[tabsPanelData.selectedTabIndex];
 
     if (!tabData.historyIndex) tabData.historyIndex = 0;
     tabData.historyIndex--;
@@ -643,10 +648,10 @@ export class AppService {
     ChangeDirEventService.skipNextHistoryChange = true;
 
     const path = tabData.history[tabData.historyIndex];
-    this.filePageData = filePageDataValue;
+    this.tabsPanelDatas[panelIndex] = tabsPanelData;
 
-    this.filePageDataService.update(this.filePageData);
-    this.changeDir(new ChangeDirEvent(srcPanelIndex, path));
+    this.tabsPanelDataService.update(panelIndex, tabsPanelData);
+    this.changeDir(new ChangeDirEvent(panelIndex, path));
   }
 
 
@@ -722,17 +727,17 @@ export class AppService {
   }
 
   public addTab(panelIndex: PanelIndex, tabData: TabData) {
-    const currentData = this.filePageData;
-    const tabsPanel = currentData.tabRows[panelIndex];
-    tabsPanel.tabs.push(tabData);
-    tabsPanel.selectedTabIndex = tabsPanel.tabs.length - 1;
-    this.updateFilePageData(currentData);
+    const tabsPanelData = this.tabsPanelDatas[panelIndex];
+
+    tabsPanelData.tabs.push(tabData);
+    tabsPanelData.selectedTabIndex = tabsPanelData.tabs.length - 1;
+    this.updateTabsPanelData(panelIndex, tabsPanelData);
   }
 
   public openFindDialog(
     data: FindDialogData | null
   ) {
-    const srcPanelIndex = this.getActivePanelIndex();
+    const panelIndex = this.getActivePanelIndex();
     if (!data) {
       data = new FindDialogData('', '**/*.ts', true, false);
       data.folders = this.getRelevantDirsFromActiveTab();
@@ -750,15 +755,14 @@ export class AppService {
           if (findData.findDialogData.newtab) {
             const tabDataFindings = new TabData(findData.dirTabKey);
             tabDataFindings.findData = findData;
-            this.addTab(srcPanelIndex, tabDataFindings);
+            this.addTab(panelIndex, tabDataFindings);
 
           } else {
-            const currentData = this.filePageData;
-            const tabsPanel = currentData.tabRows[srcPanelIndex];
+            const tabsPanel = this.tabsPanelDatas[panelIndex];
             const tabData = tabsPanel.tabs[tabsPanel.selectedTabIndex];
             tabData.path = findData.dirTabKey;
             tabData.findData = findData;
-            this.updateFilePageData(this.filePageData);
+            this.updateTabsPanelData(panelIndex, this.tabsPanelDatas[panelIndex]);
           }
         }
       });
@@ -803,27 +807,33 @@ export class AppService {
   //   const filePageDataValue = this.clone(this.filePageDataService.getValue());
   //   const panelData = filePageDataValue.tabRows[panelIndex];
   //   panelData.tabs[panelData.selectedTabIndex].focusRowCriterea = focusRowCriterea;
-  //   this.updateFilePageData(filePageDataValue);
+  //   this.updateTabsPanelData(filePageDataValue);
   // }
 
+  callActionMkDir(para: { dir: string; base: string; panelIndex: PanelIndex }) {
+    const actionEvent = this.commandService.mkdir(para);
+    this.commandService.addActions([actionEvent]);
+  }
+
   private removeTab() {
-    const value = this.filePageDataService.getValue();
-    const tabsPanelData = value.tabRows[this.panelSelectionService.getValue()];
+    const panelIndex = this.getActivePanelIndex();
+    const tabsPanelData = this.tabsPanelDataService.getValue(panelIndex);
+
     if (tabsPanelData.tabs.length > 1) {
       const selectedTabIndex = tabsPanelData.selectedTabIndex;
       tabsPanelData.tabs.splice(selectedTabIndex, 1);
       tabsPanelData.selectedTabIndex = Math.min(tabsPanelData.tabs.length - 1, selectedTabIndex);
-      this.filePageDataService.update(value);
+      this.tabsPanelDataService.update(panelIndex, tabsPanelData);
     }
   }
 
   private addNewTab() {
-    const value = this.filePageDataService.getValue();
-    const tabsPanelData = value.tabRows[this.panelSelectionService.getValue()];
+    const panelIndex = this.getActivePanelIndex();
+    const tabsPanelData = this.tabsPanelDataService.getValue(panelIndex);
     const tabData = tabsPanelData.tabs[tabsPanelData.selectedTabIndex];
     tabsPanelData.tabs.push(this.clone(tabData));
     tabsPanelData.selectedTabIndex = tabsPanelData.tabs.length - 1;
-    this.filePageDataService.update(value);
+    this.tabsPanelDataService.update(panelIndex, tabsPanelData);
   }
 
   private rename() {
@@ -862,6 +872,10 @@ export class AppService {
     }
   }
 
+  // private updateFocusRowCritereaOnActivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
+  //   this.updateFocusRowCriterea(this.getActivePanelIndex(), focusRowCriterea);
+  // }
+
   private groupFiles() {
     const srcPanelIndex = this.getActivePanelIndex();
     const targetPanelIndex = this.getInActivePanelIndex();
@@ -889,10 +903,6 @@ export class AppService {
     }
   }
 
-  // private updateFocusRowCritereaOnActivePanel(focusRowCriterea: Partial<FileItemIf> | null) {
-  //   this.updateFocusRowCriterea(this.getActivePanelIndex(), focusRowCriterea);
-  // }
-
   private createFileOperationParams(target: FileItemIf): QueueFileOperationParams[] {
     const selectedData = this.getSelectedOrFocussedDataForActivePanel();
     const srcPanelIndex = this.getActivePanelIndex();
@@ -908,8 +918,8 @@ export class AppService {
 
   private getOtherPanelSelectedTabData(): TabData {
     const inactivePanelIndex = [1, 0][this.getActivePanelIndex()];
-    const fpd: FilePageData = this.filePageData;
-    return fpd.tabRows[inactivePanelIndex].tabs[fpd.tabRows[inactivePanelIndex].selectedTabIndex];
+    const panelData: TabsPanelData = this.tabsPanelDatas[inactivePanelIndex];
+    return panelData.tabs[panelData.selectedTabIndex];
   }
 
   private getSourcePaths(selectedData: FileItemIf[]): string[] {
@@ -922,8 +932,8 @@ export class AppService {
       });
     }
     const panelIndex = this.getActivePanelIndex();
-    const fpd: FilePageData = this.filePageData;
-    const activeTab = fpd.tabRows[panelIndex].tabs[fpd.tabRows[panelIndex].selectedTabIndex];
+    const panelData: TabsPanelData = this.tabsPanelDatas[panelIndex];
+    const activeTab = panelData.tabs[panelData.selectedTabIndex];
     return [activeTab.path];
   }
 
@@ -932,17 +942,12 @@ export class AppService {
   }
 
   private getTabDataForPanelIndex(panelIndex: 0 | 1): TabData {
-    const fileData = this.filePageData;
-    const tabsPanelData = fileData.tabRows[panelIndex];
-    return tabsPanelData.tabs[tabsPanelData.selectedTabIndex];
+    const panelData: TabsPanelData = this.tabsPanelDatas[panelIndex];
+    return  panelData.tabs[panelData.selectedTabIndex];
   }
 
   private getSelectedDataForActivePanel(): FileItemIf[] {
     return this.getSelectedData(this.getActivePanelIndex());
-  }
-
-  private getSelectedOrFocussedDataForActivePanel(): FileItemIf[] {
-    return this.getSelectedOrFocussedData(this.getActivePanelIndex());
   }
 
   // private getFocussedData(panelIndex: PanelIndex): FileItemIf | null {
@@ -954,6 +959,10 @@ export class AppService {
   //   return null;
   // }
 
+  private getSelectedOrFocussedDataForActivePanel(): FileItemIf[] {
+    return this.getSelectedOrFocussedData(this.getActivePanelIndex());
+  }
+
   private getRelevantDirsFromActiveTab(): string[] {
     let fileItems = this.getSelectedDataForActivePanel().filter(fi => fi.isDir);
     if (fileItems.length === 1 && fileItems[0].base === DOT_DOT) {
@@ -963,11 +972,6 @@ export class AppService {
       return fileItems.map(fi => `${fi.dir}/${fi.base}`);
     }
     return [this.getActiveTabOnActivePanel().path];
-  }
-
-  callActionMkDir(para: { dir: string; base: string; panelIndex: PanelIndex }) {
-    const actionEvent = this.commandService.mkdir(para);
-    this.commandService.addActions([actionEvent]);
   }
 
 

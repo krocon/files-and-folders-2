@@ -27,7 +27,6 @@ import {ButtonEnableStates, FileItemIf} from "@fnf-data";
 import {AppService} from "./app.service";
 import {FileTableComponent} from "./component/main/filetable/file-table.component";
 import {CommonModule} from "@angular/common";
-import {FilePageData} from "./domain/filepagedata/data/file-page.data";
 import {BreadcrumbComponent} from "./component/main/header/breadcrumb/breadcrumb.component";
 import {TabpanelComponent} from "./component/main/header/tabpanel/tabpanel.component";
 import {PanelIndex} from "@fnf/fnf-data";
@@ -68,14 +67,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
   // Using signals directly from appService
   readonly winDrives = this.appService.winDrives;
   readonly sysinfo = this.appService.sysinfo;
-  latest:string[] = this.appService.latest;
-  favs:string[] = this.appService.favs;
+  latest: string[] = this.appService.latest;
+  favs: string[] = this.appService.favs;
   readonly dockerRoot = this.appService.dockerRoot;
 
   readonly panelIndices: PanelIndex[] = [0, 1];
   readonly activePanelIndex = computed(() => this.panelSelectionService.panelIndex());
 
-  filePageData: FilePageData = this.appService.filePageData;
+  tabsPanelData: [TabsPanelData, TabsPanelData] = this.appService.tabsPanelDatas;
   selectionEvents: SelectionEvent[] = this.panelIndices
     .map(i => new SelectionEvent());
   buttonEnableStatesArr = [
@@ -105,7 +104,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
   }
 
   ngOnInit(): void {
-    const sorting = JSON.stringify([{"columnIndex":0,"sortState":"asc"}]);
+    const sorting = JSON.stringify([{"columnIndex": 0, "sortState": "asc"}]);
     localStorage.setItem('fnf-file-table-0-sortingState', sorting);
     localStorage.setItem('fnf-file-table-1-sortingState', sorting);
 
@@ -119,10 +118,17 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
     });
 
     this.appService
-      .filePageDataChanges()
+      .filePageDataChanges(0)
       .subscribe(fd => {
         this.normalizeFilePageData(fd);
-        this.filePageData = {...fd};
+        this.tabsPanelData[0] = {...fd};
+        this.cdr.detectChanges();
+      });
+    this.appService
+      .filePageDataChanges(1)
+      .subscribe(fd => {
+        this.normalizeFilePageData(fd);
+        this.tabsPanelData[1] = {...fd};
         this.cdr.detectChanges();
       });
 
@@ -171,10 +177,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
   }
 
   onTabDataChanged(tabsPanelData: TabsPanelData, panelIndex: PanelIndex): void {
-    if (this.filePageData) {
-      this.filePageData.tabRows[panelIndex] = tabsPanelData;
+    if (this.tabsPanelData) {
+      this.tabsPanelData[panelIndex] = tabsPanelData;
       this.updatePathes();
-      this.appService.updateFilePageData(this.filePageData);
+      this.appService.updateTabsPanelData(panelIndex, this.tabsPanelData[panelIndex]);
     }
   }
 
@@ -230,13 +236,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
     );
   }
 
-  private normalizeFilePageData(fd: FilePageData) {
+  private normalizeFilePageData(tabsPanelData: TabsPanelData) {
     // Normalize paths in all tabs
-    for (const tabRow of fd.tabRows) {
-      for (const tab of tabRow.tabs) {
-        tab.path = this.normalizePath(tab.path);
-        tab.id = this.idCounter++;
-      }
+    for (const tab of tabsPanelData.tabs) {
+      tab.path = this.normalizePath(tab.path);
+      tab.id = this.idCounter++;
     }
   }
 
