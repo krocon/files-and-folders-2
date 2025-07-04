@@ -189,22 +189,6 @@
     </mat-menu>
 
 
-    <button
-        [matMenuTriggerFor]="menuTools"
-        class="panel-button row-reverse"
-        mat-stroked-button>
-      Tools
-      <mat-icon>keyboard_arrow_up</mat-icon>
-    </button>
-    <mat-menu #menuTools="matMenu">
-      @for (tool of tools; track tool) {
-        <button
-            mat-menu-item
-            (click)="onToolClicked(tool)">{{ tool.label }}
-          <fnf-shortcut [keys]="getShortcutAsLabelTokens(tool.shortcut)"></fnf-shortcut>
-        </button>
-      }
-    </mat-menu>
 
     <fnf-task-button class="panel-button" (onClick)="openButtonSheet()" ></fnf-task-button>
     <!--button
@@ -250,5 +234,25 @@
         mat-stroked-button>
       <mat-icon>bug_report</mat-icon>
     </button>
+
+
+
+    <button
+        [matMenuTriggerFor]="menuTools"
+        class="panel-button row-reverse"
+        mat-stroked-button>
+      Tools
+      <mat-icon>keyboard_arrow_up</mat-icon>
+    </button>
+    <mat-menu #menuTools="matMenu">
+      @for (tool of tools; track tool) {
+        <button
+            mat-menu-item
+            (click)="onToolClicked(tool)">{{ tool.label }}
+          <fnf-shortcut [keys]="getShortcutAsLabelTokens(tool.shortcut)"></fnf-shortcut>
+        </button>
+      }
+    </mat-menu>
+
   </div>
 </div>

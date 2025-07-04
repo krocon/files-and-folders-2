@@ -25,6 +25,26 @@
             formControlName="target"
             matInput
             placeholder="New name"/>
+
+        <button
+            matSuffix
+            [matMenuTriggerFor]="menuSuggestions"
+            mat-icon-button>
+          <mat-icon class="fnf-header-fg-color">expand_more</mat-icon>
+        </button>
+        <mat-menu
+            #menuSuggestions="matMenu"
+            class="fnf-suggestion-template-menu">
+          @for (s of suggestions; track s) {
+            <button
+                (click)="onSuggestionClicked(s)"
+                mat-menu-item>
+              {{s}}
+            </button>
+            <mat-divider></mat-divider>
+          }
+        </mat-menu>
+
       </mat-form-field>
 
       <div>

@@ -16,13 +16,16 @@ import {
   MatDialogRef,
   MatDialogTitle
 } from "@angular/material/dialog";
-import {MatError, MatFormField, MatInput} from "@angular/material/input";
-import {MatButton} from "@angular/material/button";
+import {MatError, MatFormField, MatInput, MatSuffix} from "@angular/material/input";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {FnfAutofocusDirective} from "../../../common/fnf-autofocus.directive";
 import {MatTooltip} from "@angular/material/tooltip";
 import {RenameDialogResultData} from "./rename-dialog-result.data";
 import {FnfFilenameValidation} from "../../../common/fnf-filename-validation";
+import {MatDivider} from "@angular/material/divider";
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {cleanFileName} from "../../../common/fn/clean-file.name.fn";
 
 @Component({
   selector: "fnf-rename-dialog",
@@ -38,7 +41,13 @@ import {FnfFilenameValidation} from "../../../common/fnf-filename-validation";
     MatFormField,
     FnfAutofocusDirective,
     MatError,
-    MatTooltip
+    MatTooltip,
+    MatDivider,
+    MatIconButton,
+    MatMenu,
+    MatMenuItem,
+    MatSuffix,
+    MatMenuTrigger
   ],
   styleUrls: ["./rename-dialog.component.css"]
 })
@@ -47,6 +56,7 @@ export class RenameDialogComponent {
   formGroup: FormGroup;
   sourceTooltip = "";
 
+  suggestions: string[] = [];
 
   constructor(
     public dialogRef: MatDialogRef<RenameDialogComponent>,
@@ -85,8 +95,30 @@ export class RenameDialogComponent {
           })
       }
     );
+    this.createSuggestions();
   }
 
+  private createSuggestions(){
+    let fileItem = this.data.source;
+    const base = fileItem.base;
+    const ext = fileItem.ext;
+    const dir = fileItem.dir;
+    const full = dir+'/'+base;
+
+    let allParents = dir.split('/').map(s=>s+ext);
+
+    const arr = [
+      allParents[allParents.length-1],
+      allParents[allParents.length-2],
+      base.replace(/[^a-zA-Z0-9-]/g, ' ') + ext
+    ];
+    this.suggestions= [
+      ...arr,
+      ...arr.map(s=> cleanFileName(s) + ext),
+    ];
+
+    console.info(this.suggestions);
+  }
 
   get errorMessage(): string {
     const targetControl = this.formGroup.get('target');
@@ -115,4 +147,7 @@ export class RenameDialogComponent {
   }
 
 
+  onSuggestionClicked(suggestion: string) {
+    this.formGroup.setValue({target: suggestion}, {emitEvent: true});
+  }
 }
