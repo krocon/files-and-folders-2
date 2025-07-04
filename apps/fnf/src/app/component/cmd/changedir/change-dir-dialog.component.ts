@@ -31,6 +31,7 @@ import {ChangeDirEvent} from "../../../service/change-dir-event";
 import {MatFormField, MatInput, MatLabel} from "@angular/material/input";
 import {debounceTime, distinctUntilChanged, Subject} from "rxjs";
 import {MatSlider, MatSliderThumb} from "@angular/material/slider";
+import {getAllParents} from "../../../common/fn/get-all-parents.fn";
 
 
 @Component({
@@ -94,6 +95,9 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
   private filterTextChanged = new Subject<string>();
 
+  private allParents: string[] = [];
+  private readonly INDENTATION_SPACE = ' ';
+  private readonly INDENTATION_MULTIPLIER = 3;
 
   constructor(
     public dialogRef: MatDialogRef<ChangeDirDialogComponent>,
@@ -120,6 +124,7 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
       columnDefs,
       tableOptions: this.tableOptions,
     });
+    this.allParents = getAllParents(this.changeDirDialogData.sourceDir);
   }
 
   ngOnDestroy(): void {
@@ -132,36 +137,6 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
     this.initFetchDirectories(5);
     this.initFetchDirectories(this.maxDeep);
     this.initTextChangeListener();
-  }
-
-  private initFetchDirectories(deep:number=5) {
-    const para = new FindFolderPara([this.changeDirDialogData.sourceDir], '', deep);
-    this.gotoAnythingDialogService
-      .findFolders(para)
-      .pipe(
-        takeWhile(() => this.alive),
-      )
-      .subscribe(arr => {
-          console.info('_______', arr);
-          this.rows =
-            createAsciiTree(
-              arr.map(s => s.substring(this.changeDirDialogData.sourceDir.length))
-            );
-          this.applyFilter();
-        }
-      );
-  }
-
-  private initTextChangeListener() {
-    this.filterTextChanged
-      .pipe(
-        takeWhile(() => this.alive),
-        debounceTime(300),
-        distinctUntilChanged()
-      )
-      .subscribe(filterText => {
-        this.applyFilter()
-      });
   }
 
   onCancelClicked() {
@@ -200,8 +175,74 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
         fr.map(s => s.path)
       )
     ];
+
+    // -------------------------------------------------
+    if (this.changeDirDialogData.showParentTree) {
+      const sd = this.changeDirDialogData.sourceDir;
+      this.filteredRows.sort((a, b) => {
+        const ap = sd.startsWith(a.path);
+        const bp = sd.startsWith(b.path);
+        if (ap !== bp) {
+          if (ap) return -1;
+          if (bp) return 1;
+        }
+        return a.path.localeCompare(b.path);
+      });
+
+      const spaces = this.getIndentation(sd);
+      this.filteredRows.forEach(r => {
+        if (!sd.startsWith(r.path)) {
+          r.label = spaces + r.label;
+        }
+        return r;
+      });
+    }
+    // -------------------------------------------------
+
     this.tableApi?.setRows(this.filteredRows);
     this.tableApi?.repaintHard();
+  }
+
+  private getIndentation(path: string): string {
+    const depth = path.split('/').length;
+    const indentationLength = depth * this.INDENTATION_MULTIPLIER;
+    return this.INDENTATION_SPACE.repeat(indentationLength);
+  }
+
+
+  private initFetchDirectories(deep: number = 5) {
+    const para = new FindFolderPara([this.changeDirDialogData.sourceDir], '', deep);
+    this.gotoAnythingDialogService
+      .findFolders(para)
+      .pipe(
+        takeWhile(() => this.alive),
+      )
+      .subscribe(arr => {
+          this.rows = (this.changeDirDialogData.showParentTree) ?
+            [
+              ...createAsciiTree(this.allParents),
+              ...createAsciiTree(
+                arr.map(s => s.substring(this.changeDirDialogData.sourceDir.length))
+              )
+            ] :
+            createAsciiTree(
+              arr.map(s => s.substring(this.changeDirDialogData.sourceDir.length))
+            );
+          this.applyFilter();
+        }
+      );
+  }
+
+  private initTextChangeListener() {
+    this.filterTextChanged
+      .pipe(
+        takeWhile(() => this.alive),
+        debounceTime(300),
+        distinctUntilChanged()
+      )
+      .subscribe(filterText => {
+        this.applyFilter()
+      });
   }
 
   private filterPredicate(r: { path: string, label: string }): boolean {

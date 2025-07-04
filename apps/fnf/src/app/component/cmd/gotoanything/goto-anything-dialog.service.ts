@@ -31,7 +31,6 @@ export class GotoAnythingDialogService {
   public open(data: GotoAnythingDialogData, cb: (target: GotoAnythingOptionData | undefined) => void) {
     let alive = true;
     const config = new GotoAnythingDialogConfig(data);
-
     return this.dialog
       .open<GotoAnythingDialogComponent, GotoAnythingDialogData, GotoAnythingOptionData | undefined>(GotoAnythingDialogComponent, config)
       .afterClosed()

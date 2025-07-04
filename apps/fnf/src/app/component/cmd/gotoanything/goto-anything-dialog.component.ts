@@ -30,7 +30,6 @@ import {
 } from "@angular/material/autocomplete";
 import {UpperCasePipe} from "@angular/common";
 import {GotoAnythingOptionData} from "./goto-anything-option.data";
-import {HttpClient} from "@angular/common/http";
 import {GotoAnythingDialogService} from "./goto-anything-dialog.service";
 import {takeWhile} from "rxjs/operators";
 import {AppService} from "../../../app.service";
@@ -84,7 +83,6 @@ export class GotoAnythingDialogComponent implements OnInit, OnDestroy {
     public dialogRef: MatDialogRef<GotoAnythingDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: GotoAnythingDialogData,
     private readonly formBuilder: FormBuilder,
-    private readonly httpClient: HttpClient,
     private readonly gotoAnythingDialogService: GotoAnythingDialogService,
     private readonly appService: AppService,
   ) {
