@@ -21,11 +21,11 @@ export function cleanFileName(name: string): string {
     'multi', 'multilingual',
 
     // Resolutions
-    '1080p', '720p', '2160p', '4k', 'uhd', '480p', '576p', 'hd', 'fullhd', 'qhd',
+    '1080p', '720p', '2160p', '4k', 'uhd', '480p', '576p', 'hd', 'sd', 'fullhd', 'qhd',
 
     // Sources
     'bluray', 'bdrip', 'brrip', 'dvdrip', 'dvd', 'hdrip', 'webrip', 'web-dl', 'webdl',
-    'amzn', 'netflix', 'nf', 'hulu', 'disney', 'hbo', 'tv', 'hdtv', 'pdtv',
+    'amzn', 'netflix', 'nf', 'hulu', 'disney', 'hbo', 'tv', 'rs', 'hdtv', 'pdtv',
 
     // Codecs
     'x264', 'x265', 'h264', 'h265', 'hevc', 'xvid', 'divx', 'aac', 'ac3', 'dts', 'mp3',
