@@ -40,7 +40,7 @@ export class SelectionManagerForObjectModels<T> {
 
 
 
-  handleKeyDownEvent(evt: KeyboardEvent) {
+  public handleKeyDownEvent(evt: KeyboardEvent) {
     if (evt.key === ' ') {
       this.focusIndex = this.bodyModel.focusedRowIndex;
       if (this.focusIndex < 0) return; // skip
@@ -68,7 +68,7 @@ export class SelectionManagerForObjectModels<T> {
   }
 
 
-  handleKeyUpEvent(evt: KeyboardEvent) {
+  public handleKeyUpEvent(evt: KeyboardEvent) {
     this.focusIndex = this.bodyModel.focusedRowIndex;
     if (this.focusIndex < 0) return; // skip
 
@@ -111,50 +111,50 @@ export class SelectionManagerForObjectModels<T> {
     this.tableApi?.repaint();
   }
 
-  handleGeMouseEvent(evt: GeMouseEvent): boolean {
+  public handleGeMouseEvent(evt: GeMouseEvent): boolean {
     this.evt = evt;
     this.focusIndex = this.bodyModel.focusedRowIndex;
     return this.calcSelection();
   }
 
-  toggleRowSelectionByIndex(rowIndex: number) {
+  private toggleRowSelectionByIndex(rowIndex: number) {
     const row: T = this.bodyModel.getFilteredRows()[rowIndex];
     let selected = this.isRowSelected(row);
     this.setRowSelected(row, !selected);
     this.updateSelection();
   }
 
-  toggleRowSelection(row: T) {
+  public toggleRowSelection(row: T) {
     let selected = this.isRowSelected(row);
     this.setRowSelected(row, !selected);
     this.updateSelection();
   }
 
-  selectionAll() {
+  public selectionAll() {
     this.bodyModel?.getAllRows().forEach((row: any) => this.setRowSelected(row, true));
     this.updateSelection();
   }
 
-  clear() {
+  public clear() {
     this.deSelectionAll();
   }
 
-  deSelectionAll() {
+  public deSelectionAll() {
     this.bodyModel?.getAllRows().forEach((row: any) => this.setRowSelected(row, false));
     this.updateSelection();
   }
 
-  toggleSelection() {
+  public toggleSelection() {
     this.bodyModel?.getAllRows().forEach((row: any) => this.setRowSelected(row, !this.isRowSelected(row)));
     this.updateSelection();
   }
 
-  getSelectedRows(): T[] {
+  public getSelectedRows(): T[] {
     return this.bodyModel?.getAllRows()
       .filter((row: any) => this.options.isSelectable(row) && this.isRowSelected(row));
   }
 
-  applySelection2Model(keys: any[]): void {
+  public applySelection2Model(keys: any[]): void {
     this.bodyModel?.getAllRows()
       .forEach((row: any) => {
         const key = this.options.getKey(row);
@@ -164,17 +164,17 @@ export class SelectionManagerForObjectModels<T> {
     this.updateSelection();
   }
 
-  updateSelection() {
+  public updateSelection() {
     this.selection$.next(this.getSelectedRows());
   }
 
-  setRowSelected(row: T, selected: boolean) {
+  public setRowSelected(row: T, selected: boolean) {
     if (row && this.options.isSelectable(row)) {
       this.options.setSelected(row, selected);
     }
   }
 
-  isRowSelected(row: T): boolean {
+  public isRowSelected(row: T): boolean {
     return this.options.isSelected(row);
   }
 
