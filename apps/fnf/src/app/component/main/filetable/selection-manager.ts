@@ -184,7 +184,6 @@ export class SelectionManagerForObjectModels<T> {
     const evt = this.evt;
     let dirty = false;
 
-    console.info(evt)
     if (evt) {
       // Selection:
       if (!evt.originalEvent?.shiftKey && !evt.originalEvent?.ctrlKey && !evt.originalEvent?.metaKey) {
