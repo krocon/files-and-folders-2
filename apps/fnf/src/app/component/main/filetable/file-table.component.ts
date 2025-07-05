@@ -353,7 +353,10 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   onKeyUp(evt: KeyboardEvent) {
-    this.selectionManager.handleKeyEvent(evt);
+    this.selectionManager.handleKeyUpEvent(evt);
+  }
+  onKeyDown(evt: KeyboardEvent) {
+    this.selectionManager.handleKeyDownEvent(evt);
   }
 
   async requestRows(): Promise<void> {

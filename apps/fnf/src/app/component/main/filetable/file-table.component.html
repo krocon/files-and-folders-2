@@ -2,6 +2,7 @@
 <guiexpert-table
     (mouseClicked)="onMouseClicked($event)"
     (keyup)="onKeyUp($event)"
+    (keydown)="onKeyDown($event)"
     (tableReady)="onTableReady($event)"
     [debounceMouseClickDelay]="150"
     [tableModel]="tableModel"

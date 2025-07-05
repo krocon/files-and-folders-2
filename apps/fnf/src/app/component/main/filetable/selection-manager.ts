@@ -38,19 +38,80 @@ export class SelectionManagerForObjectModels<T> {
 
 
 
-  handleKeyEvent(evt: KeyboardEvent) {
+  handleKeyDownEvent(evt: KeyboardEvent) {
+    console.info('SelectionManagerForObjectModels handleKeyDownEvent', evt);
+
+    if (evt.key === ' ') {
+      this.focusIndex = this.bodyModel.focusedRowIndex;
+      if (this.focusIndex < 0) return; // skip
+
+      // Toggle selection for current row
+      this.toggleRowSelectionByIndex(this.focusIndex);
+
+      // Store the last selected index for range selection
+      this.previousRowIndex = this.focusIndex;
+
+      // Move focus to next row if possible
+      const nextFocusIndex = Math.min(
+        this.bodyModel.getFilteredRows().length - 1, 
+        this.focusIndex + 1
+      );
+
+      if (nextFocusIndex > this.focusIndex) {
+        this.bodyModel.focusedRowIndex = nextFocusIndex;
+      }
+
+      // Prevent default space behavior (scrolling)
+      evt.preventDefault();
+    }
+  }
+  handleKeyUpEvent(evt: KeyboardEvent) {
+    console.info('SelectionManagerForObjectModels handleKeyUpEvent', evt);
+
     this.focusIndex = this.bodyModel.focusedRowIndex;
     if (this.focusIndex < 0) return; // skip
 
     if (evt.key === ' ') {
-      this.toggleRowSelectionByIndex(this.focusIndex);
+      // Space key handling moved to handleKeyDownEvent
+    } else if ((evt.key === 'ArrowUp' || evt.key === 'ArrowDown')) {
+      // Calculate the new focus index based on arrow key
+      const newFocusIndex = evt.key === 'ArrowUp' 
+        ? Math.max(0, this.focusIndex) 
+        : Math.min(this.bodyModel.getFilteredRows().length - 1, this.focusIndex);
+
+      // Always update the cursor position regardless of shift key
+      this.bodyModel.focusedRowIndex = newFocusIndex;
+
+      if (evt.shiftKey && this.previousRowIndex > -1) {
+        // Handle range selection with shift + arrow keys
+        // Select the range between previous selection and current focus
+        const r1 = Math.min(newFocusIndex, this.previousRowIndex);
+        const r2 = Math.max(newFocusIndex, this.previousRowIndex);
+        let rows: T[] = this.bodyModel.getFilteredRows();
+        for (let i = r1; i <= r2; i++) {
+          this.setRowSelected(rows[i], true);
+        }
+        this.updateSelection();
+      } else if (!evt.shiftKey && (evt.ctrlKey || evt.metaKey)) {
+        // No shift key but with Ctrl/Meta key - toggle selection
+        const row = this.bodyModel.getRowByIndex(newFocusIndex);
+        if (row) {
+          this.toggleRowSelection(row);
+        }
+        this.updateSelection();
+      }
+      // No selection change for plain arrow keys (without modifiers)
+
+      // Update the previous row index for future range selections
+      if (evt.shiftKey || evt.ctrlKey || evt.metaKey) {
+        this.previousRowIndex = newFocusIndex;
+      }
     }
-    // TODO range selection?
   }
 
   handleGeMouseEvent(evt: GeMouseEvent): boolean {
     this.evt = evt;
-    this.bodyModel.focusedRowIndex;
+    this.focusIndex = this.bodyModel.focusedRowIndex;
     return this.calcSelection();
   }
 
