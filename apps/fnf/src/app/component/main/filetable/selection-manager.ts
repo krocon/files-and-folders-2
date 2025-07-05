@@ -182,13 +182,12 @@ export class SelectionManagerForObjectModels<T> {
     if (!this.bodyModel) return false;
 
     const evt = this.evt;
-
     let dirty = false;
 
-
+    console.info(evt)
     if (evt) {
       // Selection:
-      if (!evt.originalEvent?.shiftKey) {
+      if (!evt.originalEvent?.shiftKey && !evt.originalEvent?.ctrlKey && !evt.originalEvent?.metaKey) {
         this.deSelectionAll();
       }
       if (evt.originalEvent?.shiftKey && this.previousRowIndex > -1) {
@@ -207,7 +206,8 @@ export class SelectionManagerForObjectModels<T> {
 
       } else if (evt.originalEvent?.ctrlKey || evt.originalEvent?.metaKey) {
         const row = this.bodyModel.getRowByIndex(evt.rowIndex);
-        this.setRowSelected(row, true);
+        // Toggle selection when Ctrl/Meta key is pressed
+        this.toggleRowSelection(row);
         dirty = true;
 
       } else {
