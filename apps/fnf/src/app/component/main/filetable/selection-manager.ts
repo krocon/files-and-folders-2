@@ -39,7 +39,6 @@ export class SelectionManagerForObjectModels<T> {
   }
 
 
-
   public handleKeyDownEvent(evt: KeyboardEvent) {
     if (evt.key === ' ') {
       this.focusIndex = this.bodyModel.focusedRowIndex;
@@ -53,7 +52,7 @@ export class SelectionManagerForObjectModels<T> {
 
       // Move focus to next row if possible
       const nextFocusIndex = Math.min(
-        this.bodyModel.getFilteredRows().length - 1, 
+        this.bodyModel.getFilteredRows().length - 1,
         this.focusIndex + 1
       );
 
@@ -76,8 +75,8 @@ export class SelectionManagerForObjectModels<T> {
       // Space key handling moved to handleKeyDownEvent
     } else if ((evt.key === 'ArrowUp' || evt.key === 'ArrowDown')) {
       // Calculate the new focus index based on arrow key
-      const newFocusIndex = evt.key === 'ArrowUp' 
-        ? Math.max(0, this.focusIndex) 
+      const newFocusIndex = evt.key === 'ArrowUp'
+        ? Math.max(0, this.focusIndex)
         : Math.min(this.bodyModel.getFilteredRows().length - 1, this.focusIndex);
 
       // Always update the cursor position regardless of shift key
@@ -115,13 +114,6 @@ export class SelectionManagerForObjectModels<T> {
     this.evt = evt;
     this.focusIndex = this.bodyModel.focusedRowIndex;
     return this.calcSelection();
-  }
-
-  private toggleRowSelectionByIndex(rowIndex: number) {
-    const row: T = this.bodyModel.getFilteredRows()[rowIndex];
-    let selected = this.isRowSelected(row);
-    this.setRowSelected(row, !selected);
-    this.updateSelection();
   }
 
   public toggleRowSelection(row: T) {
@@ -176,6 +168,13 @@ export class SelectionManagerForObjectModels<T> {
 
   public isRowSelected(row: T): boolean {
     return this.options.isSelected(row);
+  }
+
+  private toggleRowSelectionByIndex(rowIndex: number) {
+    const row: T = this.bodyModel.getFilteredRows()[rowIndex];
+    let selected = this.isRowSelected(row);
+    this.setRowSelected(row, !selected);
+    this.updateSelection();
   }
 
   private calcSelection() {
