@@ -316,7 +316,7 @@ export class AppService {
     return this.panelSelectionService.getValue();
   }
 
-  getInActivePanelIndex(): PanelIndex {
+  private getInActivePanelIndex(): PanelIndex {
     return this.panelSelectionService.getValue() ? 0 : 1;
   }
 
@@ -664,7 +664,7 @@ export class AppService {
     this.selectionDialogService.open(data, cb);
   }
 
-  getSelectedData(panelIndex: PanelIndex): FileItemIf[] {
+  private getSelectedData(panelIndex: PanelIndex): FileItemIf[] {
     return this.selectionManagers[panelIndex]?.getSelectedRows() ?? [];
   }
 
@@ -824,7 +824,7 @@ export class AppService {
 
   private groupFiles() {
     const srcPanelIndex = this.getActivePanelIndex();
-    const targetPanelIndex = this.getInActivePanelIndex();
+    const targetPanelIndex = this.getInactivePanelIndex();
     const sourceTabData = this.getActiveTabOnActivePanel();
     const targetTabData = this.getOtherPanelSelectedTabData();
     const rows = this.getSelectedOrFocussedData(srcPanelIndex)
