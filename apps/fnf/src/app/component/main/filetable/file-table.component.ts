@@ -351,6 +351,11 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+
+  onKeyUp(evt: KeyboardEvent) {
+    this.selectionManager.handleKeyEvent(evt);
+  }
+
   async requestRows(): Promise<void> {
     let findData: FindData | undefined = undefined;
     if (this._tabsPanelData) {
@@ -826,4 +831,5 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       && (this.hiddenFilesVisible || !value.base.startsWith('.'))
       ;
   }
+
 }
