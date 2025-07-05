@@ -334,7 +334,11 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
   onMouseClicked(evt: GeMouseEvent) {
     if (evt.clickCount === 2 && evt.areaIdent === 'body' && this.tableModel) {
       const fileItem: FileItemIf = this.bodyAreaModel.getRowByIndex(evt.rowIndex);
-      if (fileItem.isDir) {
+
+      console.info(fileItem.base, isZipBase(fileItem.base))
+      if (isZipBase(fileItem.base)) {
+        this.changeDir(fileItem);
+      } else if (fileItem.isDir) {
         this.changeDir(fileItem);
       } else {
         this.appService.open(fileItem);
@@ -447,8 +451,13 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       const r = this.bodyAreaModel.focusedRowIndex;
       if (r > -1) {
         const row = this.bodyAreaModel.getRowByIndex(r);
-        if (row?.isDir) {
+
+        if (isZipBase(row.base)) {
           this.changeDir(row);
+
+        } else if (row?.isDir) {
+          this.changeDir(row);
+
         } else {
           this.appService.open(row);
         }
@@ -820,6 +829,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private changeDirNext(path: string) {
+    console.info('changeDirNext', path);
     this.appService.changeDir(new ChangeDirEvent(this._panelIndex, path));
   }
 

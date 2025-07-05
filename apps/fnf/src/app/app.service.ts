@@ -15,6 +15,7 @@ import {
   FileItemIf,
   FindData,
   FindDialogData,
+  isZipUrl,
   Sysinfo,
   SysinfoIf
 } from "@fnf-data";
@@ -532,11 +533,19 @@ export class AppService {
     path: string,
     panelIndex: PanelIndex
   ): Promise<void> {
+
+    console.info('setPathToActiveTabInGivenPanel '+panelIndex, path);
     if (path.startsWith('tabfind')) {
       console.warn('setPathToActiveTabInGivenPanel: tabfind not supported yet');
     }
     try {
-      const checkedPath: string = await this.checkPath(path);
+      let checkedPath = path;
+      if (isZipUrl(path)) {
+        //
+      } else {
+        checkedPath = await this.checkPath(path);
+      }
+
 
       const panelData: TabsPanelData = this.tabsPanelDatas[panelIndex];
       const tabData: TabData = panelData.tabs[panelData.selectedTabIndex];
