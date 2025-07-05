@@ -1,0 +1,17 @@
+### list files in zip
+POST http://localhost:3333/api/readdir
+Content-Type: application/json
+
+{
+  "path": "/Users/marckronberg/WebstormProjects/files-and-folders-2/test/demo.zip:",
+  "rid": 123
+}
+
+### list files in zip in a inner sub folder
+POST http://localhost:3333/api/readdir
+Content-Type: application/json
+
+{
+"path": "/Users/marckronberg/WebstormProjects/files-and-folders-2/test/demo.zip:/demo/a1",
+"rid": 123
+}

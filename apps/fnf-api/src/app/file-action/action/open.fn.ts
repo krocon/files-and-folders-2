@@ -24,7 +24,7 @@ async function execute(
     return [];
   } catch (error) {
     // Second try:
-    logger.log("First command failed, trying alternate command");
+    logger.log("The first command failed, trying alternate command");
     try {
       await executeCommand(cmdAlternate);
       return [];
@@ -47,13 +47,16 @@ export async function open(para: FilePara): Promise<DirEventIf[]> {
   if (windows) {
     // http://stackoverflow.com/questions/12010103/launch-a-program-from-command-line-without-opening-a-new-window
     cmd = " start \"\" /max \"" + source + "\" ";
+
   } else if (osx) {
-    cmd = " open  \"" + source + "\" ";
+    cmd = " open \"" + source + "\" ";
+
   } else if (linux) {
     cmd = "evince -f \"" + source + "\" ";
     cmdAlternate = "kpdf \"" + source + "\" ";
+
   } else {
-    throw new Error("open file-content not supported for system.");
+    throw new Error("open file-content is not supported for this system.");
   }
 
   logger.log(`Opening file: ${source}`);
