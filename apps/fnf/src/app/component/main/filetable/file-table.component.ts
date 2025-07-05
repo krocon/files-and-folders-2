@@ -403,7 +403,8 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   onTableReady(tableApi: TableApi) {
-    this.tableApi = tableApi
+    this.tableApi = tableApi;
+    this.selectionManager.tableApi = tableApi;
   }
 
 
@@ -435,12 +436,12 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       this.openSelectionDialog(false);
 
     } else if (action === "SPACE_PRESSED") {
-      const r = this.bodyAreaModel.focusedRowIndex;
-      if (r > -1) {
-        const row = this.bodyAreaModel.getRowByIndex(r);
-        this.selectionManager.toggleRowSelection(row);
-        this.tableApi?.repaint();
-      }
+      // const r = this.bodyAreaModel.focusedRowIndex;
+      // if (r > -1) {
+      //   const row = this.bodyAreaModel.getRowByIndex(r);
+      //   this.selectionManager.toggleRowSelection(row);
+      //   this.tableApi?.repaint();
+      // }
 
     } else if (action === "ENTER_PRESSED") {
       const r = this.bodyAreaModel.focusedRowIndex;

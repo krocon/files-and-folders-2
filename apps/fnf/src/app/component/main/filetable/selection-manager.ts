@@ -1,4 +1,4 @@
-import {AreaModelObjectArray, GeMouseEvent} from "@guiexpert/table";
+import {AreaModelObjectArray, GeMouseEvent, TableApi} from "@guiexpert/table";
 import {BehaviorSubject} from "rxjs";
 
 
@@ -20,6 +20,8 @@ export class SelectionManagerForObjectModels<T> {
 
   public readonly selection$ = new BehaviorSubject<T[]>([]);
 
+  public tableApi: TableApi | undefined;
+
   private previousRowIndex: number = -1;
   private focusIndex: number = -1;
   private evt: GeMouseEvent | undefined = undefined;
@@ -39,8 +41,6 @@ export class SelectionManagerForObjectModels<T> {
 
 
   handleKeyDownEvent(evt: KeyboardEvent) {
-    console.info('SelectionManagerForObjectModels handleKeyDownEvent', evt);
-
     if (evt.key === ' ') {
       this.focusIndex = this.bodyModel.focusedRowIndex;
       if (this.focusIndex < 0) return; // skip
@@ -64,10 +64,11 @@ export class SelectionManagerForObjectModels<T> {
       // Prevent default space behavior (scrolling)
       evt.preventDefault();
     }
+    this.tableApi?.repaint();
   }
-  handleKeyUpEvent(evt: KeyboardEvent) {
-    console.info('SelectionManagerForObjectModels handleKeyUpEvent', evt);
 
+
+  handleKeyUpEvent(evt: KeyboardEvent) {
     this.focusIndex = this.bodyModel.focusedRowIndex;
     if (this.focusIndex < 0) return; // skip
 
@@ -107,6 +108,7 @@ export class SelectionManagerForObjectModels<T> {
         this.previousRowIndex = newFocusIndex;
       }
     }
+    this.tableApi?.repaint();
   }
 
   handleGeMouseEvent(evt: GeMouseEvent): boolean {
