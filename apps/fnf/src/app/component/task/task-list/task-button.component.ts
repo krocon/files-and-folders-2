@@ -17,6 +17,7 @@ import {MatTooltip} from "@angular/material/tooltip";
 import {BusyBeeComponent} from "../../common/busy-bee.component";
 import {MatIcon} from "@angular/material/icon";
 import {StatusIconType} from "../../common/status-icon.type";
+import {calcStatusIcon} from "./calc-status-icon.fn";
 
 
 @Component({
@@ -29,12 +30,12 @@ import {StatusIconType} from "../../common/status-icon.type";
         class="panel-button row-reverse"
         [matTooltip]="queueProgress.getInfoText()"
         mat-stroked-button>
-      
+
       Tasks
       <mat-icon>
         <app-busy-bee [status]="status"></app-busy-bee>
       </mat-icon>
-        
+
     </button>
   `,
   imports: [
@@ -44,11 +45,12 @@ import {StatusIconType} from "../../common/status-icon.type";
     BusyBeeComponent,
     MatIcon,
   ],
-  changeDetection:ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TaskButtonComponent implements OnInit, OnDestroy {
 
   @Output() onClick = new EventEmitter<number>();
+  @Output() onClose = new EventEmitter<number>();
 
   queueProgress: QueueProgress;
   status: StatusIconType = 'idle';
@@ -72,23 +74,14 @@ export class TaskButtonComponent implements OnInit, OnDestroy {
       .pipe(
         takeWhile(() => this.alive)
       )
-      .subscribe(
-        () => {
-          console.info('refresh job queue table');
-          this.updateUi();
-        }
-      );
+      .subscribe(this.updateUi.bind(this));
+
     this.actionQueueService
       .onEvent(ActionQueueService.OPEN_JOB_QUEUE_TABLE)
       .pipe(
         takeWhile(() => this.alive)
       )
-      .subscribe(
-        () => {
-          console.info('open job queue table');
-          this.onClicked();
-        }
-      );
+      .subscribe(this.onClicked.bind(this));
   }
 
   onClicked() {
@@ -97,15 +90,15 @@ export class TaskButtonComponent implements OnInit, OnDestroy {
 
   private updateUi() {
     this.queueProgress = this.actionQueueService.getQueueProgress(0);
-
-    let status:StatusIconType = 'idle';
-    if (this.queueProgress.unfinished) {
-      status = this.queueProgress.errors ? 'error' : 'busy';
-    }
-    this.status = status;
+    this.status = calcStatusIcon(this.queueProgress);
     this.cdr.detectChanges();
 
-    console.info('--------------');
+    if (this.status === 'success') {
+      this.onClose.next(Date.now());
+    }
+
+    console.info('button');
+    console.info(this.status);
     console.info(this.queueProgress.getInfoText()); // "3 / 9"
     console.info(JSON.stringify(this.queueProgress, null, 4)); // {"unfinished": 6, "finished": 3, "errors": 0, "class": "text-info"}
   }

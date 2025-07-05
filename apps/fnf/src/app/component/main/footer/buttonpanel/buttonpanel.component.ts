@@ -79,7 +79,7 @@ export class ButtonPanelComponent implements OnInit {
     // },
   ];
 
-  tools: CmdIf[]=[];
+  tools: CmdIf[] = [];
 
   constructor(
     private readonly appService: AppService,
@@ -103,16 +103,19 @@ export class ButtonPanelComponent implements OnInit {
   }
 
 
-  //private _bottomSheet = inject(MatBottomSheet);
   openButtonSheet() {
     this.matBottomSheet.open(TaskList);
+  }
+
+  closeButtonSheet() {
+    this.matBottomSheet.dismiss();
   }
 
   onButtonClick(action: string): void {
     if (action === 'copy') {
       this.appService.copy();
-    // } else if (action === 'edit') {
-    //   this.appService.onEditClicked();
+      // } else if (action === 'edit') {
+      //   this.appService.onEditClicked();
     } else if (action === 'move') {
       this.appService.move();
 
@@ -166,7 +169,8 @@ export class ButtonPanelComponent implements OnInit {
   getShortcutsByAction(action: ActionId) {
     return this.appService.getFirstShortcutByActionAsTokens(action);
   }
-  getShortcutAsLabelTokens(sc:string):string[] {
+
+  getShortcutAsLabelTokens(sc: string): string[] {
     return this.appService.getShortcutAsLabelTokens(sc);
   }
 }

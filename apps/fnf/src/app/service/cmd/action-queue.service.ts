@@ -185,6 +185,7 @@ export class ActionQueueService {
       }
     }
     queue.status = this.QUEUE_STATUS_IDLE;
+    this.triggerJobQueueTableUpdate();
   }
 
   /**

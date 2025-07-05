@@ -190,14 +190,7 @@
 
 
 
-    <fnf-task-button class="panel-button" (onClick)="openButtonSheet()" ></fnf-task-button>
-    <!--button
-        (click)="openButtonSheet()"
-        class="panel-button row-reverse"
-        mat-stroked-button>
-      Tasks
-      <mat-icon>menu</mat-icon>
-    </button-->
+    <fnf-task-button class="panel-button" (onClick)="openButtonSheet()" (onClose)="closeButtonSheet()" ></fnf-task-button>
 
 
     <button
