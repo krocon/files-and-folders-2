@@ -439,7 +439,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     } else if (action === "REDUCE_SELECTION") {
       this.openSelectionDialog(false);
 
-    } else if (action === "SPACE_PRESSED") {
+    // } else if (action === "SPACE_PRESSED") {
       // const r = this.bodyAreaModel.focusedRowIndex;
       // if (r > -1) {
       //   const row = this.bodyAreaModel.getRowByIndex(r);
@@ -459,7 +459,12 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
           this.changeDir(row);
 
         } else {
-          this.appService.open(row);
+          if (!isZipUrl(row.dir)) {
+            this.appService.open(row);
+          } else {
+            // TODO later
+          }
+
         }
       }
 

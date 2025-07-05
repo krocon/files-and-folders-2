@@ -541,7 +541,7 @@ export class AppService {
     try {
       let checkedPath = path;
       if (isZipUrl(path)) {
-        //
+        // no path check
       } else {
         checkedPath = await this.checkPath(path);
       }
