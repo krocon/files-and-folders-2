@@ -21,7 +21,7 @@ import {
 import {MatError, MatFormField, MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
-import {FnfAutofocusDirective} from "../../../common/fnf-autofocus.directive";
+import {FnfAutofocusDirective} from "../../../common/directive/fnf-autofocus.directive";
 import {
   MatAutocomplete,
   MatAutocompleteSelectedEvent,

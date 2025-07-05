@@ -18,7 +18,7 @@ import {MatDividerModule} from "@angular/material/divider";
 import {DockerRootDeletePipe} from "./docker-root-delete.pipe";
 import {MatListItem} from "@angular/material/list";
 import {AppService} from "../../../../../app.service";
-import {FnfAutofocusDirective} from "../../../../../common/fnf-autofocus.directive";
+import {FnfAutofocusDirective} from "../../../../../common/directive/fnf-autofocus.directive";
 import {takeWhile} from "rxjs/operators";
 
 

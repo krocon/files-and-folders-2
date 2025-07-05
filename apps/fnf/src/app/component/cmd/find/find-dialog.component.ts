@@ -10,7 +10,7 @@ import {
 import {MatFormField, MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
-import {FnfAutofocusDirective} from "../../../common/fnf-autofocus.directive";
+import {FnfAutofocusDirective} from "../../../common/directive/fnf-autofocus.directive";
 import {FindDialogData} from "@fnf/fnf-data";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatCheckbox} from "@angular/material/checkbox";

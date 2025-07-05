@@ -26,6 +26,7 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 import {ActionShortcutPipe} from "../../../../common/action-shortcut.pipe";
 import {takeWhile} from "rxjs/operators";
 import {MatDivider} from "@angular/material/divider";
+import {FnfAutofocusDirective} from "../../../../common/directive/fnf-autofocus.directive";
 
 @Component({
   selector: 'app-tabpanel',
@@ -43,6 +44,7 @@ import {MatDivider} from "@angular/material/divider";
     ActionShortcutPipe,
     MatIconButton,
     MatDivider,
+    FnfAutofocusDirective,
   ],
   templateUrl: './tabpanel.component.html',
   styleUrl: './tabpanel.component.css'

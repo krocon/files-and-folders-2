@@ -144,7 +144,7 @@
           'hidden' : !tabsPanelData.tabs[tabsPanelData.selectedTabIndex].filterActive,
           'panelIndex0' : panelIndex === 0
           }"
-          autofocus="autofocus"
+          [fnfAutofocus]="tabsPanelData.tabs[tabsPanelData.selectedTabIndex].filterActive"
           class="filter border-0 float-right mr-1"
           matInput
           placeholder="Filter">

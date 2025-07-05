@@ -19,7 +19,7 @@ import {
 import {MatError, MatFormField, MatInput, MatSuffix} from "@angular/material/input";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
-import {FnfAutofocusDirective} from "../../../common/fnf-autofocus.directive";
+import {FnfAutofocusDirective} from "../../../common/directive/fnf-autofocus.directive";
 import {MatTooltip} from "@angular/material/tooltip";
 import {RenameDialogResultData} from "./rename-dialog-result.data";
 import {FnfFilenameValidation} from "../../../common/fnf-filename-validation";

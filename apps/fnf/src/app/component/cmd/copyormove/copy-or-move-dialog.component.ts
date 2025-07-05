@@ -17,7 +17,7 @@ import {MatError, MatFormField, MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {WalkSocketService} from "../../../service/walk.socketio.service";
-import {FnfAutofocusDirective} from "../../../common/fnf-autofocus.directive";
+import {FnfAutofocusDirective} from "../../../common/directive/fnf-autofocus.directive";
 
 @Component({
   selector: "fnf-copy-or-move-dialog",

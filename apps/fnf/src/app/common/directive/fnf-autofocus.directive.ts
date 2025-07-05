@@ -30,6 +30,7 @@ export class FnfAutofocusDirective implements AfterContentInit, OnChanges, OnDes
 
   @Input("fnfAutofocus")
   set condition(value: string | boolean) {
+    console.info("fnfAutofocus", value);
     this._condition = value === "true" || ('' + value) === "true";
   }
 
