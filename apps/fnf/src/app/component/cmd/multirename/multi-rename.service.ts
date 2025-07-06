@@ -41,7 +41,7 @@ export class MultiRenameService {
     for (const row of rows) {
       if (row.source && row.target && this.isFileChanged(row.source, row.target)) {
         actions.push(
-          this.commandService.rename({
+          this.commandService.createQueueActionEventForRename({
             bulk: true, // rows.length > CommandService.BULK_LOWER_LIMIT,
             source: row.source,
             srcPanelIndex: panelIndex,
@@ -53,7 +53,7 @@ export class MultiRenameService {
     }
 
     if (actions.length > 0) {
-      actions.push(this.commandService.refreshPanel(panelIndex));
+      actions.push(this.commandService.createQueueActionEventForRefreshPanel(panelIndex));
     }
 
     return actions;

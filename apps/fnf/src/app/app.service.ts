@@ -452,7 +452,7 @@ export class AppService {
         (target) => {
           if (target) {
             const paras: QueueFileOperationParams[] = this.createFileOperationParams(target);
-            const actionEvents = paras.map(item => this.commandService.copy(item));
+            const actionEvents = paras.map(item => this.commandService.createQueueActionEventForCopy(item));
             this.commandService.addActions(actionEvents);
           }
         }
@@ -468,7 +468,7 @@ export class AppService {
         (target) => {
           if (target) {
             const paras: QueueFileOperationParams[] = this.createFileOperationParams(target);
-            const actionEvents = paras.map(item => this.commandService.move(item));
+            const actionEvents = paras.map(item => this.commandService.createQueueActionEventForMove(item));
             this.commandService.addActions(actionEvents);
           }
         }
@@ -485,7 +485,7 @@ export class AppService {
         (target) => {
           if (target) {
             const paras: QueueFileOperationParams[] = this.createFileOperationParams(target);
-            const actionEvents = paras.map(item => this.commandService.del(item));
+            const actionEvents = paras.map(item => this.commandService.createQueueActionEventForDel(item));
             const panelIndex = this.getActivePanelIndex();
             const bodyAreaModel = this.bodyAreaModels[panelIndex];
             if (bodyAreaModel?.focusedRowIndex) {
@@ -641,7 +641,7 @@ export class AppService {
       }
     }
     if (fileItem) {
-      const actionEvent = this.commandService.open(
+      const actionEvent = this.commandService.createQueueActionEventForOpen(
         new QueueFileOperationParams(fileItem, srcPanelIndex, fileItem, srcPanelIndex)
       );
       this.commandService.addActions([actionEvent]);
@@ -770,7 +770,7 @@ export class AppService {
 
 
   callActionMkDir(para: { dir: string; base: string; panelIndex: PanelIndex }) {
-    const actionEvent = this.commandService.mkdir(para);
+    const actionEvent = this.commandService.createQueueActionEventForMkdir(para);
     this.commandService.addActions([actionEvent]);
   }
 
@@ -806,7 +806,7 @@ export class AppService {
       this.renameDialogService
         .open(data, (result: RenameDialogResultData | undefined) => {
           if (result) {
-            const actionEvent = this.commandService.rename(
+            const actionEvent = this.commandService.createQueueActionEventForRename(
               new QueueFileOperationParams(result.source, srcPanelIndex, result.target, srcPanelIndex)
             );
             this.commandService.addActions([actionEvent]);

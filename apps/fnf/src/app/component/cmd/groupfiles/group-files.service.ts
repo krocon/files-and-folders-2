@@ -45,7 +45,7 @@ export class GroupFilesService {
           target: row.target
         };
         actions.push(
-          this.commandService.move(fop)
+          this.commandService.createQueueActionEventForMove(fop)
         );
       }
     }

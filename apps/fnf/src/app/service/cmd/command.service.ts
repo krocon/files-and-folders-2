@@ -54,11 +54,27 @@ export class CommandService {
     );
   }
 
+  createActionQueueEventWithFilePara(
+    filePara: FilePara,
+    bulk: boolean = false
+  ): QueueActionEvent {
+
+    const targetPanelIndex = filePara.targetPanelIndex ?? filePara.sourcePanelIndex ?? 0;
+
+    return new QueueActionEvent(
+      targetPanelIndex,
+      filePara,
+      this.ACTION_STATUS_NEW,
+      bulk,
+      this.actionId++
+    );
+  }
+
   /**
    * Refreshes a panel
    * @param panelIndex The panel index
    */
-  refreshPanel(panelIndex: PanelIndex): QueueActionEvent {
+  createQueueActionEventForRefreshPanel(panelIndex: PanelIndex): QueueActionEvent {
     return this.createActionEvent(
       this.actionQueueService.ACTION_REFRESH_PANEL,
       {} as FileItemIf,
@@ -73,7 +89,7 @@ export class CommandService {
    * Creates a directory
    * @param para The parameters for the mkdir operation
    */
-  mkdir(para: { dir: string; base: string; panelIndex: PanelIndex }): QueueActionEvent {
+  createQueueActionEventForMkdir(para: { dir: string; base: string; panelIndex: PanelIndex }): QueueActionEvent {
     return this.createActionEvent(
       this.actionQueueService.ACTION_MKDIR,
       {} as FileItemIf,
@@ -88,7 +104,7 @@ export class CommandService {
    * Deletes a file or directory
    * @param para The parameters for the delete operation
    */
-  del(para: { source: FileItemIf; srcPanelIndex: PanelIndex; bulk?: boolean }): QueueActionEvent {
+  createQueueActionEventForDel(para: { source: FileItemIf; srcPanelIndex: PanelIndex; bulk?: boolean }): QueueActionEvent {
     const source = para.source;
     const srcPanelIndex = para.srcPanelIndex;
     const bulk = para.bulk || false;
@@ -116,9 +132,9 @@ export class CommandService {
 
   /**
    * Deletes an empty directory
-   * @param para The parameters for the delempty operation
+   * @param para The parameters for the createQueueActionEventForDelEmpty operation
    */
-  delempty(para: { source: FileItemIf; srcPanelIndex: PanelIndex }): QueueActionEvent {
+  createQueueActionEventForDelEmpty(para: { source: FileItemIf; srcPanelIndex: PanelIndex }): QueueActionEvent {
     return this.createActionEvent(
       this.actionQueueService.ACTION_DELEMPTY,
       para.source,
@@ -133,7 +149,7 @@ export class CommandService {
    * Copies a file or directory
    * @param para The parameters for the copy operation
    */
-  copy(para: QueueFileOperationParams): QueueActionEvent {
+  createQueueActionEventForCopy(para: QueueFileOperationParams): QueueActionEvent {
     const source = para.source;
     const srcPanelIndex = para.srcPanelIndex;
     const targetPanelIndex = para.targetPanelIndex;
@@ -154,7 +170,7 @@ export class CommandService {
    * Moves a file or directory
    * @param para The parameters for the move operation
    */
-  move(para: QueueFileOperationParams): QueueActionEvent {
+  createQueueActionEventForMove(para: QueueFileOperationParams): QueueActionEvent {
     const source = para.source;
     const srcPanelIndex = para.srcPanelIndex;
     const target = para.target;
@@ -175,7 +191,7 @@ export class CommandService {
    * Renames a file or directory
    * @param para The parameters for the rename operation
    */
-  rename(para: QueueFileOperationParams): QueueActionEvent {
+  createQueueActionEventForRename(para: QueueFileOperationParams): QueueActionEvent {
     const source = para.source;
     const srcPanelIndex = para.srcPanelIndex;
     const target = para.target;
@@ -218,7 +234,7 @@ export class CommandService {
   }
 
 
-  open(para: QueueFileOperationParams): QueueActionEvent {
+  createQueueActionEventForOpen(para: QueueFileOperationParams): QueueActionEvent {
     const source = para.source;
     const srcPanelIndex = para.srcPanelIndex;
     const target = para.target;
