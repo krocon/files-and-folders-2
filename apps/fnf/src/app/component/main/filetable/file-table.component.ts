@@ -310,7 +310,13 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     this.appService.actionEvents$
       .pipe(takeWhile(() => this.alive))
       .subscribe(actionEvent => {
-        if (actionEvent && this.alive && this.selected) {
+
+        if (actionEvent==='RELOAD_DIR') {
+          // we do the reload on both panels (selected and unselected panel):
+          this.reload();
+
+        } else if (actionEvent && this.selected) {
+          // we are on the active panel:
           this.actionCall(actionEvent);
         }
       });
@@ -335,7 +341,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     if (evt.clickCount === 2 && evt.areaIdent === 'body' && this.tableModel) {
       const fileItem: FileItemIf = this.bodyAreaModel.getRowByIndex(evt.rowIndex);
 
-      console.info(fileItem.base, isZipBase(fileItem.base))
+      // console.info(fileItem.base, isZipBase(fileItem.base))
       if (isZipBase(fileItem.base)) {
         this.changeDir(fileItem);
       } else if (fileItem.isDir) {

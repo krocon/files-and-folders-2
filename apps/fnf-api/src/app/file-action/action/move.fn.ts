@@ -17,16 +17,14 @@ const logger = new Logger("fn-move");
 
 export async function move(para: FilePara): Promise<DirEventIf[]> {
 
-  function createRet(targetUrl: string, para: FilePara): DirEventIf[] {
+  function createRet(para: FilePara, targetUrl:string): DirEventIf[] {
     const isDir = para.source.isDir;
-    const targetDir = path.dirname(targetUrl);
-    const item = clone<FileItemIf>(para.source);
-    item.dir = targetDir;
+    const targetItem = {...clone<FileItemIf>(para.source), dir: targetUrl};
 
-    const ret: DirEventIf[] = fileUrl2CheckOrAddDirEvents(targetDir, para.targetPanelIndex);
-    ret.push(new DirEvent(para.source.dir, [para.source], false, false, 1, "", isDir ? "unlinkDir" : "unlink", para.sourcePanelIndex));
-    ret.push(new DirEvent(targetDir, [item], false, false, 1, "", isDir ? "addDir" : "add", para.targetPanelIndex));
-
+    const ret: DirEventIf[] = fileUrl2CheckOrAddDirEvents(para.target.dir, para.targetPanelIndex);
+    ret.push(new DirEvent(para.source.dir, [para.source], true, true, 1, "", isDir ? "unlinkDir" : "unlink", para.sourcePanelIndex));
+    ret.push(new DirEvent(para.target.dir, [targetItem], true, true, 1, "", isDir ? "addDir" : "add", para.targetPanelIndex));
+console.log("createRet: " + JSON.stringify(ret, null, 4)); // TODO 123
     return ret;
   }
 
@@ -98,14 +96,14 @@ export async function move(para: FilePara): Promise<DirEventIf[]> {
 
   try {
     await executeCommand(cmd);
-    return createRet(targetUrl, para);
+    return createRet(para, targetUrl);
 
   } catch (error) {
     // second try:
     logger.error(error);
     const to = path.join(targetUrl, "/", para.source.base);
     await fse.move(sourceUrl, to);
-    return createRet(targetUrl, para);
+    return createRet(para, targetUrl);
   }
 
 }

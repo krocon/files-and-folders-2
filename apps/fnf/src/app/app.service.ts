@@ -469,6 +469,7 @@ export class AppService {
           if (target) {
             const paras: QueueFileOperationParams[] = this.createFileOperationParams(target);
             const actionEvents = paras.map(item => this.commandService.createQueueActionEventForMove(item));
+            console.info('move actionEvents', actionEvents); // TODO 123
             this.commandService.addActions(actionEvents);
           }
         }

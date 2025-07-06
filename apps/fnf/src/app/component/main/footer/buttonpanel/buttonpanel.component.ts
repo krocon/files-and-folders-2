@@ -13,7 +13,6 @@ import {TaskList} from "../../../task/task-list/task-list";
 import {ButtonEnableStates, buttonEnableStatesKey, CmdIf} from "@fnf/fnf-data";
 import {MatList} from "@angular/material/list";
 import {NotifyService} from "../../../../service/cmd/notify-service";
-import {QueueNotifyEventIf} from "../../../../domain/cmd/queue-notify-event.if";
 import {ActionQueueService} from "../../../../service/cmd/action-queue.service";
 import {TaskButtonComponent} from "../../../task/task-list/task-button.component";
 
@@ -90,15 +89,15 @@ export class ButtonPanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.notifyService
-      .valueChanges()
-      .subscribe(
-        (evt: QueueNotifyEventIf) => {
-          //V TODO show status on button
-          console.info('TODO NotifyEventIf', evt);
-          console.info(this.actionQueueService.getQueues());
-        }
-      );
+    // this.notifyService
+    //   .valueChanges()
+    //   .subscribe(
+    //     (evt: QueueNotifyEventIf) => {
+    //       //V TODO show status on button
+    //       console.info('TODO NotifyEventIf', evt);
+    //       console.info(this.actionQueueService.getQueues());
+    //     }
+    //   );
     this.tools = this.appService.getDefaultTools();
   }
 
