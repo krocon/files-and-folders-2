@@ -12,7 +12,7 @@ import {CommonModule} from "@angular/common";
 import {MatButton} from "@angular/material/button";
 import {ActionQueueService} from "../../../service/cmd/action-queue.service";
 import {takeWhile} from "rxjs/operators";
-import {QueueProgress} from "../../../domain/cmd/queue.progress";
+import {QueueProgress} from "../../../domain/cmd/queue-progress";
 import {MatTooltip} from "@angular/material/tooltip";
 import {BusyBeeComponent} from "../../common/busy-bee.component";
 import {MatIcon} from "@angular/material/icon";
@@ -28,7 +28,7 @@ import {calcStatusIcon} from "./calc-status-icon.fn";
     <button
         (click)="onClicked()"
         class="panel-button row-reverse"
-        [matTooltip]="queueProgress.getInfoText()"
+        [matTooltip]="infoText"
         mat-stroked-button>
 
       Tasks
@@ -52,6 +52,7 @@ export class TaskButtonComponent implements OnInit, OnDestroy {
   @Output() onClick = new EventEmitter<number>();
   @Output() onClose = new EventEmitter<number>();
 
+  infoText: string = '';
   queueProgress: QueueProgress;
   status: StatusIconType = 'idle';
 
@@ -90,6 +91,7 @@ export class TaskButtonComponent implements OnInit, OnDestroy {
 
   private updateUi() {
     this.queueProgress = this.actionQueueService.getQueueProgress(0);
+    this.infoText = this.queueProgress.finished + ' / ' + (this.queueProgress.finished + this.queueProgress.unfinished);
     this.status = calcStatusIcon(this.queueProgress);
     this.cdr.detectChanges();
 
@@ -102,4 +104,5 @@ export class TaskButtonComponent implements OnInit, OnDestroy {
     // console.info(this.queueProgress.getInfoText()); // "3 / 9"
     // console.info(JSON.stringify(this.queueProgress, null, 4)); // {"unfinished": 6, "finished": 3, "errors": 0, "class": "text-info"}
   }
+
 }

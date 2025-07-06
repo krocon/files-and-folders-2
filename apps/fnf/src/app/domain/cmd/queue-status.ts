@@ -1,6 +1,6 @@
 export const queueStatusList = [
 
-  // Queue Status:
+  // QueueIf Status:
   'IDLE',
   'RUNNING',
   'ERROR',

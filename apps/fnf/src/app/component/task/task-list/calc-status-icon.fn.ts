@@ -1,5 +1,5 @@
 import {StatusIconType} from "../../common/status-icon.type";
-import {QueueProgress} from "../../../domain/cmd/queue.progress";
+import {QueueProgress} from "../../../domain/cmd/queue-progress";
 
 export function calcStatusIcon(queueProgress: QueueProgress): StatusIconType {
   let status: StatusIconType = 'idle';

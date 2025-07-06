@@ -1,7 +1,6 @@
-export interface QueueProgress {
+export interface QueueProgressIf {
   unfinished: number;
   finished: number;
   errors: number;
   class: string;
-  getInfoText: () => string;
 }

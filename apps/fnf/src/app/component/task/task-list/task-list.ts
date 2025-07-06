@@ -4,9 +4,9 @@ import {ActionQueueService} from "../../../service/cmd/action-queue.service";
 import {NotifyService} from "../../../service/cmd/notify-service";
 import {QueueNotifyEventIf} from "../../../domain/cmd/queue-notify-event.if";
 import {StatusIconType} from "../../common/status-icon.type";
-import {QueueProgress} from "../../../domain/cmd/queue.progress";
+import {QueueProgress} from "../../../domain/cmd/queue-progress";
 import {BusyBeeComponent} from "../../common/busy-bee.component";
-import {Queue} from "../../../domain/cmd/queue";
+import {QueueIf} from "../../../domain/cmd/queue.if";
 import {QueueStatus} from "../../../domain/cmd/queue-status";
 import {QueueActionEvent} from "../../../domain/cmd/queue-action-event";
 import {MatTooltip} from "@angular/material/tooltip";
@@ -28,10 +28,10 @@ import {MatIcon} from "@angular/material/icon";
 })
 export class TaskList implements OnInit {
 
-  queue: Queue;
+  queue: QueueIf;
   queueProgress: QueueProgress;
   status: StatusIconType = 'idle';
-
+  infoText: string = '';
 
   private _bottomSheetRef =
     inject<MatBottomSheetRef<TaskList>>(MatBottomSheetRef);
@@ -100,6 +100,7 @@ export class TaskList implements OnInit {
 
   private updateUi() {
     this.queueProgress = this.actionQueueService.getQueueProgress(0);
+    this.infoText = this.queueProgress.finished + ' / ' + (this.queueProgress.finished + this.queueProgress.unfinished);
 
     let status: StatusIconType = 'idle';
     if (this.queueProgress.unfinished) {

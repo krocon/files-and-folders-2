@@ -3,7 +3,8 @@ import {QueueActionEvent} from '../../domain/cmd/queue-action-event';
 import {QueueActionEventType} from '../../domain/cmd/queue-action-event.type';
 import {QueueStatus} from '../../domain/cmd/queue-status';
 import {Observable} from 'rxjs';
-import {QueueProgress} from "../../domain/cmd/queue.progress";
+import {QueueProgress} from "../../domain/cmd/queue-progress";
+import {QueueIf} from "../../domain/cmd/queue.if";
 import {Queue} from "../../domain/cmd/queue";
 import {FileActionService} from "./file-action.service";
 import {DirEvent, OnDoResponseType} from "@fnf/fnf-data";
@@ -18,7 +19,7 @@ export class ActionQueueService {
   // Events
   public static readonly REFRESH_JOB_QUEUE_TABLE: QueueActionEventType = 'refresh_job_queue_table';
   public static readonly OPEN_JOB_QUEUE_TABLE: QueueActionEventType = 'open_job_queue_table';
-  // Queue Status constants
+  // QueueIf Status constants
   readonly QUEUE_STATUS_IDLE: QueueStatus = 'IDLE';
   readonly QUEUE_STATUS_RUNNING: QueueStatus = 'RUNNING';
   readonly QUEUE_STATUS_ERROR: QueueStatus = 'ERROR';
@@ -39,7 +40,7 @@ export class ActionQueueService {
   readonly ACTION_REMOVE: QueueActionEventType = 'remove';
   readonly ACTION_DELEMPTY: QueueActionEventType = 'delempty';
   readonly ACTION_RENAME: QueueActionEventType = 'rename';
-  private queues: Queue[] = [];
+  private queues: QueueIf[] = [];
   private jobId = 0;
   private refreshQueueTableTimer: any;
 
@@ -54,7 +55,7 @@ export class ActionQueueService {
    * Gets a queue by index, creating a new one if necessary
    * @param queueIndex The index of the queue to get
    */
-  getQueue(queueIndex: number = 0): Queue {
+  getQueue(queueIndex: number = 0): QueueIf {
     if (queueIndex > this.queues.length) {
       throw new Error(`Error: getQueue(queueIndex) queueIndex is ${queueIndex} but queues.length is ${this.queues.length}!`);
     }
@@ -123,7 +124,7 @@ export class ActionQueueService {
    * Processes the next action in a queue
    * @param queue The queue to process
    */
-  next(queue: Queue = this.getQueue(0)): void {
+  next(queue: QueueIf = this.getQueue(0)): void {
     if (queue.status==='PAUSED') return;
 
     for (let i = 0; i < queue.actions.length; i++) {
@@ -240,26 +241,9 @@ export class ActionQueueService {
    * @private
    */
   private addNewQueue(): void {
-    this.queues.push({
-      status: this.QUEUE_STATUS_IDLE,
-      actions: [],
-      jobId: 0,
-      progress: {
-        unfinished: 0,
-        finished: 0,
-        errors: 0,
-        class: 'text-muted',
-        getInfoText: function getInfoText() {
-          return this.finished + ' / ' + (this.finished + this.unfinished);
-        }
-      },
-      buttonStates: {
-        pause: false,
-        stop: false,
-        resume: false,
-        clean: false
-      }
-    });
+    this.queues.push(new Queue({
+      status: this.QUEUE_STATUS_IDLE
+    }));
   }
 
   /**
