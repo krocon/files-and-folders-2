@@ -7,4 +7,11 @@ export interface Queue {
   actions: QueueActionEvent[];
   jobId: number;
   progress: QueueProgress;
+
+  buttonStates: {
+    pause: boolean;
+    stop: boolean;
+    resume: boolean;
+    clean: boolean;
+  }
 }

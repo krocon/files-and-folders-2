@@ -21,4 +21,10 @@
         /*    grid-template-columns: auto 1fr auto;*/
         /*}*/
     }
+    .footer {
+        display: flex;
+        justify-content: flex-end;
+        column-gap: 16px;
+        padding-top: 16px;
+    }
 }

@@ -6,32 +6,73 @@
   </div>
   <div class="body">
 
-    <table>
-      <thead>
-      <tr>
-        <td>Grp</td>
-        <td>Cmd</td>
-        <td>Status</td>
-        <td></td>
-        <td>File</td>
-      </tr>
-      </thead>
-    @for (action of queue.actions; track action) {
-      <tr class="row">
-        <td>{{action.id}}</td>
-        <td>CMD:{{action.filePara.cmd.toLowerCase()}}</td>
-        <td>{{getBeeStatus(action.status)}}</td>
-        <td>
-          <app-busy-bee [matTooltip]="action.status" [status]="getBeeStatus(action.status)"></app-busy-bee>
-        </td>
-        <td>{{getFileName(action)}}</td>
-      </tr>
-    }
-    </table>
+    @if (queue.actions.length === 0) {
 
+      <div class="empty-list">
+        <span>No actions in queue</span>
+      </div>
+
+    } @else {
+
+      <table>
+        <thead>
+        <tr>
+          <td>Grp</td>
+          <td>Cmd</td>
+          <td>Status</td>
+          <td></td>
+          <td>File</td>
+        </tr>
+        </thead>
+        @for (action of queue.actions; track action) {
+          <tr class="row">
+            <td>{{ action.id }}</td>
+            <td>{{ action.filePara.cmd.toLowerCase() }}</td>
+            <td>{{ getBeeStatus(action.status) }}</td>
+            <td>
+              <app-busy-bee
+                  [matTooltip]="action.status"
+                  [status]="getBeeStatus(action.status)"></app-busy-bee>
+            </td>
+            <td>{{ getFileName(action) }}</td>
+          </tr>
+        }
+      </table>
+    }
   </div>
   <div class="footer">
-    TODO button
+    <button
+        (click)="onRemoveSuccessedClicked()"
+        [disabled]="!queue.buttonStates.clean"
+        mat-stroked-button>
+      <mat-icon>cleaning_services</mat-icon>
+      Clean List
+    </button>
+
+    <button
+        (click)="onPauseNextClicked()"
+        [disabled]="!queue.buttonStates.pause"
+        mat-stroked-button>
+      <mat-icon>pause</mat-icon>
+      Pause
+    </button>
+
+    <button
+        (click)="onResumeClicked()"
+        [disabled]="!queue.buttonStates.resume"
+        mat-stroked-button>
+      <mat-icon>play_arrow</mat-icon>
+      Resume
+    </button>
+
+    <button
+        (click)="onDeleteAllClicked()"
+        [disabled]="!queue.buttonStates.stop"
+        mat-stroked-button>
+      <mat-icon>delete_sweep</mat-icon>
+      Stop All
+    </button>
+
   </div>
 </div>
 

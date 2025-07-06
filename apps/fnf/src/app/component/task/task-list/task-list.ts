@@ -10,6 +10,8 @@ import {Queue} from "../../../domain/cmd/queue";
 import {QueueStatus} from "../../../domain/cmd/queue-status";
 import {QueueActionEvent} from "../../../domain/cmd/queue-action-event";
 import {MatTooltip} from "@angular/material/tooltip";
+import {MatButton} from "@angular/material/button";
+import {MatIcon} from "@angular/material/icon";
 
 
 @Component({
@@ -17,6 +19,8 @@ import {MatTooltip} from "@angular/material/tooltip";
   imports: [
     BusyBeeComponent,
     MatTooltip,
+    MatIcon,
+    MatButton,
   ],
   templateUrl: './task-list.html',
   styleUrl: './task-list.css',
@@ -43,7 +47,7 @@ export class TaskList implements OnInit {
   }
 
   ngOnInit(): void {
-    let queues = this.actionQueueService.getQueues();
+    //let queues = this.actionQueueService.getQueues();
     // console.info('queues', queues);
 
     this.notifyService
@@ -76,6 +80,22 @@ export class TaskList implements OnInit {
       if (action.filePara.source?.dir) return action.filePara.source?.dir;
     }
     return "";
+  }
+
+  onRemoveSuccessedClicked() {
+    this.actionQueueService.removeSuccessed();
+  }
+
+  onDeleteAllClicked() {
+    this.actionQueueService.doStop();
+  }
+
+  onPauseNextClicked() {
+    this.actionQueueService.doPause();
+  }
+
+  onResumeClicked() {
+    this.actionQueueService.doResume();
   }
 
   private updateUi() {

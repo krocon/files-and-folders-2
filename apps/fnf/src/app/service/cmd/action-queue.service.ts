@@ -15,11 +15,13 @@ import {QueueNotifyEvent} from "../../domain/cmd/queue-notify-event";
 })
 export class ActionQueueService {
 
+  // Events
+  public static readonly REFRESH_JOB_QUEUE_TABLE: QueueActionEventType = 'refresh_job_queue_table';
+  public static readonly OPEN_JOB_QUEUE_TABLE: QueueActionEventType = 'open_job_queue_table';
   // Queue Status constants
   readonly QUEUE_STATUS_IDLE: QueueStatus = 'IDLE';
   readonly QUEUE_STATUS_RUNNING: QueueStatus = 'RUNNING';
   readonly QUEUE_STATUS_ERROR: QueueStatus = 'ERROR';
-
   // Action Status constants
   readonly ACTION_STATUS_NEW: QueueStatus = 'NEW';
   readonly ACTION_STATUS_PENDING: QueueStatus = 'PENDING';
@@ -28,10 +30,8 @@ export class ActionQueueService {
   readonly ACTION_STATUS_WARNING: QueueStatus = 'WARNING';
   readonly ACTION_STATUS_SUCCESS: QueueStatus = 'SUCCESS';
   readonly ACTION_STATUS_ABORT: QueueStatus = 'ABORT';
-
   // Action Event Keys
   readonly ACTION_REFRESH_PANEL: QueueActionEventType = 'refresh_panel';
-
   readonly ACTION_MKDIR: QueueActionEventType = 'mkdir';
   readonly ACTION_OPEN: QueueActionEventType = 'open';
   readonly ACTION_COPY: QueueActionEventType = 'copy';
@@ -39,11 +39,6 @@ export class ActionQueueService {
   readonly ACTION_REMOVE: QueueActionEventType = 'remove';
   readonly ACTION_DELEMPTY: QueueActionEventType = 'delempty';
   readonly ACTION_RENAME: QueueActionEventType = 'rename';
-
-  // Events
-  public static readonly REFRESH_JOB_QUEUE_TABLE: QueueActionEventType = 'refresh_job_queue_table';
-  public static readonly OPEN_JOB_QUEUE_TABLE: QueueActionEventType = 'open_job_queue_table';
-
   private queues: Queue[] = [];
   private jobId = 0;
   private refreshQueueTableTimer: any;
@@ -129,6 +124,8 @@ export class ActionQueueService {
    * @param queue The queue to process
    */
   next(queue: Queue = this.getQueue(0)): void {
+    if (queue.status==='PAUSED') return;
+
     for (let i = 0; i < queue.actions.length; i++) {
       const action: QueueActionEvent = queue.actions[i];
       if (action.status === this.ACTION_STATUS_NEW) {
@@ -209,6 +206,35 @@ export class ActionQueueService {
     });
   }
 
+  openJobTable() {
+    this.eventService.next(new QueueNotifyEvent(ActionQueueService.OPEN_JOB_QUEUE_TABLE, []));
+  }
+
+  removeSuccessed(queueIndex: number = 0) {
+    const queue = this.getQueue(queueIndex);
+    queue.actions = queue.actions.filter(action => action.status != this.ACTION_STATUS_SUCCESS);
+  }
+
+  doStop(queueIndex: number = 0) {
+    const queue = this.getQueue(queueIndex);
+    queue.actions = queue.actions.filter(action => action.status != this.ACTION_STATUS_PROCESSING);
+  }
+
+  doPause(queueIndex: number = 0) {
+    const queue = this.getQueue(queueIndex);
+    queue.status = 'PAUSED';
+  }
+
+  isPause(queueIndex: number = 0) {
+    return this.getQueue(queueIndex).status==='PAUSED';
+  }
+
+  doResume(queueIndex: number = 0) {
+    const queue = this.getQueue(queueIndex);
+    queue.status = 'IDLE';
+    this.triggerProgress();
+  }
+
   /**
    * Adds a new queue to the list of queues
    * @private
@@ -226,6 +252,12 @@ export class ActionQueueService {
         getInfoText: function getInfoText() {
           return this.finished + ' / ' + (this.finished + this.unfinished);
         }
+      },
+      buttonStates: {
+        pause: false,
+        stop: false,
+        resume: false,
+        clean: false
       }
     });
   }
@@ -271,16 +303,9 @@ export class ActionQueueService {
         progress.class = 'text-muted';
       }
     }
-
-    // // Force UI update
-    // timer(16).subscribe(() => {
-    // });
   }
 
-  /**
-   * Triggers a job queue table update
-   * @private
-   */
+
   private triggerJobQueueTableUpdate(): void {
     this.calcQueueProgress();
     if (this.refreshQueueTableTimer) {
@@ -288,13 +313,10 @@ export class ActionQueueService {
     }
     this.refreshQueueTableTimer = setTimeout(() => {
       this.eventService.next(new QueueNotifyEvent(ActionQueueService.REFRESH_JOB_QUEUE_TABLE, []));
-    }, 1111);
+    }, 500);
   }
 
-  /**
-   * Triggers progress calculation and starts processing queues
-   * @private
-   */
+
   private triggerProgress(): void {
     this.calcQueueProgress();
     for (let i = 0; i < this.queues.length; i++) {
@@ -305,12 +327,8 @@ export class ActionQueueService {
     }
   }
 
-
   private executeAction(action: QueueActionEvent): Observable<OnDoResponseType> {
     return this.fileActionService.do(action.filePara);
   }
 
-  openJobTable() {
-    this.eventService.next(new QueueNotifyEvent(ActionQueueService.OPEN_JOB_QUEUE_TABLE, []));
-  }
 }
