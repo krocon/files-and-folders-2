@@ -19,12 +19,11 @@ export async function move(para: FilePara): Promise<DirEventIf[]> {
 
   function createRet(para: FilePara, targetUrl:string): DirEventIf[] {
     const isDir = para.source.isDir;
-    const targetItem = {...clone<FileItemIf>(para.source), dir: targetUrl};
+    const targetItem = {...clone<FileItemIf>(para.source), dir: targetUrl, abs:false};
 
     const ret: DirEventIf[] = fileUrl2CheckOrAddDirEvents(para.target.dir, para.targetPanelIndex);
     ret.push(new DirEvent(para.source.dir, [para.source], true, true, 1, "", isDir ? "unlinkDir" : "unlink", para.sourcePanelIndex));
     ret.push(new DirEvent(para.target.dir, [targetItem], true, true, 1, "", isDir ? "addDir" : "add", para.targetPanelIndex));
-console.log("createRet: " + JSON.stringify(ret, null, 4)); // TODO 123
     return ret;
   }
 

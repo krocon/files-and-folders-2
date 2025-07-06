@@ -12,7 +12,6 @@ import {
 import {CommonModule} from "@angular/common";
 import {RenderWrapperFactory, TableComponent} from "@guiexpert/angular-table";
 import {
-  AutoRestoreOptions,
   ColumnDef,
   GeMouseEvent,
   Size,
@@ -193,18 +192,19 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     },
     horizontalBorderVisible: false,
     verticalBorderVisible: false,
-    autoRestoreOptions: {
-      ...new AutoRestoreOptions<FileItemIf>(),
-      getStorageKeyFn: () => `fnf-file-table-${this._panelIndex}-`,
-      autoRestoreCollapsedExpandedState: true,
-      autoRestoreScrollPosition: true,
-      autoRestoreSortingState: true,
-      autoRestoreSelectedState: false
-    },
+    // autoRestoreOptions: {
+    //   ...new AutoRestoreOptions<FileItemIf>(),
+    //   getStorageKeyFn: () => `fnf-file-table-${this._panelIndex}-`,
+    //   autoRestoreCollapsedExpandedState: false,
+    //   autoRestoreScrollPosition: false,
+    //   autoRestoreSortingState: true,
+    //   autoRestoreSelectedState: false
+    // },
     externalFilterFunction: this.filterFn.bind(this),
     getSelectionModel: () => undefined,
     getFocusModel: () => undefined,
     shortcutActionsDisabled: true,
+    columnsDraggable: false,
   };
 
   get panelIndex(): PanelIndex {

@@ -11,7 +11,11 @@ const config: SocketIoConfig = {
   url: "http://localhost:3334",
   options: {
     reconnection: true,
-    autoConnect: true
+    autoConnect: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    timeout: 20000
   }
 };
 

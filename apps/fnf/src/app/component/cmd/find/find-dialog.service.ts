@@ -5,11 +5,14 @@ import {takeWhile} from "rxjs/operators";
 import {MatDialog} from "@angular/material/dialog";
 import {FindDialogConfig} from "./find-dialog.config";
 import {FindDialogData} from "@fnf/fnf-data";
+import {TypedDataService} from "../../../common/typed-data.service";
 
 @Injectable({
   providedIn: "root"
 })
 export class FindDialogService {
+
+  private readonly innerService = new TypedDataService<string>("find-dlg-pattern", '');
 
 
   constructor(
@@ -20,6 +23,7 @@ export class FindDialogService {
 
   public open(data: FindDialogData, cb: (result: FindDialogData | undefined) => void) {
     let alive = true;
+    data.pattern = this.innerService.getValue();
     const config = new FindDialogConfig(data);
 
     return this.dialog
@@ -28,6 +32,9 @@ export class FindDialogService {
       .pipe(takeWhile(() => alive))
       .subscribe(item => {
         alive = false;
+        if (item) {
+          this.innerService.update(item.pattern);
+        }
         cb(item);
       });
   }

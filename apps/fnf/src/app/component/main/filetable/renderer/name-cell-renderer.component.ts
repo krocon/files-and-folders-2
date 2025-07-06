@@ -167,6 +167,12 @@ import {IconType} from "./icon.type";
       }
       .file-icon-div {
           height: 24px;
+          width: 24px;
+          position: relative;
+          &> svg {
+              position: absolute;
+              top:-2px;
+          }
       }
       svg {
           fill: currentColor;
