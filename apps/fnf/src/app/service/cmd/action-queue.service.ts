@@ -66,10 +66,7 @@ export class ActionQueueService {
     return this.queues[queueIndex];
   }
 
-  /**
-   * Gets the status of a queue
-   * @param queueIndex The index of the queue
-   */
+
   getQueueStatus(queueIndex: number = 0): QueueStatus {
     return this.getQueue(queueIndex).status;
   }
@@ -78,10 +75,7 @@ export class ActionQueueService {
     return this.queues;
   }
 
-  /**
-   * Gets the progress of a queue
-   * @param queueIndex The index of the queue
-   */
+
   getQueueProgress(queueIndex: number = 0): QueueProgress {
     return this.getQueue(queueIndex).progress;
   }
@@ -97,6 +91,7 @@ export class ActionQueueService {
     action.id = ++this.jobId;
     queue.actions.push(action);
     queue.jobId = this.jobId;
+
     this.triggerJobQueueTableUpdate();
     this.triggerProgress();
   }
@@ -286,6 +281,11 @@ export class ActionQueueService {
       } else {
         progress.class = 'text-muted';
       }
+
+      queue.buttonStates.clean = progress.finished >0;
+      queue.buttonStates.pause = progress.unfinished>0;
+      queue.buttonStates.resume = progress.unfinished>0 && queue.status==='PAUSED';
+      queue.buttonStates.stop = queue.status==='RUNNING' ||  queue.status==='PROCESSING';
     }
   }
 
