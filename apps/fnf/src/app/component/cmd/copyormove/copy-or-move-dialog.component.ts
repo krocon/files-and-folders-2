@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {CopyOrMoveDialogData} from "./copy-or-move-dialog.data";
 import {
@@ -35,7 +35,8 @@ import {FnfAutofocusDirective} from "../../../common/directive/fnf-autofocus.dir
     FnfAutofocusDirective,
     MatError
   ],
-  styleUrls: ["./copy-or-move-dialog.component.css"]
+  styleUrls: ["./copy-or-move-dialog.component.css"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
 

@@ -30,11 +30,13 @@ export class WalkGateway {
   walkdir(@MessageBody() walkParaData: WalkParaData): void {
 
 
-    const fileItems: FileItemIf[] = walkParaData.files.map(f => {
-      // Assume all initial entries are directories as per previous implementation
-      const stats = fs.statSync(f);
-      return new FileItem(f, '', '', '', stats.size, stats.isDirectory());
-    });
+    const fileItems: FileItemIf[] = walkParaData.files
+      .filter(f => fs.existsSync(f))
+      .map(f => {
+        // Assume all initial entries are directories as per previous implementation
+        const stats = fs.statSync(f);
+        return new FileItem(f, '', '', '', stats.size, stats.isDirectory());
+      });
 
     (function (walkParaData: WalkParaData, cancellings: {}, server: Server) {
 
@@ -115,7 +117,6 @@ export class WalkGateway {
 
 
       };
-
 
       // Start processing files
       processNextFile();
