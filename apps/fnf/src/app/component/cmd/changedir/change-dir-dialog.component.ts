@@ -165,7 +165,7 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
   }
 
   applyFilter() {
-    console.clear();  console.info(this.rows);
+    // console.clear();  console.info(this.rows);
     const fr = filterAsciiTree(
       this.rows.filter(r => r.path.split('/').length <= this.deep),
       this.filterPredicate.bind(this)
