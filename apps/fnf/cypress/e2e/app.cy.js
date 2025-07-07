@@ -64,15 +64,24 @@ describe('Files and Folders App', () => {
     // Verify the panels are displayed
     cy.get('.panel-left').should('exist');
     cy.get('.panel-right').should('exist');
+
+    // Take a screenshot after application loads
+    cy.screenshot('app-loaded');
   });
 
   it('should display files in the left panel', () => {
     // Verify files are displayed in the left panel
     cy.get('.panel-left').find('.file-table').should('exist');
+
+    // Take a screenshot of the left panel with files
+    cy.screenshot('left-panel-files');
   });
 
   it('should display files in the right panel', () => {
     // Verify files are displayed in the right panel
     cy.get('.panel-right').find('.file-table').should('exist');
+
+    // Take a screenshot of the right panel with files
+    cy.screenshot('right-panel-files');
   });
 });
