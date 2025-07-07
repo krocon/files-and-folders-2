@@ -14,7 +14,7 @@ import {cssThemes, Theme} from "../domain/customcss/css-theme-type";
 })
 export class LookAndFeelService {
 
-  private static readonly defaultTheme = "blackboard";
+  private static readonly defaultTheme = "light";
 
   private static readonly innerService =
     new TypedDataService<Theme>("theme", LookAndFeelService.defaultTheme);

@@ -101,6 +101,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       bodyRenderer: this.rwf.create(NameCellRendererComponent, this.cdr),
       headerClasses: ["ge-table-text-align-left"],
       bodyClasses: ["ge-table-text-align-left"],
+      sortable:()=>true,
       sortComparator: fileNameComparator
     }),
     ColumnDef.create({
@@ -110,6 +111,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       //bodyRenderer: this.rwf.create(EmailRendererComponent, this.cdr),
       headerClasses: ["ge-table-text-align-left"],
       bodyClasses: ["ge-table-text-align-left"],
+      sortable:()=>true,
       sortComparator: extComparator
     }),
     ColumnDef.create({
@@ -119,6 +121,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       bodyRenderer: this.rwf.create(SizeCellRendererComponent, this.cdr),
       headerClasses: ["ge-table-text-align-right"],
       bodyClasses: ["ge-table-text-align-right"],
+      sortable:()=>true,
       sortComparator: sizeComparator
     }),
     ColumnDef.create({
@@ -128,6 +131,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       bodyRenderer: this.rwf.create(DateCellRendererComponent, this.cdr),
       headerClasses: ["ge-table-text-align-left"],
       bodyClasses: ["ge-table-text-align-left"],
+      sortable:()=>true,
       sortComparator: dateComparator
     }),
   ];

@@ -13,7 +13,9 @@ export const environment = {
   },
   fileSystem: {
     checkPathUrl: "/api/checkpath",
-    readDirUrl: "/api/readdir"
+    readDirUrl: "/api/readdir",
+    defaultRoot: "/",
+    fileWatcher: false
   },
   lookAndFeel: {
     getLookAndFeelUrl: "assets/config/color/%theme%.json"
