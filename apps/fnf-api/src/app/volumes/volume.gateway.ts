@@ -81,34 +81,64 @@ export class VolumeGateway {
   }
 
   private getMacVolumes(): string[] {
-    return fs
-      .readdirSync(VolumeGateway.VOLUMES, {withFileTypes: true})
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => path.join(VolumeGateway.VOLUMES, dirent.name));
+    try {
+      if (fs.existsSync('/Volumes')) {
+        return fs
+          .readdirSync('/Volumes', {withFileTypes: true})
+          .filter(dirent => dirent.isDirectory())
+          .map(dirent => path.join('/Volumes', dirent.name));
+      }
+    } catch (error) {
+      console.error('Error reading Mac volumes:', error);
+    }
+    return [];
   }
 
   private getLinuxVolumes(): string[] {
     const volumes: Set<string> = new Set();
+    const username = os.userInfo().username;
 
-    // Check all possible mount locations
-    const checkPaths = [
-      VolumeGateway.VOLUMES,
-      ...VolumeGateway.ADDITIONAL_LINUX_PATHS
-    ];
-
-    for (const basePath of checkPaths) {
-      try {
-        if (fs.existsSync(basePath)) {
-          const entries = fs.readdirSync(basePath, {withFileTypes: true});
-          entries
-            .filter(dirent => dirent.isDirectory())
-            .forEach(dirent => {
-              volumes.add(path.join(basePath, dirent.name));
-            });
-        }
-      } catch (error) {
-        console.error(`Error reading ${basePath}:`, error);
+    // Check user media directory
+    const userMediaPath = `/media/${username}`;
+    try {
+      if (fs.existsSync(userMediaPath)) {
+        const entries = fs.readdirSync(userMediaPath, {withFileTypes: true});
+        entries
+          .filter(dirent => dirent.isDirectory())
+          .forEach(dirent => {
+            volumes.add(path.join(userMediaPath, dirent.name));
+          });
       }
+    } catch (error) {
+      console.error(`Error reading ${userMediaPath}:`, error);
+    }
+
+    // Check general media directory
+    try {
+      if (fs.existsSync('/media')) {
+        const entries = fs.readdirSync('/media', {withFileTypes: true});
+        entries
+          .filter(dirent => dirent.isDirectory() && dirent.name !== username)
+          .forEach(dirent => {
+            volumes.add(path.join('/media', dirent.name));
+          });
+      }
+    } catch (error) {
+      console.error('Error reading /media:', error);
+    }
+
+    // Check mnt directory
+    try {
+      if (fs.existsSync('/mnt')) {
+        const entries = fs.readdirSync('/mnt', {withFileTypes: true});
+        entries
+          .filter(dirent => dirent.isDirectory())
+          .forEach(dirent => {
+            volumes.add(path.join('/mnt', dirent.name));
+          });
+      }
+    } catch (error) {
+      console.error('Error reading /mnt:', error);
     }
 
     return Array.from(volumes);
