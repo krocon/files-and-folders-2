@@ -68,7 +68,9 @@ export class FindGateway {
 
           entries.forEach(entry => {
             const f2 = path.join(dir, entry.name);
-            if (entry.isDirectory()) {
+            const isDir = typeof entry.isDirectory === 'function' ? entry.isDirectory() : false;
+
+            if (isDir) {
               dirs.push(f2);
             } else {
               if (!directoriesOnly) {

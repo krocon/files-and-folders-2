@@ -69,7 +69,7 @@ describe('FindGateway', () => {
       return path.includes(sourceDir);
     });
 
-    (fs.readdirSync as jest.Mock).mockImplementation((dir) => {
+    (fs.readdirSync as jest.Mock).mockImplementation((dir, options) => {
       if (dir === sourceDir) {
         return [
           { name: 'test-file.txt', isDirectory: () => false },
@@ -86,7 +86,8 @@ describe('FindGateway', () => {
         size: 100,
         mtime: new Date(),
         ctime: new Date(),
-        birthtime: new Date()
+        birthtime: new Date(),
+        atime: new Date()
       };
     });
 
