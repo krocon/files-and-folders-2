@@ -8,6 +8,30 @@ describe('ASCII Tree Functions', () => {
       expect(createAsciiTree(null as any)).toEqual([]);
     });
 
+    it('should ', () => {
+      const paths:string[] = [
+          '/root',
+          '/root/dir1',
+          '/root/dir1/file1',
+          '/root/dir1/file2',
+          '/root/dir2',
+          '/root/dir2/file3',
+      ];
+      const result = createAsciiTree(paths);
+      // console.info(result);
+      const tree = result.map(r=> r.label);
+      // console.info(JSON.stringify(tree, null, 4));
+
+      expect(tree).toEqual(    [
+        "└── root",
+        "    ├── dir1",
+        "    │   ├── file1",
+        "    │   └── file2",
+        "    └── dir2",
+        "        └── file3"
+      ]);
+    });
+
     it('should create a simple tree with a single path', () => {
       const paths = ['/home/user/documents'];
       const result = createAsciiTree(paths);
