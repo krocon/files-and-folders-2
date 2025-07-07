@@ -15,6 +15,19 @@ const linux = platform.indexOf("linux") === 0;
 
 const logger = new Logger("fn-copy");
 
+/**
+ * Copies a file or directory from source to target location
+ * 
+ * This function handles copying files and directories across different platforms (Windows, macOS, Linux)
+ * using native commands when possible, with a fallback to fs-extra's copy function.
+ * 
+ * For files, it copies the file to the target directory.
+ * For directories, it recursively copies the directory and its contents to the target directory.
+ * 
+ * @param para - The FilePara object containing source and target information
+ * @returns A Promise resolving to an array of DirEventIf objects representing the changes made
+ * @throws Error if the source or target is invalid, or if the copy operation fails
+ */
 export async function copy(para: FilePara): Promise<DirEventIf[]> {
 
 

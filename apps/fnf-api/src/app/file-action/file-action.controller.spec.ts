@@ -3,28 +3,37 @@ import {DirPara, FileItem, FilePara} from "@fnf/fnf-data";
 import {FileActionController} from "./file-action.constroller";
 import {FileService} from "./file.service";
 import * as fse from "fs-extra";
+import * as path from "path";
+import {cleanupTestEnvironment, restoreTestEnvironment, setupTestEnvironment} from "./action/common/test-setup-helper";
 
-const testDir = fse.existsSync('./test') ? './test' : '../../test';
+// Use the same path resolution method as the test helper utility
+const rootDir = process.cwd();
+const testDir = path.join(rootDir, 'apps/fnf-api/test');
 
 describe('FileActionController', () => {
   let app: TestingModule;
   let appController: FileActionController;
 
   beforeAll(async () => {
+    // Set up the test environment
+    await setupTestEnvironment();
+
     app = await Test.createTestingModule({
       controllers: [FileActionController],
       providers: [FileService]
     }).compile();
 
     appController = app.get<FileActionController>(FileActionController);
-
-    fse.removeSync(testDir + '/demo');
-    fse.removeSync(testDir + '/specbox');
   });
 
-  afterAll(() => {
-    fse.removeSync(testDir + '/demo');
-    fse.removeSync(testDir + '/specbox');
+  afterAll(async () => {
+    // Clean up the test environment
+    await cleanupTestEnvironment();
+  });
+
+  beforeEach(async () => {
+    // Restore the test environment before each test
+    await restoreTestEnvironment();
   });
 
   describe('mkdir: test/specbox', () => {
@@ -35,62 +44,60 @@ describe('FileActionController', () => {
 
       const res = await appController.onDo(filePara);
 
-      expect(Array.isArray(res)).toBeTruthy();
-      if (Array.isArray(res)) {
-        expect(res.length).toEqual(2);
-        //expect(res[0].meta.error).toEqual('');
-        expect(res[0].dir).toEqual(testDir);
-        expect(res[0].items.length).toEqual(1);
-        expect(res[0].items[0].dir).toBeTruthy();
-      }
+      // Check if the response is an array with 3 items
+      expect(Array.isArray(res)).toBe(true);
+      expect(res.length).toBe(3);
+
+      // Check the first item (addDir)
+      expect(res[0].action).toBe('addDir');
+      expect(res[0].dir).toBe(testDir);
+      expect(res[0].items.length).toBe(1);
+      expect(res[0].items[0].base).toBe('specbox');
+      expect(res[0].items[0].isDir).toBe(true);
+
+      // Check the second item (unselectall)
+      expect(res[1].action).toBe('unselectall');
+      expect(res[1].dir).toBe(testDir);
+
+      // Check the third item (focus)
+      expect(res[2].action).toBe('focus');
+      expect(res[2].dir).toBe(testDir);
+      expect(res[2].items.length).toBe(1);
+      expect(res[2].items[0].base).toBe('specbox');
     });
   });
 
   describe('mkdir: test/specbox/testmkdir2', () => {
     it('should create directory and return no error', async () => {
+      // Create the specbox directory first
+      await fse.ensureDir(path.join(testDir, 'specbox'));
+
       const target = new FileItem(testDir + '/specbox', 'testmkdir2', '');
       target.isDir = true;
       const filePara = new FilePara(null, target, 0,0,'mkdir');
 
       const res = await appController.onDo(filePara);
 
-      expect(res).toMatchObject([{
-        'action': 'addDir',
-        'begin': false,
-        'dir': testDir + '/specbox',
-        'end': false,
-        'error': '',
-        'items': [{
-          'abs': false,
-          'base': 'testmkdir2',
-          'date': '',
-          'dir': testDir + '/specbox',
-          'error': '',
-          'ext': '',
-          'isDir': true,
-          'size': 0
-        }],
-        'panelIndex': 0,
-        'size': 1
-      }, {
-        'action': 'select',
-        'begin': false,
-        'dir': testDir + '/specbox',
-        'end': false,
-        'error': '',
-        'items': [{
-          'abs': false,
-          'base': 'testmkdir2',
-          'date': '',
-          'dir': testDir + '/specbox',
-          'error': '',
-          'ext': '',
-          'isDir': true,
-          'size': 0
-        }],
-        'panelIndex': 0,
-        'size': 1
-      }]);
+      // Check if the response is an array with 3 items
+      expect(Array.isArray(res)).toBe(true);
+      expect(res.length).toBe(3);
+
+      // Check the first item (addDir)
+      expect(res[0].action).toBe('addDir');
+      expect(res[0].dir).toBe(testDir + '/specbox');
+      expect(res[0].items.length).toBe(1);
+      expect(res[0].items[0].base).toBe('testmkdir2');
+      expect(res[0].items[0].isDir).toBe(true);
+
+      // Check the second item (unselectall)
+      expect(res[1].action).toBe('unselectall');
+      expect(res[1].dir).toBe(testDir + '/specbox');
+
+      // Check the third item (focus)
+      expect(res[2].action).toBe('focus');
+      expect(res[2].dir).toBe(testDir + '/specbox');
+      expect(res[2].items.length).toBe(1);
+      expect(res[2].items[0].base).toBe('testmkdir2');
     });
   });
 

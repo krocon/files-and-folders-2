@@ -15,6 +15,24 @@ const linux = platform.indexOf("linux") === 0;
 
 const logger = new Logger("fn-move");
 
+/**
+ * Moves a file or directory from source to target location
+ * 
+ * This function handles moving files and directories across different platforms (Windows, macOS, Linux)
+ * using native commands when possible, with a fallback to fs-extra's move function.
+ * 
+ * For files, it moves the file to the target directory.
+ * For directories, it recursively moves the directory and its contents to the target directory.
+ * 
+ * Platform-specific commands:
+ * - macOS: Uses 'mv' command
+ * - Windows: Uses 'robocopy' with different parameters for files and directories
+ * - Linux: Uses 'rsync' with --remove-source-files flag
+ * 
+ * @param para - The FilePara object containing source and target information
+ * @returns A Promise resolving to an array of DirEventIf objects representing the changes made
+ * @throws Error if the source or target is invalid, or if the move operation fails
+ */
 export async function move(para: FilePara): Promise<DirEventIf[]> {
 
   function createRet(para: FilePara, targetUrl:string): DirEventIf[] {

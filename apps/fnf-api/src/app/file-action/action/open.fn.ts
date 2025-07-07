@@ -4,13 +4,16 @@ import * as os from "os";
 import {Logger} from "@nestjs/common";
 import {executeCommand} from "./common/execute-command";
 
-const platform = os.platform();
-const osx = platform === "darwin";
-const linux = platform.indexOf("linux") === 0;
-const windows = platform.indexOf("win") === 0;
-
 const logger = new Logger("fn-open");
 
+/**
+ * Executes a command with a fallback option if the first command fails
+ * 
+ * @param cmd - The primary command to execute
+ * @param cmdAlternate - The fallback command to execute if the primary command fails
+ * @returns A Promise resolving to an empty array of DirEventIf objects
+ * @throws Error if both commands fail or if no command is provided
+ */
 async function execute(
   cmd: string,
   cmdAlternate: string
@@ -34,6 +37,19 @@ async function execute(
   }
 }
 
+/**
+ * Opens a file with the system's default application
+ * 
+ * This function opens a file based on the source information in the FilePara object.
+ * It uses platform-specific commands to open the file:
+ * - Windows: Uses 'start' command
+ * - macOS: Uses 'open' command
+ * - Linux: Tries 'evince' first, then falls back to 'kpdf' if evince fails
+ * 
+ * @param para - The FilePara object containing source information (file to open)
+ * @returns A Promise resolving to an empty array of DirEventIf objects
+ * @throws Error if the source is invalid or if the file cannot be opened
+ */
 export async function open(para: FilePara): Promise<DirEventIf[]> {
   if (!para || !para.source) {
     throw new Error("Invalid argument exception!");
@@ -41,6 +57,11 @@ export async function open(para: FilePara): Promise<DirEventIf[]> {
 
   const psource = para.source;
   const source = fixPath(path.join(psource.dir, "/", psource.base));
+
+  const platform = os.platform();
+  const osx = platform === "darwin";
+  const linux = platform.indexOf("linux") === 0;
+  const windows = platform.indexOf("win") === 0;
 
   let cmd;
   let cmdAlternate = "";
