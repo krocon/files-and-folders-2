@@ -59,19 +59,20 @@ describe('Files and Folders App', () => {
 
   it('should load the application', () => {
     // Basic test to verify the app loads
-    cy.contains('Files and Folders').should('exist');
+    cy.get('.fnf-main-div').should('exist');
 
     // Verify the panels are displayed
-    cy.get('.panel').should('have.length', 2);
+    cy.get('.panel-left').should('exist');
+    cy.get('.panel-right').should('exist');
   });
 
   it('should display files in the left panel', () => {
     // Verify files are displayed in the left panel
-    cy.get('.panel').eq(0).find('.file-item').should('exist');
+    cy.get('.panel-left').find('.file-table').should('exist');
   });
 
   it('should display files in the right panel', () => {
     // Verify files are displayed in the right panel
-    cy.get('.panel').eq(1).find('.file-item').should('exist');
+    cy.get('.panel-right').find('.file-table').should('exist');
   });
 });
