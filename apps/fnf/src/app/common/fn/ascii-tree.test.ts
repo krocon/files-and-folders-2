@@ -1,4 +1,5 @@
 import {createAsciiTree, filterAsciiTree} from './ascii-tree.fn';
+import {asciiTreeTestPathes} from './ascii-tree.test-data';
 
 describe('ASCII Tree Functions', () => {
   describe('createAsciiTree', () => {
@@ -66,6 +67,44 @@ describe('ASCII Tree Functions', () => {
         { path: '/m', label: '├── m' },
         { path: '/z', label: '└── z' }
       ]);
+    });
+
+    it('should create a tree from asciiTreeTestPathes', () => {
+      // Create a tree from the test paths
+      const result = createAsciiTree(asciiTreeTestPathes);
+
+      // Verify that the result is not empty
+      expect(result.length).toBeGreaterThan(0);
+
+      // Verify that the result contains the expected structure
+      // Check for some specific paths we expect to find
+      expect(result).toContainEqual(
+        expect.objectContaining({ path: '/Adobe' })
+      );
+      expect(result).toContainEqual(
+        expect.objectContaining({ path: '/Users' })
+      );
+      expect(result).toContainEqual(
+        expect.objectContaining({ path: '/test66/src/app' })
+      );
+
+      // Verify that the labels are correctly formatted
+      // Root level directories should start with either '├── ' or '└── '
+      const rootDirs = result.filter(item => {
+        const parts = item.path.split('/');
+        return parts.length === 2 && parts[1] !== '';
+      });
+
+      rootDirs.forEach(dir => {
+        expect(dir.label).toMatch(/^(├── |└── )/);
+      });
+
+      // Verify that the tree structure is consistent
+      // Each path in the result should correspond to a path in the original data
+      result.forEach(item => {
+        const pathWithoutLabel = item.path;
+        expect(asciiTreeTestPathes).toContain(pathWithoutLabel);
+      });
     });
   });
 
@@ -147,5 +186,6 @@ describe('ASCII Tree Functions', () => {
       // expect(result).toContainEqual(expect.objectContaining({ path: '/projects/mobile/android' }));
       // expect(result).toContainEqual(expect.objectContaining({ path: '/projects/mobile/ios' }));
     });
+
   });
 });
