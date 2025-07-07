@@ -53,7 +53,7 @@ export class FnfActionLabels {
 
     ENTER_PRESSED	: "Execute File",
     HOME_PRESSED		: "Jump to begin",
-    SPACE_PRESSED		: "Toggle selection$ on focussed row",
+    SPACE_PRESSED		: "Toggle selection on focussed row",
     END_PRESSED		: "Jump to end",
     PAGEUP_PRESSED	: "Jump to top",
     PAGEDOWN_PRESSED		: "Jump to bottom",

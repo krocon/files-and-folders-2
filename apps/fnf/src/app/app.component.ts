@@ -188,7 +188,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
     this.appService.onChangeDir(path, panelIndex);
   }
 
-  onKeydown(keyboardEvent: KeyboardEvent) {
+
+
+  onKeyUp(keyboardEvent: KeyboardEvent) {
+    this.appService.onKeyUp$.next(keyboardEvent);
+  }
+
+  onKeyDown(keyboardEvent: KeyboardEvent) {
+    this.appService.onKeyDown$.next(keyboardEvent);
     // console.info(keyboardEvent);
     // console.info(createHarmonizedShortcutByKeyboardEvent(keyboardEvent));
 

@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import {Injectable, Output} from "@angular/core";
 import {LookAndFeelService} from "./service/look-and-feel.service";
 import {ShortcutActionMapping, ShortcutService} from "./service/shortcut.service";
 import {SysinfoService} from "./service/sysinfo.service";
@@ -66,6 +66,9 @@ import {TabsPanelData} from "./domain/filepagedata/data/tabs-panel.data";
 })
 export class AppService {
 
+  @Output() public onKeyUp$ = new Subject<KeyboardEvent>();
+  @Output() public onKeyDown$ = new Subject<KeyboardEvent>();
+
   public sysinfo: SysinfoIf = new Sysinfo();
   public dockerRoot: string = '';
   public config: Config | undefined = undefined;
@@ -78,12 +81,11 @@ export class AppService {
     this.tabsPanelDataService.getValue(1)
   ];
 
-  // Observable properties
+
   public readonly changeDirRequest$ = new Subject<ChangeDirEvent | null>();
   public readonly dirEvents$ = new BehaviorSubject<Map<string, DirEventIf[]>>(new Map());
-
-
   public readonly actionEvents$ = new Subject<ActionId>();
+
 
   public bodyAreaModels: [FileTableBodyModel | undefined, FileTableBodyModel | undefined] = [undefined, undefined];
   public selectionManagers: [SelectionManagerForObjectModels<FileItemIf> | undefined, SelectionManagerForObjectModels<FileItemIf> | undefined] = [undefined, undefined];
@@ -142,6 +144,7 @@ export class AppService {
     this.tabsPanelDataService
       .valueChanges(0)
       .subscribe(data => this.tabsPanelDatas[0] = data);
+
     this.tabsPanelDataService
       .valueChanges(1)
       .subscribe(data => this.tabsPanelDatas[1] = data);
@@ -420,7 +423,7 @@ export class AppService {
           return;
         }
       }
-      console.log('> appService this.actionEventsSubject.next(id):', id);
+      // console.log('> appService this.actionEventsSubject.next(id):', id);
       this.actionEvents$.next(id);
     }
   }

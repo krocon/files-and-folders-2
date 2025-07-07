@@ -135,7 +135,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       sortComparator: dateComparator
     }),
   ];
-  private readonly bodyAreaModel = new FileTableBodyModel(this.columnDefs, this.rowHeight);
+  public readonly bodyAreaModel = new FileTableBodyModel(this.columnDefs, this.rowHeight);
   private readonly selectionManager = new SelectionManagerForObjectModels<FileItemIf>(
     this.bodyAreaModel,
     {
@@ -296,6 +296,21 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     this.appService.setBodyAreaModel(this._panelIndex, this.bodyAreaModel);
     this.appService.setSelectionManagers(this._panelIndex, this.selectionManager);
 
+    this.appService.onKeyDown$
+      .subscribe(evt => {
+        if (this.selected) {
+          this.onKeyDown(evt);
+        }
+      });
+
+    this.appService.onKeyUp$
+      .subscribe(evt => {
+        if (this.selected) {
+          this.onKeyUp(evt);
+        }
+      });
+
+
     // Subscribe to selection$ changes
     this.selectionManager.selection$
       .subscribe(selectedRows => {
@@ -449,7 +464,11 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     } else if (action === "REDUCE_SELECTION") {
       this.openSelectionDialog(false);
 
-    // } else if (action === "SPACE_PRESSED") {
+    } else if (action === "SPACE_PRESSED") {
+      console.info('space pressed');
+
+      // TODO hier gehts weiter
+
       // const r = this.bodyAreaModel.focusedRowIndex;
       // if (r > -1) {
       //   const row = this.bodyAreaModel.getRowByIndex(r);

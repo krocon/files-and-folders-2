@@ -14,6 +14,7 @@ export class SelectionManagerForObjectModelsOptions<T> {
   public equalRows: (a: T, b: T) => boolean = (a: T, b: T) => a === b;
 }
 
+const  SPACE = ' ';
 
 export class SelectionManagerForObjectModels<T> {
 
@@ -40,7 +41,8 @@ export class SelectionManagerForObjectModels<T> {
 
 
   public handleKeyDownEvent(evt: KeyboardEvent) {
-    if (evt.key === ' ') {
+    // console.info('selectionManager - handleKeyDownEvent():', evt);
+    if (evt.key === SPACE) {
       this.focusIndex = this.bodyModel.focusedRowIndex;
       if (this.focusIndex < 0) return; // skip
 
