@@ -71,6 +71,7 @@ import {MkdirDialogResultData} from "../../cmd/mkdir/mkdir-dialog-result.data";
 import {MkdirDialogService} from "../../cmd/mkdir/mkdir-dialog.service";
 import {DirWalker} from "./dir-walker";
 import {equalFileItem} from "../../../common/fn/equal-file-item.fn";
+import {fileItemSorter} from "../../../common/fn/file-item-sorter.fn";
 
 
 @Component({
@@ -164,28 +165,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
   private initialized = false;
   private cancellings: string[] = [];
 
-  constructor(
-    private readonly cdr: ChangeDetectorRef,
-    private readonly rwf: RenderWrapperFactory,
-    private readonly appService: AppService,
-    private readonly gridSelectionCountService: GridSelectionCountService,
-    public readonly gotoAnythingDialogService: GotoAnythingDialogService,
-    private readonly notifyService: NotifyService,
-    private readonly selectionLocalStorage: SelectionLocalStorage,
-    private readonly focusLocalStorage: FocusLocalStorage,
-    private readonly mkdirDialogService: MkdirDialogService,
-  ) {
-    this.columnDefs.forEach(def => {
-      def.sortable = () => true;
-      def.sortIconVisible = () => true;
-    });
 
-    this.tableModel = TableFactory.createTableModel({
-      columnDefs: this.columnDefs,
-      tableOptions: this.tableOptions,
-      bodyAreaModel: this.bodyAreaModel
-    });
-  }
 
   private _panelIndex: PanelIndex = 0;
 
@@ -231,7 +211,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       || this.filterActive !== selectedTabData.filterActive
       || this.hiddenFilesVisible !== selectedTabData.hiddenFilesVisible
     ;
-    this.hiddenFilesVisible = !!selectedTabData.hiddenFilesVisible;
+    this.hiddenFilesVisible = selectedTabData.hiddenFilesVisible;
     this.filterText = selectedTabData.filterText ?? '';
     this.filterActive = selectedTabData.filterActive ?? false;
 
@@ -263,43 +243,45 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  ngAfterViewInit(): void {
-    this.initialized = true;
+
+  constructor(
+    private readonly cdr: ChangeDetectorRef,
+    private readonly rwf: RenderWrapperFactory,
+    private readonly appService: AppService,
+    private readonly gridSelectionCountService: GridSelectionCountService,
+    public readonly gotoAnythingDialogService: GotoAnythingDialogService,
+    private readonly notifyService: NotifyService,
+    private readonly selectionLocalStorage: SelectionLocalStorage,
+    private readonly focusLocalStorage: FocusLocalStorage,
+    private readonly mkdirDialogService: MkdirDialogService,
+  ) {
+    this.columnDefs.forEach(def => {
+      def.sortable = () => true;
+      def.sortIconVisible = () => true;
+    });
+
+    this.tableModel = TableFactory.createTableModel({
+      columnDefs: this.columnDefs,
+      tableOptions: this.tableOptions,
+      bodyAreaModel: this.bodyAreaModel
+    });
   }
 
-  reload() {
-    if (this.tableApi) {
-      this.tableApi.setRows([]);
-      this.repaintTable();
-    }
-    this.requestRows();
-  }
-
-  getButtonEnableStates(items: FileItemIf[]): ButtonEnableStates {
-    const states = new ButtonEnableStates();
-
-    states.copy = !!items?.length && !items[0].dir?.match(EXP_ZIP_FILE_URL);
-    states.edit = items?.length === 1 && !items[0].dir?.match(EXP_ZIP_FILE_URL);
-    states.move = !!items?.length && !items[0].dir?.match(EXP_ZIP_FILE_URL);
-    states.remove = !!items?.length && !items[0].dir?.match(EXP_ZIP_FILE_URL);
-    states.mkdir = !this.dirPara?.path.startsWith('tabfind');
-    states.rename = items?.length === 1 && !items[0].dir?.match(EXP_ZIP_FILE_URL);
-    states.unpack = items?.length === 1 && !items[0].dir?.match(EXP_ZIP_FILE_URL);
-    return states;
-  }
 
   ngOnInit(): void {
     this.appService.setBodyAreaModel(this._panelIndex, this.bodyAreaModel);
     this.appService.setSelectionManagers(this._panelIndex, this.selectionManager);
 
-    this.appService.onKeyDown$
+    this.appService
+      .onKeyDown$
       .subscribe(evt => {
         if (this.selected) {
           this.onKeyDown(evt);
         }
       });
 
-    this.appService.onKeyUp$
+    this.appService
+      .onKeyUp$
       .subscribe(evt => {
         if (this.selected) {
           this.onKeyUp(evt);
@@ -308,12 +290,14 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
     // Subscribe to selection$ changes
-    this.selectionManager.selection$
+    this.selectionManager
+      .selection$
       .subscribe(selectedRows => {
         this.calcButtonStates(selectedRows);
       });
 
-    this.appService.dirEvents$
+    this.appService
+      .dirEvents$
       .pipe(takeWhile(() => this.alive))
       .subscribe(dirEventsMap => {
         if (this.dirPara?.path) {
@@ -322,11 +306,12 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       });
 
-    this.appService.actionEvents$
+    this.appService
+      .actionEvents$
       .pipe(takeWhile(() => this.alive))
       .subscribe(actionEvent => {
 
-        if (actionEvent==='RELOAD_DIR') {
+        if (actionEvent === 'RELOAD_DIR') {
           // we do the reload on both panels (selected and unselected panel):
           this.reload();
 
@@ -355,9 +340,37 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       )
   }
 
+
+  ngAfterViewInit(): void {
+    this.initialized = true;
+  }
+
+
   ngOnDestroy(): void {
     this.alive = false;
   }
+
+  reload() {
+    if (this.tableApi) {
+      this.tableApi.setRows([]);
+      this.repaintTable();
+    }
+    this.requestRows();
+  }
+
+  getButtonEnableStates(items: FileItemIf[]): ButtonEnableStates {
+    const states = new ButtonEnableStates();
+
+    states.copy = !!items?.length && !items[0].dir?.match(EXP_ZIP_FILE_URL);
+    states.edit = items?.length === 1 && !items[0].dir?.match(EXP_ZIP_FILE_URL);
+    states.move = !!items?.length && !items[0].dir?.match(EXP_ZIP_FILE_URL);
+    states.remove = !!items?.length && !items[0].dir?.match(EXP_ZIP_FILE_URL);
+    states.mkdir = !this.dirPara?.path.startsWith('tabfind');
+    states.rename = items?.length === 1 && !items[0].dir?.match(EXP_ZIP_FILE_URL);
+    states.unpack = items?.length === 1 && !items[0].dir?.match(EXP_ZIP_FILE_URL);
+    return states;
+  }
+
 
   onMouseClicked(evt: GeMouseEvent) {
     if (evt.clickCount === 2 && evt.areaIdent === 'body' && this.tableModel) {
@@ -698,6 +711,8 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
   private handleRelevantDirEvent(dirEvent: DirEventIf, zi: ZipUrlInfo) {
     if (!this.tableApi || !dirEvent || !this.dirPara) return;
 
+    // if (this.panelIndex===1 && dirEvent.action!=='list') console.info(dirEvent.action, JSON.stringify(dirEvent, null, 0));
+
     if (dirEvent.action === "list") {
       let rows: FileItemIf[] = [];
 
@@ -740,9 +755,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       }
 
     } else if (dirEvent.action === "add" || dirEvent.action === "addDir") {
-      this.tableApi.addRows(dirEvent.items)
-      this.repaintTable();
-      this.selectionManager.updateSelection();
+      this.addRows(dirEvent);
 
     } else if (dirEvent.action === "checkOrAddDir" || dirEvent.action === "checkOrAddFile") {
       const exists: boolean = this.tableApi
@@ -752,16 +765,14 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
         ).length > 0;
 
       if (!exists) {
-        this.tableApi.addRows(dirEvent.items);
-        this.repaintTable();
-        this.selectionManager.updateSelection();
+        this.addRows(dirEvent);
       }
 
     } else if (dirEvent.action === "unlink" || dirEvent.action === "unlinkDir") {
       // TODO unlink for tabfinds here?
-      console.info('findData', this.tabsPanelData?.tabs[this.tabsPanelData?.selectedTabIndex]?.findData);
-      console.info('path', this.tabsPanelData?.tabs[this.tabsPanelData?.selectedTabIndex]?.path);
-      console.info(JSON.stringify(dirEvent, null, 0));
+      // console.info('findData', this.tabsPanelData?.tabs[this.tabsPanelData?.selectedTabIndex]?.findData);
+      // console.info('path', this.tabsPanelData?.tabs[this.tabsPanelData?.selectedTabIndex]?.path);
+      // console.info(JSON.stringify(dirEvent, null, 0));
 
       this.tableApi.removeRows(dirEvent.items, equalFileItem);
       this.bodyAreaModel.focusedRowIndex = Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.focusedRowIndex);
@@ -810,6 +821,16 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       console.warn("Unknown dir changedir action:", dirEvent);
     }
   }
+
+  private addRows(dirEvent: DirEventIf) {
+    if (!this.tableApi || !dirEvent || !this.dirPara) return;
+
+    this.tableApi.addRows(dirEvent.items);
+    this.bodyAreaModel.getAllRows().sort(fileItemSorter)
+    this.repaintTable();
+    this.selectionManager.updateSelection();
+  }
+
 
   private setFileItemSelected(fileItem: FileItemIf, selected: boolean) {
     if (!fileItem.meta) {
