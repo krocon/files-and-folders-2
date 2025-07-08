@@ -57,7 +57,7 @@ import {getAllParents} from "../../../common/fn/get-all-parents.fn";
 })
 export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
-  maxDeep = 15
+  maxDeep = 20
 
   filterText = '';
   deep: number = this.maxDeep;
@@ -177,28 +177,6 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
       )
     ];
 
-    // -------------------------------------------------
-    if (this.changeDirDialogData.showParentTree) {
-      const sd = this.changeDirDialogData.sourceDir;
-      this.filteredRows.sort((a, b) => {
-        const ap = sd.startsWith(a.path);
-        const bp = sd.startsWith(b.path);
-        if (ap !== bp) {
-          if (ap) return -1;
-          if (bp) return 1;
-        }
-        return a.path.localeCompare(b.path);
-      });
-
-      const spaces = this.getIndentation(sd);
-      this.filteredRows.forEach(r => {
-        if (!sd.startsWith(r.path)) {
-          r.label = spaces + r.label;
-        }
-        return r;
-      });
-    }
-    // -------------------------------------------------
 
     this.tableApi?.setRows(this.filteredRows);
     this.tableApi?.repaintHard();
@@ -210,6 +188,9 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
     return this.INDENTATION_SPACE.repeat(indentationLength);
   }
 
+  // private debug(tree: { path: string, label: string }[]) {
+  //   console.info('\n' + tree.map(r => r.label).join('\n').substring(0, 1000) + '\n');
+  // }
 
   private initFetchDirectories(deep: number = 5) {
     const para = new FindFolderPara([this.changeDirDialogData.sourceDir], '', deep);
@@ -219,17 +200,10 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
         takeWhile(() => this.alive),
       )
       .subscribe(arr => {
-          this.rows = (this.changeDirDialogData.showParentTree) ?
-            [
-              ...createAsciiTree(this.allParents),
-              ...createAsciiTree(
-                arr.map(s => s.substring(this.changeDirDialogData.sourceDir.length))
-              )
-            ] :
-            createAsciiTree(
-              arr.map(s => s.substring(this.changeDirDialogData.sourceDir.length))
-            );
+        this.rows = createAsciiTree(arr);
           this.applyFilter();
+        // this.tableApi?.setRows(this.rows);
+        // this.tableApi?.repaintHard();
         }
       );
   }
