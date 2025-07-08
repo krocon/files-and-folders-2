@@ -84,20 +84,17 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
     }
     this.sourceTooltip = data.source.join("\n");
 
-    // if (this.deleteMode) {
-    //   this.formGroup = this.formBuilder.group({});
-    // } else {
-      this.formGroup = this.formBuilder.group(
-        {
-          // source: new FormControl(this.source, []),
-          target: new FormControl(data.target, [
-            Validators.required,
-            Validators.minLength(1),
-            Validators.pattern(/^(?!tabfind).*$/)
-          ])
-        }
-      );
-    // }
+    this.formGroup = this.formBuilder.group(
+      {
+        // source: new FormControl(this.source, []),
+        target: new FormControl(data.target, [
+          Validators.required,
+          Validators.minLength(1),
+          Validators.pattern(/^(?!tabfind).*$/)
+        ])
+      }
+    );
+
     dialogRef
       .afterOpened()
       .pipe(takeWhile(() => this.alive))
@@ -127,6 +124,23 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
     this.createSuggestions();
   }
 
+  onSuggestionClicked(suggestion: string) {
+    this.formGroup.setValue({target: suggestion}, {emitEvent: true});
+  }
+
+  onOkClicked() {
+    const formData = this.formGroup.getRawValue();
+    const fileItem = new FileItem(formData.target, formData.name, "");
+    fileItem.isDir = true;
+    this.walkSocketService.cancelWalkDir(this.walkCancelKey);
+    this.dialogRef.close(fileItem);
+  }
+
+  onCancelClicked() {
+    this.walkSocketService.cancelWalkDir(this.walkCancelKey);
+    this.dialogRef.close(undefined);
+  }
+
   private createSuggestions() {
     const dirs = [...new Set([
       ...this.appService.latest,
@@ -146,23 +160,6 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
       dirs2.push()
     }
     this.suggestions = [...new Set(dirs2)].sort();
-  }
-
-  onSuggestionClicked(suggestion: string) {
-    this.formGroup.setValue({target: suggestion}, {emitEvent: true});
-  }
-
-  onOkClicked() {
-    const formData = this.formGroup.getRawValue();
-    const fileItem = new FileItem(formData.target, formData.name, "");
-    fileItem.isDir = true;
-    this.walkSocketService.cancelWalkDir(this.walkCancelKey);
-    this.dialogRef.close(fileItem);
-  }
-
-  onCancelClicked() {
-    this.walkSocketService.cancelWalkDir(this.walkCancelKey);
-    this.dialogRef.close(undefined);
   }
 
   private getTitleByKey(key: FileOperation): string {
