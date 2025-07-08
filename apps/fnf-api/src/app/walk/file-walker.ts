@@ -53,8 +53,12 @@ export class FileWalker {
       return;
     }
 
-    const entries = fs.readdirSync(item.dir, {withFileTypes: true});
-    this.addNewFilesToProcess(entries, item.dir);
+    try {
+      const entries = fs.readdirSync(item.dir, {withFileTypes: true});
+      this.addNewFilesToProcess(entries, item.dir);
+    } catch (e) {
+      console.warn('Error reading directory: ' + item.dir, e);
+    }
   }
 
   private processFile(item: FileItemIf): void {

@@ -13,11 +13,15 @@ import {FileItem, WalkData} from "@fnf/fnf-data";
 import {takeWhile} from "rxjs/operators";
 import {FileOperation} from "./file-operation";
 import {FnfFileSizePipe} from "../../../common/fnf-file-size.pipe";
-import {MatError, MatFormField, MatInput} from "@angular/material/input";
-import {MatButton} from "@angular/material/button";
+import {MatError, MatFormField, MatInput, MatSuffix} from "@angular/material/input";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {WalkSocketService} from "../../../service/walk.socketio.service";
 import {FnfAutofocusDirective} from "../../../common/directive/fnf-autofocus.directive";
+import {MatDivider} from "@angular/material/divider";
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {AppService} from "../../../app.service";
+import {getAllParents} from "../../../common/fn/get-all-parents.fn";
 
 @Component({
   selector: "fnf-copy-or-move-dialog",
@@ -33,12 +37,20 @@ import {FnfAutofocusDirective} from "../../../common/directive/fnf-autofocus.dir
     MatDialogActions,
     MatFormField,
     FnfAutofocusDirective,
-    MatError
+    MatError,
+    MatDivider,
+    MatIconButton,
+    MatMenu,
+    MatMenuItem,
+    MatSuffix,
+    MatMenuTrigger
   ],
   styleUrls: ["./copy-or-move-dialog.component.css"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
+
+  suggestions: string[] = [];
 
   formGroup: FormGroup;
   error = "";
@@ -60,6 +72,7 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
     private readonly formBuilder: FormBuilder,
     private readonly walkSocketService: WalkSocketService,
     private readonly cdr: ChangeDetectorRef,
+    private readonly appService: AppService,
   ) {
     this.title = this.getTitleByKey(data?.fileOperation);
     this.deleteMode = data?.fileOperation === "delete";
@@ -77,7 +90,11 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
       this.formGroup = this.formBuilder.group(
         {
           // source: new FormControl(this.source, []),
-          target: new FormControl(data.target, [Validators.required, Validators.minLength(1)])
+          target: new FormControl(data.target, [
+            Validators.required,
+            Validators.minLength(1),
+            Validators.pattern(/^(?!tabfind).*$/)
+          ])
         }
       );
     }
@@ -100,7 +117,6 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.alive = true;
-
     this.walkCancelKey = this.walkSocketService
       .walkDir(
         this.data.source,
@@ -108,6 +124,32 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
           this.walkData = walkData;
           this.cdr.detectChanges();
         });
+    this.createSuggestions();
+  }
+
+  private createSuggestions() {
+    let dirs = [...new Set([
+      ...this.appService.latest,
+      ...this.appService.favs
+    ])];
+
+    let dirs2: string[] = [];
+    for (const dir of dirs) {
+      dirs2.push(dir);
+      getAllParents(dir).forEach(
+        (parent: string) => {
+          if (!dirs2.includes(parent)) {
+            dirs2.push(parent);
+          }
+        }
+      )
+      dirs2.push()
+    }
+    this.suggestions = [...new Set(dirs2)].sort();
+  }
+
+  onSuggestionClicked(suggestion: string) {
+    this.formGroup.setValue({target: suggestion}, {emitEvent: true});
   }
 
   onOkClicked() {

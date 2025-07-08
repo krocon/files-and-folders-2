@@ -467,9 +467,10 @@ export class AppService {
   move() {
     const selectedData: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
     const sources: string[] = this.getSourcePaths(selectedData);
+    const targetDir = this.getOtherPanelSelectedTabData().path;
     this.copyOrMoveDialogService
       .open(
-        new CopyOrMoveDialogData(sources, this.getOtherPanelSelectedTabData().path, "move"),
+        new CopyOrMoveDialogData(sources, targetDir, "move"),
         (target) => {
           if (target) {
             const paras: QueueFileOperationParams[] = this.createFileOperationParams(target);
@@ -886,9 +887,9 @@ export class AppService {
   private getSourcePaths(selectedData: FileItemIf[]): string[] {
     if (selectedData.length) {
       return selectedData.map(f => {
-        if (f.abs) {
-          return f.base;
-        }
+        // if (f.abs) {
+        //   return f.base;
+        // }
         return f.dir + "/" + f.base;
       });
     }

@@ -116,8 +116,6 @@ export class RenameDialogComponent {
       ...arr,
       ...arr.map(s=> cleanFileName(s) + ext),
     ];
-
-    console.info(this.suggestions);
   }
 
   get errorMessage(): string {
