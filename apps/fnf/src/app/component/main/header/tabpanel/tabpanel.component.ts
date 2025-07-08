@@ -27,6 +27,7 @@ import {ActionShortcutPipe} from "../../../../common/action-shortcut.pipe";
 import {takeWhile} from "rxjs/operators";
 import {MatDivider} from "@angular/material/divider";
 import {FnfAutofocusDirective} from "../../../../common/directive/fnf-autofocus.directive";
+import {NotifyService} from "../../../../service/cmd/notify-service";
 
 @Component({
   selector: 'app-tabpanel',
@@ -82,6 +83,12 @@ export class TabpanelComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @Input() set tabsPanelData(value: TabsPanelData) {
     this._tabsPanelData = value;
+  }
+
+
+  constructor(
+    private readonly eventService: NotifyService
+  ) {
   }
 
   ngOnInit(): void {
@@ -241,6 +248,14 @@ export class TabpanelComponent implements OnInit, OnDestroy, AfterViewInit {
     } else if (evt.shiftKey) {
       this.try2RemoveTab(i, evt);
     }
+  }
+
+  onTabDblClicked(i: number) {
+    if (this.tabsPanelData) {
+      this.appService.triggerAction(this.panelIndex ? 'RELOAD_DIR_1' : 'RELOAD_DIR_0');
+    }
+    console.info('path', this.tabsPanelData?.tabs[i]?.path)
+    console.info('findData', this.tabsPanelData?.tabs[i]?.findData)
   }
 
   onTabPointerDown(i: number, evt: PointerEvent, matMenuTrigger: MatMenuTrigger) {

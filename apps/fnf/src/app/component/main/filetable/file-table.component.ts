@@ -336,6 +336,13 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
           // we do the reload on both panels (selected and unselected panel):
           this.reload();
 
+        } else if (
+          (actionEvent === 'RELOAD_DIR_0' && this.panelIndex === 0)
+          || (actionEvent === 'RELOAD_DIR_1' && this.panelIndex === 1)
+        ) {
+          // we do the reload on this panel only:
+          this.reload();
+
         } else if (actionEvent && this.selected) {
           // we are on the active panel:
           this.actionCall(actionEvent);
@@ -757,6 +764,10 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
     } else if (dirEvent.action === "unlink" || dirEvent.action === "unlinkDir") {
       // TODO unlink for tabfinds here?
+      console.info('findData', this.tabsPanelData?.tabs[this.tabsPanelData?.selectedTabIndex]?.findData);
+      console.info('path', this.tabsPanelData?.tabs[this.tabsPanelData?.selectedTabIndex]?.path);
+      console.info(JSON.stringify(dirEvent, null, 0));
+
       this.tableApi.removeRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
       this.bodyAreaModel.focusedRowIndex = Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.focusedRowIndex);
       this.repaintTable();

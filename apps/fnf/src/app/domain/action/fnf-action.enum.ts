@@ -35,6 +35,8 @@ export const actionIds = [
   "NAVIGATE_FORWARD",
   "SAVE_CONFIG",
   "RELOAD_DIR",
+  "RELOAD_DIR_0",
+  "RELOAD_DIR_1",
 
   "ENTER_PRESSED",
   "HOME_PRESSED",

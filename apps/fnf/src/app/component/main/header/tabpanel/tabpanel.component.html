@@ -29,8 +29,7 @@
                 matIconButton
                 style="width: 0;overflow: clip;margin: 0;padding: 0;"
                 #matMenuTrigger="matMenuTrigger"
-                [matMenuTriggerFor]="menu"
-                aria-label="Example icon-button with a menu"></button>
+                [matMenuTriggerFor]="menu"></button>
 
             <mat-menu #menu="matMenu">
               <button
@@ -80,6 +79,7 @@
             </mat-menu>
             <app-tab
                 (click)="onTabClicked(i, $event, matMenuTrigger)"
+                (dblclick)="onTabDblClicked(i)"
                 (pointerdown)="onTabPointerDown(i, $event, matMenuTrigger)"
                 (contextmenu)="onTabContextMenu(i, $event, matMenuTrigger)"
                 [activeAndSelected]="selected && i === tabsPanelData.selectedTabIndex"
