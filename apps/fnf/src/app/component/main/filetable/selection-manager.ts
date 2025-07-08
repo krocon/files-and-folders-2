@@ -14,7 +14,7 @@ export class SelectionManagerForObjectModelsOptions<T> {
   public equalRows: (a: T, b: T) => boolean = (a: T, b: T) => a === b;
 }
 
-const  SPACE = ' ';
+const SPACE = ' ';
 
 export class SelectionManagerForObjectModels<T> {
 
@@ -43,7 +43,7 @@ export class SelectionManagerForObjectModels<T> {
   public handleKeyDownEvent(evt: KeyboardEvent) {
     // console.info('selectionManager - handleKeyDownEvent():', evt);
     if (evt.key === SPACE) {
-      this.focusIndex = this.bodyModel.focusedRowIndex;
+      this.focusIndex = this.bodyModel.getFocusedRowIndex();
       if (this.focusIndex < 0) return; // skip
 
       // Toggle selection for current row
@@ -59,7 +59,7 @@ export class SelectionManagerForObjectModels<T> {
       );
 
       if (nextFocusIndex > this.focusIndex) {
-        this.bodyModel.focusedRowIndex = nextFocusIndex;
+        this.bodyModel.setFocusedRowIndex(nextFocusIndex);
       }
 
       // Prevent default space behavior (scrolling)
@@ -70,7 +70,7 @@ export class SelectionManagerForObjectModels<T> {
 
 
   public handleKeyUpEvent(evt: KeyboardEvent) {
-    this.focusIndex = this.bodyModel.focusedRowIndex;
+    this.focusIndex = this.bodyModel.getFocusedRowIndex();
     if (this.focusIndex < 0) return; // skip
 
     if (evt.key === ' ') {
@@ -82,7 +82,7 @@ export class SelectionManagerForObjectModels<T> {
         : Math.min(this.bodyModel.getFilteredRows().length - 1, this.focusIndex);
 
       // Always update the cursor position regardless of shift key
-      this.bodyModel.focusedRowIndex = newFocusIndex;
+      this.bodyModel.setFocusedRowIndex(newFocusIndex);
 
       if (evt.shiftKey && this.previousRowIndex > -1) {
         // Handle range selection with shift + arrow keys
@@ -114,7 +114,7 @@ export class SelectionManagerForObjectModels<T> {
 
   public handleGeMouseEvent(evt: GeMouseEvent): boolean {
     this.evt = evt;
-    this.focusIndex = this.bodyModel.focusedRowIndex;
+    this.focusIndex = this.bodyModel.getFocusedRowIndex();
     return this.calcSelection();
   }
 

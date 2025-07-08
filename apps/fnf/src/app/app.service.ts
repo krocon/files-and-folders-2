@@ -442,7 +442,7 @@ export class AppService {
     console.info('tabsPanelDatas\n', this.tabsPanelDatas);
     this.bodyAreaModels.forEach((bodyAreaModel, i) => {
       if (bodyAreaModel) {
-        console.info('bodyAreaModel(' + i + ') focusedRowIndex:', bodyAreaModel.focusedRowIndex);
+        console.info('bodyAreaModel(' + i + ') focusedRowIndex:', bodyAreaModel.getFocusedRowIndex());
         console.info('bodyAreaModel(' + i + ') row count', bodyAreaModel.getRowCount());
         console.info('bodyAreaModel(' + i + ') rows:', bodyAreaModel.getAllRows());
       }
@@ -497,13 +497,22 @@ export class AppService {
             const actionEvents = paras.map(item => this.commandService.createQueueActionEventForDel(item));
             const panelIndex = this.getActivePanelIndex();
             const bodyAreaModel = this.bodyAreaModels[panelIndex];
-            if (bodyAreaModel?.focusedRowIndex) {
-              bodyAreaModel.focusedRowIndex = Math.max(0, bodyAreaModel?.focusedRowIndex - selectedData.length + 1);
+            if (bodyAreaModel?.getFocusedRowIndex()) {
+              bodyAreaModel.setFocusedRowIndex(Math.max(0, bodyAreaModel?.getFocusedRowIndex() - selectedData.length + 1));
             }
             this.commandService.addActions(actionEvents);
           }
         }
       );
+  }
+
+  ensureFocusIsVisible(): void {
+    const panelIndex = this.getActivePanelIndex();
+    const bodyAreaModel = this.bodyAreaModels[panelIndex];
+    if (bodyAreaModel) {
+      // TODO hier gehts weiter. dass muss evtl in die api!
+      // evtl in api focussedRowIndex als setter getter!
+    }
   }
 
   setTheme(theme: Theme) {
@@ -689,7 +698,7 @@ export class AppService {
   getSelectedOrFocussedData(panelIndex: PanelIndex): FileItemIf[] {
     let ret = this.selectionManagers[panelIndex]?.getSelectedRows() ?? [];
     if (!ret?.length && this.bodyAreaModels[panelIndex]) {
-      const focusedRowIndex = this.bodyAreaModels[panelIndex]?.focusedRowIndex ?? 0;
+      const focusedRowIndex = this.bodyAreaModels[panelIndex]?.getFocusedRowIndex() ?? 0;
       const frd = this.bodyAreaModels[panelIndex]?.getRowByIndex(focusedRowIndex) ?? null;
       if (frd) {
         ret = [frd];

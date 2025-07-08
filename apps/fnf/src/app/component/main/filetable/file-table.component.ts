@@ -95,80 +95,6 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
   tableModel?: TableModelIf;
 
   private readonly rowHeight = 34;
-  private readonly columnDefs = [
-    ColumnDef.create({
-      property: "base",
-      headerLabel: "Name",
-      width: new Size(100, 'weight'),
-      // width: new Size(60, '%'),
-      minWidth: new Size(200, 'px'),
-      bodyRenderer: this.rwf.create(NameCellRendererComponent, this.cdr),
-      headerClasses: ["ge-table-text-align-left"],
-      bodyClasses: ["ge-table-text-align-left"],
-      sortable:()=>true,
-      sortComparator: fileNameComparator
-    }),
-    ColumnDef.create({
-      property: "ext",
-      headerLabel: "Ext",
-      width: new Size(60, 'px'),
-      //bodyRenderer: this.rwf.create(EmailRendererComponent, this.cdr),
-      headerClasses: ["ge-table-text-align-left"],
-      bodyClasses: ["ge-table-text-align-left"],
-      sortable:()=>true,
-      sortComparator: extComparator
-    }),
-    ColumnDef.create({
-      property: "size",
-      headerLabel: "Size",
-      width: new Size(100, 'px'),
-      bodyRenderer: this.rwf.create(SizeCellRendererComponent, this.cdr),
-      headerClasses: ["ge-table-text-align-right"],
-      bodyClasses: ["ge-table-text-align-right"],
-      sortable:()=>true,
-      sortComparator: sizeComparator
-    }),
-    ColumnDef.create({
-      property: "date",
-      headerLabel: "Date",
-      width: new Size(160, 'px'),
-      bodyRenderer: this.rwf.create(DateCellRendererComponent, this.cdr),
-      headerClasses: ["ge-table-text-align-left"],
-      bodyClasses: ["ge-table-text-align-left"],
-      sortable:()=>true,
-      sortComparator: dateComparator
-    }),
-  ];
-  public readonly bodyAreaModel = new FileTableBodyModel(this.columnDefs, this.rowHeight);
-  private readonly selectionManager = new SelectionManagerForObjectModels<FileItemIf>(
-    this.bodyAreaModel,
-    {
-      isSelectable: (row: FileItemIf) => row.base !== DOT_DOT,
-      isSelected: (row: FileItemIf) => (row?.meta?.selected ?? false),
-      setSelected: (row: FileItemIf, selected: boolean) => {
-        if (!row.meta) row.meta = new FileItemMeta();
-        row.meta.selected = selected;
-      },
-      getKey: (row: FileItemIf) => row.dir + '/' + row.base,
-      equalRows: equalFileItem,
-    });
-
-  private tableApi: TableApi | undefined;
-  private alive = true;
-  private injector = inject(Injector);
-  private hiddenFilesVisible = true;
-  private filterText = "";
-  private filterActive = false;
-  private dirPara?: DirPara;
-  private findDataOld: FindData | undefined;
-
-  private initialized = false;
-  private cancellings: string[] = [];
-
-
-
-  private _panelIndex: PanelIndex = 0;
-
   readonly tableOptions: TableOptionsIf = {
     ...new TableOptions(),
     hoverColumnVisible: false,
@@ -185,6 +111,101 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     shortcutActionsDisabled: true,
     columnsDraggable: false,
   };
+  private readonly columnDefs = [
+    ColumnDef.create({
+      property: "base",
+      headerLabel: "Name",
+      width: new Size(100, 'weight'),
+      // width: new Size(60, '%'),
+      minWidth: new Size(200, 'px'),
+      bodyRenderer: this.rwf.create(NameCellRendererComponent, this.cdr),
+      headerClasses: ["ge-table-text-align-left"],
+      bodyClasses: ["ge-table-text-align-left"],
+      sortable: () => true,
+      sortComparator: fileNameComparator
+    }),
+    ColumnDef.create({
+      property: "ext",
+      headerLabel: "Ext",
+      width: new Size(60, 'px'),
+      //bodyRenderer: this.rwf.create(EmailRendererComponent, this.cdr),
+      headerClasses: ["ge-table-text-align-left"],
+      bodyClasses: ["ge-table-text-align-left"],
+      sortable: () => true,
+      sortComparator: extComparator
+    }),
+    ColumnDef.create({
+      property: "size",
+      headerLabel: "Size",
+      width: new Size(100, 'px'),
+      bodyRenderer: this.rwf.create(SizeCellRendererComponent, this.cdr),
+      headerClasses: ["ge-table-text-align-right"],
+      bodyClasses: ["ge-table-text-align-right"],
+      sortable: () => true,
+      sortComparator: sizeComparator
+    }),
+    ColumnDef.create({
+      property: "date",
+      headerLabel: "Date",
+      width: new Size(160, 'px'),
+      bodyRenderer: this.rwf.create(DateCellRendererComponent, this.cdr),
+      headerClasses: ["ge-table-text-align-left"],
+      bodyClasses: ["ge-table-text-align-left"],
+      sortable: () => true,
+      sortComparator: dateComparator
+    }),
+  ];
+  public readonly bodyAreaModel = new FileTableBodyModel(
+    this.columnDefs,
+    this.rowHeight
+  );
+  private readonly selectionManager = new SelectionManagerForObjectModels<FileItemIf>(
+    this.bodyAreaModel,
+    {
+      isSelectable: (row: FileItemIf) => row.base !== DOT_DOT,
+      isSelected: (row: FileItemIf) => (row?.meta?.selected ?? false),
+      setSelected: (row: FileItemIf, selected: boolean) => {
+        if (!row.meta) row.meta = new FileItemMeta();
+        row.meta.selected = selected;
+      },
+      getKey: (row: FileItemIf) => row.dir + '/' + row.base,
+      equalRows: equalFileItem,
+    });
+  private tableApi: TableApi | undefined;
+  private alive = true;
+  private injector = inject(Injector);
+  private hiddenFilesVisible = true;
+  private filterText = "";
+  private filterActive = false;
+  private dirPara?: DirPara;
+  private findDataOld: FindData | undefined;
+  private initialized = false;
+  private cancellings: string[] = [];
+
+  constructor(
+    private readonly cdr: ChangeDetectorRef,
+    private readonly rwf: RenderWrapperFactory,
+    private readonly appService: AppService,
+    private readonly gridSelectionCountService: GridSelectionCountService,
+    public readonly gotoAnythingDialogService: GotoAnythingDialogService,
+    private readonly notifyService: NotifyService,
+    private readonly selectionLocalStorage: SelectionLocalStorage,
+    private readonly focusLocalStorage: FocusLocalStorage,
+    private readonly mkdirDialogService: MkdirDialogService,
+  ) {
+    this.columnDefs.forEach(def => {
+      def.sortable = () => true;
+      def.sortIconVisible = () => true;
+    });
+
+    this.tableModel = TableFactory.createTableModel({
+      columnDefs: this.columnDefs,
+      tableOptions: this.tableOptions,
+      bodyAreaModel: this.bodyAreaModel
+    });
+  }
+
+  private _panelIndex: PanelIndex = 0;
 
   get panelIndex(): PanelIndex {
     return this._panelIndex;
@@ -243,37 +264,13 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-
-  constructor(
-    private readonly cdr: ChangeDetectorRef,
-    private readonly rwf: RenderWrapperFactory,
-    private readonly appService: AppService,
-    private readonly gridSelectionCountService: GridSelectionCountService,
-    public readonly gotoAnythingDialogService: GotoAnythingDialogService,
-    private readonly notifyService: NotifyService,
-    private readonly selectionLocalStorage: SelectionLocalStorage,
-    private readonly focusLocalStorage: FocusLocalStorage,
-    private readonly mkdirDialogService: MkdirDialogService,
-  ) {
-    this.columnDefs.forEach(def => {
-      def.sortable = () => true;
-      def.sortIconVisible = () => true;
-    });
-
-    this.tableModel = TableFactory.createTableModel({
-      columnDefs: this.columnDefs,
-      tableOptions: this.tableOptions,
-      bodyAreaModel: this.bodyAreaModel
-    });
-  }
-
-
   ngOnInit(): void {
     this.appService.setBodyAreaModel(this._panelIndex, this.bodyAreaModel);
     this.appService.setSelectionManagers(this._panelIndex, this.selectionManager);
 
     this.appService
       .onKeyDown$
+      .pipe(takeWhile(() => this.alive))
       .subscribe(evt => {
         if (this.selected) {
           this.onKeyDown(evt);
@@ -282,6 +279,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.appService
       .onKeyUp$
+      .pipe(takeWhile(() => this.alive))
       .subscribe(evt => {
         if (this.selected) {
           this.onKeyUp(evt);
@@ -292,6 +290,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     // Subscribe to selection$ changes
     this.selectionManager
       .selection$
+      .pipe(takeWhile(() => this.alive))
       .subscribe(selectedRows => {
         this.calcButtonStates(selectedRows);
       });
@@ -330,6 +329,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.notifyService
       .valueChanges()
+      .pipe(takeWhile(() => this.alive))
       .subscribe(
         (evt: QueueNotifyEventIf) => {
           if (Array.isArray(evt.data)) {
@@ -337,7 +337,8 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
             this.handleDirEvent(arr);
           }
         }
-      )
+      );
+
   }
 
 
@@ -400,6 +401,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
   onKeyUp(evt: KeyboardEvent) {
     this.selectionManager.handleKeyUpEvent(evt);
   }
+
   onKeyDown(evt: KeyboardEvent) {
     this.selectionManager.handleKeyDownEvent(evt);
   }
@@ -470,7 +472,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       this.tableApi?.repaint();
 
     } else if (action === 'TOGGLE_SELECTION_CURRENT_ROW') {
-      const row = this.bodyAreaModel.getRowByIndex(this.bodyAreaModel.focusedRowIndex);
+      const row = this.bodyAreaModel.getRowByIndex(this.bodyAreaModel.getFocusedRowIndex());
       this.selectionManager.toggleRowSelection(row);
       this.tableApi?.repaint();
 
@@ -481,7 +483,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       this.openSelectionDialog(false);
 
     } else if (action === "SPACE_PRESSED") {
-      const r = this.bodyAreaModel.focusedRowIndex;
+      const r = this.bodyAreaModel.getFocusedRowIndex();
       if (this.tableApi && r > -1) {
         const row = this.bodyAreaModel.getRowByIndex(r);
 
@@ -502,7 +504,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       }
 
     } else if (action === "ENTER_PRESSED") {
-      const r = this.bodyAreaModel.focusedRowIndex;
+      const r = this.bodyAreaModel.getFocusedRowIndex();
       if (r > -1) {
         const row = this.bodyAreaModel.getRowByIndex(r);
 
@@ -530,16 +532,16 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       this.setFocus2Index(Math.max(0, this.bodyAreaModel.getRowCount() - 1));
 
     } else if (action === "ARROW_UP") {
-      this.setFocus2Index(Math.max(0, this.bodyAreaModel.focusedRowIndex - 1));
+      this.setFocus2Index(Math.max(0, this.bodyAreaModel.getFocusedRowIndex() - 1));
 
     } else if (action === "ARROW_DOWN") {
-      this.setFocus2Index(Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.focusedRowIndex + 1));
+      this.setFocus2Index(Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.getFocusedRowIndex() + 1));
 
     } else if (action === "PAGEUP_PRESSED") {
-      this.setFocus2Index(Math.max(0, this.bodyAreaModel.focusedRowIndex - this.getDisplayedRowCount() + 1));
+      this.setFocus2Index(Math.max(0, this.bodyAreaModel.getFocusedRowIndex() - this.getDisplayedRowCount() + 1));
 
     } else if (action === "PAGEDOWN_PRESSED") {
-      this.setFocus2Index(Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.focusedRowIndex + this.getDisplayedRowCount() + 1));
+      this.setFocus2Index(Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.getFocusedRowIndex() + this.getDisplayedRowCount() + 1));
 
     } else if (action === "NAVIGATE_LEVEL_DOWN") {
       const fileItem = this.bodyAreaModel.getRowByIndex(0);
@@ -607,23 +609,17 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
             base: result.target.base,
             panelIndex
           };
-          this.focusLocalStorage.persistFocusCriteria(this.panelIndex,this.dirPara.path,  {dir: para.dir, base: para.base});
+          this.focusLocalStorage.persistFocusCriteria(this.panelIndex, this.dirPara.path, {
+            dir: para.dir,
+            base: para.base
+          });
           this.appService.callActionMkDir(para);
         }
       });
   }
 
-  private getFocussedData(): FileItemIf | null {
-    if (this.bodyAreaModel) {
-      const focusedRowIndex = this.bodyAreaModel.focusedRowIndex ?? 0;
-      const frd = this.bodyAreaModel.getRowByIndex(focusedRowIndex) ?? null;
-      return frd ?? null;
-    }
-    return null;
-  }
-
   setFocus2Index(index: number) {
-    this.bodyAreaModel.focusedRowIndex = index;
+    this.bodyAreaModel.setFocusedRowIndex(index);
     const partial = this.bodyAreaModel.getCriteriaFromFocussedRow();
 
     const activeTabOnActivePanel = this.appService.getActiveTabOnActivePanel();
@@ -631,9 +627,19 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.focusLocalStorage.persistFocusCriteria(this.panelIndex, dir, partial);
     this.tableApi?.repaint();
+    this.scrollToFocus();
 
     const selectedRows = this.selectionManager.getSelectionValue();
     this.calcButtonStates(selectedRows);
+  }
+
+  private getFocussedData(): FileItemIf | null {
+    if (this.bodyAreaModel) {
+      const focusedRowIndex = this.bodyAreaModel.getFocusedRowIndex() ?? 0;
+      const frd = this.bodyAreaModel.getRowByIndex(focusedRowIndex) ?? null;
+      return frd ?? null;
+    }
+    return null;
   }
 
   private openSelectionDialog(enhance: boolean) {
@@ -698,9 +704,9 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
     let rows: FileItemIf[] = [...selectedRows];
     if (rows.length === 0
-      && this.bodyAreaModel.focusedRowIndex > -1
-      && this.bodyAreaModel.focusedRowIndex < this.bodyAreaModel.getRowCount()) {
-      const rowByIndex = this.bodyAreaModel.getRowByIndex(this.bodyAreaModel.focusedRowIndex);
+      && this.bodyAreaModel.getFocusedRowIndex() > -1
+      && this.bodyAreaModel.getFocusedRowIndex() < this.bodyAreaModel.getRowCount()) {
+      const rowByIndex = this.bodyAreaModel.getRowByIndex(this.bodyAreaModel.getFocusedRowIndex());
       if (rowByIndex.base !== DOT_DOT) {
         rows = [rowByIndex];
       }
@@ -775,7 +781,8 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       // console.info(JSON.stringify(dirEvent, null, 0));
 
       this.tableApi.removeRows(dirEvent.items, equalFileItem);
-      this.bodyAreaModel.focusedRowIndex = Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.focusedRowIndex);
+      this.bodyAreaModel.setFocusedRowIndex(Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.getFocusedRowIndex()));
+      this.scrollToFocus();
       this.repaintTable();
       this.selectionManager.updateSelection();
 
@@ -829,6 +836,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     this.bodyAreaModel.getAllRows().sort(fileItemSorter)
     this.repaintTable();
     this.selectionManager.updateSelection();
+    this.scrollToFocus();
   }
 
 
@@ -932,6 +940,13 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     return (!this.filterActive || value.base.toLowerCase().includes(this.filterText.toLowerCase()))
       && (this.hiddenFilesVisible || !value.base.startsWith('.'))
       ;
+  }
+
+  private scrollToFocus() {
+    if (this.tableApi) {
+      this.tableApi.ensureRowIsVisible(this.bodyAreaModel.getFocusedRowIndex());
+      console.info('ensureRowIsVisible()', this.bodyAreaModel.getFocusedRowIndex());
+    }
   }
 
 }

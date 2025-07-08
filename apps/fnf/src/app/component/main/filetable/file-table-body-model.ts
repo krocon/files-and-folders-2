@@ -16,7 +16,7 @@ export class FileTableBodyModel extends AreaModelObjectArrayWithColumndefs<FileI
     if (selected) {
       ret.push('fnf-selected-row');
     }
-    if (this.focusedRowIndex === rowIndex) {
+    if (this.getFocusedRowIndex() === rowIndex) {
       ret.push('fnf-focused-row');
     }
     return ret;
@@ -27,13 +27,13 @@ export class FileTableBodyModel extends AreaModelObjectArrayWithColumndefs<FileI
     if (filteredRows.length === 0) {
       return null;
     }
-    if (this.focusedRowIndex < 0) {
-      this.focusedRowIndex = 0;
+    if (this.getFocusedRowIndex() < 0) {
+      this.setFocusedRowIndex(0);
     }
-    if (this.focusedRowIndex >= filteredRows.length) {
-      this.focusedRowIndex = filteredRows.length - 1;
+    if (this.getFocusedRowIndex() >= filteredRows.length) {
+      this.setFocusedRowIndex(filteredRows.length - 1);
     }
-    const row = filteredRows[this.focusedRowIndex] as FileItemIf;
+    const row = filteredRows[this.getFocusedRowIndex()] as FileItemIf;
     return {base: row.base, dir: row.dir};
   }
 
@@ -42,19 +42,19 @@ export class FileTableBodyModel extends AreaModelObjectArrayWithColumndefs<FileI
   }
 
   public setFocusByCriteria(criteria: Partial<FileItemIf>): void {
-    this.focusedRowIndex = criteria ?
+    this.setFocusedRowIndex(criteria ?
       this.getFilteredRows().findIndex(row => row.base === criteria.base && row.dir === criteria.dir)
-      : 0;
+      : 0);
 
-    if (this.focusedRowIndex < 0) {
-      this.focusedRowIndex = 0;
+    if (this.getFocusedRowIndex() < 0) {
+      this.setFocusedRowIndex(0);
     } else {
 
       let filteredRows = this.getFilteredRows();
       if (filteredRows.length === 0) {
-        this.focusedRowIndex = 0;
-      } else if (this.focusedRowIndex >= filteredRows.length) {
-        this.focusedRowIndex = filteredRows.length - 1;
+        this.setFocusedRowIndex(0);
+      } else if (this.getFocusedRowIndex() >= filteredRows.length) {
+        this.setFocusedRowIndex(filteredRows.length - 1);
       }
     }
   }

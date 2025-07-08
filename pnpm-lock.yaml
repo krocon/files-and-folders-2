@@ -41,11 +41,11 @@ importers:
         specifier: ^20.0.0
         version: 20.0.0(@angular/common@20.0.0)(@angular/core@20.0.0)(@angular/platform-browser@20.0.0)(rxjs@7.8.2)
       '@guiexpert/angular-table':
-        specifier: ^20.1.74
-        version: 20.1.74(@angular/common@20.0.0)(@angular/core@20.0.0)
+        specifier: ^20.1.78
+        version: 20.1.78(@angular/common@20.0.0)(@angular/core@20.0.0)
       '@guiexpert/table':
-        specifier: ^1.1.74
-        version: 1.1.74
+        specifier: ^1.1.78
+        version: 1.1.78
       hammerjs:
         specifier: ^2.0.8
         version: 2.0.8
@@ -2580,8 +2580,8 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
-  /@guiexpert/angular-table@20.1.74(@angular/common@20.0.0)(@angular/core@20.0.0):
-    resolution: {integrity: sha512-LKeL4cbUNd+SLgxVHBi1ybKPRC6oVN5RXKDwra66I8QB2hDtnaPquhk9X7d+ouKwyjclpgQYjrsbh/vbgo1znQ==}
+  /@guiexpert/angular-table@20.1.78(@angular/common@20.0.0)(@angular/core@20.0.0):
+    resolution: {integrity: sha512-6jIRyAKDMsESwzCBG3pSXG/rkxlgGiCd9qmIyN/UFXbKSVGS6SKi4UsxXzgEk6SMj8vl7iiV+ARNBXeTqVsRaQ==}
     peerDependencies:
       '@angular/common': ^20.0.0
       '@angular/core': ^20.0.0
@@ -2591,8 +2591,8 @@ packages:
       tslib: 2.8.1
     dev: false
 
-  /@guiexpert/table@1.1.74:
-    resolution: {integrity: sha512-zF6UqHslfnRPmLgl8I6L1C80r1vOhAc8JpIiNkypixSPICZR99gwdodV0X67oqhneYRqS8eNSOcTIPgtsI+Xow==}
+  /@guiexpert/table@1.1.78:
+    resolution: {integrity: sha512-wzOf454LTa9OOQ0DeagOk7eRCx/vKB46XDkDPftrsvhRig0oxSremand/LmKUSN6Xzr+DunfJHeekN/IMyi2eA==}
     dependencies:
       tslib: 2.8.1
     dev: false
