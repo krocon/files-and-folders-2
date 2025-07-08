@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {CopyOrMoveDialogData} from "./copy-or-move-dialog.data";
+import {CopyOrMoveOrDeleteDialogData} from "./copy-or-move-or-delete-dialog.data";
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -25,7 +25,7 @@ import {getAllParents} from "../../../common/fn/get-all-parents.fn";
 
 @Component({
   selector: "fnf-copy-or-move-dialog",
-  templateUrl: "./copy-or-move-dialog.component.html",
+  templateUrl: "./copy-or-move-or-delete-dialog.component.html",
   imports: [
     MatDialogTitle,
     MatDialogContent,
@@ -45,10 +45,10 @@ import {getAllParents} from "../../../common/fn/get-all-parents.fn";
     MatSuffix,
     MatMenuTrigger
   ],
-  styleUrls: ["./copy-or-move-dialog.component.css"],
+  styleUrls: ["./copy-or-move-or-delete-dialog.component.css"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
+export class CopyOrMoveOrDeleteDialogComponent implements OnInit, OnDestroy {
 
   suggestions: string[] = [];
 
@@ -67,8 +67,8 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
   private alive = true;
 
   constructor(
-    public dialogRef: MatDialogRef<CopyOrMoveDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: CopyOrMoveDialogData,
+    public dialogRef: MatDialogRef<CopyOrMoveOrDeleteDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: CopyOrMoveOrDeleteDialogData,
     private readonly formBuilder: FormBuilder,
     private readonly walkSocketService: WalkSocketService,
     private readonly cdr: ChangeDetectorRef,
@@ -87,11 +87,13 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
     this.formGroup = this.formBuilder.group(
       {
         // source: new FormControl(this.source, []),
-        target: new FormControl(data.target, [
-          Validators.required,
-          Validators.minLength(1),
-          Validators.pattern(/^(?!tabfind).*$/)
-        ])
+        target: new FormControl(data.target,
+          this.deleteMode ? [] :
+            [
+              Validators.required,
+              Validators.minLength(1),
+              Validators.pattern(/^(?!tabfind).*$/)
+            ])
       }
     );
 
@@ -114,6 +116,7 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.alive = true;
+    // start scanning selected files/folders:
     this.walkCancelKey = this.walkSocketService
       .walkDir(
         this.data.source,

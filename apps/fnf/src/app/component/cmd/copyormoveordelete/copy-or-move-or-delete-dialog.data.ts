@@ -1,7 +1,7 @@
 import {FileOperation} from "./file-operation";
 
 
-export class CopyOrMoveDialogData {
+export class CopyOrMoveOrDeleteDialogData {
 
   constructor(
     public source: string[] = [],

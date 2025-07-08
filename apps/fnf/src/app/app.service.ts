@@ -34,8 +34,10 @@ import {TabData} from "./domain/filepagedata/data/tab.data";
 import {FileActionService} from "./service/cmd/file-action.service";
 import {FileTableBodyModel} from "./component/main/filetable/file-table-body-model";
 import {SelectionManagerForObjectModels} from "./component/main/filetable/selection-manager";
-import {CopyOrMoveDialogData} from "./component/cmd/copyormove/copy-or-move-dialog.data";
-import {CopyOrMoveDialogService} from "./component/cmd/copyormove/copy-or-move-dialog.service";
+import {CopyOrMoveOrDeleteDialogData} from "./component/cmd/copyormoveordelete/copy-or-move-or-delete-dialog.data";
+import {
+  CopyOrMoveOrDeleteDialogService
+} from "./component/cmd/copyormoveordelete/copy-or-move-or-delete-dialog.service";
 import {ClipboardService} from "./service/clipboard-service";
 import {GotoAnythingDialogService} from "./component/cmd/gotoanything/goto-anything-dialog.service";
 import {RenameDialogService} from "./component/cmd/rename/rename-dialog.service";
@@ -104,7 +106,7 @@ export class AppService {
     private readonly latestDataService: LatestDataService,
     private readonly favDataService: FavDataService,
     private readonly changeDirEventService: ChangeDirEventService,
-    private readonly copyOrMoveDialogService: CopyOrMoveDialogService,
+    private readonly copyOrMoveDialogService: CopyOrMoveOrDeleteDialogService,
     private readonly clipboardService: ClipboardService,
     private readonly renameDialogService: RenameDialogService,
     private readonly commandService: CommandService,
@@ -453,7 +455,7 @@ export class AppService {
     const sources: string[] = this.getSourcePaths(selectedData);
     this.copyOrMoveDialogService
       .open(
-        new CopyOrMoveDialogData(sources, this.getOtherPanelSelectedTabData().path, "copy"),
+        new CopyOrMoveOrDeleteDialogData(sources, this.getOtherPanelSelectedTabData().path, "copy"),
         (target) => {
           if (target) {
             const paras: QueueFileOperationParams[] = this.createFileOperationParams(target);
@@ -470,7 +472,7 @@ export class AppService {
     const targetDir = this.getOtherPanelSelectedTabData().path;
     this.copyOrMoveDialogService
       .open(
-        new CopyOrMoveDialogData(sources, targetDir, "move"),
+        new CopyOrMoveOrDeleteDialogData(sources, targetDir, "move"),
         (target) => {
           if (target) {
             const paras: QueueFileOperationParams[] = this.createFileOperationParams(target);
@@ -488,7 +490,7 @@ export class AppService {
 
     this.copyOrMoveDialogService
       .open(
-        new CopyOrMoveDialogData(sources, "", "delete"),
+        new CopyOrMoveOrDeleteDialogData(sources, "", "delete"),
         (target) => {
           if (target) {
             const paras: QueueFileOperationParams[] = this.createFileOperationParams(target);

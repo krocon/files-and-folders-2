@@ -26,9 +26,7 @@ export class WalkGateway {
    */
   @SubscribeMessage("walkdir")
   walkdir(@MessageBody() walkParaData: WalkParaData): void {
-
     new FileWalker(walkParaData, this.cancellings, this.server);
-
   }
 
   @SubscribeMessage("cancelwalk")
