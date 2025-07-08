@@ -14,7 +14,9 @@
     "test:fnf": "pnpm --filter fnf test",
     "test:fnf-api": "pnpm --filter fnf-api test",
     "test:fnf-data": "pnpm --filter fnf-data test",
+    "e2e:fnf": "pnpm --filter fnf e2e",
     "test": "pnpm test:fnf && pnpm test:fnf-api",
+    "e2e": "pnpm e2e:fnf",
     "install:all": "pnpm install && pnpm --filter fnf-data install && pnpm --filter fnf install && pnpm --filter fnf-api install"
   },
   "private": true,

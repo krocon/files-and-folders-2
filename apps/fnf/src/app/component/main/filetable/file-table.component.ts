@@ -70,6 +70,8 @@ import {MkdirDialogData} from "../../cmd/mkdir/mkdir-dialog.data";
 import {MkdirDialogResultData} from "../../cmd/mkdir/mkdir-dialog-result.data";
 import {MkdirDialogService} from "../../cmd/mkdir/mkdir-dialog.service";
 import {DirWalker} from "./dir-walker";
+import {equalFileItem} from "../../../common/fn/equal-file-item.fn";
+
 
 @Component({
   standalone: true,
@@ -147,7 +149,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
         row.meta.selected = selected;
       },
       getKey: (row: FileItemIf) => row.dir + '/' + row.base,
-      equalRows: (a: FileItemIf, b: FileItemIf) => a.base === b.base && a.dir === b.dir,
+      equalRows: equalFileItem,
     });
 
   private tableApi: TableApi | undefined;
@@ -157,7 +159,6 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
   private filterText = "";
   private filterActive = false;
   private dirPara?: DirPara;
-  //private focusRowCriterea: Partial<FileItemIf> | null = null;
   private findDataOld: FindData | undefined;
 
   private initialized = false;
@@ -198,14 +199,6 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     },
     horizontalBorderVisible: false,
     verticalBorderVisible: false,
-    // autoRestoreOptions: {
-    //   ...new AutoRestoreOptions<FileItemIf>(),
-    //   getStorageKeyFn: () => `fnf-file-table-${this._panelIndex}-`,
-    //   autoRestoreCollapsedExpandedState: false,
-    //   autoRestoreScrollPosition: false,
-    //   autoRestoreSortingState: true,
-    //   autoRestoreSelectedState: false
-    // },
     externalFilterFunction: this.filterFn.bind(this),
     getSelectionModel: () => undefined,
     getFocusModel: () => undefined,
@@ -755,7 +748,8 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       const exists: boolean = this.tableApi
         .findRows(
           dirEvent.items,
-          (a, b) => a.base === b.base && a.dir === b.dir).length > 0;
+          equalFileItem
+        ).length > 0;
 
       if (!exists) {
         this.tableApi.addRows(dirEvent.items);
@@ -769,13 +763,13 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       console.info('path', this.tabsPanelData?.tabs[this.tabsPanelData?.selectedTabIndex]?.path);
       console.info(JSON.stringify(dirEvent, null, 0));
 
-      this.tableApi.removeRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
+      this.tableApi.removeRows(dirEvent.items, equalFileItem);
       this.bodyAreaModel.focusedRowIndex = Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.focusedRowIndex);
       this.repaintTable();
       this.selectionManager.updateSelection();
 
     } else if (dirEvent.action === "change") {
-      this.tableApi.updateRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
+      this.tableApi.updateRows(dirEvent.items, equalFileItem);
       this.repaintTable();
 
     } else if (dirEvent.action === "focus") {
@@ -785,7 +779,8 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       this.repaintTable();
 
     } else if (dirEvent.action === "unselect") {
-      this.tableApi.findRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir)
+      this.tableApi
+        .findRows(dirEvent.items, equalFileItem)
         .forEach(r => {
           this.setFileItemSelected(r, false);
           this.selectionManager.setRowSelected(r, false);
@@ -794,13 +789,16 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       this.repaintTable();
 
     } else if (dirEvent.action === "unselectall") {
-      this.bodyAreaModel.getAllRows().forEach(r => this.setFileItemSelected(r, false));
+      this.bodyAreaModel
+        .getAllRows()
+        .forEach(r => this.setFileItemSelected(r, false));
       this.selectionManager.clear();
       this.selectionManager.updateSelection();
       this.repaintTable();
 
     } else if (dirEvent.action === "select") {
-      this.tableApi.findRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir)
+      this.tableApi
+        .findRows(dirEvent.items, equalFileItem)
         .forEach(r => {
           this.setFileItemSelected(r, true);
           this.selectionManager.setRowSelected(r, true);

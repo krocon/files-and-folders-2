@@ -1,5 +1,6 @@
 import {TableApi} from "@guiexpert/table";
 import {FileItemIf, WalkData} from "@fnf/fnf-data";
+import {equalFileItem} from "../../../common/fn/equal-file-item.fn";
 
 
 export class DirWalker {
@@ -17,9 +18,7 @@ export class DirWalker {
     if (this.lastTimestamp < walkData.timestamp) {
       this.lastTimestamp = walkData.timestamp;
       this.row.size = walkData.sizeSum;
-      this.tableApi.updateRows([this.row], (a: FileItemIf, b: FileItemIf) => (
-        a.dir === b.dir && a.base === b.base
-      ));
+      this.tableApi.updateRows([this.row], equalFileItem);
       this.callback();
     }
   }
