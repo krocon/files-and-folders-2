@@ -77,7 +77,7 @@
         class="panel-left">
       @if (initialized && tabsPanelData) {
         <app-file-table
-            (selectionChanged)="onSelectionChanged($event, 0)"
+            (selectionLabelDataChanged)="onSelectionChanged($event, 0)"
             (buttonStatesChanged)="onButtonStatesChanged($event, 0)"
             [selected]="activePanelIndex()===0"
             [tabsPanelData]="tabsPanelData[0]"
@@ -93,7 +93,7 @@
         class="panel-right">
       @if (initialized && tabsPanelData) {
         <app-file-table
-            (selectionChanged)="onSelectionChanged($event, 1)"
+            (selectionLabelDataChanged)="onSelectionChanged($event, 1)"
             (buttonStatesChanged)="onButtonStatesChanged($event, 1)"
             [selected]="activePanelIndex()===1"
             [tabsPanelData]="tabsPanelData[1]"

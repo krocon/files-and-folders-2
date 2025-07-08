@@ -69,6 +69,7 @@ import {FocusLocalStorage} from "./focus-local-storage";
 import {MkdirDialogData} from "../../cmd/mkdir/mkdir-dialog.data";
 import {MkdirDialogResultData} from "../../cmd/mkdir/mkdir-dialog-result.data";
 import {MkdirDialogService} from "../../cmd/mkdir/mkdir-dialog.service";
+import {DirWalker} from "./dir-walker";
 
 @Component({
   standalone: true,
@@ -85,7 +86,7 @@ import {MkdirDialogService} from "../../cmd/mkdir/mkdir-dialog.service";
 export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @Input() selected: boolean = false;
-  @Output() selectionChanged = new Subject<SelectionEvent>();
+  @Output() selectionLabelDataChanged = new Subject<SelectionEvent>();
   @Output() buttonStatesChanged = new Subject<ButtonEnableStates>();
 
   tableModel?: TableModelIf;
@@ -160,6 +161,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
   private findDataOld: FindData | undefined;
 
   private initialized = false;
+  private cancellings: string[] = [];
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
@@ -321,7 +323,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(takeWhile(() => this.alive))
       .subscribe(dirEventsMap => {
         if (this.dirPara?.path) {
-          let dirEvents = dirEventsMap.get(this.dirPara.path);
+          const dirEvents = dirEventsMap.get(this.dirPara.path);
           if (dirEvents) this.handleDirEvent(dirEvents);
         }
       });
@@ -465,16 +467,25 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       this.openSelectionDialog(false);
 
     } else if (action === "SPACE_PRESSED") {
-      console.info('space pressed');
+      const r = this.bodyAreaModel.focusedRowIndex;
+      if (this.tableApi && r > -1) {
+        const row = this.bodyAreaModel.getRowByIndex(r);
 
-      // TODO hier gehts weiter
+        if (row?.isDir) {
+          const dir = row.dir + '/' + row.base;
 
-      // const r = this.bodyAreaModel.focusedRowIndex;
-      // if (r > -1) {
-      //   const row = this.bodyAreaModel.getRowByIndex(r);
-      //   this.selectionManager.toggleRowSelection(row);
-      //   this.tableApi?.repaint();
-      // }
+          const dirWalker = new DirWalker(row, this.tableApi, () => {
+            const selectedRows = this.selectionManager.getSelectionValue();
+            this.calcSelectionLabelData(selectedRows);
+          });
+
+          this.cancellings.push(
+            this.appService.walkDir(
+              [dir],
+              dirWalker.walkCallback.bind(dirWalker)
+            ));
+        }
+      }
 
     } else if (action === "ENTER_PRESSED") {
       const r = this.bodyAreaModel.focusedRowIndex;
@@ -656,16 +667,20 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  private calcButtonStates<T>(selectedRows: FileItemIf[]) {
-    if (this.dirPara?.path && this.initialized) {
-      this.selectionLocalStorage.persistSelection(this.panelIndex, this.dirPara.path, this.selectionManager);
-    }
+  private calcSelectionLabelData(selectedRows: FileItemIf[]) {
     const selectionLabelData: SelectionEvent = this.gridSelectionCountService
       .getSelectionCountData(
         selectedRows,
         this.bodyAreaModel?.getFilteredRows() ?? []
       );
-    this.selectionChanged.next(selectionLabelData);
+    this.selectionLabelDataChanged.next(selectionLabelData);
+  }
+
+  private calcButtonStates<T>(selectedRows: FileItemIf[]) {
+    if (this.dirPara?.path && this.initialized) {
+      this.selectionLocalStorage.persistSelection(this.panelIndex, this.dirPara.path, this.selectionManager);
+    }
+    this.calcSelectionLabelData(selectedRows);
 
     let rows: FileItemIf[] = [...selectedRows];
     if (rows.length === 0
@@ -716,7 +731,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
             [],
             this.bodyAreaModel?.getFilteredRows() ?? []
           );
-        this.selectionChanged.next(selectionLabelData);
+        this.selectionLabelDataChanged.next(selectionLabelData);
       }
 
       if (dirEvent.end) {
@@ -741,6 +756,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       }
 
     } else if (dirEvent.action === "unlink" || dirEvent.action === "unlinkDir") {
+      // TODO unlink for tabfinds here?
       this.tableApi.removeRows(dirEvent.items, (a, b) => a.base === b.base && a.dir === b.dir);
       this.bodyAreaModel.focusedRowIndex = Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.focusedRowIndex);
       this.repaintTable();
@@ -864,6 +880,13 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private changeDirNext(path: string) {
     console.info('changeDirNext', path);
+    while (this.cancellings.length > 0) {
+      const id = this.cancellings.pop();
+      if (id) {
+        console.info('cancelWalkDir', id);
+        this.appService.cancelWalkDir(id);
+      }
+    }
     this.appService.changeDir(new ChangeDirEvent(this._panelIndex, path));
   }
 

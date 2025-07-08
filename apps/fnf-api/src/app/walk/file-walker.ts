@@ -4,10 +4,12 @@ import * as fs from "fs-extra";
 import * as path from "path";
 
 export class FileWalker {
+
   private readonly walkData: WalkData = new WalkData();
   private readonly files: FileItemIf[];
   private step = 0;
   private readonly STEPS_PER_MESSAGE: number;
+
 
   constructor(
     private readonly walkParaData: WalkParaData,
@@ -19,7 +21,7 @@ export class FileWalker {
       .filter(f => fs.existsSync(f))
       .map(f => {
         const stats = fs.statSync(f);
-        return new FileItem(f, '', '', '', stats.size, stats.isDirectory());
+        return new FileItem(f, '', '', '', stats?.size ?? 0, stats.isDirectory());
       });
     this.files = [...initialFiles];
     this.STEPS_PER_MESSAGE = walkParaData.stepsPerMessage;
@@ -27,7 +29,7 @@ export class FileWalker {
     const walkData: WalkData = new WalkData(
       initialFiles.filter(f => !f.isDir).length,
       initialFiles.filter(f => f.isDir).length,
-      initialFiles.map(f => f.size).reduce((a, b) => a + b, 0),
+      initialFiles.map(f => f.size ?? 0).reduce((a, b) => a + b, 0),
       false
     );
     this.emitWithDelay(this.walkParaData.emmitDataKey, walkData, () => this.processNextFile());
@@ -35,7 +37,6 @@ export class FileWalker {
 
 
   private emitWithDelay(key: string, data: WalkData, callback: () => void): void {
-    console.log("emitWithDelay() key:" + key, JSON.stringify(data, null, 2)); // TODO 123
     this.server.emit(key, data);
     setImmediate(callback);
   }
@@ -59,6 +60,7 @@ export class FileWalker {
   private processFile(item: FileItemIf): void {
     this.walkData.fileCount++;
     this.walkData.sizeSum += item.size;
+    this.walkData.timestamp = Date.now();
   }
 
   private addNewFilesToProcess(entries: fs.Dirent[], parentDir: string): void {
@@ -72,7 +74,7 @@ export class FileWalker {
         entry.name,
         '', // ext
         '', // date
-        size,
+        size ?? 0,
         isDir,
         false // abs
       ));

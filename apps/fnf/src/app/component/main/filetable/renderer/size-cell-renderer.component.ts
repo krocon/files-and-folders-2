@@ -48,22 +48,22 @@ export class SizeCellRendererComponent implements ComponentRendererIf<FileItemIf
       return undefined;
     }
 
-    if (fileItem.isDir) {
-      this.text = ' DIR';
-      this.tooltip = ' DIRECTORY';
-      return undefined;
-    }
-
     if (fileItem?.meta?.status === "temp") {
       this.tooltip = 'temporary file';
       this.clazz = 'temporary';
       return undefined;
     }
 
-    const size = fileItem.size;
+    const size = fileItem.size ?? 0;
     const formattedSize = this.formatFileSize(size);
     this.text = formattedSize;
     this.tooltip = `${size.toLocaleString("en-US", {minimumFractionDigits: 0})} bytes (${formattedSize})`;
+
+    if (fileItem.isDir && size === 0) {
+      this.text = ' DIR';
+      this.tooltip = ' DIRECTORY';
+      return undefined;
+    }
 
     return undefined;
   }

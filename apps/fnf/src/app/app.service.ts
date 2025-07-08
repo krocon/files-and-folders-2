@@ -59,6 +59,7 @@ import {ChangeDirDialogService} from "./component/cmd/changedir/change-dir-dialo
 import {ChangeDirDialogData} from "./component/cmd/changedir/data/change-dir-dialog.data";
 import {map} from "rxjs/operators";
 import {TabsPanelData} from "./domain/filepagedata/data/tabs-panel.data";
+import {WalkCallback, WalkSocketService} from "./service/walk.socketio.service";
 
 
 @Injectable({
@@ -115,6 +116,7 @@ export class AppService {
     private readonly multiRenameDialogService: MultiRenameDialogService,
     private readonly groupFilesDialogService: GroupFilesDialogService,
     private readonly changeDirDialogService: ChangeDirDialogService,
+    private readonly walkSocketService: WalkSocketService,
   ) {
     // Set config to services:
     ConfigService.forRoot(environment.config);
@@ -922,6 +924,17 @@ export class AppService {
       return fileItems.map(fi => `${fi.dir}/${fi.base}`);
     }
     return [this.getActiveTabOnActivePanel().path];
+  }
+
+
+  walkDir(
+    pathes: string[],
+    callback: WalkCallback): string {
+    return this.walkSocketService.walkDir(pathes, callback);
+  }
+
+  cancelWalkDir(cancelKey: string) {
+    this.walkSocketService.cancelWalkDir(cancelKey);
   }
 
 }
