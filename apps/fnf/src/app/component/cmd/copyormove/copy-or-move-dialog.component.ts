@@ -84,9 +84,9 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
     }
     this.sourceTooltip = data.source.join("\n");
 
-    if (this.deleteMode) {
-      this.formGroup = this.formBuilder.group({});
-    } else {
+    // if (this.deleteMode) {
+    //   this.formGroup = this.formBuilder.group({});
+    // } else {
       this.formGroup = this.formBuilder.group(
         {
           // source: new FormControl(this.source, []),
@@ -97,7 +97,7 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
           ])
         }
       );
-    }
+    // }
     dialogRef
       .afterOpened()
       .pipe(takeWhile(() => this.alive))
@@ -128,12 +128,12 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
   }
 
   private createSuggestions() {
-    let dirs = [...new Set([
+    const dirs = [...new Set([
       ...this.appService.latest,
       ...this.appService.favs
     ])];
 
-    let dirs2: string[] = [];
+    const dirs2: string[] = [];
     for (const dir of dirs) {
       dirs2.push(dir);
       getAllParents(dir).forEach(
@@ -153,7 +153,8 @@ export class CopyOrMoveDialogComponent implements OnInit, OnDestroy {
   }
 
   onOkClicked() {
-    const fileItem = new FileItem(this.data.target, this.formGroup.getRawValue().name, "");
+    const formData = this.formGroup.getRawValue();
+    const fileItem = new FileItem(formData.target, formData.name, "");
     fileItem.isDir = true;
     this.walkSocketService.cancelWalkDir(this.walkCancelKey);
     this.dialogRef.close(fileItem);
