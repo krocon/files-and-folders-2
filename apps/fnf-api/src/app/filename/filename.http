@@ -1,3 +1,9 @@
+### hasopenaiapikey test
+POST http://localhost:3333/api/hasopenaiapikey
+Content-Type: application/json
+
+{}
+
 ### convert file names test
 POST http://localhost:3333/api/convertnames
 Content-Type: application/json

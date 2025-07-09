@@ -24,7 +24,8 @@ export const environment = {
     fileWatcher: false
   },
   multiRename: {
-    convertUrl: prefix + "/api/convertnames"
+    convertUrl: prefix + "/api/convertnames",
+    hasOpenAiApiKeyUrl: prefix + "/api/hasopenaiapikey"
   },
   lookAndFeel: {
     getLookAndFeelUrl: "assets/config/color/%theme%.json"

@@ -105,6 +105,8 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
   options: MultiRenameOptions;
   tableModel?: TableModelIf;
   rows: QueueFileOperationParams[];
+  public hasOpenAiApiKey: boolean = false;
+  fetchAiButtonDisabled = false;
   private readonly rowHeight = 34;
   readonly tableOptions: TableOptionsIf = {
     ...new TableOptions(),
@@ -131,7 +133,6 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
   };
   private tableApi: TableApi | undefined;
   private alive = true;
-
 
   constructor(
     public dialogRef: MatDialogRef<MultiRenameDialogComponent>,
@@ -242,6 +243,16 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
 
   ngOnInit(): void {
     this.alive = true;
+
+    this.multiRenameAiService
+      .hasOpenAiApiKey()
+      .pipe(
+        takeWhile(() => this.alive),
+      )
+      .subscribe(res => {
+        this.hasOpenAiApiKey = res;
+      });
+
     this.formGroup.valueChanges
       .pipe(
         takeWhile(() => this.alive),
@@ -296,8 +307,6 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
       }, 0);
     });
   }
-
-  fetchAiButtonDisabled = false;
 
   @AvoidDoubleExecution()
   onFetchAiClicked() {

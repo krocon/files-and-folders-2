@@ -12,6 +12,13 @@ export class FilenameController {
   constructor(private readonly httpService: HttpService) {
   }
 
+  @Post("hasopenaiapikey")
+  async hasOpenAiApiKey(): Promise<boolean> {
+    return !!environment.openaiApiKey;
+  }
+
+
+
   @Post("convertnames")
   async convertFilenames(
     @MessageBody() para: ConvertPara

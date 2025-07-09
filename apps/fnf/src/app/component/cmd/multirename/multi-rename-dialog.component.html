@@ -29,7 +29,7 @@
 
       <button
           (click)="onFetchAiClicked()"
-          [disabled]="fetchAiButtonDisabled"
+          [disabled]="fetchAiButtonDisabled || !hasOpenAiApiKey"
           data-test-id="fetch-ai-button"
           color="primary"
           mat-raised-button>
@@ -43,7 +43,11 @@
       </div>
 
 
-      <div></div>
+      <div>
+        @if (!hasOpenAiApiKey) {
+          <span>Open AI API key is not installed properly.</span>
+        }
+      </div>
 
     </div>
 
