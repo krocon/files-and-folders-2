@@ -18,6 +18,7 @@ import {Config} from "@fnf/fnf-data";
 import {FindFolderModule} from "./findfolder/find-folder.module";
 import {CmdModule} from "./cmd/cmd.module";
 import {VolumeModule} from "./volumes/volume.module";
+import {FilenameModule} from "./filename/filename.module";
 
 const config = new Config(
   process.env.FNF_INCOMPATIBLE_PATHS ? process.env.FNF_INCOMPATIBLE_PATHS.split(",") : [],
@@ -51,7 +52,8 @@ const config = new Config(
     CustomCssModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, "..", "fnf")
-    })
+    }),
+    FilenameModule
   ],
   controllers: [
     AppController

@@ -25,6 +25,10 @@ export class SearchTemplateDropdownComponent {
   // TODO load via backend (apps/fnf/src/assets/config/filetype/filetype-extensions.json)
   fileTypes: FileExtensionsType[] = [
     {"label": "movies", "extensions": [".avi", ".mkv", ".mp4", ".mov", ".wmv", ".flv", ".webm"]},
+    {
+      "label": "movies & images",
+      "extensions": [".avi", ".mkv", ".mp4", ".mov", ".wmv", ".flv", ".webm", ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".svg", ".heic"]
+    },
     {"label": "audio", "extensions": [".mp3", ".wav", ".aac", ".flac", ".ogg", ".wma", ".m4a"]},
     {"label": "images", "extensions": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".svg", ".heic"]},
     {
