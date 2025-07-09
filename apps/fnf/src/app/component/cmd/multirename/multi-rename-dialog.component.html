@@ -36,7 +36,12 @@
         Fetch AI
       </button>
 
-      <mat-spinner [class.hidden]="!fetchAiButtonDisabled"></mat-spinner>
+      <div class="fetch-ai-spinner">
+        @if (fetchAiButtonDisabled) {
+          <mat-spinner [diameter]="36"></mat-spinner>
+        }
+      </div>
+
 
       <div></div>
 
