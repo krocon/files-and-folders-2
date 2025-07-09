@@ -1,5 +1,5 @@
 ### convert file names test
-POST http://localhost:3333/api/convert
+POST http://localhost:3333/api/convertnames
 Content-Type: application/json
 
 {

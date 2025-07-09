@@ -26,6 +26,20 @@
             value="AI">AI
         </mat-button-toggle>
       </mat-button-toggle-group>
+
+      <button
+          (click)="onFetchAiClicked()"
+          [disabled]="fetchAiButtonDisabled"
+          data-test-id="fetch-ai-button"
+          color="primary"
+          mat-raised-button>
+        Fetch AI
+      </button>
+
+      <mat-spinner [class.hidden]="!fetchAiButtonDisabled"></mat-spinner>
+
+      <div></div>
+
     </div>
 
     <div class="row-1">

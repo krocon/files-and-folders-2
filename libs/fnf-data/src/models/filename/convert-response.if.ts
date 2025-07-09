@@ -1,6 +1,1 @@
-export interface ConvertResponseItem {
-  input: string;
-  title: string;
-}
-
-export type ConvertResponseType = Array<ConvertResponseItem>;
+export type ConvertResponseType = { [key: string]: string };

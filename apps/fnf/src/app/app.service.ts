@@ -134,6 +134,7 @@ export class AppService {
     GotoAnythingDialogService.forRoot(environment.gotoAnything);
     ToolService.forRoot(environment.tool);
     FiletypeExtensionsService.forRoot(environment.filetypeExtensions);
+    MultiRenameAiService.forRoot(environment.multiRename);
 
     this.favDataService
       .valueChanges()

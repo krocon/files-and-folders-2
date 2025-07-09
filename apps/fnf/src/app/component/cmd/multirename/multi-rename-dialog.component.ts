@@ -7,7 +7,6 @@ import {
   OnDestroy,
   OnInit,
   QueryList,
-  Renderer2,
   ViewChild,
   ViewChildren
 } from "@angular/core";
@@ -41,6 +40,7 @@ import {MatCheckbox} from "@angular/material/checkbox";
 import {RenderWrapperFactory, TableComponent} from "@guiexpert/angular-table";
 import {
   AutoRestoreOptions,
+  AvoidDoubleExecution,
   ColumnDef,
   Size,
   TableApi,
@@ -63,6 +63,7 @@ import {MatDivider} from "@angular/material/divider";
 import {TypedDataService} from "../../../common/typed-data.service";
 import {MultiRenameAiService} from "./multi-rename-ai.service";
 import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-toggle";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
   selector: "fnf-multi-rename-dialog",
@@ -89,6 +90,7 @@ import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-to
     MatDivider,
     MatButtonToggleGroup,
     MatButtonToggle,
+    MatProgressSpinner,
   ],
   styleUrls: ["./multi-rename-dialog.component.css"]
 })
@@ -130,6 +132,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
   private tableApi: TableApi | undefined;
   private alive = true;
 
+
   constructor(
     public dialogRef: MatDialogRef<MultiRenameDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public multiRenameDialogData: MultiRenameDialogData,
@@ -139,7 +142,6 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
     private readonly multiRenameService: MultiRenameService,
     private readonly zone: NgZone,
     private readonly multiRenameAiService: MultiRenameAiService,
-    private readonly renderer: Renderer2,
   ) {
     this.data = multiRenameDialogData.data ? multiRenameDialogData.data : MultiRenameDialogComponent.innerServiceMultiRenameData.getValue();
     if (!this.data.strategy) this.data.strategy = 'Manual';
@@ -286,15 +288,49 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.zone.run(() => {
-        this.formGroup.patchValue({strategy: this.data.strategy}, {emitEvent: true, onlySelf: false});
+    this.zone.runOutsideAngular(() => {
+      setTimeout(() => {
+        this.zone.run(() => {
+          this.formGroup.patchValue({strategy: this.data.strategy}, {emitEvent: true, onlySelf: false});
+        })
+      }, 0);
+    });
+  }
+
+  fetchAiButtonDisabled = false;
+
+  @AvoidDoubleExecution()
+  onFetchAiClicked() {
+    this.fetchAiButtonDisabled = true;
+    this.multiRenameAiService
+      .convert({
+        files: this.rows.map(this.fileOperationParams2Url.bind(this)),
       })
-    }, 10);
+      .pipe(
+        takeWhile(() => this.alive),
+      )
+      .subscribe(res => {
+        console.info('res', res);
+
+        this.rows.forEach((r, i) => {
+          const url = this.fileOperationParams2Url(r);
+          if (res[url]) {
+            r.target.base = res[url];
+          }
+        });
+        this.tableApi?.setRows(this.rows);
+        this.tableApi?.repaint();
+
+        this.fetchAiButtonDisabled = false;
+        this.cdr.detectChanges();
+      });
   }
 
   private clone(r: FileItemIf): FileItemIf {
     return JSON.parse(JSON.stringify(r));
   }
 
+  private fileOperationParams2Url(r: QueueFileOperationParams): string {
+    return r.source.dir + '/' + r.source.base;
+  }
 }

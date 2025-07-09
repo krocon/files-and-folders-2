@@ -10,7 +10,7 @@ import {HttpClient} from "@angular/common/http";
 export class MultiRenameAiService {
 
   private static readonly config = {
-    convertUrl: "/api/convert"
+    convertUrl: "/api/convertnames"
   };
 
   constructor(

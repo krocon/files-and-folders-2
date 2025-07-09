@@ -29,6 +29,17 @@
             width: 100%;
         }
 
+        .row-0 {
+            display: flex;
+            gap: 36px;
+            align-items: center;
+
+            mat-spinner {
+                width: 36px;
+                height: 36px;
+            }
+        }
+
         .row-1 {
             display: grid;
             grid-template-columns: minmax(100px, 1fr) 280px 160px 160px 160px;

@@ -6,18 +6,19 @@ import {ConvertPara, ConvertResponseType} from "@fnf-data/src";
 import {MessageBody} from "@nestjs/websockets";
 
 
-@Controller('convert')
+@Controller()
 export class FilenameController {
 
   constructor(private readonly httpService: HttpService) {
   }
 
-  @Post()
+  @Post("convertnames")
   async convertFilenames(
     @MessageBody() para: ConvertPara
   ): Promise<ConvertResponseType> {
 
-    const {files} = para;
+    const files: string[] = para.files;
+    const fs = files.join('\n');
 
     if (!environment.openaiApiKey) {
       throw new Error('OpenAI API key is missing. Please set the FNF_OPENAI_API_KEY environment variable.');
@@ -39,11 +40,12 @@ Audiobook: AUTHOR - TITLE (yyyy).ext
 Game: ROM TITLE [REGION] (yyyy).ext
 Comics: TITLE ## (PUBLISHER) (YEAR).ext
 
-The output should be JSON in the form: [{"input": string, "title": string}].
+Your answer should be a valid (parsable) JSON in the form: {[key:string]: string}.
+(key is the input file, value is the new filename (BASE.EXT, without path).
 
 Input:
-${JSON.stringify(files)}
-`;
+
+` + fs;
 
     const headers = {
       'Content-Type': 'application/json',
@@ -65,8 +67,14 @@ ${JSON.stringify(files)}
         this.httpService.post(apiUrl, body, {headers}),
       );
 
-      const reply = response.data.choices?.[0]?.message?.content;
-      return JSON.parse(reply);
+      try {
+        const reply = response.data.choices?.[0]?.message?.content;
+        return JSON.parse(reply.replace(/Output:/g, '').trim());
+
+      } catch (e) {
+        console.error(e);
+        return {'error': e + ''};
+      }
 
     } catch (error) {
       if (error.response && error.response.status === 401) {
