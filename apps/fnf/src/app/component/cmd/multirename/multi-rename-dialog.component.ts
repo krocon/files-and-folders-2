@@ -1,4 +1,16 @@
-import {AfterViewInit, ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit} from "@angular/core";
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  Inject,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  QueryList,
+  Renderer2,
+  ViewChild,
+  ViewChildren
+} from "@angular/core";
 import {
   AbstractControl,
   FormArray,
@@ -82,16 +94,16 @@ import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-to
 })
 export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewInit {
 
+  private static readonly innerServiceMultiRenameData = new TypedDataService<MultiRenameData>("multiRenameData", new MultiRenameData());
+  @ViewChild(MatButtonToggleGroup) buttonToggleGroup?: MatButtonToggleGroup;
+  @ViewChildren(MatButtonToggle) buttonToggles?: QueryList<MatButtonToggle>;
   formGroup: FormGroup;
   source = "";
   data: MultiRenameData;
   options: MultiRenameOptions;
-
   tableModel?: TableModelIf;
   rows: QueueFileOperationParams[];
-
   private readonly rowHeight = 34;
-
   readonly tableOptions: TableOptionsIf = {
     ...new TableOptions(),
     hoverColumnVisible: false,
@@ -118,9 +130,6 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
   private tableApi: TableApi | undefined;
   private alive = true;
 
-  private static readonly innerServiceMultiRenameData = new TypedDataService<MultiRenameData>("multiRenameData", new MultiRenameData());
-
-
   constructor(
     public dialogRef: MatDialogRef<MultiRenameDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public multiRenameDialogData: MultiRenameDialogData,
@@ -130,13 +139,15 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
     private readonly multiRenameService: MultiRenameService,
     private readonly zone: NgZone,
     private readonly multiRenameAiService: MultiRenameAiService,
+    private readonly renderer: Renderer2,
   ) {
-    this.data = multiRenameDialogData.data  ? multiRenameDialogData.data : MultiRenameDialogComponent.innerServiceMultiRenameData.getValue();
+    this.data = multiRenameDialogData.data ? multiRenameDialogData.data : MultiRenameDialogComponent.innerServiceMultiRenameData.getValue();
+    if (!this.data.strategy) this.data.strategy = 'Manual';
     this.options = multiRenameDialogData.options;
 
     this.formGroup = this.formBuilder.group(
       {
-        strategy: new FormControl(this.data.strategy, []),
+        strategy: new FormControl('x', []),
         renameTemplate: new FormControl(this.data.renameTemplate, [Validators.required, Validators.minLength(1)]),
         capitalizeMode: new FormControl(this.data.capitalizeMode, []),
         counterStart: new FormControl(this.data.counterStart, []),
@@ -229,12 +240,6 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
 
   ngOnInit(): void {
     this.alive = true;
-
-    // Force change detection to ensure mat-button-toggle-group shows selection indicator
-    setTimeout(() => {
-      this.cdr.detectChanges();
-    }, 100);
-
     this.formGroup.valueChanges
       .pipe(
         takeWhile(() => this.alive),
@@ -250,7 +255,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   onOkClicked() {
-    if (this.multiRenameDialogData.data===null) {
+    if (this.multiRenameDialogData.data === null) {
       MultiRenameDialogComponent.innerServiceMultiRenameData.update(
         {...new MultiRenameData(), ...this.formGroup.getRawValue()}
       );
@@ -259,7 +264,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
     this.dialogRef.close(actionEvents);
   }
 
-  onResetClicked(){
+  onResetClicked() {
     this.data = new MultiRenameData();
     MultiRenameDialogComponent.innerServiceMultiRenameData.update(this.data);
     this.formGroup.reset(this.data);
@@ -276,23 +281,20 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
     this.tableApi = tableApi
   }
 
+  onMakroClicked(macro: Makro, index: number, replacementForm: AbstractControl<any>) {
+    replacementForm.setValue({...macro.data, checked: true});
+  }
+
   ngAfterViewInit(): void {
-    // Force change detection again after view initialization
     setTimeout(() => {
-      // Manually update the form control value to trigger change detection
-      const currentValue = this.formGroup.get('strategy')?.value;
-      this.formGroup.get('strategy')?.setValue(currentValue, {emitEvent: false});
-      this.cdr.detectChanges();
-    }, 200);
+      this.zone.run(() => {
+        this.formGroup.patchValue({strategy: this.data.strategy}, {emitEvent: true, onlySelf: false});
+      })
+    }, 10);
   }
 
   private clone(r: FileItemIf): FileItemIf {
     return JSON.parse(JSON.stringify(r));
   }
 
-
-
-  onMakroClicked(macro: Makro, index:number, replacementForm: AbstractControl<any>) {
-    replacementForm.setValue({...macro.data, checked:true});
-  }
 }
