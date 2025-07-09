@@ -4,11 +4,26 @@
 
 <mat-dialog-content>
 
-
   <form
       [formGroup]="formGroup"
       [class.replacements-checked]="!formGroup.get('replacementsChecked')?.value"
+      [class.ai-mode]="formGroup.get('strategy')?.value === 'AI'"
       autocomplete="off">
+
+    <div class="row-0">
+      <mat-button-toggle-group
+          [hideSingleSelectionIndicator]="false"
+          formControlName="strategy"
+          name="strategy"
+          aria-label="Strategy">
+        <mat-button-toggle
+            value="Manual">Manual
+        </mat-button-toggle>
+        <mat-button-toggle
+            value="AI">AI
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
 
     <div class="row-1">
       <mat-form-field>

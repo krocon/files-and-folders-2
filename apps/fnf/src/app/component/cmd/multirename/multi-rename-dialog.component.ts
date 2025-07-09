@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit} from "@angular/core";
+import {AfterViewInit, ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit} from "@angular/core";
 import {
   AbstractControl,
   FormArray,
@@ -50,6 +50,7 @@ import {Makro} from "./data/makro";
 import {MatDivider} from "@angular/material/divider";
 import {TypedDataService} from "../../../common/typed-data.service";
 import {MultiRenameAiService} from "./multi-rename-ai.service";
+import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-toggle";
 
 @Component({
   selector: "fnf-multi-rename-dialog",
@@ -74,10 +75,12 @@ import {MultiRenameAiService} from "./multi-rename-ai.service";
     MatMenuTrigger,
     MatSuffix,
     MatDivider,
+    MatButtonToggleGroup,
+    MatButtonToggle,
   ],
   styleUrls: ["./multi-rename-dialog.component.css"]
 })
-export class MultiRenameDialogComponent implements OnInit, OnDestroy {
+export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewInit {
 
   formGroup: FormGroup;
   source = "";
@@ -133,6 +136,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
 
     this.formGroup = this.formBuilder.group(
       {
+        strategy: new FormControl(this.data.strategy, []),
         renameTemplate: new FormControl(this.data.renameTemplate, [Validators.required, Validators.minLength(1)]),
         capitalizeMode: new FormControl(this.data.capitalizeMode, []),
         counterStart: new FormControl(this.data.counterStart, []),
@@ -225,6 +229,12 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.alive = true;
+
+    // Force change detection to ensure mat-button-toggle-group shows selection indicator
+    setTimeout(() => {
+      this.cdr.detectChanges();
+    }, 100);
+
     this.formGroup.valueChanges
       .pipe(
         takeWhile(() => this.alive),
@@ -264,6 +274,16 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
 
   onTableReady(tableApi: TableApi) {
     this.tableApi = tableApi
+  }
+
+  ngAfterViewInit(): void {
+    // Force change detection again after view initialization
+    setTimeout(() => {
+      // Manually update the form control value to trigger change detection
+      const currentValue = this.formGroup.get('strategy')?.value;
+      this.formGroup.get('strategy')?.setValue(currentValue, {emitEvent: false});
+      this.cdr.detectChanges();
+    }, 200);
   }
 
   private clone(r: FileItemIf): FileItemIf {

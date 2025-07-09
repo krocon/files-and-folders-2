@@ -7,13 +7,21 @@
     form {
         height: 100%;
         display: grid;
-        grid-template-rows: auto auto auto auto auto 1fr;
+        grid-template-rows: auto auto auto auto auto auto 1fr;
         grid-gap: 12px;
         align-items: start;
         align-content: start;
 
         &.replacements-checked {
-            grid-template-rows: auto auto auto auto 0 1fr;
+            grid-template-rows: auto auto auto auto auto 0 1fr;
+        }
+
+        &.ai-mode > div.row-1,
+        &.ai-mode > div.row-2,
+        &.ai-mode > div.row-3,
+        &.ai-mode > div.row-4,
+        &.ai-mode > div.row-5 {
+            display: none;
         }
 
         & > div {
