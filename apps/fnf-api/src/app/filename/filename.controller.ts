@@ -12,7 +12,6 @@ export class FilenameController {
 
   @Post()
   async convertFilenames(@Body('files') files: string[]) {
-    console.log('convertFilenames() oaik:', environment.openaiApiKey);
     if (!environment.openaiApiKey) {
       throw new Error('OpenAI API key is missing. Please set the FNF_OPENAI_API_KEY environment variable.');
     }
@@ -43,8 +42,10 @@ export class FilenameController {
 
       const reply = response.data.choices?.[0]?.message?.content;
       return JSON.parse(reply);
+
     } catch (error) {
       if (error.response && error.response.status === 401) {
+        console.error(error);
         throw new Error('Authentication failed with OpenAI API. Please check your API key.');
       }
       throw error;

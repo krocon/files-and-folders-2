@@ -1,5 +1,6 @@
 import {Module} from "@nestjs/common";
 import {ServeStaticModule} from "@nestjs/serve-static";
+import {ConfigModule as NestConfigModule} from "@nestjs/config";
 
 import {join} from "path";
 
@@ -30,6 +31,10 @@ const config = new Config(
 
 @Module({
   imports: [
+    NestConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env', 'apps/fnf-api/.env'],
+    }),
     SysinfoModule,
     ConfigModule.forRoot(
       config
