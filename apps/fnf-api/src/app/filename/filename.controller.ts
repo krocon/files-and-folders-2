@@ -1,6 +1,8 @@
 import {Body, Controller, Post} from '@nestjs/common';
 import {firstValueFrom} from 'rxjs';
 import {HttpService} from "@nestjs/axios";
+import {environment} from "../../environments/environment";
+
 
 @Controller('convert')
 export class FilenameController {
@@ -16,7 +18,7 @@ export class FilenameController {
 
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer YOUR_OPENAI_API_KEY`,
+      'Authorization': `Bearer ${environment.openaiApiKey}`,
     };
 
     const body = {

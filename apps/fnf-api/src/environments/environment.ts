@@ -1,11 +1,13 @@
 const frontendPort = process.env.frontendPort ? Number(process.env.frontendPort) : 4201;
 const websocketPort = process.env.websocketPort ? Number(process.env.websocketPort) : 3334;
+const openaiApiKey = process.env.FNF_OPENAI_API_KEY || 'YOUR_OPENAI_API_KEY';
 
 export const environment = {
   production: false,
 
   frontendPort,
   websocketPort,
+  openaiApiKey,
   websocketOptions: {
     cors: {
       origin: [

@@ -1,8 +1,10 @@
-### readdir test
+### convert file names test
 POST http://localhost:3333/api/convert
 Content-Type: application/json
 
-[
-  "/Users/marckronberg/Filme.nosync/Karate Kid Legends (2025)/Karate.Kid.Legends.2025.German.DL.1080p.WEB.x264-WvF/karate.kid.legends.2025.german.dl.1080p.web.x264-wvf.mkv",
-  "/Users/marckronberg/Filme.nosync/The Giant Behemoth (1959)/The.Giant.Behemoth.1959.GERMAN.1080p.WEB.H264-WRO/Sample/wro-the.giant.behemoth.1959.german.1080p.web.h264-sample.mkv"
-]
+{
+  "files": [
+    "/Users/abc/Filme.nosync/Karate Kid Legends (2025)/Karate.Kid.Legends.2025.German.DL.1080p.WEB.x264-WvF/karate.kid.legends.2025.german.dl.1080p.web.x264-wvf.mkv",
+    "/Users/abc/Filme.nosync/The Giant Behemoth (1959)/The.Giant.Behemoth.1959.GERMAN.1080p.WEB.H264-WRO/Sample/wro-the.giant.behemoth.1959.german.1080p.web.h264-sample.mkv"
+  ]
+}
