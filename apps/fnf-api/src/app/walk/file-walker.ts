@@ -57,7 +57,7 @@ export class FileWalker {
       const entries = fs.readdirSync(item.dir, {withFileTypes: true});
       this.addNewFilesToProcess(entries, item.dir);
     } catch (e) {
-      console.warn('Error reading directory: ' + item.dir, e);
+      console.warn('Error reading directory: ' + item.dir);
     }
   }
 

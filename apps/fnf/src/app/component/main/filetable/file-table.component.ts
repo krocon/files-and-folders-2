@@ -157,8 +157,10 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
   ];
   public readonly bodyAreaModel = new FileTableBodyModel(
     this.columnDefs,
-    this.rowHeight
+    this.rowHeight,
+    this.onFocusChanged.bind(this)
   );
+
   private readonly selectionManager = new SelectionManagerForObjectModels<FileItemIf>(
     this.bodyAreaModel,
     {
@@ -627,7 +629,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.focusLocalStorage.persistFocusCriteria(this.panelIndex, dir, partial);
     this.tableApi?.repaint();
-    this.scrollToFocus();
+    //this.scrollToFocus();
 
     const selectedRows = this.selectionManager.getSelectionValue();
     this.calcButtonStates(selectedRows);
@@ -782,7 +784,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
       this.tableApi.removeRows(dirEvent.items, equalFileItem);
       this.bodyAreaModel.setFocusedRowIndex(Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.getFocusedRowIndex()));
-      this.scrollToFocus();
+      //this.scrollToFocus();
       this.repaintTable();
       this.selectionManager.updateSelection();
 
@@ -836,7 +838,6 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     this.bodyAreaModel.getAllRows().sort(fileItemSorter)
     this.repaintTable();
     this.selectionManager.updateSelection();
-    this.scrollToFocus();
   }
 
 
@@ -942,11 +943,14 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       ;
   }
 
-  private scrollToFocus() {
-    if (this.tableApi) {
-      this.tableApi.ensureRowIsVisible(this.bodyAreaModel.getFocusedRowIndex());
-      console.info('ensureRowIsVisible()', this.bodyAreaModel.getFocusedRowIndex());
-    }
+  // private scrollToFocus() {
+  //   if (this.tableApi) {
+  //     this.tableApi.ensureRowIsVisible(this.bodyAreaModel.getFocusedRowIndex());
+  //   }
+  // }
+
+  private onFocusChanged(focusRowIndex: number) {
+    this.tableApi?.ensureRowIsVisible(focusRowIndex);
   }
 
 }

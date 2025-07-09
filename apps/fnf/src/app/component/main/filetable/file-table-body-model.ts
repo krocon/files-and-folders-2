@@ -4,7 +4,11 @@ import {FileItemIf} from "@fnf/fnf-data";
 export class FileTableBodyModel extends AreaModelObjectArrayWithColumndefs<FileItemIf> {
 
 
-  constructor(columnDefs: ColumnDefIf[], defaultRowHeight: number = 34) {
+  constructor(
+    columnDefs: ColumnDefIf[],
+    defaultRowHeight: number = 34,
+    private onFocusChanged: (focusRowIndex: number) => void = (focusRowIndex: number) => console.log
+  ) {
     super("body", [], columnDefs, defaultRowHeight);
   }
 
@@ -57,6 +61,11 @@ export class FileTableBodyModel extends AreaModelObjectArrayWithColumndefs<FileI
         this.setFocusedRowIndex(filteredRows.length - 1);
       }
     }
+  }
+
+  public override setFocusedRowIndex(value: number) {
+    super.setFocusedRowIndex(value);
+    this.onFocusChanged(value);
   }
 
 }

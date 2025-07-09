@@ -110,7 +110,7 @@ export class VolumeGateway {
           });
       }
     } catch (error) {
-      console.error(`Error reading ${userMediaPath}:`, error);
+      console.warn(`Error reading ${userMediaPath}`);
     }
 
     // Check general media directory
@@ -124,7 +124,7 @@ export class VolumeGateway {
           });
       }
     } catch (error) {
-      console.error('Error reading /media:', error);
+      console.warn('Error reading /media');
     }
 
     // Check mnt directory
@@ -138,7 +138,7 @@ export class VolumeGateway {
           });
       }
     } catch (error) {
-      console.error('Error reading /mnt:', error);
+      console.warn('Error reading /mnt');
     }
 
     return Array.from(volumes);
