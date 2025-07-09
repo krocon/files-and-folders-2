@@ -62,6 +62,7 @@ import {ChangeDirDialogData} from "./component/cmd/changedir/data/change-dir-dia
 import {map} from "rxjs/operators";
 import {TabsPanelData} from "./domain/filepagedata/data/tabs-panel.data";
 import {WalkCallback, WalkSocketService} from "./service/walk.socketio.service";
+import {MultiRenameAiService} from "./component/cmd/multirename/multi-rename-ai.service";
 
 
 @Injectable({
@@ -121,6 +122,7 @@ export class AppService {
     private readonly groupFilesDialogService: GroupFilesDialogService,
     private readonly changeDirDialogService: ChangeDirDialogService,
     private readonly walkSocketService: WalkSocketService,
+    private readonly multiRenameAiService: MultiRenameAiService,
   ) {
     // Set config to services:
     ConfigService.forRoot(environment.config);

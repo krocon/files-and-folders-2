@@ -49,6 +49,7 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {Makro} from "./data/makro";
 import {MatDivider} from "@angular/material/divider";
 import {TypedDataService} from "../../../common/typed-data.service";
+import {MultiRenameAiService} from "./multi-rename-ai.service";
 
 @Component({
   selector: "fnf-multi-rename-dialog",
@@ -125,10 +126,10 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy {
     private readonly cdr: ChangeDetectorRef,
     private readonly multiRenameService: MultiRenameService,
     private readonly zone: NgZone,
+    private readonly multiRenameAiService: MultiRenameAiService,
   ) {
     this.data = multiRenameDialogData.data  ? multiRenameDialogData.data : MultiRenameDialogComponent.innerServiceMultiRenameData.getValue();
     this.options = multiRenameDialogData.options;
-
 
     this.formGroup = this.formBuilder.group(
       {

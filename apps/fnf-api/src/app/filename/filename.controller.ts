@@ -1,7 +1,9 @@
-import {Body, Controller, Post} from '@nestjs/common';
+import {Controller, Post} from '@nestjs/common';
 import {firstValueFrom} from 'rxjs';
 import {HttpService} from "@nestjs/axios";
 import {environment} from "../../environments/environment";
+import {ConvertPara, ConvertResponseType} from "@fnf-data/src";
+import {MessageBody} from "@nestjs/websockets";
 
 
 @Controller('convert')
@@ -11,14 +13,37 @@ export class FilenameController {
   }
 
   @Post()
-  async convertFilenames(@Body('files') files: string[]) {
+  async convertFilenames(
+    @MessageBody() para: ConvertPara
+  ): Promise<ConvertResponseType> {
+
+    const {files} = para;
+
     if (!environment.openaiApiKey) {
       throw new Error('OpenAI API key is missing. Please set the FNF_OPENAI_API_KEY environment variable.');
     }
 
-    const apiUrl = 'https://api.openai.com/v1/chat/completions'; // Beispiel: OpenAI Chat API
+    const apiUrl = 'https://api.openai.com/v1/chat/completions';
 
-    const prompt = `Ich habe eine Liste von Filenamen. Bitte erstelle mir für jedes File einen Dateinamen in der Form "TITLE (yyyy).EXT". Die Files sind Video-Dateien von bekannten Filmen. Die Ausgabe sollte JSON sein.\nInput : ${JSON.stringify(files)}`;
+    const prompt = `I have a list of filenames. 
+Please create a new filename for each file.
+The files are well-known movies, books, music, ...
+
+Try to use these pattern:
+Movie: TITLE (yyyy).ext
+Music: ARTIST - TITLE. ext or Album ARTIST - ALBUM (yyyy) /TRACK - TITLE.ext
+Book: AUTHOR - TITLE (yyyy).ext
+TV Show: SHOWNAME - SxxEyy - TITLE.ext
+Podcast: PODCASTNAME - Ep### - TITLE.ext
+Audiobook: AUTHOR - TITLE (yyyy).ext
+Game: ROM TITLE [REGION] (yyyy).ext
+Comics: TITLE ## (PUBLISHER) (YEAR).ext
+
+The output should be JSON in the form: [{"input": string, "title": string}].
+
+Input:
+${JSON.stringify(files)}
+`;
 
     const headers = {
       'Content-Type': 'application/json',

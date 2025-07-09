@@ -37,6 +37,9 @@ export * from './models/file/fix-path.fn';
 export * from './models/file/on-do-response-type';
 export * from './models/file/panel-index';
 
+export * from './models/filename/convert-response.if';
+export * from './models/filename/convert-para.if';
+
 export * from './models/filetype/filetype-extensions.if';
 
 export * from './models/find/find-dialog.data';

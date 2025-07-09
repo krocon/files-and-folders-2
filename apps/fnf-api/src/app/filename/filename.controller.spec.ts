@@ -50,7 +50,7 @@ describe('FilenameController', () => {
   });
 
   it('should return renamed filenames as JSON', async () => {
-    const result = await controller.convertFilenames(input);
+    const result = await controller.convertFilenames({files: input});
 
     expect(result).toEqual({
       [input[0]]: "Karate Kid Legends (2025).mkv",

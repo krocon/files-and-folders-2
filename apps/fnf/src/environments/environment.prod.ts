@@ -17,6 +17,9 @@ export const environment = {
     defaultRoot: "/",
     fileWatcher: false
   },
+  multiRename: {
+    convertUrl: "/api/convert"
+  },
   lookAndFeel: {
     getLookAndFeelUrl: "assets/config/color/%theme%.json"
   },
