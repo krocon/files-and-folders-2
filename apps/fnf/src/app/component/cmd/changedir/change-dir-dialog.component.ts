@@ -31,7 +31,6 @@ import {ChangeDirEvent} from "../../../service/change-dir-event";
 import {MatFormField, MatInput, MatLabel} from "@angular/material/input";
 import {debounceTime, distinctUntilChanged, Subject} from "rxjs";
 import {MatSlider, MatSliderThumb} from "@angular/material/slider";
-import {getAllParents} from "../../../common/fn/get-all-parents.fn";
 
 
 @Component({
@@ -95,7 +94,6 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
 
   private filterTextChanged = new Subject<string>();
 
-  private allParents: string[] = [];
   private readonly INDENTATION_SPACE = ' ';
   private readonly INDENTATION_MULTIPLIER = 3;
 
@@ -124,7 +122,6 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
       columnDefs,
       tableOptions: this.tableOptions,
     });
-    this.allParents = getAllParents(this.changeDirDialogData.sourceDir);
   }
 
   ngOnDestroy(): void {
@@ -151,7 +148,7 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
     if (this.tableApi) {
       const row = this.tableApi.getBodyModel().getRowByIndex(evt.rowIndex);
       if (row) {
-        const path = this.changeDirDialogData.sourceDir + (row.path ?? '');
+        const path = (row.path ?? '');
         this.dialogRef.close(
           new ChangeDirEvent(this.changeDirDialogData.sourcePanelIndex, path)
         );

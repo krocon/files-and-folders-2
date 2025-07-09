@@ -27,7 +27,6 @@ import {ActionShortcutPipe} from "../../../../common/action-shortcut.pipe";
 import {takeWhile} from "rxjs/operators";
 import {MatDivider} from "@angular/material/divider";
 import {FnfAutofocusDirective} from "../../../../common/directive/fnf-autofocus.directive";
-import {NotifyService} from "../../../../service/cmd/notify-service";
 
 @Component({
   selector: 'app-tabpanel',
@@ -63,14 +62,14 @@ export class TabpanelComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   @Output() readonly dataChanged = new EventEmitter<TabsPanelData>();
-  // @Output() readonly filterChanged = new EventEmitter<TabsPanelData>();
+
   filterVisible: boolean = false;
   @ViewChild('favMenu') private readonly favMenu!: FavsAndLatestComponent;
   @ViewChild(MatTabGroup) private tabGroup!: MatTabGroup;
 
   private readonly appService = inject(AppService);
   private readonly ngZone = inject(NgZone);
-  // private readonly injector = inject(Injector);
+
   private alive = true;
   private resizeObserver: ResizeObserver | null = null;
 
@@ -85,11 +84,6 @@ export class TabpanelComponent implements OnInit, OnDestroy, AfterViewInit {
     this._tabsPanelData = value;
   }
 
-
-  constructor(
-    private readonly eventService: NotifyService
-  ) {
-  }
 
   ngOnInit(): void {
     this.appService
@@ -134,46 +128,6 @@ export class TabpanelComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  /**
-   * Ensures that the active tab is visible in the viewport
-   * This is called after resizing, adding tabs, or changing the selected tab
-   */
-  private ensureActiveTabVisible(): void {
-    if (!this.tabGroup || !this.tabsPanelData) {
-      return;
-    }
-
-    // Use setTimeout to ensure this runs after the view has been updated
-    setTimeout(() => {
-      // Find the tab header element
-      const tabHeader = this.tabGroup._elementRef.nativeElement.querySelector('.mat-mdc-tab-header');
-      if (!tabHeader) return;
-
-      // Find the active tab
-      const activeTabIndex = this.tabsPanelData?.selectedTabIndex || 0;
-      const tabLabels = tabHeader.querySelectorAll('.mat-mdc-tab');
-      if (!tabLabels || activeTabIndex >= tabLabels.length) return;
-
-      const activeTab = tabLabels[activeTabIndex];
-      if (!activeTab) return;
-
-      // Check if the active tab is fully visible
-      const tabHeaderRect = tabHeader.getBoundingClientRect();
-      const activeTabRect = activeTab.getBoundingClientRect();
-
-      // If the active tab is not fully visible, scroll to it
-      if (activeTabRect.left < tabHeaderRect.left || activeTabRect.right > tabHeaderRect.right) {
-        // Use the Material tabs scrollTo method if available
-        if (this.tabGroup._tabHeader && typeof this.tabGroup._tabHeader._scrollToLabel === 'function') {
-          this.tabGroup._tabHeader._scrollToLabel(activeTabIndex);
-        } else {
-          // Fallback: manually scroll the tab into view
-          activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
-        }
-      }
-    });
-  }
-
   onSelectedIndexChanged(n: number) {
     if (this.tabsPanelData && n > -1) {
       this.tabsPanelData!.selectedTabIndex = n;
@@ -182,7 +136,6 @@ export class TabpanelComponent implements OnInit, OnDestroy, AfterViewInit {
       this.ensureActiveTabVisible();
     }
   }
-
 
   onAddTabClicked($event: MouseEvent) {
     if (this.tabsPanelData) {
@@ -267,6 +220,11 @@ export class TabpanelComponent implements OnInit, OnDestroy, AfterViewInit {
     matMenuTrigger.openMenu();
   }
 
+  onLongPress(i: number, evt: MouseEvent | TouchEvent, matMenuTrigger: MatMenuTrigger) {
+    evt.preventDefault();
+    matMenuTrigger.openMenu();
+  }
+
   onTabCloseClicked(i: number) {
     if (this.tabsPanelData) {
       if (this.tabsPanelData.tabs.length > 1) {
@@ -321,6 +279,50 @@ export class TabpanelComponent implements OnInit, OnDestroy, AfterViewInit {
     this.appService.addTab(targetPanelIndex, clone);
     this.onTabCloseClicked(i);
     // Note: onTabCloseClicked already calls ensureActiveTabVisible
+  }
+
+  onHistoryClicked(dir: string) {
+    this.appService.onChangeDir(dir, this.panelIndex)
+  }
+
+  /**
+   * Ensures that the active tab is visible in the viewport
+   * This is called after resizing, adding tabs, or changing the selected tab
+   */
+  private ensureActiveTabVisible(): void {
+    if (!this.tabGroup || !this.tabsPanelData) {
+      return;
+    }
+
+    // Use setTimeout to ensure this runs after the view has been updated
+    setTimeout(() => {
+      // Find the tab header element
+      const tabHeader = this.tabGroup._elementRef.nativeElement.querySelector('.mat-mdc-tab-header');
+      if (!tabHeader) return;
+
+      // Find the active tab
+      const activeTabIndex = this.tabsPanelData?.selectedTabIndex || 0;
+      const tabLabels = tabHeader.querySelectorAll('.mat-mdc-tab');
+      if (!tabLabels || activeTabIndex >= tabLabels.length) return;
+
+      const activeTab = tabLabels[activeTabIndex];
+      if (!activeTab) return;
+
+      // Check if the active tab is fully visible
+      const tabHeaderRect = tabHeader.getBoundingClientRect();
+      const activeTabRect = activeTab.getBoundingClientRect();
+
+      // If the active tab is not fully visible, scroll to it
+      if (activeTabRect.left < tabHeaderRect.left || activeTabRect.right > tabHeaderRect.right) {
+        // Use the Material tabs scrollTo method if available
+        if (this.tabGroup._tabHeader && typeof this.tabGroup._tabHeader._scrollToLabel === 'function') {
+          this.tabGroup._tabHeader._scrollToLabel(activeTabIndex);
+        } else {
+          // Fallback: manually scroll the tab into view
+          activeTab.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'nearest'});
+        }
+      }
+    });
   }
 
   private clone<T>(o: T): T {

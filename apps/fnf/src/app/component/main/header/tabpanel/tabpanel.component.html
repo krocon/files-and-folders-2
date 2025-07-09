@@ -77,11 +77,31 @@
               </button>
 
             </mat-menu>
+
+            <button
+                matIconButton
+                style="width: 0;overflow: clip;margin: 0;padding: 0;"
+                #matMenuTrigger2="matMenuTrigger"
+                [matMenuTriggerFor]="menu2"></button>
+
+            <mat-menu #menu2="matMenu">
+              @for (dir of tab.history; track dir; let j = $index) {
+                <button
+                    (click)="onHistoryClicked(dir)"
+                    mat-menu-item>
+                  <mat-icon>arrow_forward</mat-icon>
+                  <span>{{ dir }}</span>
+                </button>
+              }
+            </mat-menu>
+
+
             <app-tab
                 (click)="onTabClicked(i, $event, matMenuTrigger)"
                 (dblclick)="onTabDblClicked(i)"
                 (pointerdown)="onTabPointerDown(i, $event, matMenuTrigger)"
                 (contextmenu)="onTabContextMenu(i, $event, matMenuTrigger)"
+                (onLongPress)="onLongPress(i, $event, matMenuTrigger2)"
                 [activeAndSelected]="selected && i === tabsPanelData.selectedTabIndex"
                 [class.active]="i === tabsPanelData.selectedTabIndex"
                 [panelIndex]="panelIndex"

@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {FileItemIf, PanelIndex} from "@fnf/fnf-data";
 import {TabData} from "../../../../../domain/filepagedata/data/tab.data";
 import {CommonModule} from "@angular/common";
@@ -23,12 +23,13 @@ export class TabComponent {
 
   fileItems: Array<FileItemIf> = [];
   fileItem: FileItemIf | undefined = undefined;
-  tabfind:boolean = false;
+  tabfind: boolean = false;
   pattern: string = '';
 
   @Input() panelIndex: PanelIndex = 0;
-  // @Input() tabsPanelData?: TabsPanelData;
   @Input() activeAndSelected: boolean = false;
+
+  @Output() onLongPress = new EventEmitter<MouseEvent | TouchEvent>();
 
 
   private _tab?: TabData;
@@ -37,25 +38,21 @@ export class TabComponent {
     return this._tab;
   }
 
-  @Input() set tab(value: TabData) {
-    this._tab = value;
-    this.fileItems = path2FileItems(value.path);
+  @Input() set tab(tabData: TabData) {
+    this._tab = tabData;
+    this.fileItems = path2FileItems(tabData.path);
     this.fileItem = this.fileItems[this.fileItems.length - 1];
-    this.tabfind = this.fileItem.base.startsWith('tabfind');
-    this.pattern = value.findData?.findDialogData?.pattern ?? '';
+    this.tabfind = this.fileItem?.base.startsWith('tabfind') ?? false;
+    this.pattern = tabData.findData?.findDialogData?.pattern ?? '';
   }
 
 
-  getLabel(fi: FileItemIf) {
-    if (this.tabfind) {
-      return fi.base.replace('tabfind', 'F');
-    }
-    return fi.base;
+  onLongPressFindTab(evt: MouseEvent | TouchEvent) {
+    this.onLongPress.next(evt);
   }
 
-  onLongPress(evt: MouseEvent | TouchEvent) {
-    // TODO longpress
-    console.info(' TODO onLongPress', evt);
+  onLongPressNormalTab(evt: MouseEvent | TouchEvent) {
+    this.onLongPress.next(evt);
   }
 
   shortenLabel(base: string) {

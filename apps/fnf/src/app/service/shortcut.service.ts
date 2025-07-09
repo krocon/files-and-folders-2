@@ -45,7 +45,7 @@ export class ShortcutService {
 
   createHarmonizedShortcutByKeyboardEvent(keyboardEvent: KeyboardEvent): string {
     return createHarmonizedShortcutByKeyboardEvent(keyboardEvent)
-      .split(' ') // TODO following block  can be deleted later
+      .split(' ')
       .filter(s => s)
       .filter((s, i, arr) => arr.indexOf(s) === i)
       .join(' ');

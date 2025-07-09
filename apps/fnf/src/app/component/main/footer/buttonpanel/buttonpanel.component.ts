@@ -89,15 +89,6 @@ export class ButtonPanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.notifyService
-    //   .valueChanges()
-    //   .subscribe(
-    //     (evt: QueueNotifyEventIf) => {
-    //       //V TODO show status on button
-    //       console.info('TODO NotifyEventIf', evt);
-    //       console.info(this.actionQueueService.getQueues());
-    //     }
-    //   );
     this.tools = this.appService.getDefaultTools();
   }
 

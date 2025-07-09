@@ -69,6 +69,8 @@ import {WalkCallback, WalkSocketService} from "./service/walk.socketio.service";
 })
 export class AppService {
 
+  private MAX_HISTORY_LENGTH = 15;
+
   @Output() public onKeyUp$ = new Subject<KeyboardEvent>();
   @Output() public onKeyDown$ = new Subject<KeyboardEvent>();
 
@@ -477,7 +479,6 @@ export class AppService {
           if (target) {
             const paras: QueueFileOperationParams[] = this.createFileOperationParams(target);
             const actionEvents = paras.map(item => this.commandService.createQueueActionEventForMove(item));
-            console.info('move actionEvents', actionEvents); // TODO 123
             this.commandService.addActions(actionEvents);
           }
         }
@@ -570,7 +571,7 @@ export class AppService {
       tabData.path = checkedPath;
       tabData.findData = undefined;
 
-      if (ChangeDirEventService.skipNextHistoryChange) {
+      if (!ChangeDirEventService.skipNextHistoryChange) {
         ChangeDirEventService.skipNextHistoryChange = false;
 
         // add checkedPath on top:
@@ -578,8 +579,8 @@ export class AppService {
         // remove double items:
         tabData.history = tabData.history.filter((his, i, arr) => arr.indexOf(his) === i);
         // max count = 10:
-        if (tabData.history.length > 10) {
-          tabData.history.length = 10;
+        if (tabData.history.length > this.MAX_HISTORY_LENGTH) {
+          tabData.history.length = this.MAX_HISTORY_LENGTH;
         }
         this.addLatest(checkedPath);
       }
@@ -869,7 +870,6 @@ export class AppService {
       this.groupFilesDialogService
         .open(data, (arr: QueueActionEvent[] | undefined) => {
           if (arr) {
-            console.info('groupFiles ActionEvents:', arr); // TODO del
             this.commandService.addActions(arr);
           }
         });

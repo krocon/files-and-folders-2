@@ -157,14 +157,7 @@ export class ActionQueueService {
                   type: action.action,
                   data: res
                 });
-
-                // next action:
                 this.next(queue);
-                // just a test for ui TODO !!!!!!!!!!
-                // setTimeout(()=>{
-                //   this.next(queue);
-                // }, 1000* 5);
-
                 this.triggerJobQueueTableUpdate();
               },
               error: (err) => {
