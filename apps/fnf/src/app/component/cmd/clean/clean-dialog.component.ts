@@ -1,5 +1,13 @@
 import {Component, Inject, OnInit} from "@angular/core";
-import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {
+  AbstractControl,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators
+} from "@angular/forms";
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -62,11 +70,35 @@ export class CleanDialogComponent implements OnInit {
             data.pattern,
             {
               validators: [
-
+                (control: AbstractControl): ValidationErrors | null => {
+                  if (
+                    control.get('deleteEmptyFolders')?.value.trim() === ''
+                    && control.get('deleteEmptyFolders')?.value === false
+                  ) {
+                    return {
+                      "mandatory": "You need a delete-pattern or delete empty folders to be checked"
+                    };
+                  }
+                  return null;
+                },
               ]
             }),
-          //directoriesOnly: new FormControl(data.directoriesOnly, {}),
-          deleteEmptyFolders: new FormControl(data.deleteEmptyFolders, {})
+
+          deleteEmptyFolders: new FormControl(data.deleteEmptyFolders, {
+            validators: [
+              (control: AbstractControl): ValidationErrors | null => {
+                if (
+                  control.get('deleteEmptyFolders')?.value.trim() === ''
+                  && control.get('deleteEmptyFolders')?.value === false
+                ) {
+                  return {
+                    "mandatory": "You need a delete-pattern or delete empty folders to be checked"
+                  };
+                }
+                return null;
+              },
+            ]
+          })
         }
       );
   }
