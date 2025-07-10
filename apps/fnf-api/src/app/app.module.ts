@@ -21,6 +21,7 @@ import {CmdModule} from "./cmd/cmd.module";
 import {VolumeModule} from "./volumes/volume.module";
 import {FilenameModule} from "./filename/filename.module";
 import {CheckGlobModule} from "./checkglob/checkglob.module";
+import {CleanModule} from "./clean/clean.module";
 
 const config = new Config(
   process.env.FNF_INCOMPATIBLE_PATHS ? process.env.FNF_INCOMPATIBLE_PATHS.split(",") : [],
@@ -60,7 +61,8 @@ const config = new Config(
       rootPath: join(__dirname, "..", "fnf")
     }),
     FilenameModule,
-    CheckGlobModule
+    CheckGlobModule,
+    CleanModule
   ],
   controllers: [
     AppController
