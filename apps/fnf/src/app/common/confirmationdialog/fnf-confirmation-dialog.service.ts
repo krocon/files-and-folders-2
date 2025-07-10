@@ -10,6 +10,8 @@ import {ButtonData} from "./data/button.data";
   providedIn: "root"
 })
 export class FnfConfirmationDialogService {
+
+
   constructor(public dialog: MatDialog) {
   }
 
@@ -25,8 +27,8 @@ export class FnfConfirmationDialogService {
   }
 
   public showError(phrases: Array<string>): Observable<FnfConfirmationDialogComponent> {
-    const title = "Fehler";
-    const buttons: Array<ButtonData> = [new ButtonData("CANCEL", "Schliessen", "warn")];
+    const title = "Error";
+    const buttons: Array<ButtonData> = [new ButtonData("CANCEL", "Close", "warn")];
     const data: ConfirmationData = new ConfirmationData(title, phrases, buttons);
     data.cssClass = "fnf-color-red-1";
     return this.dialog
@@ -40,8 +42,8 @@ export class FnfConfirmationDialogService {
   }
 
   public showInfo(phrases: Array<string>): Observable<FnfConfirmationDialogComponent> {
-    const title = "Hinweis";
-    const buttons: Array<ButtonData> = [new ButtonData("CANCEL", "Schliessen", "warn")];
+    const title = "Info";
+    const buttons: Array<ButtonData> = [new ButtonData("CANCEL", "Close", "warn")];
     const data: ConfirmationData = new ConfirmationData(title, phrases, buttons);
 
     return this.dialog

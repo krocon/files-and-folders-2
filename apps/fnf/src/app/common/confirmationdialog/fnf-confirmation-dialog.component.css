@@ -26,3 +26,29 @@ div.buttons-horizontal-div {
 ::ng-deep .mat-form-field-infix {
     width: 100%;
 }
+
+.confirm-dialog-div {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-gap: 12px;
+    overflow: clip;
+}
+
+.fnf-dialog-title.mat-mdc-dialog-title {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    padding-left: 12px;
+}
+
+.mat-mdc-dialog-content {
+    overflow-y: auto;
+    margin-bottom: 0;
+}
+
+.buttons-horizontal-div {
+    display: flex;
+    padding: 12px 16px;
+    justify-content: flex-end;
+}
+

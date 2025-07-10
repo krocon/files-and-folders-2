@@ -45,7 +45,9 @@
 
       <div>
         @if (!hasOpenAiApiKey) {
-          <span>Open AI API key is not installed properly.</span>
+          <span>Your OpenAI API key is not installed properly (<a
+              href="javascript:void(0)"
+              (click)="openInfo()">More Information</a>).</span>
         }
       </div>
 

@@ -64,6 +64,7 @@ import {TypedDataService} from "../../../common/typed-data.service";
 import {MultiRenameAiService} from "./multi-rename-ai.service";
 import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-toggle";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {FnfConfirmationDialogService} from "../../../common/confirmationdialog/fnf-confirmation-dialog.service";
 
 @Component({
   selector: "fnf-multi-rename-dialog",
@@ -108,6 +109,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
   public hasOpenAiApiKey: boolean = false;
   fetchAiButtonDisabled = false;
   private readonly rowHeight = 34;
+
   readonly tableOptions: TableOptionsIf = {
     ...new TableOptions(),
     hoverColumnVisible: false,
@@ -143,6 +145,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
     private readonly multiRenameService: MultiRenameService,
     private readonly zone: NgZone,
     private readonly multiRenameAiService: MultiRenameAiService,
+    private readonly confirmationDialogService: FnfConfirmationDialogService,
   ) {
     this.data = multiRenameDialogData.data ? multiRenameDialogData.data : MultiRenameDialogComponent.innerServiceMultiRenameData.getValue();
     if (!this.data.strategy) this.data.strategy = 'Manual';
@@ -296,6 +299,14 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
 
   onMakroClicked(macro: Makro, index: number, replacementForm: AbstractControl<any>) {
     replacementForm.setValue({...macro.data, checked: true});
+  }
+
+  openInfo() {
+    this.confirmationDialogService.showInfo([
+      "To run the AI mode, you'll need an OpenAI account and associated API key (https://platform.openai.com/signup). ",
+      "Set an environment variable called `FNF_OPENAI_API_KEY` with your API key.",
+      "Alternatively you can create an `.env` file at the root of this app containing `FNF_OPENAI_API_KEY=<your API key>`, which will be picked up by nestjs."
+    ]);
   }
 
   ngAfterViewInit(): void {

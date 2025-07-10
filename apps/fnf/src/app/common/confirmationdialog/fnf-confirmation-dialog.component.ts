@@ -7,6 +7,7 @@ import {CommonModule} from "@angular/common";
 import {MatFormField, MatInput} from "@angular/material/input";
 import {FormsModule} from "@angular/forms";
 import {MatCheckbox} from "@angular/material/checkbox";
+import {MatIcon} from "@angular/material/icon";
 
 @Component({
   selector: "confirmationdialog",
@@ -21,7 +22,8 @@ import {MatCheckbox} from "@angular/material/checkbox";
     MatDialogContent,
     MatFormField,
     FormsModule,
-    MatCheckbox
+    MatCheckbox,
+    MatIcon
   ],
   styleUrls: ["./fnf-confirmation-dialog.component.css"]
 })

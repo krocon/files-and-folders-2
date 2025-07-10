@@ -1,15 +1,18 @@
 <div
     [className]="data.cssClass"
     data-test-id="confirm-dialog-div">
+
   @if (data && data.title) {
-    <div mat-dialog-title>
+    <div
+        mat-dialog-title
+        class="fnf-dialog-title">
+      <h4>{{ data.title }}</h4>
       <button
           (click)="onCloseClicked()"
           class="fnf-float-right"
           mat-icon-button>
-        &#x2716;
+        <mat-icon>close</mat-icon>
       </button>
-      <h4>{{ data.title }}</h4>
     </div>
   }
 

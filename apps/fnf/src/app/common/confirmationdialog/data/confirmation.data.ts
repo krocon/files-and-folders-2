@@ -8,7 +8,7 @@ export class ConfirmationData {
     public title: string,
     public phrases: Array<string>,
     public buttons: Array<ButtonData>,
-    public width = "500px",
+    public width = "600px",
     public height = "",
     public vertical = false,
     public inputs: InputData[] = [],
