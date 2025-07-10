@@ -11,6 +11,10 @@
     width: 100%;
 }
 
+.mat-mdc-checkbox {
+    margin-top: 24px;
+}
+
 .mat-mdc-dialog-actions {
 
     display: grid;

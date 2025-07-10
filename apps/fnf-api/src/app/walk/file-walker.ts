@@ -25,6 +25,7 @@ export class FileWalker {
         const stats = fs.statSync(f);
         return new FileItem(f, '', '', '', stats?.size ?? 0, stats.isDirectory());
       });
+
     this.files = [...initialFiles];
     this.STEPS_PER_MESSAGE = walkParaData.stepsPerMessage;
 
@@ -55,7 +56,9 @@ export class FileWalker {
   }
 
   private processDirectory(item: FileItemIf): void {
-    this.walkData.folderCount++;
+    if (this.matchesPattern(item)) {
+      this.walkData.folderCount++;
+    }
 
     if (this.shouldEmitProgress()) {
       this.emitWithDelay(this.walkParaData.emmitDataKey, this.walkData, () => this.processNextFile());

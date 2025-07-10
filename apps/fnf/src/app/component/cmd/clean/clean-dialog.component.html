@@ -33,13 +33,21 @@
             (onSelected)="onSearchTemplateSelected($event)"
             matSuffix></fnf-clean-template-dropdown>
 
+        <mat-hint>
+          @if (walkCancelKey) {
+            Pattern found:
+            <fnf-walk-data
+                [walkData]="walkData"
+                [hideWording]="true"></fnf-walk-data>
+          }
+        </mat-hint>
 
         <mat-error>
           Invalid glob pattern. Must be empty or a valid pattern.
         </mat-error>
 
-
       </mat-form-field>
+
 
       <mat-checkbox formControlName="deleteEmptyFolders">
         Delete empty sub-folders
@@ -48,11 +56,7 @@
     </form>
 
     <div>
-      @if (walkCancelKey) {
-        <fnf-walk-data
-            [walkData]="walkData"
-            [hideFolderCount]="true"></fnf-walk-data>
-      }
+
     </div>
 
   </div>
@@ -60,13 +64,14 @@
 
 <mat-dialog-actions>
 
-  <button
+  <div></div>
+  <!--button
       (click)="onCheckClicked()"
       [disabled]="!formGroup.valid || formGroup.get('pattern')?.invalid || formGroup.get('pattern')?.pending"
       data-test-id="dialog-check-button"
       mat-raised-button>
     Check affected files
-  </button>
+  </button-->
 
   <div class="glob-pattern-info">
     See:

@@ -14,7 +14,7 @@ export type WalkCallback = (walkData: WalkData) => void;
  */
 export class WalkSocketService {
 
-  private rid = 0;
+  private rid: number = Math.floor(Math.random() * 1000000) + 1;
   private cancellings: { [key: string]: Subscription } = {};
   private isConnected = false;
   private pendingWalks: Array<{ pathes: string[], filePattern: string, callback: WalkCallback }> = [];

@@ -8,16 +8,18 @@ import {FnfFileSizePipe} from '../fnf-file-size.pipe';
   imports: [FnfFileSizePipe],
   template: `
     @if (walkData.last) {
-      @if (walkData.folderCount === 0) {
-        Explicit:
-      } @else {
-        Implicit:
+      @if (!hideWording) {
+        @if (walkData.folderCount === 0) {
+          Explicit:
+        } @else {
+          Implicit:
+        }
       }
     } @else {
       Scanning...
     }
 
-    <b> {{ walkData.fileCount }}</b> file{{ walkData.fileCount > 1 ? 's' : '' }} (
+    <b>{{ walkData.fileCount }}</b> file{{ walkData.fileCount > 1 ? 's' : '' }}&nbsp;(
     <b>{{ walkData.sizeSum | fnfFileSize }}</b>)
 
     @if (hideFolderCount || walkData.folderCount === 0) {
@@ -32,4 +34,5 @@ import {FnfFileSizePipe} from '../fnf-file-size.pipe';
 export class WalkDataComponent {
   @Input() walkData: WalkData = new WalkData(0, 0, 0, false);
   @Input() hideFolderCount: boolean = false;
+  @Input() hideWording: boolean = false;
 }

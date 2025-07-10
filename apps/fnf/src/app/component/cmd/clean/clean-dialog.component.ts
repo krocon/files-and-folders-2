@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit} from "@angular/core";
 import {
   AbstractControl,
   FormBuilder,
@@ -28,6 +28,7 @@ import {WalkDataComponent} from "../../../common/walkdata/walk-data.component";
 import {WalkSocketService} from "../../../service/walk.socketio.service";
 import {GlobValidatorService} from "../../../service/glob-validator.service";
 import {globPatternAsyncValidator} from "../../../common/fn/glob-pattern-validator.fn";
+import {debounceTime, distinctUntilChanged, takeWhile} from "rxjs/operators";
 
 
 @Component({
@@ -52,12 +53,13 @@ import {globPatternAsyncValidator} from "../../../common/fn/glob-pattern-validat
   styleUrls: ["./clean-dialog.component.css"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CleanDialogComponent implements OnInit {
+export class CleanDialogComponent implements OnInit, OnDestroy {
 
   formGroup: FormGroup;
   walkData = new WalkData(0, 0, 0, false);
   walkCancelKey = '';
 
+  alive = true;
 
 
   constructor(
@@ -102,7 +104,26 @@ export class CleanDialogComponent implements OnInit {
       });
   }
 
+  ngOnDestroy(): void {
+    this.alive = false;
+  }
+
   ngOnInit(): void {
+    this.formGroup
+      .valueChanges
+      .pipe(
+        takeWhile(() => this.alive),
+        debounceTime(1000),
+        distinctUntilChanged()
+      )
+      .subscribe(
+        () => {
+          if (!this.formGroup.invalid) {
+            this.onCheckClicked();
+          }
+        }
+      );
+    this.onCheckClicked();
   }
 
   onOkClicked() {
