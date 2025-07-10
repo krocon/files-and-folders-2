@@ -21,6 +21,9 @@ export const environment = {
     convertUrl: "/api/convertnames",
     hasOpenAiApiKeyUrl: "/api/hasopenaiapikey"
   },
+  checkGlob: {
+    checkGlobUrl: "/api/checkglob"
+  },
   lookAndFeel: {
     getLookAndFeelUrl: "assets/config/color/%theme%.json"
   },

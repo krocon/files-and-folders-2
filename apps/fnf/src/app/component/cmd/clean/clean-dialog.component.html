@@ -32,6 +32,13 @@
         <fnf-clean-template-dropdown
             (onSelected)="onSearchTemplateSelected($event)"
             matSuffix></fnf-clean-template-dropdown>
+
+
+        <mat-error>
+          Invalid glob pattern. Must be empty or a valid pattern.
+        </mat-error>
+
+
       </mat-form-field>
 
       <mat-checkbox formControlName="deleteEmptyFolders">
@@ -55,7 +62,7 @@
 
   <button
       (click)="onCheckClicked()"
-      [disabled]="!formGroup.valid || formGroup.get('pattern')?.value==='' || formGroup.get('pattern')"
+      [disabled]="!formGroup.valid || formGroup.get('pattern')?.invalid || formGroup.get('pattern')?.pending"
       data-test-id="dialog-check-button"
       mat-raised-button>
     Check affected files
@@ -79,7 +86,7 @@
 
   <button
       (click)="onOkClicked()"
-      [disabled]="!formGroup.valid"
+      [disabled]="!formGroup.valid || formGroup.pending"
       color="primary"
       data-test-id="dialog-ok-button"
       mat-raised-button>

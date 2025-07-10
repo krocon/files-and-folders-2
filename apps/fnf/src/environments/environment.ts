@@ -27,9 +27,14 @@ export const environment = {
     convertUrl: prefix + "/api/convertnames",
     hasOpenAiApiKeyUrl: prefix + "/api/hasopenaiapikey"
   },
+  checkGlob: {
+    checkGlobUrl: prefix + "/api/checkglob"
+  },
+
   lookAndFeel: {
     getLookAndFeelUrl: "assets/config/color/%theme%.json"
   },
+
   shortcut: {
     getShortcutActionMappingUrl: "assets/config/shortcut/"
   },

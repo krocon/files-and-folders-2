@@ -65,6 +65,7 @@ import {TabsPanelData} from "./domain/filepagedata/data/tabs-panel.data";
 import {WalkCallback, WalkSocketService} from "./service/walk.socketio.service";
 import {MultiRenameAiService} from "./component/cmd/multirename/multi-rename-ai.service";
 import {CleanDialogService} from "./component/cmd/clean/clean-dialog.service";
+import {GlobValidatorService} from "./service/glob-validator.service";
 
 
 @Injectable({
@@ -72,15 +73,11 @@ import {CleanDialogService} from "./component/cmd/clean/clean-dialog.service";
 })
 export class AppService {
 
-  private MAX_HISTORY_LENGTH = 15;
-
   @Output() public onKeyUp$ = new Subject<KeyboardEvent>();
   @Output() public onKeyDown$ = new Subject<KeyboardEvent>();
-
   public sysinfo: SysinfoIf = new Sysinfo();
   public dockerRoot: string = '';
   public config: Config | undefined = undefined;
-
   public favs: string[] = [];
   public latest: string[] = [];
   public winDrives: string[] = [];
@@ -88,15 +85,12 @@ export class AppService {
     this.tabsPanelDataService.getValue(0),
     this.tabsPanelDataService.getValue(1)
   ];
-
-
   public readonly changeDirRequest$ = new Subject<ChangeDirEvent | null>();
   public readonly dirEvents$ = new BehaviorSubject<Map<string, DirEventIf[]>>(new Map());
   public readonly actionEvents$ = new Subject<ActionId>();
-
-
   public bodyAreaModels: [FileTableBodyModel | undefined, FileTableBodyModel | undefined] = [undefined, undefined];
   public selectionManagers: [SelectionManagerForObjectModels<FileItemIf> | undefined, SelectionManagerForObjectModels<FileItemIf> | undefined] = [undefined, undefined];
+  private MAX_HISTORY_LENGTH = 15;
   private defaultTools: CmdIf[] = [];
 
 
@@ -125,7 +119,6 @@ export class AppService {
     private readonly groupFilesDialogService: GroupFilesDialogService,
     private readonly changeDirDialogService: ChangeDirDialogService,
     private readonly walkSocketService: WalkSocketService,
-    private readonly multiRenameAiService: MultiRenameAiService,
   ) {
     // Set config to services:
     ConfigService.forRoot(environment.config);
@@ -138,6 +131,7 @@ export class AppService {
     ToolService.forRoot(environment.tool);
     FiletypeExtensionsService.forRoot(environment.filetypeExtensions);
     MultiRenameAiService.forRoot(environment.multiRename);
+    GlobValidatorService.forRoot(environment.checkGlob);
 
     this.favDataService
       .valueChanges()
@@ -332,10 +326,6 @@ export class AppService {
     return this.panelSelectionService.getValue();
   }
 
-  private getInActivePanelIndex(): PanelIndex {
-    return this.panelSelectionService.getValue() ? 0 : 1;
-  }
-
   getActiveTabOnActivePanel(): TabData {
     const pi = this.getActivePanelIndex();
     const tabsPanelData = this.tabsPanelDataService.getValue(pi);
@@ -358,7 +348,6 @@ export class AppService {
   addLatest(item: string) {
     this.latestDataService.addLatest(item);
   }
-
 
   triggerAction(id: ActionId) {
     // console.log('> triggerAction:', id);
@@ -460,7 +449,6 @@ export class AppService {
     });
   }
 
-
   copy() {
     const selectedData: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
     const sources: string[] = this.getSourcePaths(selectedData);
@@ -533,7 +521,6 @@ export class AppService {
     return this.shortcutService.getActionByKeyEvent(keyboardEvent) as ActionId;
   }
 
-
   public async model2local(panelIndex: 0 | 1) {
     const tabData = this.getTabDataForPanelIndex(panelIndex);
     if (tabData) {
@@ -562,7 +549,7 @@ export class AppService {
     panelIndex: PanelIndex
   ): Promise<void> {
 
-    console.info('setPathToActiveTabInGivenPanel '+panelIndex, path);
+    console.info('setPathToActiveTabInGivenPanel ' + panelIndex, path);
     if (path.startsWith('tabfind')) {
       console.warn('setPathToActiveTabInGivenPanel: tabfind not supported yet');
     }
@@ -701,10 +688,6 @@ export class AppService {
     this.selectionDialogService.open(data, cb);
   }
 
-  private getSelectedData(panelIndex: PanelIndex): FileItemIf[] {
-    return this.selectionManagers[panelIndex]?.getSelectedRows() ?? [];
-  }
-
   getSelectedOrFocussedData(panelIndex: PanelIndex): FileItemIf[] {
     let ret = this.selectionManagers[panelIndex]?.getSelectedRows() ?? [];
     if (!ret?.length && this.bodyAreaModels[panelIndex]) {
@@ -794,10 +777,6 @@ export class AppService {
         });
   }
 
-  // cancelFind(findData: FindData) {
-  //   this.findSocketService.cancelFind(findData.emmitCancelKey);
-  // }
-
   requestFindings(findData: FindData) {
     this.findSocketService
       .find(findData, event => {
@@ -808,10 +787,31 @@ export class AppService {
       });
   }
 
-
   callActionMkDir(para: { dir: string; base: string; panelIndex: PanelIndex }) {
     const actionEvent = this.commandService.createQueueActionEventForMkdir(para);
     this.commandService.addActions([actionEvent]);
+  }
+
+  // cancelFind(findData: FindData) {
+  //   this.findSocketService.cancelFind(findData.emmitCancelKey);
+  // }
+
+  walkDir(
+    pathes: string[],
+    callback: WalkCallback): string {
+    return this.walkSocketService.walkDir(pathes, '', callback);
+  }
+
+  cancelWalkDir(cancelKey: string) {
+    this.walkSocketService.cancelWalkDir(cancelKey);
+  }
+
+  private getInActivePanelIndex(): PanelIndex {
+    return this.panelSelectionService.getValue() ? 0 : 1;
+  }
+
+  private getSelectedData(panelIndex: PanelIndex): FileItemIf[] {
+    return this.selectionManagers[panelIndex]?.getSelectedRows() ?? [];
   }
 
   private removeTab() {
@@ -937,7 +937,7 @@ export class AppService {
 
   private getTabDataForPanelIndex(panelIndex: 0 | 1): TabData {
     const panelData: TabsPanelData = this.tabsPanelDatas[panelIndex];
-    return  panelData.tabs[panelData.selectedTabIndex];
+    return panelData.tabs[panelData.selectedTabIndex];
   }
 
   private getSelectedDataForActivePanel(): FileItemIf[] {
@@ -957,17 +957,6 @@ export class AppService {
       return fileItems.map(fi => `${fi.dir}/${fi.base}`);
     }
     return [this.getActiveTabOnActivePanel().path];
-  }
-
-
-  walkDir(
-    pathes: string[],
-    callback: WalkCallback): string {
-    return this.walkSocketService.walkDir(pathes, '', callback);
-  }
-
-  cancelWalkDir(cancelKey: string) {
-    this.walkSocketService.cancelWalkDir(cancelKey);
   }
 
 }
