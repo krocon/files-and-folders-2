@@ -14,8 +14,8 @@ import {FnfAutofocusDirective} from "../../../common/directive/fnf-autofocus.dir
 import {CleanDialogData} from "@fnf/fnf-data";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatCheckbox} from "@angular/material/checkbox";
-import {SearchTemplateDropdownComponent} from "../../common/searchtemplatedropdown/search-template-dropdown.component";
 import {SelectFolderDropdownComponent} from "../../common/selectfolderdropdown/select-folder-dropdown.component";
+import {CleanTemplateDropdownComponent} from "../../common/cleantemplatedropdown/clean-template-dropdown.component";
 
 
 @Component({
@@ -33,8 +33,8 @@ import {SelectFolderDropdownComponent} from "../../common/selectfolderdropdown/s
     MatFormField,
     FnfAutofocusDirective,
     MatCheckbox,
-    SearchTemplateDropdownComponent,
     SelectFolderDropdownComponent,
+    CleanTemplateDropdownComponent,
   ],
   styleUrls: ["./clean-dialog.component.css"]
 })
@@ -62,7 +62,7 @@ export class CleanDialogComponent implements OnInit {
             data.pattern,
             {
               validators: [
-                Validators.required,
+
               ]
             }),
           //directoriesOnly: new FormControl(data.directoriesOnly, {}),
@@ -88,7 +88,7 @@ export class CleanDialogComponent implements OnInit {
     const p = '{'
       + evt
         .split('|')
-        .map(s => '**/*' + s)
+        //.map(s => '**/*' + s)
         .join(',')
       + '}';
 

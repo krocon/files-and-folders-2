@@ -7,6 +7,7 @@ import {ConfigService} from "./service/config.service";
 import {FileSystemService} from "./service/file-system.service";
 import {environment} from "../environments/environment";
 import {
+  CleanDialogData,
   CmdIf,
   Config,
   DirEventIf,
@@ -63,6 +64,7 @@ import {map} from "rxjs/operators";
 import {TabsPanelData} from "./domain/filepagedata/data/tabs-panel.data";
 import {WalkCallback, WalkSocketService} from "./service/walk.socketio.service";
 import {MultiRenameAiService} from "./component/cmd/multirename/multi-rename-ai.service";
+import {CleanDialogService} from "./component/cmd/clean/clean-dialog.service";
 
 
 @Injectable({
@@ -114,6 +116,7 @@ export class AppService {
     private readonly renameDialogService: RenameDialogService,
     private readonly commandService: CommandService,
     private readonly shortcutDialogService: ShortcutDialogService,
+    private readonly cleanDialogService: CleanDialogService,
     private readonly toolService: ToolService,
     private readonly selectionDialogService: SelectionDialogService,
     private readonly findDialogService: FindDialogService,
@@ -423,8 +426,7 @@ export class AppService {
       this.openFindDialog(null);
 
     } else if (id === "OPEN_DELETE_EMPTY_FOLDERS_DLG") {
-      // TODO OPEN_DELETE_EMPTY_FOLDERS_DLG  analog find dialog
-      alert('not yet implemented');
+      this.openCleanDialog(null);
 
     } else if (id === "OPEN_SHORTCUT_DLG") {
       this.shortcutDialogService.open();
@@ -733,12 +735,24 @@ export class AppService {
     this.updateTabsPanelData(panelIndex, tabsPanelData);
   }
 
+  public openCleanDialog(data: CleanDialogData | null) {
+    if (!data) {
+      data = new CleanDialogData('', '**/*.bak', true);
+      data.folders = this.getRelevantDirsFromActiveTab();
+    }
+    this.cleanDialogService.open(
+      data,
+      (result: CleanDialogData | undefined) => {
+        this.actionEvents$.next('RELOAD_DIR');
+      });
+  }
+
   public openFindDialog(
     data: FindDialogData | null
   ) {
     const panelIndex = this.getActivePanelIndex();
     if (!data) {
-      data = new FindDialogData('', '**/*.ts', true, false);
+      data = new FindDialogData('', '**/*.*', true, false);
       data.folders = this.getRelevantDirsFromActiveTab();
     }
     this.findDialogService

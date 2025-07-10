@@ -22,9 +22,9 @@ type FileExtensionsType = { "label": string, "extensions": string[] };
 })
 export class CleanTemplateDropdownComponent {
 
-  // TODO load via backend (apps/fnf/src/assets/config/filetype/filetype-extensions.json)
+
   fileTypes: FileExtensionsType[] = [
-    {"label": "movies", "extensions": [".avi", ".mkv", ".mp4", ".mov", ".wmv", ".flv", ".webm"]},
+    {"label": "Warez", "extensions": ["**/*.nfo", "**/*sample.mkv", "**/Sample", "**/Proof"]},
   ];
 
   @Output() onSelected = new EventEmitter<string>();
