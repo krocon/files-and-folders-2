@@ -72,7 +72,7 @@ export class CleanDialogComponent implements OnInit {
               validators: [
                 (control: AbstractControl): ValidationErrors | null => {
                   if (
-                    control.get('deleteEmptyFolders')?.value.trim() === ''
+                    control.get('pattern')?.value.trim() === ''
                     && control.get('deleteEmptyFolders')?.value === false
                   ) {
                     return {
@@ -88,7 +88,7 @@ export class CleanDialogComponent implements OnInit {
             validators: [
               (control: AbstractControl): ValidationErrors | null => {
                 if (
-                  control.get('deleteEmptyFolders')?.value.trim() === ''
+                  control.get('pattern')?.value.trim() === ''
                   && control.get('deleteEmptyFolders')?.value === false
                 ) {
                   return {
