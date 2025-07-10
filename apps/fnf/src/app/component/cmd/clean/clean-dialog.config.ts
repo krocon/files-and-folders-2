@@ -8,7 +8,7 @@ export class CleanDialogConfig extends MatDialogConfig {
   constructor(public override data: CleanDialogData) {
     super();
     this.minHeight = 200;
-    this.minWidth = "700px";
+    this.minWidth = "800px";
     this.autoFocus = false;
   }
 }

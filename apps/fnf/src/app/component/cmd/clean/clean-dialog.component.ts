@@ -94,6 +94,9 @@ export class CleanDialogComponent implements OnInit {
     this.dialogRef.close(undefined);
   }
 
+  onCheckClicked() {
+    // TODO check
+  }
 
   onSearchTemplateSelected(evt: string) {
     const p = '{'

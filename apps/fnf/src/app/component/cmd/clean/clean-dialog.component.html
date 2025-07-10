@@ -34,12 +34,8 @@
             matSuffix></fnf-clean-template-dropdown>
       </mat-form-field>
 
-      <!--mat-checkbox formControlName="directoriesOnly">
-        Directories only
-      </mat-checkbox-->
-
       <mat-checkbox formControlName="deleteEmptyFolders">
-        Delete empty folders
+        Delete empty sub-folders
       </mat-checkbox>
 
     </form>
@@ -49,6 +45,13 @@
 </mat-dialog-content>
 
 <mat-dialog-actions>
+
+  <button
+      (click)="onCheckClicked()"
+      data-test-id="dialog-check-button"
+      mat-raised-button>
+    Check affected files
+  </button>
 
   <div class="glob-pattern-info">
     See:
