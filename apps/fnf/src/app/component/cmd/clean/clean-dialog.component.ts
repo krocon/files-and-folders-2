@@ -1,7 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit} from "@angular/core";
 import {
   AbstractControl,
-  AsyncValidatorFn,
   FormBuilder,
   FormControl,
   FormGroup,
@@ -28,7 +27,7 @@ import {CleanTemplateDropdownComponent} from "../../common/cleantemplatedropdown
 import {WalkDataComponent} from "../../../common/walkdata/walk-data.component";
 import {WalkSocketService} from "../../../service/walk.socketio.service";
 import {GlobValidatorService} from "../../../service/glob-validator.service";
-import {map, Observable} from "rxjs";
+import {globPatternAsyncValidator} from "../../../common/fn/glob-pattern-validator.fn";
 
 
 @Component({
@@ -60,37 +59,6 @@ export class CleanDialogComponent implements OnInit {
   walkCancelKey = '';
 
 
-  /**
-   * Async validator that validates a glob pattern using the API.
-   * @param globValidatorService The service to use for validation
-   * @returns An async validator function
-   */
-  static globPatternAsyncValidator(globValidatorService: GlobValidatorService): AsyncValidatorFn {
-    return (control: AbstractControl): Observable<ValidationErrors | null> => {
-      const value = control.value;
-
-      // Allow empty values
-      if (!value || value.trim() === '') {
-        return new Observable(observer => {
-          observer.next(null);
-          observer.complete();
-        });
-      }
-
-      // Call the API to validate the pattern
-      return globValidatorService.validateGlobPattern(value).pipe(
-        map(isValid => {
-          if (isValid) {
-            console.info('Valid glob pattern ' + value);
-            return null;
-          } else {
-            console.error('Invalid glob pattern', value);
-            return {invalidGlobPattern: 'Invalid glob pattern'};
-          }
-        })
-      );
-    };
-  }
 
   constructor(
     public dialogRef: MatDialogRef<CleanDialogComponent>,
@@ -106,7 +74,7 @@ export class CleanDialogComponent implements OnInit {
         {
           folder: new FormControl(folder, {validators: [Validators.required]}),
           pattern: new FormControl(data.pattern, {
-            asyncValidators: [CleanDialogComponent.globPatternAsyncValidator(this.globValidatorService)]
+            asyncValidators: [globPatternAsyncValidator(this.globValidatorService)]
           }),
           deleteEmptyFolders: new FormControl(data.deleteEmptyFolders)
         },
