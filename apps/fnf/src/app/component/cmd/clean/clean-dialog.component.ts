@@ -50,6 +50,7 @@ export class CleanDialogComponent implements OnInit {
 
   formGroup: FormGroup;
 
+
   constructor(
     public dialogRef: MatDialogRef<CleanDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: CleanDialogData,
@@ -59,46 +60,24 @@ export class CleanDialogComponent implements OnInit {
     this.formGroup = this.formBuilder
       .group(
         {
-          folder: new FormControl(
-            folder,
-            {
-              validators: [
-                Validators.required,
-              ]
-            }),
-          pattern: new FormControl(
-            data.pattern,
-            {
-              validators: [
-                (control: AbstractControl): ValidationErrors | null => {
-                  if (
-                    control.get('pattern')?.value.trim() === ''
-                    && control.get('deleteEmptyFolders')?.value === false
-                  ) {
-                    return {
-                      "mandatory": "You need a delete-pattern or delete empty folders to be checked"
-                    };
-                  }
-                  return null;
-                },
-              ]
-            }),
+          folder: new FormControl(folder, {validators: [Validators.required]}),
+          pattern: new FormControl(data.pattern),
+          deleteEmptyFolders: new FormControl(data.deleteEmptyFolders)
+        },
+        {
+          validators: [
+            (formGroup: AbstractControl): ValidationErrors | null => {
+              const pattern = formGroup.get('pattern')?.value;
+              const deleteEmptyFolders = formGroup.get('deleteEmptyFolders')?.value;
 
-          deleteEmptyFolders: new FormControl(data.deleteEmptyFolders, {
-            validators: [
-              (control: AbstractControl): ValidationErrors | null => {
-                if (
-                  control.get('pattern')?.value.trim() === ''
-                  && control.get('deleteEmptyFolders')?.value === false
-                ) {
-                  return {
-                    "mandatory": "You need a delete-pattern or delete empty folders to be checked"
-                  };
-                }
-                return null;
-              },
-            ]
-          })
+              if ((!pattern || pattern.trim() === '') && deleteEmptyFolders === false) {
+                return {
+                  "mandatory": "You need a delete-pattern or delete empty folders to be checked"
+                };
+              }
+              return null;
+            }
+          ]
         }
       );
   }
@@ -120,7 +99,6 @@ export class CleanDialogComponent implements OnInit {
     const p = '{'
       + evt
         .split('|')
-        //.map(s => '**/*' + s)
         .join(',')
       + '}';
 
