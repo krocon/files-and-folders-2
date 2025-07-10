@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit} from "@angular/core";
 import {
   AbstractControl,
   FormBuilder,
@@ -19,11 +19,13 @@ import {MatFormField, MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {FnfAutofocusDirective} from "../../../common/directive/fnf-autofocus.directive";
-import {CleanDialogData} from "@fnf/fnf-data";
+import {CleanDialogData, WalkData} from "@fnf/fnf-data";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {SelectFolderDropdownComponent} from "../../common/selectfolderdropdown/select-folder-dropdown.component";
 import {CleanTemplateDropdownComponent} from "../../common/cleantemplatedropdown/clean-template-dropdown.component";
+import {WalkDataComponent} from "../../../common/walkdata/walk-data.component";
+import {WalkSocketService} from "../../../service/walk.socketio.service";
 
 
 @Component({
@@ -43,18 +45,23 @@ import {CleanTemplateDropdownComponent} from "../../common/cleantemplatedropdown
     MatCheckbox,
     SelectFolderDropdownComponent,
     CleanTemplateDropdownComponent,
+    WalkDataComponent,
   ],
-  styleUrls: ["./clean-dialog.component.css"]
+  styleUrls: ["./clean-dialog.component.css"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CleanDialogComponent implements OnInit {
 
   formGroup: FormGroup;
-
+  walkData = new WalkData(0, 0, 0, false);
+  walkCancelKey = '';
 
   constructor(
     public dialogRef: MatDialogRef<CleanDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: CleanDialogData,
     private readonly formBuilder: FormBuilder,
+    private readonly walkSocketService: WalkSocketService,
+    private readonly cdr: ChangeDetectorRef,
   ) {
     const folder = data.folder ? data.folder : data.folders?.join(',');
     this.formGroup = this.formBuilder
@@ -80,11 +87,16 @@ export class CleanDialogComponent implements OnInit {
           ]
         }
       );
+    dialogRef.afterClosed()
+      .subscribe(result => {
+        if (this.walkCancelKey) {
+          this.walkSocketService.cancelWalkDir(this.walkCancelKey);
+        }
+      });
   }
 
   ngOnInit(): void {
   }
-
 
   onOkClicked() {
     // TODO this.dialogRef.close(this.formGroup.getRawValue());
@@ -95,7 +107,24 @@ export class CleanDialogComponent implements OnInit {
   }
 
   onCheckClicked() {
-    // TODO check
+    if (this.walkCancelKey) {
+      this.walkSocketService.cancelWalkDir(this.walkCancelKey);
+    }
+    this.walkData = new WalkData(0, 0, 0, false);
+    this.cdr.detectChanges();
+
+    let rawValue = this.formGroup.getRawValue();
+    let folders = rawValue.folder.split(',');
+    let pattern = rawValue.pattern ?? '';
+    this.walkCancelKey = this.walkSocketService
+      .walkDir(
+        folders,
+        pattern,
+        (walkData: WalkData) => {
+          console.info('walkData', walkData); // TODO del
+          this.walkData = walkData;
+          this.cdr.detectChanges();
+        });
   }
 
   onSearchTemplateSelected(evt: string) {

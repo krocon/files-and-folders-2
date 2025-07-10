@@ -2,6 +2,8 @@ import {FileItem, FileItemIf, WalkData, WalkParaData} from "@fnf-data/src";
 import {Server} from "socket.io";
 import * as fs from "fs-extra";
 import * as path from "path";
+import * as micromatch from "micromatch";
+
 
 export class FileWalker {
 
@@ -28,13 +30,20 @@ export class FileWalker {
 
     const walkData: WalkData = new WalkData(
       initialFiles.filter(f => !f.isDir).length,
-      initialFiles.filter(f => f.isDir).length,
+      initialFiles.filter(f => f.isDir).filter(this.matchesPattern.bind(this)).length,
       initialFiles.map(f => f.size ?? 0).reduce((a, b) => a + b, 0),
       false
     );
     this.emitWithDelay(this.walkParaData.emmitDataKey, walkData, () => this.processNextFile());
   }
 
+
+  private matchesPattern(item: FileItemIf): boolean {
+    if (!this.walkParaData.filePattern) {
+      return true;
+    }
+    return (micromatch.isMatch(path.join(item.dir, item.base), this.walkParaData.filePattern));
+  }
 
   private emitWithDelay(key: string, data: WalkData, callback: () => void): void {
     this.server.emit(key, data);
@@ -62,6 +71,7 @@ export class FileWalker {
   }
 
   private processFile(item: FileItemIf): void {
+    if (!this.matchesPattern(item)) return; // skip
     this.walkData.fileCount++;
     this.walkData.sizeSum += item.size;
     this.walkData.timestamp = Date.now();

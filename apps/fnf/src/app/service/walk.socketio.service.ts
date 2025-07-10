@@ -17,7 +17,7 @@ export class WalkSocketService {
   private rid = 0;
   private cancellings: { [key: string]: Subscription } = {};
   private isConnected = false;
-  private pendingWalks: Array<{pathes: string[], callback: WalkCallback}> = [];
+  private pendingWalks: Array<{ pathes: string[], filePattern: string, callback: WalkCallback }> = [];
 
   constructor(
     private readonly socket: Socket
@@ -56,7 +56,7 @@ export class WalkSocketService {
       const walks = [...this.pendingWalks];
       this.pendingWalks = [];
       walks.forEach(walk => {
-        this.walkDir(walk.pathes, walk.callback);
+        this.walkDir(walk.pathes, walk.filePattern, walk.callback);
       });
     }
   }
@@ -144,6 +144,7 @@ export class WalkSocketService {
    * This method allows for asynchronous directory traversal with progress updates through a callback function.
    *
    * @param {string[]} pathes - An array of directory paths to walk through
+   * @param {string} filePattern - A glob pattern to filter files. If empty, all files will be counted
    * @param {WalkCallback} callback - A callback function that receives WalkData updates during the walk process
    * @returns {string} A unique cancel key that can be used to stop the walk operation
    *
@@ -153,7 +154,7 @@ export class WalkSocketService {
    * const walkService = new WalkSocketService(socket);
    *
    * const paths = ['/home/user/documents', '/home/user/pictures'];
-   * const cancelKey = walkService.walkDir(paths, (walkData: WalkData) => {
+   * const cancelKey = walkService.walkDir(paths, '*.txt', (walkData: WalkData) => {
    *   console.log(`Files found: ${walkData.fileCount}`);
    *   console.log(`Folders found: ${walkData.folderCount}`);
    *   console.log(`Total size: ${walkData.sizeSum} bytes`);
@@ -164,7 +165,7 @@ export class WalkSocketService {
    * });
    *
    * // Example 2: Walk with cancellation
-   * const cancelKey2 = walkService.walkDir(['path/to/dir'], (walkData: WalkData) => {
+   * const cancelKey2 = walkService.walkDir(['path/to/dir'], '', (walkData: WalkData) => {
    *   if (walkData.fileCount > 1000) {
    *     // Too many files, cancel the operation
    *     walkService.cancelWalkDir(cancelKey2);
@@ -173,7 +174,7 @@ export class WalkSocketService {
    *
    * // Example 3: Progress tracking with percentage
    * let totalSize = 0;
-   * const cancelKey3 = walkService.walkDir(['path/to/large/dir'], (walkData: WalkData) => {
+   * const cancelKey3 = walkService.walkDir(['path/to/large/dir'], '*.jpg', (walkData: WalkData) => {
    *   totalSize += walkData.sizeSum;
    *
    *   if (walkData.last) {
@@ -207,13 +208,16 @@ export class WalkSocketService {
    */
   public walkDir(
     pathes: string[],
+    filePattern: string,
     callback: WalkCallback
   ): string {
 
     this.rid++;
     const listenKey = `walk${this.rid}`;
     const cancelKey = `cancelwalk${this.rid}`;
-    const walkParaData = new WalkParaData(pathes, listenKey, cancelKey);
+    const walkParaData = new WalkParaData(pathes, filePattern, listenKey, cancelKey);
+
+    console.info('walkParaData', JSON.stringify(walkParaData, null, 2)); // TODO del
 
     this.cancellings[cancelKey] = this.socket
       .fromEvent<WalkData, string>(listenKey)
@@ -223,7 +227,7 @@ export class WalkSocketService {
 
     if (!this.isConnected) {
       console.log('Socket disconnected, queueing walk request');
-      this.pendingWalks.push({pathes, callback});
+      this.pendingWalks.push({pathes, filePattern, callback});
     } else {
       this.socket.emit("walkdir", walkParaData);
     }

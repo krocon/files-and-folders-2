@@ -963,7 +963,7 @@ export class AppService {
   walkDir(
     pathes: string[],
     callback: WalkCallback): string {
-    return this.walkSocketService.walkDir(pathes, callback);
+    return this.walkSocketService.walkDir(pathes, '', callback);
   }
 
   cancelWalkDir(cancelKey: string) {

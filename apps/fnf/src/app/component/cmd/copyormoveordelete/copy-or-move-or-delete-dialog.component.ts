@@ -12,7 +12,6 @@ import {FileItem, WalkData} from "@fnf/fnf-data";
 
 import {takeWhile} from "rxjs/operators";
 import {FileOperation} from "./file-operation";
-import {FnfFileSizePipe} from "../../../common/fnf-file-size.pipe";
 import {MatError, MatFormField, MatInput, MatSuffix} from "@angular/material/input";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
@@ -22,6 +21,7 @@ import {MatDivider} from "@angular/material/divider";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {AppService} from "../../../app.service";
 import {getAllParents} from "../../../common/fn/get-all-parents.fn";
+import {WalkDataComponent} from "../../../common/walkdata/walk-data.component";
 
 @Component({
   selector: "fnf-copy-or-move-dialog",
@@ -29,7 +29,6 @@ import {getAllParents} from "../../../common/fn/get-all-parents.fn";
   imports: [
     MatDialogTitle,
     MatDialogContent,
-    FnfFileSizePipe,
     ReactiveFormsModule,
     MatIconModule,
     MatInput,
@@ -43,7 +42,8 @@ import {getAllParents} from "../../../common/fn/get-all-parents.fn";
     MatMenu,
     MatMenuItem,
     MatSuffix,
-    MatMenuTrigger
+    MatMenuTrigger,
+    WalkDataComponent
   ],
   styleUrls: ["./copy-or-move-or-delete-dialog.component.css"],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -103,6 +103,13 @@ export class CopyOrMoveOrDeleteDialogComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.focusOnTarget = !this.deleteMode;
       });
+    dialogRef
+      .afterClosed()
+      .subscribe(result => {
+        if (this.walkCancelKey) {
+          this.walkSocketService.cancelWalkDir(this.walkCancelKey);
+        }
+      });
   }
 
   get hasError(): boolean {
@@ -120,6 +127,7 @@ export class CopyOrMoveOrDeleteDialogComponent implements OnInit, OnDestroy {
     this.walkCancelKey = this.walkSocketService
       .walkDir(
         this.data.source,
+        '',
         (walkData: WalkData) => {
           this.walkData = walkData;
           this.cdr.detectChanges();
@@ -135,12 +143,10 @@ export class CopyOrMoveOrDeleteDialogComponent implements OnInit, OnDestroy {
     const formData = this.formGroup.getRawValue();
     const fileItem = new FileItem(formData.target, formData.name, "");
     fileItem.isDir = true;
-    this.walkSocketService.cancelWalkDir(this.walkCancelKey);
     this.dialogRef.close(fileItem);
   }
 
   onCancelClicked() {
-    this.walkSocketService.cancelWalkDir(this.walkCancelKey);
     this.dialogRef.close(undefined);
   }
 

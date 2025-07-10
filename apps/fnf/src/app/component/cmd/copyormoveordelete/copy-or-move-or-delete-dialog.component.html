@@ -11,25 +11,7 @@
     </div>
 
     <div>
-      @if (walkData.last) {
-        @if (walkData.folderCount === 0) {
-          Explicit:
-        } @else {
-          Implicit:
-        }
-      } @else {
-        Scanning...
-      }
-       
-      <b> {{ walkData.fileCount }}</b> file{{ walkData.fileCount > 1 ? 's' : '' }} (<b>{{ walkData.sizeSum | fnfFileSize }} </b>)
-      
-      @if (walkData.folderCount === 0) {
-         <!-- no folder -->
-      } @else if (walkData.folderCount === 1) {
-         and one folder
-      } @else {
-         and <b>{{ walkData.folderCount }}</b> folders
-      }
+      <fnf-walk-data [walkData]="walkData"></fnf-walk-data>
     </div>
 
     @if (!deleteMode) {

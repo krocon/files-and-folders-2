@@ -40,6 +40,13 @@
 
     </form>
 
+    <div>
+      @if (walkCancelKey) {
+        <fnf-walk-data
+            [walkData]="walkData"
+            [hideFolderCount]="true"></fnf-walk-data>
+      }
+    </div>
 
   </div>
 </mat-dialog-content>
@@ -48,6 +55,7 @@
 
   <button
       (click)="onCheckClicked()"
+      [disabled]="!formGroup.valid || formGroup.get('pattern')?.value==='' || formGroup.get('pattern')"
       data-test-id="dialog-check-button"
       mat-raised-button>
     Check affected files
