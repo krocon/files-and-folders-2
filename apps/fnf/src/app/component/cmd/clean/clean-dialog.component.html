@@ -1,0 +1,76 @@
+<h2
+    data-test-id="page-subtitle-h2"
+    mat-dialog-title>Clean Folders</h2>
+
+<mat-dialog-content>
+  <div class="dlg-content-div">
+
+
+    <form
+        [formGroup]="formGroup"
+        autocomplete="off">
+      <mat-form-field>
+        <mat-label>Clean in</mat-label>
+        <input
+            (keydown.enter)="onOkClicked()"
+            formControlName="folder"
+            matInput
+            placeholder="Clean in"/>
+        <fnf-select-folder-dropdown
+            (onSelected)="onFolderClicked($event)"
+            matSuffix></fnf-select-folder-dropdown>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Delete Files</mat-label>
+        <input
+            (keydown.enter)="onOkClicked()"
+            [fnfAutofocus]="true"
+            formControlName="pattern"
+            matInput
+            placeholder="Search for"/>
+        <fnf-search-template-dropdown
+            (onSelected)="onSearchTemplateSelected($event)"
+            matSuffix></fnf-search-template-dropdown>
+      </mat-form-field>
+
+      <!--mat-checkbox formControlName="directoriesOnly">
+        Directories only
+      </mat-checkbox-->
+
+      <mat-checkbox formControlName="deleteEmptyFolders">
+        Delete empty folders
+      </mat-checkbox>
+
+    </form>
+
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+
+  <div class="glob-pattern-info">
+    See:
+    <a
+        href="https://code.visualstudio.com/docs/editor/glob-patterns"
+        target="_blank">Glob Patterns
+    </a>
+  </div>
+
+  <button
+      (click)="onCancelClicked()"
+      data-test-id="dialog-cancel-button"
+      mat-raised-button>
+    Cancel
+  </button>
+
+  <button
+      (click)="onOkClicked()"
+      [disabled]="!formGroup.valid"
+      color="primary"
+      data-test-id="dialog-ok-button"
+      mat-raised-button>
+    Find
+  </button>
+</mat-dialog-actions>

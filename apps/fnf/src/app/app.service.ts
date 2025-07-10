@@ -422,6 +422,10 @@ export class AppService {
     } else if (id === "OPEN_FIND_DLG") {
       this.openFindDialog(null);
 
+    } else if (id === "OPEN_DELETE_EMPTY_FOLDERS_DLG") {
+      // TODO OPEN_DELETE_EMPTY_FOLDERS_DLG  analog find dialog
+      alert('not yet implemented');
+
     } else if (id === "OPEN_SHORTCUT_DLG") {
       this.shortcutDialogService.open();
 

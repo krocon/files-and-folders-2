@@ -27,7 +27,7 @@ export class FnfActionLabels {
     OPEN_FIND_DUBLICATES_DLG: "Find Dublicates...",
     OPEN_MULTIRENAME_DLG: "Multi Rename...",
     OPEN_RENAME_DLG: "Rename...",
-    OPEN_DELETE_EMPTY_FOLDERS_DLG: "Delete Empty Folders...",
+    OPEN_DELETE_EMPTY_FOLDERS_DLG: "Clean Folders...",
     OPEN_FIND_DLG: "Find...",
     RELOAD_DIR: "Reload...",
 

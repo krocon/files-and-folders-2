@@ -1,6 +1,10 @@
 // Export all models
 export * from './models/customcss/css-colors.data';
 
+export * from './models/clean/clean.data';
+export * from './models/clean/clean-dialog.data';
+
+
 export * from './models/config/config';
 
 export * from './models/emitable';
