@@ -3,6 +3,7 @@ import {CleanHelper} from './clean.helper';
 import {CleanDialogData} from '@fnf/fnf-data';
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import {CleanResult} from './clean-result';
 
 jest.mock('fs-extra', () => ({
   ...jest.requireActual('fs-extra'),
@@ -35,7 +36,7 @@ describe('CleanHelper', () => {
     it('should process a single folder when folders array is not provided', async () => {
       // Arrange
       const cleanDialogData = new CleanDialogData('/test/folder', '**/*.tmp');
-      (fs.existsSync as jest.Mock).mockReturnValue(true);
+      ((fs.existsSync as unknown) as jest.Mock).mockReturnValue(true);
 
       // Mock implementation for deleteMatchingFiles
       jest.spyOn(cleanHelper as any, 'deleteMatchingFiles').mockResolvedValue(undefined);
@@ -55,7 +56,7 @@ describe('CleanHelper', () => {
       // Arrange
       const cleanDialogData = new CleanDialogData('', '**/*.tmp');
       cleanDialogData.folders = ['/test/folder1', '/test/folder2'];
-      (fs.existsSync as jest.Mock).mockReturnValue(true);
+      ((fs.existsSync as unknown) as jest.Mock).mockReturnValue(true);
 
       // Mock implementation for deleteMatchingFiles
       jest.spyOn(cleanHelper as any, 'deleteMatchingFiles').mockResolvedValue(undefined);
@@ -74,7 +75,7 @@ describe('CleanHelper', () => {
     it('should add error when folder does not exist', async () => {
       // Arrange
       const cleanDialogData = new CleanDialogData('/test/folder', '**/*.tmp');
-      (fs.existsSync as jest.Mock).mockReturnValue(false);
+      ((fs.existsSync as unknown) as jest.Mock).mockReturnValue(false);
 
       // Act
       const result = await cleanHelper.clean(cleanDialogData);
@@ -87,7 +88,7 @@ describe('CleanHelper', () => {
     it('should not delete empty folders when deleteEmptyFolders is false', async () => {
       // Arrange
       const cleanDialogData = new CleanDialogData('/test/folder', '**/*.tmp', false);
-      (fs.existsSync as jest.Mock).mockReturnValue(true);
+      ((fs.existsSync as unknown) as jest.Mock).mockReturnValue(true);
 
       // Mock implementation for deleteMatchingFiles
       jest.spyOn(cleanHelper as any, 'deleteMatchingFiles').mockResolvedValue(undefined);
@@ -115,9 +116,9 @@ describe('CleanHelper', () => {
         {name: 'subdir', isDirectory: () => true}
       ];
 
-      (fs.readdir as jest.Mock).mockResolvedValue(entries);
+      ((fs.readdir as unknown) as jest.Mock).mockResolvedValue(entries);
       (path.join as jest.Mock).mockImplementation((dir, file) => `${dir}/${file}`);
-      (fs.remove as jest.Mock).mockResolvedValue(undefined);
+      ((fs.remove as unknown) as jest.Mock).mockResolvedValue(undefined);
 
       // Mock micromatch.isMatch to return true for *.tmp files
       jest.mock('micromatch', () => ({
@@ -156,8 +157,8 @@ describe('CleanHelper', () => {
       const result = {deletedFiles: 0, deletedFolders: 0, errors: []};
 
       // Mock an empty folder
-      (fs.readdir as jest.Mock).mockResolvedValue([]);
-      (fs.rmdir as jest.Mock).mockResolvedValue(undefined);
+      ((fs.readdir as unknown) as jest.Mock).mockResolvedValue([]);
+      ((fs.rmdir as unknown) as jest.Mock).mockResolvedValue(undefined);
 
       // Act
       const wasEmpty = await cleanHelper['deleteEmptyFolders'](folderPath, result);
@@ -175,11 +176,11 @@ describe('CleanHelper', () => {
       const result = {deletedFiles: 0, deletedFolders: 0, errors: []};
 
       // Mock a folder with a subdirectory
-      (fs.readdir as jest.Mock).mockImplementationOnce(() => ['subdir']);
-      (fs.stat as jest.Mock).mockResolvedValue({isDirectory: () => true});
+      ((fs.readdir as unknown) as jest.Mock).mockImplementationOnce(() => ['subdir']);
+      ((fs.stat as unknown) as jest.Mock).mockResolvedValue({isDirectory: () => true});
 
       // Mock the subdirectory as empty
-      jest.spyOn(cleanHelper as any, 'deleteEmptyFolders').mockImplementation(async (path, result) => {
+      jest.spyOn(cleanHelper as any, 'deleteEmptyFolders').mockImplementation(async (path, result: CleanResult) => {
         if (path === '/test/folder/subdir') {
           result.deletedFolders++;
           return true;
@@ -208,8 +209,8 @@ describe('CleanHelper', () => {
       const result = {deletedFiles: 0, deletedFolders: 0, errors: []};
 
       // Mock a non-empty folder
-      (fs.readdir as jest.Mock).mockResolvedValue(['file.txt']);
-      (fs.stat as jest.Mock).mockResolvedValue({isDirectory: () => false});
+      ((fs.readdir as unknown) as jest.Mock).mockResolvedValue(['file.txt']);
+      ((fs.stat as unknown) as jest.Mock).mockResolvedValue({isDirectory: () => false});
 
       // Act
       const wasEmpty = await cleanHelper['deleteEmptyFolders'](folderPath, result);
