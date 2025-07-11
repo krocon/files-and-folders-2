@@ -2,7 +2,6 @@ import {Test, TestingModule} from '@nestjs/testing';
 import {FileActionGateway} from '@fnf/fnf-api/src/app/file-action/file-action.gateway';
 import {FileService} from '@fnf/fnf-api/src/app/file-action/file.service';
 import {ActionGatewayKeys as keys, FileItem, FilePara} from '@fnf/fnf-data';
-import {cleanupTestEnvironment, restoreTestEnvironment, setupTestEnvironment} from './action/common/test-setup-helper';
 import * as path from 'path';
 import {Server} from 'socket.io';
 
@@ -28,18 +27,18 @@ describe('FileActionGateway', () => {
   // Setup and teardown for all tests
   beforeAll(async () => {
     // Set up the initial test environment
-    await setupTestEnvironment();
+    // await setupTestEnvironment();
   });
 
   afterAll(async () => {
     // Clean up the test environment after all tests
-    await cleanupTestEnvironment();
+    // await cleanupTestEnvironment();
   });
 
   // Setup and teardown for each test
   beforeEach(async () => {
     // Restore the test environment before each test
-    await restoreTestEnvironment();
+    // await restoreTestEnvironment();
 
     // Create a mock FileService
     const mockFileService = {

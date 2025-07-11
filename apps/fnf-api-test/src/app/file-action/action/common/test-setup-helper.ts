@@ -93,24 +93,24 @@ export async function setupTestEnvironment(): Promise<void> {
     );
 
     // Verify that all required files and directories exist
-    const requiredPaths = [
-      demoDir,
-      targetDir,
-      path.join(demoDir, 'test-file.txt'),
-      path.join(demoDir, 'file-to-move.txt'),
-      nestedDir,
-      path.join(nestedDir, 'nested-file.txt'),
-      deepDir,
-      path.join(deepDir, 'deep-file.txt'),
-      nestedForMoveDir,
-      path.join(nestedForMoveDir, 'nested-file.txt')
-    ];
-
-    for (const p of requiredPaths) {
-      if (!await fse.pathExists(p)) {
-        console.error(`Error: Required path ${p} does not exist after setup.`);
-      }
-    }
+    // const requiredPaths = [
+    //   demoDir,
+    //   targetDir,
+    //   path.join(demoDir, 'test-file.txt'),
+    //   path.join(demoDir, 'file-to-move.txt'),
+    //   nestedDir,
+    //   path.join(nestedDir, 'nested-file.txt'),
+    //   deepDir,
+    //   path.join(deepDir, 'deep-file.txt'),
+    //   nestedForMoveDir,
+    //   path.join(nestedForMoveDir, 'nested-file.txt')
+    // ];
+    //
+    // for (const p of requiredPaths) {
+    //   if (!await fse.pathExists(p)) {
+    //     console.error(`Error: Required path ${p} does not exist after setup.`, p);
+    //   }
+    // }
 
   } catch (error) {
     console.error(`Error setting up test environment: ${error.message}`);

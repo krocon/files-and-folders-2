@@ -14,8 +14,6 @@
     "build:all": "pnpm build",
     "test:fnf": "pnpm --filter fnf test ",
     "test:fnf-api-test": "pnpm --filter fnf-api-test test",
-
-
     "e2e:fnf": "pnpm --filter fnf e2e",
     "test": "pnpm test:fnf && pnpm test:fnf-api-test",
     "e2e": "pnpm e2e:fnf",
