@@ -43,11 +43,18 @@ export class CleanHelper {
       }
     }
 
+    // Process each folder again:
+    if (cleanDialogData.deleteEmptyFolders) {
+      for (const folder of foldersToProcess) {
+        await this.deleteEmptyFolders(folder, result);
+      }
+    }
+
     return result;
   }
 
   /**
-   * Recursively deletes files matching the pattern
+   * Recursively deletes files and folders matching the pattern
    * @param folderPath The folder to process
    * @param pattern The glob pattern to match against
    * @param result The result object to update
@@ -60,8 +67,18 @@ export class CleanHelper {
         const fullPath = path.join(folderPath, entry.name);
 
         if (entry.isDirectory()) {
-          // Recursively process subdirectories
-          await this.deleteMatchingFiles(fullPath, pattern, result);
+          // Check if directory matches pattern
+          if (micromatch.isMatch(fullPath, pattern)) {
+            try {
+              await fs.remove(fullPath);
+              result.deletedFolders++;
+            } catch (error) {
+              result.errors.push(`Failed to delete folder ${fullPath}: ${error.message}`);
+            }
+          } else {
+            // Recursively process subdirectories only if they don't match the pattern
+            await this.deleteMatchingFiles(fullPath, pattern, result);
+          }
         } else {
           // Check if file matches pattern
           if (micromatch.isMatch(fullPath, pattern)) {
@@ -95,8 +112,11 @@ export class CleanHelper {
         const stats = await fs.stat(fullPath);
 
         if (stats.isDirectory()) {
+
+
           // If subdirectory was empty and deleted, don't include it in our check
           const wasEmpty = await this.deleteEmptyFolders(fullPath, result);
+
           if (wasEmpty) {
             // Remove the entry from our list since it's been deleted
             const index = entries.indexOf(entry);

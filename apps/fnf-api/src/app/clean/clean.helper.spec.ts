@@ -148,6 +148,53 @@ describe('CleanHelper', () => {
       expect(cleanHelper['deleteMatchingFiles']).toHaveBeenCalledWith('/test/folder/subdir', pattern, result);
       expect(result.deletedFiles).toBe(1); // Only file1.tmp should be deleted
     });
+
+    it('should delete folders that match the pattern before navigating into them', async () => {
+      // Arrange
+      const folderPath = '/test/folder';
+      const pattern = '**/*.tmp';
+      const result = {deletedFiles: 0, deletedFolders: 0, errors: []};
+
+      const entries = [
+        {name: 'file1.txt', isDirectory: () => false},
+        {name: 'subdir.tmp', isDirectory: () => true},
+        {name: 'normaldir', isDirectory: () => true}
+      ];
+
+      ((fs.readdir as unknown) as jest.Mock).mockResolvedValue(entries);
+      (path.join as jest.Mock).mockImplementation((dir, file) => `${dir}/${file}`);
+      ((fs.remove as unknown) as jest.Mock).mockResolvedValue(undefined);
+
+      // Mock micromatch.isMatch to return true for *.tmp files/folders
+      const micromatch = require('micromatch');
+      micromatch.isMatch = jest.fn().mockImplementation((path, pattern) => path.endsWith('.tmp'));
+
+      // Recursively mock for normaldir
+      jest.spyOn(cleanHelper as any, 'deleteMatchingFiles').mockImplementation(async (path, pattern, result) => {
+        if (path === '/test/folder/normaldir') {
+          return;
+        }
+
+        // Call the original implementation for the main folder
+        return await jest.requireActual('./clean.helper').CleanHelper.prototype.deleteMatchingFiles.call(
+          cleanHelper,
+          path,
+          pattern,
+          result
+        );
+      });
+
+      // Act
+      await cleanHelper['deleteMatchingFiles'](folderPath, pattern, result);
+
+      // Assert
+      expect(fs.readdir).toHaveBeenCalledWith(folderPath, {withFileTypes: true});
+      expect(fs.remove).toHaveBeenCalledWith('/test/folder/subdir.tmp');
+      expect(cleanHelper['deleteMatchingFiles']).toHaveBeenCalledWith('/test/folder/normaldir', pattern, result);
+      expect(cleanHelper['deleteMatchingFiles']).not.toHaveBeenCalledWith('/test/folder/subdir.tmp', pattern, result);
+      expect(result.deletedFolders).toBe(1); // subdir.tmp should be deleted
+      expect(result.deletedFiles).toBe(0); // No files should be deleted
+    });
   });
 
   describe('deleteEmptyFolders', () => {
