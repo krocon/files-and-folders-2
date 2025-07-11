@@ -109,7 +109,19 @@ export async function copy(para: FilePara): Promise<DirEventIf[]> {
   logger.log("cmd: " + cmd);
 
   try {
-    await executeCommand(cmd);
+    // Use spawn with a reasonable timeout for large file operations
+    // The timeout is longer for directories or when the source file is large
+    const fileSize = sourceIsDirectory ? 0 : stats.size;
+    const isLargeFile = fileSize > 100 * 1024 * 1024; // 100MB threshold
+    const timeout = sourceIsDirectory || isLargeFile ? 3600000 : 300000; // 1 hour for large files/dirs, 5 minutes otherwise
+
+    logger.log(`Moving ${sourceIsDirectory ? 'directory' : 'file'} of size ${fileSize} bytes with timeout ${timeout}ms`);
+
+    await executeCommand(cmd, {
+      useSpawn: true,
+      timeout: timeout
+    });
+
     return createRet(ptarget.dir, targetUrl, para);
 
   } catch (error) {
