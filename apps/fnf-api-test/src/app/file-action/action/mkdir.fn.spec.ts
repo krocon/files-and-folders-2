@@ -2,11 +2,7 @@ import {mkdir} from '@fnf/fnf-api/src/app/file-action/action/mkdir.fn';
 import {FileItem, FilePara} from '@fnf/fnf-data';
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import {
-  cleanupTestEnvironment,
-  restoreTestEnvironment,
-  setupTestEnvironment
-} from '@fnf/fnf-api/src/app/file-action/action/common/test-setup-helper';
+import {cleanupTestEnvironment, restoreTestEnvironment, setupTestEnvironment} from './common/test-setup-helper';
 
 /**
  * Test suite for the mkdir function
@@ -15,7 +11,7 @@ import {
 describe('mkdir', () => {
   // Define test paths
   const rootDir = process.cwd();
-  const testDir = path.join(rootDir, 'apps/fnf-api/test');
+  const testDir = path.join(rootDir, './test');
   const targetDir = path.join(testDir, 'target');
 
   // Setup and teardown for all tests

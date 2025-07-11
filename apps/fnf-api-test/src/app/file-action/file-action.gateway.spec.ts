@@ -2,11 +2,7 @@ import {Test, TestingModule} from '@nestjs/testing';
 import {FileActionGateway} from '@fnf/fnf-api/src/app/file-action/file-action.gateway';
 import {FileService} from '@fnf/fnf-api/src/app/file-action/file.service';
 import {ActionGatewayKeys as keys, FileItem, FilePara} from '@fnf/fnf-data';
-import {
-  cleanupTestEnvironment,
-  restoreTestEnvironment,
-  setupTestEnvironment
-} from '@fnf/fnf-api/src/app/file-action/action/common/test-setup-helper';
+import {cleanupTestEnvironment, restoreTestEnvironment, setupTestEnvironment} from './action/common/test-setup-helper';
 import * as path from 'path';
 import {Server} from 'socket.io';
 
@@ -26,7 +22,7 @@ describe('FileActionGateway', () => {
   } as unknown as Server;
 
   // Define test paths
-  const testDir = path.resolve('./apps/fnf-api/test');
+  const testDir = path.resolve('./test');
   const sourceDir = path.join(testDir, 'demo');
 
   // Setup and teardown for all tests

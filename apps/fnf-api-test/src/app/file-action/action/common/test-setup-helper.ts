@@ -9,12 +9,13 @@ import * as path from 'path';
  */
 
 // Define paths - use path.resolve to get the absolute path to the project root
-const rootDir = path.resolve(process.cwd(), '../../..');
-const rootTestDir = path.join(rootDir, 'test');
-const apiTestDir = path.join(rootDir, 'apps/fnf-api/test');
+const rootDir = path.resolve(process.cwd());
+const apiTestDir = path.join(rootDir, 'test');
+const testDataDir = path.join(rootDir, 'test', 'data');
+
 
 /**
- * Sets up the test environment by copying demo files from root /test to apps/fnf-api/test
+ * Sets up the test environment by copying demo files to apps/fnf-api-test/test
  * This ensures that each test has a fresh copy of the demo files to work with.
  *
  * @returns Promise that resolves when setup is complete
@@ -26,18 +27,26 @@ export async function setupTestEnvironment(): Promise<void> {
 
     // Ensure the target directory exists
     await fse.ensureDir(apiTestDir);
+    await fse.ensureDir(testDataDir);
 
-    // Copy demo.zip from root test directory
-    const demoZipSource = path.join(rootTestDir, 'demo.zip');
-    const demoZipTarget = path.join(apiTestDir, 'demo.zip');
+    const demoZipPath = path.join(apiTestDir, 'demo.zip');
+    const testDataDemoZipPath = path.join(testDataDir, 'demo.zip');
 
-    if (await fse.pathExists(demoZipSource)) {
-      await fse.copy(demoZipSource, demoZipTarget);
-    } else {
-      // Create an empty demo.zip if the source doesn't exist
-      await fse.writeFile(demoZipTarget, '');
-      console.warn(`Warning: Source demo.zip not found at ${demoZipSource}, created empty file instead.`);
+
+    try {
+      await fse.copy(testDataDemoZipPath, demoZipPath);
+    } catch (error) {
+      console.error(`Warning: Could not copy files from ${apiTestDir} to ${testDataDir}: ${error.message}`);
+      console.info('demoZipPath', demoZipPath);
+      console.info('testDataDemoZipPath', testDataDemoZipPath);
     }
+
+
+    // Ensure demo.zip exists
+    // if (!await fse.pathExists(demoZipPath)) {
+    //   console.warn(`Warning: demo.zip not found at ${demoZipPath}, creating empty file instead.`);
+    //   await fse.writeFile(demoZipPath, '');
+    // }
 
     // Create demo and target directories
     const demoDir = path.join(apiTestDir, 'demo');
@@ -109,7 +118,7 @@ export async function setupTestEnvironment(): Promise<void> {
 }
 
 /**
- * Cleans up the test environment by removing all files from apps/fnf-api/test
+ * Cleans up the test environment by removing all files from apps/fnf-api-test/test
  * This ensures that tests don't interfere with each other.
  *
  * @returns Promise that resolves when cleanup is complete

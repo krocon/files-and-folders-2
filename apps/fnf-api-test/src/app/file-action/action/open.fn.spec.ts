@@ -3,11 +3,7 @@ import {FileItem, FilePara} from '@fnf/fnf-data';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
-import {
-  cleanupTestEnvironment,
-  restoreTestEnvironment,
-  setupTestEnvironment
-} from '@fnf/fnf-api/src/app/file-action/action/common/test-setup-helper';
+import {cleanupTestEnvironment, restoreTestEnvironment, setupTestEnvironment} from './common/test-setup-helper';
 // Import the mocked module
 import * as executeCommandModule from '@fnf/fnf-api/src/app/file-action/action/common/execute-command';
 
@@ -22,7 +18,7 @@ jest.mock('@fnf/fnf-api/src/app/file-action/action/common/execute-command', () =
  */
 describe('open', () => {
   // Define test paths
-  const testDir = path.resolve('./apps/fnf-api/test');
+  const testDir = path.resolve('./test');
   const sourceDir = path.join(testDir, 'demo');
   const testFile = 'test-file.txt';
 

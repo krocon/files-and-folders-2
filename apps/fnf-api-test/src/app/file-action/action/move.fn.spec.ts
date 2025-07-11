@@ -2,11 +2,7 @@ import {move} from '@fnf/fnf-api/src/app/file-action/action/move.fn';
 import {FileItem, FilePara} from '@fnf/fnf-data';
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import {
-  cleanupTestEnvironment,
-  restoreTestEnvironment,
-  setupTestEnvironment
-} from '@fnf/fnf-api/src/app/file-action/action/common/test-setup-helper';
+import {cleanupTestEnvironment, restoreTestEnvironment, setupTestEnvironment} from './common/test-setup-helper';
 
 /**
  * Test suite for the move function
@@ -14,7 +10,7 @@ import {
  */
 describe('move', () => {
   // Define test paths
-  const testDir = path.resolve('./apps/fnf-api/test');
+  const testDir = path.resolve('./test');
   const sourceDir = path.join(testDir, 'demo');
   const targetDir = path.join(testDir, 'target');
   const testFile = 'test-file.txt';

@@ -2,11 +2,7 @@ import {rename} from '@fnf/fnf-api/src/app/file-action/action/rename.fn';
 import {FileItem, FilePara} from '@fnf/fnf-data';
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import {
-  cleanupTestEnvironment,
-  restoreTestEnvironment,
-  setupTestEnvironment
-} from '@fnf/fnf-api/src/app/file-action/action/common/test-setup-helper';
+import {cleanupTestEnvironment, restoreTestEnvironment, setupTestEnvironment} from './common/test-setup-helper';
 
 /**
  * Test suite for the rename function
@@ -14,7 +10,7 @@ import {
  */
 describe('rename', () => {
   // Define test paths
-  const testDir = path.resolve('./apps/fnf-api/test');
+  const testDir = path.resolve('./test');
   const sourceDir = path.join(testDir, 'demo');
   const testFile = 'file-to-rename.txt';
   const renamedFile = 'renamed-file.txt';

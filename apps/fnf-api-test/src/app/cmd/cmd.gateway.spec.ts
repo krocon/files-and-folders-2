@@ -5,7 +5,7 @@ import {
   cleanupTestEnvironment,
   restoreTestEnvironment,
   setupTestEnvironment
-} from '@fnf/fnf-api/src/app/file-action/action/common/test-setup-helper';
+} from '../file-action/action/common/test-setup-helper';
 import * as path from 'path';
 import {Server} from 'socket.io';
 
@@ -24,7 +24,7 @@ describe('CmdGateway', () => {
   } as unknown as Server;
 
   // Define test paths
-  const testDir = path.resolve('./apps/fnf-api/test');
+  const testDir = path.resolve('./test');
   const sourceDir = path.join(testDir, 'demo');
 
   // Setup and teardown for all tests

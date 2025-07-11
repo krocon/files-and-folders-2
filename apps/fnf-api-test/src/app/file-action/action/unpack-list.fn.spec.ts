@@ -2,11 +2,7 @@ import {unpacklist} from '@fnf/fnf-api/src/app/file-action/action/unpack-list.fn
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as StreamZip from 'node-stream-zip';
-import {
-  cleanupTestEnvironment,
-  restoreTestEnvironment,
-  setupTestEnvironment
-} from '@fnf/fnf-api/src/app/file-action/action/common/test-setup-helper';
+import {cleanupTestEnvironment, restoreTestEnvironment, setupTestEnvironment} from './common/test-setup-helper';
 
 /**
  * Test suite for the unpacklist function
@@ -14,7 +10,7 @@ import {
  */
 describe('unpacklist', () => {
   // Define test paths
-  const testDir = path.resolve('./apps/fnf-api/test');
+  const testDir = path.resolve('./test');
   const sourceDir = path.join(testDir, 'demo');
   const zipFile = 'test-archive.zip';
   const zipFilePath = path.join(sourceDir, zipFile);
