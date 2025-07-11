@@ -14,6 +14,8 @@ export type WalkCallback = (walkData: WalkData) => void;
  */
 export class WalkSocketService {
 
+  static runningNumber = 0;
+
   private rid: number = Math.floor(Math.random() * 1000000) + 1;
   private cancellings: { [key: string]: Subscription } = {};
   private isConnected = false;
@@ -222,6 +224,9 @@ export class WalkSocketService {
     this.cancellings[cancelKey] = this.socket
       .fromEvent<WalkData, string>(listenKey)
       .subscribe(wd => {
+        WalkSocketService.runningNumber++;
+        wd.rn = WalkSocketService.runningNumber;
+        console.info('###', JSON.stringify(wd));
         callback(wd);
       });
 
