@@ -722,45 +722,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     // if (this.panelIndex===1 && dirEvent.action!=='list') console.info(dirEvent.action, JSON.stringify(dirEvent, null, 0));
 
     if (dirEvent.action === "list") {
-      let rows: FileItemIf[] = [];
-
-      if (!dirEvent.end) {
-        rows = [...this.bodyAreaModel.getAllRows()];
-      }
-      if (dirEvent.items) {
-        rows = [...rows,
-          ...dirEvent.items.filter(fi => (
-            fi.dir === this.dirPara?.path
-            || this.dirPara?.path.startsWith('tabfind')
-            || isSameDir(fi.dir, this.dirPara?.path ?? '')
-            || isRoot(fi.dir) && isRoot(zi.zipInnerUrl))
-          )];
-      }
-      if (!isRoot(this.dirPara.path)
-        && !this.dirPara?.path.startsWith('tabfind')
-        && !rows.find(r => r.base === DOT_DOT)
-      ) {
-        // Adding '..' as the first item (parent dir):
-        rows = [
-          new FileItem(getParent(this.dirPara.path), DOT_DOT, "", "", 1, true),
-          ...rows
-        ];
-      }
-
-      if (this.tableApi) {
-        this.setRows(rows);
-
-        const selectionLabelData: SelectionEvent = this.gridSelectionCountService
-          .getSelectionCountData(
-            [],
-            this.bodyAreaModel?.getFilteredRows() ?? []
-          );
-        this.selectionLabelDataChanged.next(selectionLabelData);
-      }
-
-      if (dirEvent.end) {
-        //
-      }
+      this.handleDirEventList(dirEvent, zi, this.dirPara.path);
 
     } else if (dirEvent.action === "add" || dirEvent.action === "addDir") {
       this.addRows(dirEvent);
@@ -784,7 +746,10 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
       this.tableApi.removeRows(dirEvent.items, equalFileItem);
       this.bodyAreaModel.setFocusedRowIndex(Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.getFocusedRowIndex()));
-      //this.scrollToFocus();
+
+      this.tableApi.externalFilterChanged();
+      this.tableApi.reSort();
+
       this.repaintTable();
       this.selectionManager.updateSelection();
 
@@ -831,11 +796,57 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  private handleDirEventList(dirEvent: DirEventIf, zi: ZipUrlInfo, panelPath: string) {
+    let rows: FileItemIf[] = [];
+
+    if (!dirEvent.end) {
+      rows = [...this.bodyAreaModel.getAllRows()];
+    }
+    if (dirEvent.items) {
+      rows = [...rows,
+        ...dirEvent.items.filter(fi => (
+          fi.dir === panelPath
+          || panelPath.startsWith('tabfind')
+          || isSameDir(fi.dir, panelPath ?? '')
+          || isRoot(fi.dir) && isRoot(zi.zipInnerUrl))
+        )];
+    }
+    if (!isRoot(panelPath)
+      && !panelPath.startsWith('tabfind')
+      && !rows.find(r => r.base === DOT_DOT)
+    ) {
+      // Adding '..' as the first item (parent dir):
+      rows = [
+        new FileItem(getParent(panelPath), DOT_DOT, "", "", 1, true),
+        ...rows
+      ];
+    }
+
+    if (this.tableApi) {
+      this.setRows(rows);
+
+      const selectionLabelData: SelectionEvent = this.gridSelectionCountService
+        .getSelectionCountData(
+          [],
+          this.bodyAreaModel?.getFilteredRows() ?? []
+        );
+      this.selectionLabelDataChanged.next(selectionLabelData);
+    }
+
+    if (dirEvent.end) {
+      //
+    }
+  }
+
   private addRows(dirEvent: DirEventIf) {
     if (!this.tableApi || !dirEvent || !this.dirPara) return;
 
     this.tableApi.addRows(dirEvent.items);
-    this.bodyAreaModel.getAllRows().sort(fileItemSorter)
+    this.bodyAreaModel.getAllRows().sort(fileItemSorter);
+
+    this.tableApi.externalFilterChanged();
+    this.tableApi.reSort();
+
     this.repaintTable();
     this.selectionManager.updateSelection();
   }
@@ -876,7 +887,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       this.tableApi.externalFilterChanged();
       this.tableApi.reSort();
       this.tableApi.repaintHard();
-      this.tableApi.repaintHard();
+      this.tableApi.ensureRowIsVisible(this.bodyAreaModel.getFocusedRowIndex());
     }
   }
 
@@ -936,7 +947,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     return isSameDir(f1, zi.zipUrl + ":");
   }
 
-  private filterFn(value: FileItemIf, index: number, array: FileItemIf[]): boolean {
+  private filterFn(value: FileItemIf, _index: number, _array: FileItemIf[]): boolean {
     if (value.base === DOT_DOT) return true;
     return (!this.filterActive || value.base.toLowerCase().includes(this.filterText.toLowerCase()))
       && (this.hiddenFilesVisible || !value.base.startsWith('.'))

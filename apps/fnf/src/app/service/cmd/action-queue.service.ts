@@ -80,21 +80,6 @@ export class ActionQueueService {
     return this.getQueue(queueIndex).progress;
   }
 
-  /**
-   * Adds an action to a queue
-   * @param action The action to add
-   * @param queueIndex The index of the queue to add the action to
-   */
-  addAction(action: QueueActionEvent, queueIndex: number = 0): void {
-    const queue = this.getQueue(queueIndex);
-    action.status = this.ACTION_STATUS_NEW;
-    action.id = ++this.jobId;
-    queue.actions.push(action);
-    queue.jobId = this.jobId;
-
-    this.triggerJobQueueTableUpdate();
-    this.triggerProgress();
-  }
 
   /**
    * Adds multiple actions to a queue
