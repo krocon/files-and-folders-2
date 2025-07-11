@@ -4,12 +4,12 @@
   "description": "Tests for NestJS API for Files and Folders",
   "private": false,
   "scripts": {
-    "test": "jest",
+    "test": "jest --runInBand",
     "test-fn": "jest --testPathPattern=\".*fn\\.spec\\.ts$\" --runInBand",
     "test-gateway": "jest --testPathPattern=\".*gateway\\.spec\\.ts$\" --runInBand",
     "test-controller": "jest --testPathPattern=\".*controller\\.spec\\.ts$\" --runInBand",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
+    "test:watch": "jest --watch --runInBand",
+    "test:cov": "jest --coverage --runInBand",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
   },
   "dependencies": {

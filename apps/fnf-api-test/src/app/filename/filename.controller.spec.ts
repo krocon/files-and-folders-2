@@ -4,6 +4,22 @@ import {HttpService} from '@nestjs/axios';
 import {of} from 'rxjs';
 import {AxiosResponse} from 'axios';
 
+// Mock the environment module
+jest.mock('@fnf/fnf-api/src/environments/environment', () => ({
+  environment: {
+    openaiApiKey: 'test-api-key',
+    production: false,
+    frontendPort: 4201,
+    websocketPort: 3334,
+    websocketOptions: {
+      cors: {
+        origin: ['*'],
+        methods: ["GET", "POST"],
+      }
+    }
+  }
+}));
+
 describe('FilenameController', () => {
   let controller: FilenameController;
   let httpService: HttpService;

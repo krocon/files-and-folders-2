@@ -8,8 +8,8 @@ import * as path from 'path';
  * and cleaning up after tests.
  */
 
-// Define paths - use process.cwd() to get the absolute path to the project root
-const rootDir = process.cwd();
+// Define paths - use path.resolve to get the absolute path to the project root
+const rootDir = path.resolve(process.cwd(), '../../..');
 const rootTestDir = path.join(rootDir, 'test');
 const apiTestDir = path.join(rootDir, 'apps/fnf-api/test');
 
@@ -20,42 +20,92 @@ const apiTestDir = path.join(rootDir, 'apps/fnf-api/test');
  * @returns Promise that resolves when setup is complete
  */
 export async function setupTestEnvironment(): Promise<void> {
-  // Ensure the target directory exists
-  await fse.ensureDir(apiTestDir);
+  try {
+    // First, ensure we have a clean test environment
+    await cleanupTestEnvironment();
 
-  // Copy demo.zip from root test directory
-  const demoZipSource = path.join(rootTestDir, 'demo.zip');
-  const demoZipTarget = path.join(apiTestDir, 'demo.zip');
+    // Ensure the target directory exists
+    await fse.ensureDir(apiTestDir);
 
-  if (await fse.pathExists(demoZipSource)) {
-    await fse.copy(demoZipSource, demoZipTarget);
+    // Copy demo.zip from root test directory
+    const demoZipSource = path.join(rootTestDir, 'demo.zip');
+    const demoZipTarget = path.join(apiTestDir, 'demo.zip');
+
+    if (await fse.pathExists(demoZipSource)) {
+      await fse.copy(demoZipSource, demoZipTarget);
+    } else {
+      // Create an empty demo.zip if the source doesn't exist
+      await fse.writeFile(demoZipTarget, '');
+      console.warn(`Warning: Source demo.zip not found at ${demoZipSource}, created empty file instead.`);
+    }
+
+    // Create demo and target directories
+    const demoDir = path.join(apiTestDir, 'demo');
+    const targetDir = path.join(apiTestDir, 'target');
+
+    await fse.ensureDir(demoDir);
+    await fse.ensureDir(targetDir);
+
+    // Create some test files in the demo directory
+    await fse.writeFile(
+      path.join(demoDir, 'test-file.txt'),
+      'This is a test file for file operations.'
+    );
+
+    // Create a file to move for move tests
+    await fse.writeFile(
+      path.join(demoDir, 'file-to-move.txt'),
+      'This file will be moved during tests.'
+    );
+
+    // Create nested directory structure
+    const nestedDir = path.join(demoDir, 'nested');
+    await fse.ensureDir(nestedDir);
+    await fse.writeFile(
+      path.join(nestedDir, 'nested-file.txt'),
+      'This is a nested file for testing.'
+    );
+
+    // Create deep nested directory
+    const deepDir = path.join(nestedDir, 'deep');
+    await fse.ensureDir(deepDir);
+    await fse.writeFile(
+      path.join(deepDir, 'deep-file.txt'),
+      'This is a deeply nested file for testing.'
+    );
+
+    // Create directory for move tests
+    const nestedForMoveDir = path.join(demoDir, 'nested-for-move');
+    await fse.ensureDir(nestedForMoveDir);
+    await fse.writeFile(
+      path.join(nestedForMoveDir, 'nested-file.txt'),
+      'This is a nested file for move testing.'
+    );
+
+    // Verify that all required files and directories exist
+    const requiredPaths = [
+      demoDir,
+      targetDir,
+      path.join(demoDir, 'test-file.txt'),
+      path.join(demoDir, 'file-to-move.txt'),
+      nestedDir,
+      path.join(nestedDir, 'nested-file.txt'),
+      deepDir,
+      path.join(deepDir, 'deep-file.txt'),
+      nestedForMoveDir,
+      path.join(nestedForMoveDir, 'nested-file.txt')
+    ];
+
+    for (const p of requiredPaths) {
+      if (!await fse.pathExists(p)) {
+        console.error(`Error: Required path ${p} does not exist after setup.`);
+      }
+    }
+
+  } catch (error) {
+    console.error(`Error setting up test environment: ${error.message}`);
+    throw error;
   }
-
-  // Create demo and target directories
-  await fse.ensureDir(path.join(apiTestDir, 'demo'));
-  await fse.ensureDir(path.join(apiTestDir, 'target'));
-
-  // Create some test files in the demo directory
-  await fse.writeFile(
-    path.join(apiTestDir, 'demo', 'test-file.txt'),
-    'This is a test file for file operations.'
-  );
-
-  // Create nested directory structure
-  const nestedDir = path.join(apiTestDir, 'demo', 'nested');
-  await fse.ensureDir(nestedDir);
-  await fse.writeFile(
-    path.join(nestedDir, 'nested-file.txt'),
-    'This is a nested file for testing.'
-  );
-
-  // Create deep nested directory
-  const deepDir = path.join(nestedDir, 'deep');
-  await fse.ensureDir(deepDir);
-  await fse.writeFile(
-    path.join(deepDir, 'deep-file.txt'),
-    'This is a deeply nested file for testing.'
-  );
 }
 
 /**
@@ -65,9 +115,47 @@ export async function setupTestEnvironment(): Promise<void> {
  * @returns Promise that resolves when cleanup is complete
  */
 export async function cleanupTestEnvironment(): Promise<void> {
-  // Check if directory exists before attempting to empty it
+  // Check if directory exists before attempting to clean it
   if (await fse.pathExists(apiTestDir)) {
-    await fse.emptyDir(apiTestDir);
+    try {
+      // Use a more robust approach to clean up the test directory
+      // First, remove the entire directory and all its contents
+      await fse.remove(apiTestDir);
+
+      // Then recreate the empty directory
+      await fse.ensureDir(apiTestDir);
+
+    } catch (error) {
+      console.warn(`Warning: Could not fully clean up test environment: ${error.message}`);
+
+      // Fallback cleanup method if the first approach fails
+      try {
+        // Try to empty the directory
+        await fse.emptyDir(apiTestDir);
+
+        // Additional cleanup for nested directories that might be causing issues
+        const nestedDirs = [
+          path.join(apiTestDir, 'demo', 'nested', 'deep'),
+          path.join(apiTestDir, 'demo', 'nested'),
+          path.join(apiTestDir, 'demo'),
+          path.join(apiTestDir, 'target')
+        ];
+
+        // Process directories from deepest to shallowest
+        for (const dir of nestedDirs) {
+          if (await fse.pathExists(dir)) {
+            try {
+              // Remove the directory and all its contents
+              await fse.remove(dir);
+            } catch (innerError) {
+              console.warn(`Warning: Could not remove directory ${dir}: ${innerError.message}`);
+            }
+          }
+        }
+      } catch (fallbackError) {
+        console.warn(`Warning: Fallback cleanup also failed: ${fallbackError.message}`);
+      }
+    }
   }
 }
 

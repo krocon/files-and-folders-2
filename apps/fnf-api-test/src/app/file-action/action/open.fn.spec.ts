@@ -3,12 +3,18 @@ import {FileItem, FilePara} from '@fnf/fnf-data';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
-import * as executeCommandModule from '@fnf/fnf-api/src/app/file-action/action/common/execute-command';
 import {
   cleanupTestEnvironment,
   restoreTestEnvironment,
   setupTestEnvironment
 } from '@fnf/fnf-api/src/app/file-action/action/common/test-setup-helper';
+// Import the mocked module
+import * as executeCommandModule from '@fnf/fnf-api/src/app/file-action/action/common/execute-command';
+
+// Mock the executeCommand module
+jest.mock('@fnf/fnf-api/src/app/file-action/action/common/execute-command', () => ({
+  executeCommand: jest.fn()
+}));
 
 /**
  * Test suite for the open function
@@ -20,8 +26,8 @@ describe('open', () => {
   const sourceDir = path.join(testDir, 'demo');
   const testFile = 'test-file.txt';
 
-  // Mock the executeCommand function
-  let executeCommandSpy: jest.SpyInstance;
+  // Get a reference to the mocked function
+  const executeCommandMock = executeCommandModule.executeCommand as jest.Mock;
 
   // Setup and teardown for all tests
   beforeAll(async () => {
@@ -43,13 +49,14 @@ describe('open', () => {
     const testFilePath = path.join(sourceDir, testFile);
     await fse.writeFile(testFilePath, 'This is a test file for opening.');
 
-    // Mock the executeCommand function
-    executeCommandSpy = jest.spyOn(executeCommandModule, 'executeCommand').mockResolvedValue(undefined);
+    // Reset and configure the mock for each test
+    executeCommandMock.mockReset();
+    executeCommandMock.mockResolvedValue(undefined);
   });
 
   afterEach(async () => {
-    // Restore the original executeCommand function
-    executeCommandSpy.mockRestore();
+    // Reset all mocks after each test
+    jest.clearAllMocks();
   });
 
   /**
@@ -65,8 +72,8 @@ describe('open', () => {
     await open(filePara);
 
     // Assert
-    expect(executeCommandSpy).toHaveBeenCalledTimes(1);
-    const command = executeCommandSpy.mock.calls[0][0];
+    expect(executeCommandMock).toHaveBeenCalledTimes(1);
+    const command = executeCommandMock.mock.calls[0][0];
     expect(command).toContain('start');
     expect(command).toContain(expectedPath);
   });
@@ -84,8 +91,8 @@ describe('open', () => {
     await open(filePara);
 
     // Assert
-    expect(executeCommandSpy).toHaveBeenCalledTimes(1);
-    const command = executeCommandSpy.mock.calls[0][0];
+    expect(executeCommandMock).toHaveBeenCalledTimes(1);
+    const command = executeCommandMock.mock.calls[0][0];
     expect(command).toContain('open');
     expect(command).toContain(expectedPath);
   });
@@ -103,8 +110,8 @@ describe('open', () => {
     await open(filePara);
 
     // Assert
-    expect(executeCommandSpy).toHaveBeenCalledTimes(1);
-    const command = executeCommandSpy.mock.calls[0][0];
+    expect(executeCommandMock).toHaveBeenCalledTimes(1);
+    const command = executeCommandMock.mock.calls[0][0];
     expect(command).toContain('evince');
     expect(command).toContain(expectedPath);
   });
@@ -114,8 +121,8 @@ describe('open', () => {
    */
   (os.platform().indexOf('linux') === 0 ? it : it.skip)('should try alternate command when first command fails', async () => {
     // Mock executeCommand to fail on first call and succeed on second
-    executeCommandSpy.mockReset();
-    executeCommandSpy
+    executeCommandMock.mockReset();
+    executeCommandMock
       .mockRejectedValueOnce(new Error('Command failed'))
       .mockResolvedValueOnce(undefined);
 
@@ -127,8 +134,8 @@ describe('open', () => {
     await open(filePara);
 
     // Assert
-    expect(executeCommandSpy).toHaveBeenCalledTimes(2);
-    const secondCommand = executeCommandSpy.mock.calls[1][0];
+    expect(executeCommandMock).toHaveBeenCalledTimes(2);
+    const secondCommand = executeCommandMock.mock.calls[1][0];
     expect(secondCommand).toContain('kpdf');
   });
 
