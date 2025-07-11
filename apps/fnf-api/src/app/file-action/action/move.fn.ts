@@ -116,10 +116,13 @@ export async function move(para: FilePara): Promise<DirEventIf[]> {
     return createRet(para, targetUrl);
 
   } catch (error) {
-    // second try:
+    return fallbackMove(error, sourceUrl, targetUrl, para);
+  }
+
+  async function fallbackMove(error: Error, sourceUrl: string, targetUrl: string, para: FilePara): Promise<DirEventIf[]> {
     logger.error(error);
-    const to = path.join(targetUrl, "/", para.source.base);
-    await fse.move(sourceUrl, to);
+    const targetPath = path.join(targetUrl, "/", para.source.base);
+    await fse.move(sourceUrl, targetPath);
     return createRet(para, targetUrl);
   }
 
