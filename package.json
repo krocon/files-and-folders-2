@@ -12,8 +12,10 @@
     "build:fnf-data": "pnpm --filter fnf-data build",
     "build": "pnpm build:fnf-data && pnpm build:fnf && pnpm build:fnf-api && pnpm build:fnf-api-test",
     "build:all": "pnpm build",
-    "test:fnf": "pnpm --filter fnf apps/fnf-api-test/test",
-    "test:fnf-api-test": "pnpm --filter fnf-api-test apps/fnf-api-test/test",
+    "test:fnf": "pnpm --filter fnf test ",
+    "test:fnf-api-test": "pnpm --filter fnf-api-test test",
+
+
     "e2e:fnf": "pnpm --filter fnf e2e",
     "test": "pnpm test:fnf && pnpm test:fnf-api-test",
     "e2e": "pnpm e2e:fnf",

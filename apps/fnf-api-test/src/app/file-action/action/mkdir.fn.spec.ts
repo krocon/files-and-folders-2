@@ -36,7 +36,7 @@ describe('mkdir', () => {
    */
   it('should create a directory and return correct DirEvents', async () => {
     // Arrange
-    const newDirName = 'new-directory';
+    const newDirName = 'new-directory-2';
     const target = new FileItem(targetDir, newDirName, '');
     target.isDir = true;
     const filePara = new FilePara(null, target, 0, 0, 'mkdir');
@@ -77,7 +77,7 @@ describe('mkdir', () => {
    */
   it('should create a nested directory', async () => {
     // Arrange
-    const nestedPath = 'nested/deep/directory';
+    const nestedPath = 'nested/deep/directory2';
     const target = new FileItem(targetDir, nestedPath, '');
     target.isDir = true;
     const filePara = new FilePara(null, target, 0, 0, 'mkdir');
@@ -102,7 +102,7 @@ describe('mkdir', () => {
    */
   it('should throw an error when directory already exists', async () => {
     // Arrange
-    const existingDirName = 'existing-directory';
+    const existingDirName = 'existing-directory-2';
     const existingDirPath = path.join(targetDir, existingDirName);
 
     // Create the directory first

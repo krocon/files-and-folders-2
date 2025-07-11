@@ -11,7 +11,7 @@ import * as path from 'path';
 // Define paths - use path.resolve to get the absolute path to the project root
 const rootDir = path.resolve(process.cwd());
 const apiTestDir = path.join(rootDir, 'test');
-const testDataDir = path.join(rootDir, 'test', 'data');
+const testDataDir = path.join(rootDir, 'testdata');
 
 
 /**
@@ -179,3 +179,5 @@ export async function restoreTestEnvironment(): Promise<void> {
   await cleanupTestEnvironment();
   await setupTestEnvironment();
 }
+
+
