@@ -34,8 +34,11 @@
             matSuffix></fnf-clean-template-dropdown>
 
         <mat-hint>
-          @if (walkCancelKey) {
-            Pattern found:
+          @if (formGroup.get('pattern')?.invalid || !formGroup.get('pattern')?.value) {
+            No file will be deleted.
+
+          } @else if (walkCancelKey) {
+            Pattern found &rarr;
             <fnf-walk-data
                 [walkData]="walkData"
                 [hideWording]="true"></fnf-walk-data>

@@ -13,6 +13,7 @@ export class CleanHelper {
    * @returns A summary of the cleaning operation
    */
   async clean(cleanDialogData: CleanDialogData): Promise<CleanResult> {
+
     const result: CleanResult = {
       deletedFiles: 0,
       deletedFolders: 0,

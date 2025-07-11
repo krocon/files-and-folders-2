@@ -41,7 +41,7 @@ export class FileWalker {
 
   private matchesPattern(item: FileItemIf): boolean {
     if (!this.walkParaData.filePattern) {
-      return true;
+      return false;
     }
     return (micromatch.isMatch(path.join(item.dir, item.base), this.walkParaData.filePattern));
   }

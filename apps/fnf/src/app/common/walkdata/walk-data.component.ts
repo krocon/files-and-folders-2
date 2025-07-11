@@ -19,13 +19,13 @@ import {FnfFileSizePipe} from '../fnf-file-size.pipe';
       Scanning...
     }
 
-    <b>{{ walkData.fileCount }}</b> file{{ walkData.fileCount > 1 ? 's' : '' }}&nbsp;(
-    <b>{{ walkData.sizeSum | fnfFileSize }}</b>)
+    <b>{{ walkData.fileCount }}</b> file{{ walkData.fileCount > 1 ? 's' : '' }}&nbsp;
+    <span>(<b>{{ walkData.sizeSum | fnfFileSize }}</b>)</span>
 
     @if (hideFolderCount || walkData.folderCount === 0) {
       <!-- no folder -->
     } @else if (walkData.folderCount === 1) {
-      and one folder
+      and <b>one</b> folder
     } @else {
       and <b>{{ walkData.folderCount }}</b> folders
     }

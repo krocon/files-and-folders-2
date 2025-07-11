@@ -24,7 +24,7 @@ export class CleanTemplateDropdownComponent {
 
 
   fileTypes: FileExtensionsType[] = [
-    {"label": "Warez Leftovers", "extensions": ["**/*.nfo", "**/*sample.mkv", "**/Sample", "**/Proof"]},
+    {"label": "Warez Leftovers", "extensions": ["**/*.nfo", "**/*sample.mkv", "**/Sample", "**/Proof", "**/Subs"]},
   ];
 
   @Output() onSelected = new EventEmitter<string>();

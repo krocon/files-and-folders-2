@@ -132,15 +132,29 @@ export class CleanDialogComponent implements OnInit, OnDestroy {
 
   onOkClicked() {
     this.cleaning = true;
+    this.updateFormControlsState();
     this.cdr.detectChanges();
     this.cleanService
       .clean(this.formGroup.getRawValue())
       .pipe(takeWhile(() => this.alive))
       .subscribe((res: CleanResult) => {
         this.cleaning = false;
+        this.updateFormControlsState();
         this.cdr.detectChanges();
         this.dialogRef.close(res);
       });
+  }
+
+  private updateFormControlsState() {
+    if (this.cleaning) {
+      this.formGroup.get('folder')?.disable();
+      this.formGroup.get('pattern')?.disable();
+      this.formGroup.get('deleteEmptyFolders')?.disable();
+    } else {
+      this.formGroup.get('folder')?.enable();
+      this.formGroup.get('pattern')?.enable();
+      this.formGroup.get('deleteEmptyFolders')?.enable();
+    }
   }
 
   onCancelClicked() {
