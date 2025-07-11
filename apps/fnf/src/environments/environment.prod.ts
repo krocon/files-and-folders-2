@@ -24,6 +24,9 @@ export const environment = {
   checkGlob: {
     checkGlobUrl: "/api/checkglob"
   },
+  clean: {
+    cleanUrl: "/api/clean"
+  },
   lookAndFeel: {
     getLookAndFeelUrl: "assets/config/color/%theme%.json"
   },

@@ -66,6 +66,7 @@ import {WalkCallback, WalkSocketService} from "./service/walk.socketio.service";
 import {MultiRenameAiService} from "./component/cmd/multirename/multi-rename-ai.service";
 import {CleanDialogService} from "./component/cmd/clean/clean-dialog.service";
 import {GlobValidatorService} from "./service/glob-validator.service";
+import {CleanService} from "./service/clean.service";
 
 
 @Injectable({
@@ -132,6 +133,7 @@ export class AppService {
     FiletypeExtensionsService.forRoot(environment.filetypeExtensions);
     MultiRenameAiService.forRoot(environment.multiRename);
     GlobValidatorService.forRoot(environment.checkGlob);
+    CleanService.forRoot(environment.clean);
 
     this.favDataService
       .valueChanges()

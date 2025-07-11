@@ -3,7 +3,7 @@ import {CleanHelper} from './clean.helper';
 import {CleanDialogData} from '@fnf/fnf-data';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import {CleanResult} from './clean-result';
+import {CleanResult} from '@fnf-data/src/models/clean/clean-result';
 
 jest.mock('fs-extra', () => ({
   ...jest.requireActual('fs-extra'),

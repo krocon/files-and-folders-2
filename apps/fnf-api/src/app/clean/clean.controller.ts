@@ -1,10 +1,11 @@
 import {Body, Controller, Post} from '@nestjs/common';
 import {CleanDialogData} from '@fnf/fnf-data';
 import {CleanHelper} from './clean.helper';
-import {CleanResult} from "./clean-result";
+import {CleanResult} from "@fnf-data/src/models/clean/clean-result";
 
 @Controller()
 export class CleanController {
+
   constructor(private readonly cleanHelper: CleanHelper) {
   }
 

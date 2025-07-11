@@ -55,9 +55,12 @@
 
     </form>
 
-    <div>
+    @if (cleaning) {
+      <div>
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      </div>
+    }
 
-    </div>
 
   </div>
 </mat-dialog-content>
@@ -91,7 +94,7 @@
 
   <button
       (click)="onOkClicked()"
-      [disabled]="!formGroup.valid || formGroup.pending"
+      [disabled]="!formGroup.valid || formGroup.pending || cleaning"
       color="primary"
       data-test-id="dialog-ok-button"
       mat-raised-button>

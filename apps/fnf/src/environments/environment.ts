@@ -30,6 +30,9 @@ export const environment = {
   checkGlob: {
     checkGlobUrl: prefix + "/api/checkglob"
   },
+  clean: {
+    cleanUrl: prefix + "/api/clean"
+  },
 
   lookAndFeel: {
     getLookAndFeelUrl: "assets/config/color/%theme%.json"

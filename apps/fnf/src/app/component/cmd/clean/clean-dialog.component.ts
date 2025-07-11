@@ -19,7 +19,7 @@ import {MatFormField, MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {FnfAutofocusDirective} from "../../../common/directive/fnf-autofocus.directive";
-import {CleanDialogData, WalkData} from "@fnf/fnf-data";
+import {CleanDialogData, CleanResult, WalkData} from "@fnf/fnf-data";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {SelectFolderDropdownComponent} from "../../common/selectfolderdropdown/select-folder-dropdown.component";
@@ -29,6 +29,8 @@ import {WalkSocketService} from "../../../service/walk.socketio.service";
 import {GlobValidatorService} from "../../../service/glob-validator.service";
 import {globPatternAsyncValidator} from "../../../common/fn/glob-pattern-validator.fn";
 import {debounceTime, distinctUntilChanged, takeWhile} from "rxjs/operators";
+import {CleanService} from "../../../service/clean.service";
+import {MatProgressBar} from "@angular/material/progress-bar";
 
 
 @Component({
@@ -49,6 +51,7 @@ import {debounceTime, distinctUntilChanged, takeWhile} from "rxjs/operators";
     SelectFolderDropdownComponent,
     CleanTemplateDropdownComponent,
     WalkDataComponent,
+    MatProgressBar,
   ],
   styleUrls: ["./clean-dialog.component.css"],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,7 +63,7 @@ export class CleanDialogComponent implements OnInit, OnDestroy {
   walkCancelKey = '';
 
   alive = true;
-
+  public cleaning = false;
 
   constructor(
     public dialogRef: MatDialogRef<CleanDialogComponent>,
@@ -69,6 +72,7 @@ export class CleanDialogComponent implements OnInit, OnDestroy {
     private readonly walkSocketService: WalkSocketService,
     private readonly cdr: ChangeDetectorRef,
     private readonly globValidatorService: GlobValidatorService,
+    private readonly cleanService: CleanService,
   ) {
     const folder = data.folder ? data.folder : data.folders?.join(',');
     this.formGroup = this.formBuilder
@@ -127,7 +131,16 @@ export class CleanDialogComponent implements OnInit, OnDestroy {
   }
 
   onOkClicked() {
-    // TODO this.dialogRef.close(this.formGroup.getRawValue());
+    this.cleaning = true;
+    this.cdr.detectChanges();
+    this.cleanService
+      .clean(this.formGroup.getRawValue())
+      .pipe(takeWhile(() => this.alive))
+      .subscribe((res: CleanResult) => {
+        this.cleaning = false;
+        this.cdr.detectChanges();
+        this.dialogRef.close(res);
+      });
   }
 
   onCancelClicked() {
