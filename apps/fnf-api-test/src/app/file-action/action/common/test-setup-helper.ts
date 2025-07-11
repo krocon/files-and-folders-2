@@ -34,7 +34,8 @@ export async function setupTestEnvironment(): Promise<void> {
 
 
     try {
-      await fse.copy(testDataDemoZipPath, demoZipPath);
+      await fse.copy(testDataDir, apiTestDir);
+      // await fse.copy(testDataDemoZipPath, demoZipPath);
     } catch (error) {
       console.error(`Warning: Could not copy files from ${apiTestDir} to ${testDataDir}: ${error.message}`);
       console.info('demoZipPath', demoZipPath);
