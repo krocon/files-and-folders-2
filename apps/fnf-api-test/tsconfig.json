@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@fnf-data/*": [
+        "../../libs/fnf-data/*"
+      ],
+      "@fnf/fnf-data": [
+        "../../libs/fnf-data/src/index.ts"
+      ],
+      "@fnf/fnf-api/*": [
+        "../../apps/fnf-api/*"
+      ]
+    }
+  }
+}

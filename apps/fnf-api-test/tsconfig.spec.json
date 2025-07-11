@@ -1,0 +1,29 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "types": [
+      "jest",
+      "node"
+    ],
+    "paths": {
+      "@fnf-data/*": [
+        "../../libs/fnf-data/*"
+      ],
+      "@fnf/fnf-data": [
+        "../../libs/fnf-data/src/index.ts"
+      ],
+      "@fnf/fnf-api/*": [
+        "../../apps/fnf-api/*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/*.d.ts"
+  ],
+  "skipLibCheck": true
+}
