@@ -4,6 +4,7 @@ import {MatMenuModule} from "@angular/material/menu";
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {MatDividerModule} from "@angular/material/divider";
+import {MatTooltip} from "@angular/material/tooltip";
 
 
 type FileExtensionsType = { "label": string, "extensions": string[] };
@@ -17,7 +18,7 @@ type FileExtensionsType = { "label": string, "extensions": string[] };
     MatIconModule,
     MatButtonModule,
     MatDividerModule,
-
+    MatTooltip,
   ]
 })
 export class CleanTemplateDropdownComponent {

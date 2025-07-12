@@ -12,7 +12,9 @@
     <button
         (click)="onItemClicked(ft)"
         mat-menu-item>
-      <span [innerText]="ft.label"></span>
+      <span
+          [innerText]="ft.label"
+          [matTooltip]="ft.extensions.length > 0 ? ft.extensions.join(', ') : 'No extensions'"></span>
     </button>
   }
 
