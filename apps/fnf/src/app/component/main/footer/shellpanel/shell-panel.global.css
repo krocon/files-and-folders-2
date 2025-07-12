@@ -1,0 +1,15 @@
+
+app-shell-panel {
+    .mat-mdc-form-field {
+        .mdc-line-ripple {
+            display: none;
+        }
+    }
+
+    .mat-mdc-form-field.mat-focused,
+    .mat-mdc-form-field:hover {
+        .mdc-line-ripple {
+            display: block;
+        }
+    }
+}

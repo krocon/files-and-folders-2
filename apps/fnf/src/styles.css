@@ -20,6 +20,8 @@
 @import "css/buttonpanel.component.global.css";
 @import "css/fnf-scrollbar.css";
 
+@import "app/component/main/footer/shellpanel/shell-panel.global.css";
+
 
 html, body {
     margin: 0;

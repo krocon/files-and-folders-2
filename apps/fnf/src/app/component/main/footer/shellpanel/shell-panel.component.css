@@ -1,0 +1,17 @@
+
+.shell-panel {
+    padding: 0;
+    height: 60px;
+    overflow-y: clip;
+
+    display: grid;
+    /*grid-template-columns: auto minmax(200px, 1fr);*/
+    grid-template-columns: 1fr;
+    grid-gap: 12px;
+    align-items: baseline;
+
+    .path-div {
+        overflow-x: clip;
+        text-align: right;
+    }
+}

@@ -1,0 +1,18 @@
+<div class="shell-panel">
+
+  <!--  <mat-label class="path-div">{{path}}</mat-label>-->
+
+  <mat-form-field>
+
+    <mat-label>{{ text ? path : 'Enter shell command' }}</mat-label>
+
+    <input
+        (keydown.enter)="onOkClicked()"
+        [(ngModel)]="text"
+        [placeholder]="'Enter shell command'"
+        matInput/>
+    <!--fnf-select-folder-dropdown
+        (onSelected)="onFolderClicked($event)"
+        matSuffix></fnf-select-folder-dropdown-->
+  </mat-form-field>
+</div>

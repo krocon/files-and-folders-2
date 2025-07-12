@@ -30,6 +30,8 @@ export class CleanTemplateDropdownComponent {
       extensions: [
         "**/*.nfo",
         "**/*sample.mkv",
+        "**/*proof.jpg",
+        "**/*proof.jpeg",
         "**/Sample",
         "**/Proof",
         "**/Subs"

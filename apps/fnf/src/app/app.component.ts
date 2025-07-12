@@ -32,7 +32,7 @@ import {PanelSelectionService} from "./domain/filepagedata/service/panel-selecti
 import {SummaryLabel} from "./component/main/footer/summarylabel/summary-label";
 import {TabsPanelData} from "./domain/filepagedata/data/tabs-panel.data";
 import {SelectionEvent} from "./domain/filepagedata/data/selection-event";
-import {ShellPanel} from "./component/main/footer/shellpanel/shell-panel";
+import {ShellPanelComponent} from "./component/main/footer/shellpanel/shell-panel.component";
 
 
 const CONFIG: ResizeConfig = {
@@ -54,7 +54,7 @@ const CONFIG: ResizeConfig = {
     BreadcrumbComponent,
     TabpanelComponent,
     SummaryLabel,
-    ShellPanel
+    ShellPanelComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
