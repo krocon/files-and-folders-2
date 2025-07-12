@@ -1,5 +1,5 @@
 import {Test, TestingModule} from '@nestjs/testing';
-import {CmdGateway} from '@fnf/fnf-api/src/app/cmd/cmd.gateway';
+import {ShellGateway} from '@fnf/fnf-api/src/app/shell/shell.gateway';
 import {CmdIf} from '@fnf/fnf-data';
 import {
   cleanupTestEnvironment,
@@ -10,7 +10,7 @@ import * as path from 'path';
 import {Server} from 'socket.io';
 
 describe('CmdGateway', () => {
-  let gateway: CmdGateway;
+  let gateway: ShellGateway;
 
   // Mock for WebSocketServer
   const mockServer = {
@@ -45,11 +45,11 @@ describe('CmdGateway', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        CmdGateway,
+        ShellGateway,
       ],
     }).compile();
 
-    gateway = module.get<CmdGateway>(CmdGateway);
+    gateway = module.get<ShellGateway>(ShellGateway);
 
     // Manually set the server property
     gateway['server'] = mockServer;

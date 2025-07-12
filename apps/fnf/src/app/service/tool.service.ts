@@ -1,8 +1,6 @@
 import {Injectable} from "@angular/core";
-import {CmdIf, DirEventIf, SysinfoIf} from "@fnf/fnf-data";
-import {Socket} from "ngx-socket-io";
+import {CmdIf, DirEventIf} from "@fnf/fnf-data";
 import {HttpClient} from "@angular/common/http";
-import {ShortcutActionMapping} from "./shortcut.service";
 
 @Injectable({
   providedIn: "root"
@@ -15,8 +13,7 @@ export class ToolService {
   };
 
   constructor(
-    private readonly httpClient: HttpClient,
-    private readonly socket: Socket,
+    private readonly httpClient: HttpClient
   ) {
   }
 
@@ -25,10 +22,9 @@ export class ToolService {
   }
 
 
-
-  public async fetchTools(f: 'osx'|'windows'): Promise<CmdIf[]|undefined> {
+  public async fetchTools(f: 'osx' | 'windows'): Promise<CmdIf[] | undefined> {
     return await this.httpClient
-      .get<CmdIf[]>(ToolService.config.loadUrl+f+'.json')
+      .get<CmdIf[]>(ToolService.config.loadUrl + f + '.json')
       .toPromise();
   }
 

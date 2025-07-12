@@ -17,7 +17,7 @@ import {ConfigModule} from "./config/config.module";
 import {FindModule} from "./find/find.module";
 import {Config} from "@fnf/fnf-data";
 import {FindFolderModule} from "./findfolder/find-folder.module";
-import {CmdModule} from "./cmd/cmd.module";
+import {ShellModule} from "./shell/shell.module";
 import {VolumeModule} from "./volumes/volume.module";
 import {FilenameModule} from "./filename/filename.module";
 import {CheckGlobModule} from "./checkglob/checkglob.module";
@@ -49,7 +49,7 @@ const config = new Config(
     WalkModule,
     VolumeModule,
     FindModule,
-    CmdModule,
+    ShellModule,
     FindFolderModule.forRoot(
       config
     ),
