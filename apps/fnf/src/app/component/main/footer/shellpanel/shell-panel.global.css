@@ -12,4 +12,9 @@ app-shell-panel {
             display: block;
         }
     }
+
+    .mdc-text-field--filled:not(.mdc-text-field--disabled),
+    .mdc-text-field--filled:not(.mdc-text-field--disabled) > div {
+        background-color: transparent;
+    }
 }

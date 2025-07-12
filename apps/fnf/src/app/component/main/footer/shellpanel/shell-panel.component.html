@@ -7,6 +7,8 @@
     <mat-label>{{ text ? path : 'Enter shell command' }}</mat-label>
 
     <input
+        (focusin)="onFocusIn()"
+        (focusout)="onFocusOut()"
         (keydown.enter)="onOkClicked()"
         [(ngModel)]="text"
         [placeholder]="'Enter shell command'"

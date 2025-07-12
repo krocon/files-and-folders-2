@@ -130,7 +130,8 @@
 
   <div class="footer-center-div fnf-footer-bg-color fnf-footer-fg-color">
     @if (shellVisible) {
-      <app-shell-panel></app-shell-panel>
+      <app-shell-panel
+          (focusChanged)="onShellfocusChanged($event)"></app-shell-panel>
     }
   </div>
 

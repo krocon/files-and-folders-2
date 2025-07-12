@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
@@ -23,8 +23,21 @@ export class ShellPanelComponent {
   @Input() path = "c:\\test\\data";
   @Input() text = "";
 
+  @Output() focusChanged = new EventEmitter<boolean>();
+
+  hasFocus = false;
 
   onOkClicked() {
 
+  }
+
+  onFocusIn() {
+    this.hasFocus = true;
+    this.focusChanged.emit(true);
+  }
+
+  onFocusOut() {
+    this.hasFocus = false;
+    this.focusChanged.emit(false);
   }
 }

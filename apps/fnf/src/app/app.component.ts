@@ -202,11 +202,19 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
   }
 
 
+  private isInputElement(event: KeyboardEvent): boolean {
+    const target = event.target as HTMLElement;
+    return target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
+  }
+
   onKeyUp(keyboardEvent: KeyboardEvent) {
+    if (this.shellInputHasFocus || this.isInputElement(keyboardEvent)) return; // skip
     this.appService.onKeyUp$.next(keyboardEvent);
   }
 
   onKeyDown(keyboardEvent: KeyboardEvent) {
+    if (this.shellInputHasFocus || this.isInputElement(keyboardEvent)) return; // skip
+
     const actionByKeyEvent = this.appService.getActionByKeyEvent(keyboardEvent);
     if (actionByKeyEvent && actionByKeyEvent !== 'DO_NOTHING') {
       keyboardEvent.preventDefault();
@@ -262,5 +270,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
    */
   private normalizePath(path: string): string {
     return path.replace(/\\/g, "/").replace(/\/\//g, "/");
+  }
+
+  shellInputHasFocus = false;
+
+  onShellfocusChanged(hasFocus: boolean) {
+    this.shellInputHasFocus = hasFocus;
   }
 }
