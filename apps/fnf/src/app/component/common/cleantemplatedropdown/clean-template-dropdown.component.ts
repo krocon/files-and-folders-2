@@ -22,10 +22,76 @@ type FileExtensionsType = { "label": string, "extensions": string[] };
 })
 export class CleanTemplateDropdownComponent {
 
-
+  // TODO Make data editable and reload it
   fileTypes: FileExtensionsType[] = [
-    {"label": "Warez Leftovers", "extensions": ["**/*.nfo", "**/*sample.mkv", "**/Sample", "**/Proof", "**/Subs"]},
+    {
+      label: "Video RAR Leftovers",
+      extensions: [
+        "**/*.nfo",
+        "**/*sample.mkv",
+        "**/Sample",
+        "**/Proof",
+        "**/Subs"
+      ]
+    },
+    {
+      label: "Warez Leftovers",
+      extensions: [
+        "**/*.dlc",
+        "**/*.ccf",
+        "**/*.rsdf",
+        "**/*.nzf",
+        "**/*.nzb",
+        "**/*.metalink",
+        "**/*.meta4",
+        "**/*.torrent"
+      ]
+    },
+    {
+      label: "System Junk (macOS)",
+      extensions: [
+        "**/.DS_Store",
+        "**/.Spotlight-V100",
+        "**/.TemporaryItems",
+        "**/.Trashes",
+        "**/.AppleDouble",
+        "**/.AppleDesktop"
+      ]
+    },
+    {
+      label: "System Junk (Windows)",
+      extensions: [
+        "**/Thumbs.db",
+        "**/desktop.ini",
+        "**/~*",
+        "**/*.lnk"
+      ]
+    },
+    {
+      label: "System Junk (Linux)",
+      extensions: [
+        "**/.Trash-*",
+        "**/*.swp",
+        "**/*.tmp",
+        "**/*~"
+      ]
+    },
+    {
+      label: "Mac App Artifacts",
+      extensions: [
+        "**/__MACOSX",
+        "**/*.DS_Store"
+      ]
+    },
+    {
+      label: "Par2 / Usenet Recovery Files",
+      extensions: [
+        "**/*.par2",
+        "**/*.sfv"
+      ]
+    }
   ];
+
 
   @Output() onSelected = new EventEmitter<string>();
 
