@@ -47,9 +47,6 @@ export class TaskList implements OnInit {
   }
 
   ngOnInit(): void {
-    //let queues = this.actionQueueService.getQueues();
-    // console.info('queues', queues);
-
     this.notifyService
       .valueChanges()
       .subscribe(
@@ -108,10 +105,5 @@ export class TaskList implements OnInit {
     }
     this.status = status;
     this.cdr.detectChanges();
-
-    // console.info('task-list:');
-    // console.info(this.status);
-    // console.info(this.queueProgress.getInfoText()); // "3 / 9"
-    // console.info(JSON.stringify(this.queueProgress, null, 4)); // {"unfinished": 6, "finished": 3, "errors": 0, "class": "text-info"}
   }
 }

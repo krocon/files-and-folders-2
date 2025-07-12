@@ -78,20 +78,8 @@ export class MultiRenameService {
     const parentOfParent = this.getParentDir(source.dir, 2);
     const parentOfParentOfParent = this.getParentDir(source.dir, 3);
 
-    // console.info('source', source);
-    // console.info('target', target);
-    // console.info('pattern', pattern);
-    // console.info('name', name);
-    // console.info('ext', ext);
-    // console.info('parent', parent);
-    // console.info('parentOfParent', parentOfParent);
-    // console.info('index', index);
-    // console.info('data', data);
-    // console.info('data.counterStart', data.counterStart);
-
     let processedName = this.applyCapitalization(name, data.capitalizeMode);
     if (!ignoreExtension) ext = this.applyCapitalization(ext, data.capitalizeMode);
-
 
     if (data.replaceGermanUmlauts) {
       processedName = this.replaceUmlauts(processedName);

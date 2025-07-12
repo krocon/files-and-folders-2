@@ -207,8 +207,6 @@ export class TabpanelComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.tabsPanelData) {
       this.appService.triggerAction(this.panelIndex ? 'RELOAD_DIR_1' : 'RELOAD_DIR_0');
     }
-    console.info('path', this.tabsPanelData?.tabs[i]?.path)
-    console.info('findData', this.tabsPanelData?.tabs[i]?.findData)
   }
 
   onTabPointerDown(i: number, evt: PointerEvent, matMenuTrigger: MatMenuTrigger) {

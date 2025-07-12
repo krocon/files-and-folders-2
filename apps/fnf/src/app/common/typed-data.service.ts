@@ -71,7 +71,7 @@ export class TypedDataService<T> {
 
   private next() {
     const value = this.getValue();
-    if (value) {
+    if (value || value === 0 || value === false) {
       this.valueChanges$.next(this.options.clone(value));
     }
   }

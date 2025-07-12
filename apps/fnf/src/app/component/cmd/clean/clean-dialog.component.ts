@@ -177,7 +177,6 @@ export class CleanDialogComponent implements OnInit, OnDestroy {
         folders,
         pattern,
         (walkData: WalkData) => {
-          console.info('walkData', walkData); // TODO del
           this.walkData = walkData;
           this.cdr.detectChanges();
         });

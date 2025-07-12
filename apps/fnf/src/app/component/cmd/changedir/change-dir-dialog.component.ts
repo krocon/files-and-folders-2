@@ -162,13 +162,11 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
   }
 
   applyFilter() {
-    // console.clear();  console.info(this.rows);
     const fr = filterAsciiTree(
       this.rows.filter(r => r.path.split('/').length <= this.deep),
       this.filterPredicate.bind(this)
     );
     this.filteredRows = [
-      //...this.volumes.map(v => ({ path: v, label: v })),
       ...createAsciiTree(
         fr.map(s => s.path)
       )
@@ -185,9 +183,6 @@ export class ChangeDirDialogComponent implements OnInit, OnDestroy {
     return this.INDENTATION_SPACE.repeat(indentationLength);
   }
 
-  // private debug(tree: { path: string, label: string }[]) {
-  //   console.info('\n' + tree.map(r => r.label).join('\n').substring(0, 1000) + '\n');
-  // }
 
   private initFetchDirectories(deep: number = 5) {
     const para = new FindFolderPara([this.changeDirDialogData.sourceDir], '', deep);

@@ -131,10 +131,6 @@ export class ActionQueueService {
             .subscribe({
               next: (res: OnDoResponseType) => {
 
-                console.info('-----------------');
-                console.info('Action queue    :', action);
-                console.info('Action response :', res);
-
                 queue.status = this.QUEUE_STATUS_IDLE;
                 action.status = this.ACTION_STATUS_SUCCESS;
 

@@ -18,9 +18,7 @@ describe('ASCII Tree Functions', () => {
           '/root/dir2/file3',
       ];
       const result = createAsciiTree(paths);
-      // console.info(result);
       const tree = result.map(r=> r.label);
-      // console.info(JSON.stringify(tree, null, 4));
 
       expect(tree).toEqual(    [
         "└── root",

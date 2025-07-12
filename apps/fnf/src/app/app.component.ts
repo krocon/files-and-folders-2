@@ -32,6 +32,7 @@ import {PanelSelectionService} from "./domain/filepagedata/service/panel-selecti
 import {SummaryLabel} from "./component/main/footer/summarylabel/summary-label";
 import {TabsPanelData} from "./domain/filepagedata/data/tabs-panel.data";
 import {SelectionEvent} from "./domain/filepagedata/data/selection-event";
+import {ShellPanel} from "./component/main/footer/shellpanel/shell-panel";
 
 
 const CONFIG: ResizeConfig = {
@@ -52,7 +53,8 @@ const CONFIG: ResizeConfig = {
     FileTableComponent,
     BreadcrumbComponent,
     TabpanelComponent,
-    SummaryLabel
+    SummaryLabel,
+    ShellPanel
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
@@ -79,12 +81,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
     new ButtonEnableStates(),
     new ButtonEnableStates()
   ];
+  shellVisible: boolean = this.appService.isShellVisible();
 
   @ViewChild('splitPaneMain') private readonly splitPaneMainRef!: ElementRef<HTMLDivElement>;
   @ViewChild('splitPaneLeft') private readonly splitPaneLeftRef!: ElementRef<HTMLDivElement>;
 
   private doCheckCount = 0;
   private idCounter = 0;
+
 
   constructor(
     private readonly renderer: Renderer2,
@@ -105,6 +109,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
 
     console.info('Files and Folders');
     console.info('        > Build Version:', environment.version);
+    console.info('        > shellVisible_: ', this.shellVisible);
 
     this.appService.init(() => {
       this.initialized = true;
@@ -145,6 +150,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
       .getVolumes$()
       .subscribe(volumes => {
         console.info('        > volumes: ', volumes.join(', '));
+      });
+
+    this.appService
+      .shellVisibilityChanges$()
+      .subscribe(shellVisible => {
+        this.shellVisible = shellVisible;
+        console.info('        > shellVisible: ', shellVisible);
+        this.cdr.detectChanges();
       });
   }
 
@@ -187,7 +200,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
     this.selectionEvents[panelIndex] = new SelectionEvent();
     this.appService.onChangeDir(path, panelIndex);
   }
-
 
 
   onKeyUp(keyboardEvent: KeyboardEvent) {

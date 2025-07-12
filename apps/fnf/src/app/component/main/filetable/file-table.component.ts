@@ -378,8 +378,6 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
   onMouseClicked(evt: GeMouseEvent) {
     if (evt.clickCount === 2 && evt.areaIdent === 'body' && this.tableModel) {
       const fileItem: FileItemIf = this.bodyAreaModel.getRowByIndex(evt.rowIndex);
-
-      // console.info(fileItem.base, isZipBase(fileItem.base))
       if (isZipBase(fileItem.base)) {
         this.changeDir(fileItem);
       } else if (fileItem.isDir) {
@@ -719,8 +717,6 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
   private handleRelevantDirEvent(dirEvent: DirEventIf, zi: ZipUrlInfo) {
     if (!this.tableApi || !dirEvent || !this.dirPara) return;
 
-    // if (this.panelIndex===1 && dirEvent.action!=='list') console.info(dirEvent.action, JSON.stringify(dirEvent, null, 0));
-
     if (dirEvent.action === "list") {
       this.handleDirEventList(dirEvent, zi, this.dirPara.path);
 
@@ -739,10 +735,6 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       }
 
     } else if (dirEvent.action === "unlink" || dirEvent.action === "unlinkDir") {
-      // TODO unlink for tabfinds here?
-      // console.info('findData', this.tabsPanelData?.tabs[this.tabsPanelData?.selectedTabIndex]?.findData);
-      // console.info('path', this.tabsPanelData?.tabs[this.tabsPanelData?.selectedTabIndex]?.path);
-      // console.info(JSON.stringify(dirEvent, null, 0));
 
       this.tableApi.removeRows(dirEvent.items, equalFileItem);
       this.bodyAreaModel.setFocusedRowIndex(Math.min(this.bodyAreaModel.getRowCount() - 1, this.bodyAreaModel.getFocusedRowIndex()));
@@ -930,11 +922,9 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private changeDirNext(path: string) {
-    console.info('changeDirNext', path);
     while (this.cancellings.length > 0) {
       const id = this.cancellings.pop();
       if (id) {
-        console.info('cancelWalkDir', id);
         this.appService.cancelWalkDir(id);
       }
     }

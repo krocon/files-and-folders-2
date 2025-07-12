@@ -67,6 +67,7 @@ import {MultiRenameAiService} from "./component/cmd/multirename/multi-rename-ai.
 import {CleanDialogService} from "./component/cmd/clean/clean-dialog.service";
 import {GlobValidatorService} from "./service/glob-validator.service";
 import {CleanService} from "./service/clean.service";
+import {ShellLocalStorage} from "./component/main/footer/shellpanel/shell-local-storage";
 
 
 @Injectable({
@@ -120,6 +121,7 @@ export class AppService {
     private readonly groupFilesDialogService: GroupFilesDialogService,
     private readonly changeDirDialogService: ChangeDirDialogService,
     private readonly walkSocketService: WalkSocketService,
+    private readonly shellLocalStorage: ShellLocalStorage,
   ) {
     // Set config to services:
     ConfigService.forRoot(environment.config);
@@ -367,6 +369,9 @@ export class AppService {
       const tab = tabsPanelData.tabs[tabsPanelData.selectedTabIndex];
       tab.filterActive = !tab.filterActive;
       this.tabsPanelDataService.update(panelIndex, tabsPanelData);
+
+    } else if (id === 'TOGGLE_SHELL') {
+      this.setShellVisible(!this.isShellVisible());
 
     } else if (id === 'TOGGLE_HIDDEN_FILES') {
       const tab = tabsPanelData.tabs[tabsPanelData.selectedTabIndex];
@@ -959,6 +964,18 @@ export class AppService {
       return fileItems.map(fi => `${fi.dir}/${fi.base}`);
     }
     return [this.getActiveTabOnActivePanel().path];
+  }
+
+  setShellVisible(visible: boolean = true) {
+    this.shellLocalStorage.setShellVisible(visible);
+  }
+
+  isShellVisible() {
+    return this.shellLocalStorage.isShellVisible();
+  }
+
+  shellVisibilityChanges$(): BehaviorSubject<boolean> {
+    return this.shellLocalStorage.valueChanges$();
   }
 
 }

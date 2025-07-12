@@ -330,7 +330,6 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
         takeWhile(() => this.alive),
       )
       .subscribe(res => {
-        console.info('res', res);
 
         this.rows.forEach((r, i) => {
           const url = this.fileOperationParams2Url(r);

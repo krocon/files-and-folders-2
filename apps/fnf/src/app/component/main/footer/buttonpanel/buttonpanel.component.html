@@ -61,6 +61,11 @@
               <fnf-shortcut [keys]="getShortcutsByAction('TOGGLE_HIDDEN_FILES')"></fnf-shortcut>
             </button>
             <button
+                (click)="triggerAction('TOGGLE_SHELL')"
+                mat-menu-item> Toggle Shell...
+              <fnf-shortcut [keys]="getShortcutsByAction('TOGGLE_SHELL')"></fnf-shortcut>
+            </button>
+            <button
                 (click)="triggerAction('RELOAD_DIR')"
                 mat-menu-item> Reload...
               <fnf-shortcut [keys]="getShortcutsByAction('RELOAD_DIR')"></fnf-shortcut>

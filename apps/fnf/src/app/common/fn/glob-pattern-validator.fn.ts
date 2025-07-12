@@ -24,12 +24,9 @@ export function globPatternAsyncValidator(globValidatorService: GlobValidatorSer
     return globValidatorService.validateGlobPattern(value).pipe(
       map(isValid => {
         if (isValid) {
-          console.info('Valid glob pattern ' + value);
           return null;
-        } else {
-          console.error('Invalid glob pattern', value);
-          return {invalidGlobPattern: 'Invalid glob pattern'};
         }
+        return {invalidGlobPattern: 'Invalid glob pattern'};
       })
     );
   };

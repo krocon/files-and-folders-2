@@ -9,9 +9,8 @@ export type WalkCallback = (walkData: WalkData) => void;
 @Injectable({
   providedIn: "root"
 })
-/**
- * @class WalkSocketService
- */
+
+
 export class WalkSocketService {
 
   static runningNumber = 0;
@@ -31,18 +30,15 @@ export class WalkSocketService {
 
   private setupSocketListeners(): void {
     this.socket.on('connect', () => {
-      console.log('Socket connected');
       this.isConnected = true;
       this.processPendingWalks();
     });
 
     this.socket.on('disconnect', (reason) => {
-      console.log(`Socket disconnected: ${reason}`);
       this.isConnected = false;
     });
 
     this.socket.on('reconnect', (attemptNumber) => {
-      console.log(`Socket reconnected after ${attemptNumber} attempts`);
       this.isConnected = true;
       this.processPendingWalks();
     });
@@ -219,19 +215,16 @@ export class WalkSocketService {
     const cancelKey = `cancelwalk${this.rid}`;
     const walkParaData = new WalkParaData(pathes, filePattern, listenKey, cancelKey);
 
-    console.info('walkParaData', JSON.stringify(walkParaData, null, 2)); // TODO del
-
     this.cancellings[cancelKey] = this.socket
       .fromEvent<WalkData, string>(listenKey)
       .subscribe(wd => {
         WalkSocketService.runningNumber++;
         wd.rn = WalkSocketService.runningNumber;
-        console.info('###', JSON.stringify(wd));
+
         callback(wd);
       });
 
     if (!this.isConnected) {
-      console.log('Socket disconnected, queueing walk request');
       this.pendingWalks.push({pathes, filePattern, callback});
     } else {
       this.socket.emit("walkdir", walkParaData);

@@ -41,7 +41,6 @@ export class SelectionManagerForObjectModels<T> {
 
 
   public handleKeyDownEvent(evt: KeyboardEvent) {
-    // console.info('selectionManager - handleKeyDownEvent():', evt);
     if (evt.key === SPACE) {
       this.focusIndex = this.bodyModel.getFocusedRowIndex();
       if (this.focusIndex < 0) return; // skip
