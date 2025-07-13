@@ -3,7 +3,6 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  computed,
   DoCheck,
   ElementRef,
   OnDestroy,
@@ -72,9 +71,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
   readonly dockerRoot = this.appService.dockerRoot;
 
   readonly panelIndices: PanelIndex[] = [0, 1];
-  readonly activePanelIndex = computed(() => this.panelSelectionService.panelIndex());
-
   tabsPanelData: [TabsPanelData, TabsPanelData] = this.appService.tabsPanelDatas;
+
+  activePanelIndex: PanelIndex = this.panelSelectionService.getValue();
+  activeTabsPanelData: TabsPanelData = this.tabsPanelData[this.activePanelIndex];
+  activePanelPath: string = '';
+
+
+
   selectionEvents: SelectionEvent[] = this.panelIndices
     .map(i => new SelectionEvent());
   buttonEnableStatesArr = [
@@ -111,6 +115,13 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
     console.info('        > Build Version:', environment.version);
     console.info('        > shellVisible_: ', this.shellVisible);
 
+    this.panelSelectionService
+      .valueChanges$()
+      .subscribe(panelIndex => {
+        this.activePanelIndex = panelIndex;
+        this.calcActiveData();
+      })
+
     this.appService.init(() => {
       this.initialized = true;
       console.info('        > App initialized');
@@ -122,13 +133,20 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
       .subscribe(fd => {
         this.normalizeFilePageData(fd);
         this.tabsPanelData[0] = {...fd};
+        if (this.activePanelIndex === 0) {
+          this.calcActiveData();
+        }
         this.cdr.detectChanges();
       });
+
     this.appService
       .filePageDataChanges(1)
       .subscribe(fd => {
         this.normalizeFilePageData(fd);
         this.tabsPanelData[1] = {...fd};
+        if (this.activePanelIndex === 1) {
+          this.calcActiveData();
+        }
         this.cdr.detectChanges();
       });
 
@@ -159,6 +177,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
         console.info('        > shellVisible: ', shellVisible);
         this.cdr.detectChanges();
       });
+  }
+
+  private calcActiveData() {
+    this.activeTabsPanelData = this.tabsPanelData[this.activePanelIndex];
+    this.activePanelPath = this.activeTabsPanelData.tabs[this.activeTabsPanelData.panelIndex].path;
   }
 
   onSelectionChanged(selectionLabelData: SelectionEvent, panelIndex: PanelIndex) {

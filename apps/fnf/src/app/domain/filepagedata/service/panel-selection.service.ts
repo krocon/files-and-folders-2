@@ -1,6 +1,7 @@
-import {Injectable, signal, Signal} from "@angular/core";
+import {Injectable} from "@angular/core";
 import {TypedDataService} from "../../../common/typed-data.service";
 import {PanelIndex} from "@fnf/fnf-data";
+import {BehaviorSubject} from "rxjs";
 
 
 @Injectable({
@@ -11,21 +12,20 @@ export class PanelSelectionService {
   private static readonly innerService =
     new TypedDataService<PanelIndex>("activePanelIndex", 0);
 
-  private panelIndexSignal = signal<PanelIndex>(this.getValue());
-  public panelIndex: Signal<PanelIndex> = this.panelIndexSignal.asReadonly();
+  public valueChanges$(): BehaviorSubject<PanelIndex> {
+    return PanelSelectionService.innerService.valueChanges$;
+  }
 
   public toggle() {
     const pi = PanelSelectionService.innerService.getValue();
     const newValue = pi === 0 ? 1 : 0;
     PanelSelectionService.innerService.update(newValue);
     PanelSelectionService.innerService.valueChanges$.next(newValue);
-    this.panelIndexSignal.set(newValue);
   }
 
   public update(panelIndex: PanelIndex) {
     PanelSelectionService.innerService.update(panelIndex);
     PanelSelectionService.innerService.valueChanges$.next(panelIndex);
-    this.panelIndexSignal.set(panelIndex);
   }
 
   public getValue(): PanelIndex {

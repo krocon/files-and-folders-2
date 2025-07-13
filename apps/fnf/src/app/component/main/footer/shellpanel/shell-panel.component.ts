@@ -28,7 +28,7 @@ export class ShellPanelComponent {
   hasFocus = false;
 
   onOkClicked() {
-
+    console.log('onOkClicked', this.text, this.path);
   }
 
   onFocusIn() {
