@@ -18,6 +18,7 @@ import {ShellHistoryService} from "./shell-history.service";
 import {ShellAutocompleteService} from "../../../../service/shell-autocomplete.service";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {BehaviorSubject, Observable, Subject} from "rxjs";
+import {takeUntil} from "rxjs/operators";
 
 
 /**
@@ -102,6 +103,7 @@ export class ShellPanelComponent implements OnDestroy {
           para: ''
         }
       ])
+      .pipe(takeUntil(this.destroy$))
       .subscribe(res => {
         const res0 = res[0];
         // TODO ausgabe und error anzeigen
@@ -140,9 +142,11 @@ export class ShellPanelComponent implements OnDestroy {
 
     // Get autocomplete suggestions based on current input
     if (this.text && this.text.trim().length > 0) {
-      this.filterCommands(this.text).subscribe(commands => {
-        this.filteredCommands$.next(commands);
-      });
+      this.filterCommands(this.text)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(commands => {
+          this.filteredCommands$.next(commands);
+        });
     } else {
       this.filteredCommands$.next([]);
     }
