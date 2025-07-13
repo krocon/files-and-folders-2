@@ -31,7 +31,9 @@ export class ShellController {
 
       console.info('shell cmd...:', cmd); // TODO del
       try {
-        const {stdout, stderr} = await execPromise(c);
+        // Use cmd.path as the working directory if it exists
+        const options = cmd.path ? {cwd: cmd.path} : {};
+        const {stdout, stderr} = await execPromise(c, options);
         if (stdout) console.info('stdout', stdout); // TODO del
         if (stderr) console.error('stderr', stderr);
 

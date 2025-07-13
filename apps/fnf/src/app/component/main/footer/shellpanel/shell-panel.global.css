@@ -1,8 +1,26 @@
 
 app-shell-panel {
     .mat-mdc-form-field {
+        /*line-heightght: 1;*/
+        height: 32px;
+
         .mdc-line-ripple {
             display: none;
+        }
+
+        .mat-mdc-form-field-bottom-align {
+            display: none;
+        }
+
+        .mat-mdc-form-field-infix {
+            height: 32px;
+            min-height: 32px;
+            padding: 4px 0;
+        }
+
+        .mdc-text-field,
+        .mdc-text-field--outlined {
+            border-color: red;
         }
     }
 
@@ -17,4 +35,6 @@ app-shell-panel {
     .mdc-text-field--filled:not(.mdc-text-field--disabled) > div {
         background-color: transparent;
     }
+
+
 }

@@ -181,7 +181,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
 
   private calcActiveData() {
     this.activeTabsPanelData = this.tabsPanelData[this.activePanelIndex];
-    this.activePanelPath = this.activeTabsPanelData.tabs[this.activeTabsPanelData.panelIndex].path;
+    let tabData = this.activeTabsPanelData.tabs[this.activeTabsPanelData.selectedTabIndex];
+    this.activePanelPath = tabData?.path ?? '';
   }
 
   onSelectionChanged(selectionLabelData: SelectionEvent, panelIndex: PanelIndex) {
