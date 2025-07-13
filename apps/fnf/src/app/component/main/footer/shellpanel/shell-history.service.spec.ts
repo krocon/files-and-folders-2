@@ -94,4 +94,81 @@ describe('ShellHistoryService', () => {
   });
 
 
+  describe('valueChanges$', () => {
+    it('should return a BehaviorSubject', () => {
+      const valueChanges = service.valueChanges$();
+      expect(valueChanges).toBeTruthy();
+      expect(valueChanges.constructor.name).toBe('BehaviorSubject');
+    });
+
+    it('should emit the current history initially', () => {
+      // Add some items to history
+      service.addHistory('command1');
+      service.addHistory('command2');
+
+      // Get the valueChanges$ and subscribe to it
+      const valueChanges = service.valueChanges$();
+      let emittedValue: string[] | null = null;
+
+      valueChanges.subscribe(value => {
+        emittedValue = value;
+      });
+
+      // Check that the emitted value matches the current history
+      expect(emittedValue).toEqual(['command1', 'command2']);
+    });
+
+    it('should emit when history is added', () => {
+      const valueChanges = service.valueChanges$();
+      const emittedValues: string[][] = [];
+
+      // Subscribe to valueChanges$
+      const subscription = valueChanges.subscribe(value => {
+        emittedValues.push([...value]); // Clone the array to avoid reference issues
+      });
+
+      // Initial empty history should be emitted
+      expect(emittedValues.length).toBe(1);
+      expect(emittedValues[0]).toEqual([]);
+
+      // Add an item and check that the new history is emitted
+      service.addHistory('new command');
+      expect(emittedValues.length).toBe(2);
+      expect(emittedValues[1]).toEqual(['new command']);
+
+      // Add another item
+      service.addHistory('another command');
+      expect(emittedValues.length).toBe(3);
+      expect(emittedValues[2]).toEqual(['new command', 'another command']);
+
+      subscription.unsubscribe();
+    });
+
+    it('should emit when history is cleared', () => {
+      // Add some items to history
+      service.addHistory('command1');
+      service.addHistory('command2');
+
+      const valueChanges = service.valueChanges$();
+      const emittedValues: string[][] = [];
+
+      // Subscribe to valueChanges$
+      const subscription = valueChanges.subscribe(value => {
+        emittedValues.push([...value]); // Clone the array to avoid reference issues
+      });
+
+      // Initial history should be emitted
+      expect(emittedValues.length).toBe(1);
+      expect(emittedValues[0]).toEqual(['command1', 'command2']);
+
+      // Clear the history and check that empty array is emitted
+      service.clear();
+      expect(emittedValues.length).toBe(2);
+      expect(emittedValues[1]).toEqual([]);
+
+      subscription.unsubscribe();
+    });
+  });
+
+
 });
