@@ -6,8 +6,8 @@ import {TypedDataService} from "../../../../common/typed-data.service";
 })
 export class ShellHistoryService {
 
+  public static readonly MAX_HISTORY_LENGTH = 20;
   private readonly innerService = new TypedDataService<string[]>("shell-history", []);
-
 
   constructor() {
   }
@@ -20,8 +20,14 @@ export class ShellHistoryService {
   addHistory(item: string) {
     const history = this.getHistory();
     history.push(item);
-    while (history.length > 20) history.shift();
+    while (history.length > ShellHistoryService.MAX_HISTORY_LENGTH) {
+      history.shift();
+    }
     this.innerService.update(history);
+  }
+
+  clear() {
+    this.innerService.update([]);
   }
 
   valueChanges$() {
