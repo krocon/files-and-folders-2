@@ -25,6 +25,37 @@ html {
     font-weight: bold;
 }
 
+.fnf-shell-panel-dialog {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 100px !important;
+    border-radius: 0 0 0 0;
+
+
+    max-height: calc(100vh - 100px) !important;
+    height: calc(100vh - 100px) !important;
+
+    max-width: 100vw;
+    width: 100vw;
+    padding: 0;
+    border: 0;
+
+    .mat-bottom-sheet-container {
+        width: 100vw;
+        max-width: 100vw;
+        padding: 0;
+        border: 0;
+        overflow: clip;
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            font-family: monospace;
+        }
+    }
+
+}
+
 .mat-mdc-dialog-content{
     max-height: 100vh !important;
 }

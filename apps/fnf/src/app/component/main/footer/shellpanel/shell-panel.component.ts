@@ -4,6 +4,8 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatFormField, MatInput, MatPrefix, MatSuffix} from "@angular/material/input";
 import {ShellService} from "../../../../service/shell.service";
+import {MatBottomSheet, MatBottomSheetConfig} from "@angular/material/bottom-sheet";
+import {ShellOutComponent} from "./shell-out.component";
 
 
 /**
@@ -38,6 +40,7 @@ export class ShellPanelComponent {
   constructor(
     private readonly shellService: ShellService,
     private readonly cdr: ChangeDetectorRef,
+    private readonly matBottomSheet: MatBottomSheet,
   ) {
     // nothing
   }
@@ -60,11 +63,12 @@ export class ShellPanelComponent {
         // TODO ausgabe und error anzeigen
         console.info('onOkClicked RES:', res);
         console.info('\n');
-
         console.info(res0.stdout);
+
 
         if (!res0.stderr && !res0.error) {
           this.text = '';
+          this.openShellOutput(res0.stdout ?? '');
 
         } else {
           this.errorMsg = res0.stderr ?? res0.error ?? '';
@@ -89,5 +93,14 @@ export class ShellPanelComponent {
   onTextChange() {
     this.errorMsg = '';
     this.cdr.detectChanges();
+  }
+
+  openShellOutput(text: string) {
+    const config = new MatBottomSheetConfig();
+    config.panelClass = 'fnf-shell-panel-dialog';
+    config.data = text;
+    config.height = 'calc(100vh - 200px)';
+    // config.width = 'calc(100vw - 200px)';
+    this.matBottomSheet.open(ShellOutComponent, config);
   }
 }

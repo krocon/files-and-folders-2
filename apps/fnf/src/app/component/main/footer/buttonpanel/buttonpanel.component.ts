@@ -8,12 +8,10 @@ import {MatDivider} from '@angular/material/divider';
 import {cssThemes, Theme} from '../../../../domain/customcss/css-theme-type';
 import {AppService} from "../../../../app.service";
 import {ActionId} from "../../../../domain/action/fnf-action.enum";
-import {MatBottomSheet} from "@angular/material/bottom-sheet";
+import {MatBottomSheet, MatBottomSheetConfig} from "@angular/material/bottom-sheet";
 import {TaskList} from "../../../task/task-list/task-list";
 import {ButtonEnableStates, buttonEnableStatesKey, CmdIf} from "@fnf/fnf-data";
 import {MatList} from "@angular/material/list";
-import {NotifyService} from "../../../../service/cmd/notify-service";
-import {ActionQueueService} from "../../../../service/cmd/action-queue.service";
 import {TaskButtonComponent} from "../../../task/task-list/task-button.component";
 
 @Component({
@@ -83,8 +81,6 @@ export class ButtonPanelComponent implements OnInit {
   constructor(
     private readonly appService: AppService,
     private readonly matBottomSheet: MatBottomSheet,
-    private readonly notifyService: NotifyService,
-    private readonly actionQueueService: ActionQueueService,
   ) {
   }
 
@@ -94,8 +90,11 @@ export class ButtonPanelComponent implements OnInit {
 
 
   openButtonSheet() {
-    this.matBottomSheet.open(TaskList);
+    const config = new MatBottomSheetConfig();
+    config.panelClass = 'fnf-top-sheet';
+    this.matBottomSheet.open(TaskList, config);
   }
+
 
   closeButtonSheet() {
     this.matBottomSheet.dismiss();
