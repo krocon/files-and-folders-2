@@ -57,6 +57,7 @@ export * from './models/sysinfo/sysinfo';
 
 export * from './models/shell/cmd.if';
 export * from './models/shell/shell-cmd.if';
+export * from './models/shell/shell-cmd-result.if';
 
 export { getParent } from "./models/file/get-parent";
 export { isSameDir } from "./models/file/is-same-dir";

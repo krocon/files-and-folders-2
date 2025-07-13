@@ -27,6 +27,9 @@ export const environment = {
   clean: {
     cleanUrl: "/api/clean"
   },
+  shell: {
+    shellUrl: "/api/shell"
+  },
   lookAndFeel: {
     getLookAndFeelUrl: "assets/config/color/%theme%.json"
   },

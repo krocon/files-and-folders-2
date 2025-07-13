@@ -68,6 +68,7 @@ import {CleanDialogService} from "./component/cmd/clean/clean-dialog.service";
 import {GlobValidatorService} from "./service/glob-validator.service";
 import {CleanService} from "./service/clean.service";
 import {ShellLocalStorage} from "./component/main/footer/shellpanel/shell-local-storage";
+import {ShellService} from "./service/shell.service";
 
 
 @Injectable({
@@ -136,6 +137,7 @@ export class AppService {
     MultiRenameAiService.forRoot(environment.multiRename);
     GlobValidatorService.forRoot(environment.checkGlob);
     CleanService.forRoot(environment.clean);
+    ShellService.forRoot(environment.shell);
 
     this.favDataService
       .valueChanges()
