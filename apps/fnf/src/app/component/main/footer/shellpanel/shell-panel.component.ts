@@ -17,7 +17,7 @@ import {ShellOutComponent} from "./shell-out.component";
 import {ShellHistoryService} from "./shell-history.service";
 import {ShellAutocompleteService} from "../../../../service/shell-autocomplete.service";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
-import {BehaviorSubject, Observable, Subject} from "rxjs";
+import {Observable, Subject} from "rxjs";
 import {debounceTime, takeUntil} from "rxjs/operators";
 
 
@@ -48,7 +48,7 @@ export class ShellPanelComponent implements OnDestroy {
   @Output() focusChanged = new EventEmitter<boolean>();
   hasFocus = false;
   errorMsg = '';
-  filteredCommands$ = new BehaviorSubject<string[]>([]);
+  // filteredCommands$ = new BehaviorSubject<string[]>([]);
 
   private readonly destroy$ = new Subject<void>();
   private readonly textChange$ = new Subject<string>();
@@ -143,7 +143,7 @@ export class ShellPanelComponent implements OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
     this.textChange$.complete();
-    this.filteredCommands$.complete();
+    // this.filteredCommands$.complete();
   }
 
   /**
@@ -162,15 +162,19 @@ export class ShellPanelComponent implements OnDestroy {
           this.filterCommands(this.text)
             .pipe(takeUntil(this.destroy$))
             .subscribe(commands => {
-              this.filteredCommands$.next(commands);
+              //this.filteredCommands$.next(commands);
+              this.filteredCommands = commands;
               this.cdr.detectChanges();
             });
         } else {
-          this.filteredCommands$.next([]);
+          // this.filteredCommands$.next([]);
+          this.filteredCommands = [];
           this.cdr.detectChanges();
         }
       });
   }
+
+  filteredCommands: string[] = [];
 
   /**
    * Filter commands based on user input
