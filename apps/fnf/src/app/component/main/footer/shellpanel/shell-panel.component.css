@@ -31,10 +31,13 @@
         text-align: right;
 
         display: grid;
-        grid-template-columns: auto auto;
+        grid-template-columns: 1fr;
         grid-gap: 12px;
         align-items: center;
 
+        &.has-error {
+            grid-template-columns: 1fr auto;
+        }
     }
 
     .error-div {

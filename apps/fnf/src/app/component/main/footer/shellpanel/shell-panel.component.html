@@ -5,7 +5,8 @@
 
     <div
         matPrefix
-        class="path-div">
+        class="path-div"
+        [class.has-error]="errorMsg">
       <div>{{ path }}&gt;</div>
       @if (errorMsg) {
         <div class="error-sign">!</div>

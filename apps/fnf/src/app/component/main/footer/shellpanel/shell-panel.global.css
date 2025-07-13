@@ -53,4 +53,8 @@ app-shell-panel {
         grid-template-columns: auto auto auto 1fr;
     }
 
+    .mdc-text-field--outlined {
+        padding-right: 0;
+    }
+
 }
