@@ -36,6 +36,9 @@ export const environment = {
   shell: {
     shellUrl: prefix + "/api/shell"
   },
+  shellAutocomplete: {
+    autocompleteUrl: prefix + "/api/shell-autocomplete"
+  },
 
   lookAndFeel: {
     getLookAndFeelUrl: "assets/config/color/%theme%.json"

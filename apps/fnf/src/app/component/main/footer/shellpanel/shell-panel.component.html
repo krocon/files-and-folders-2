@@ -23,7 +23,18 @@
         [placeholder]="'Enter shell command'"
         [class.font-weight-bold]="hasFocus"
         [class.fnf-warn-fg]="errorMsg"
+        [matAutocomplete]="auto"
         matInput/>
+
+    <mat-autocomplete #auto="matAutocomplete">
+      @for (command of filteredCommands$ | async; track command) {
+        <mat-option
+            [value]="command"
+            (click)="onOptionSelected(command)">
+          {{ command }}
+        </mat-option>
+      }
+    </mat-autocomplete>
 
     @if (errorMsg) {
       <div

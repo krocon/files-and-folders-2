@@ -69,6 +69,7 @@ import {GlobValidatorService} from "./service/glob-validator.service";
 import {CleanService} from "./service/clean.service";
 import {ShellLocalStorage} from "./component/main/footer/shellpanel/shell-local-storage";
 import {ShellService} from "./service/shell.service";
+import {ShellAutocompleteService} from "./service/shell-autocomplete.service";
 
 
 @Injectable({
@@ -138,6 +139,7 @@ export class AppService {
     GlobValidatorService.forRoot(environment.checkGlob);
     CleanService.forRoot(environment.clean);
     ShellService.forRoot(environment.shell);
+    ShellAutocompleteService.forRoot(environment.shellAutocomplete);
 
     this.favDataService
       .valueChanges()

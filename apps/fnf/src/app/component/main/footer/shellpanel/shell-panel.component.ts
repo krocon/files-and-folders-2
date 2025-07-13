@@ -7,6 +7,9 @@ import {ShellService} from "../../../../service/shell.service";
 import {MatBottomSheet, MatBottomSheetConfig} from "@angular/material/bottom-sheet";
 import {ShellOutComponent} from "./shell-out.component";
 import {ShellHistoryService} from "./shell-history.service";
+import {ShellAutocompleteService} from "../../../../service/shell-autocomplete.service";
+import {MatAutocompleteModule} from "@angular/material/autocomplete";
+import {Observable, of} from "rxjs";
 
 
 /**
@@ -23,6 +26,7 @@ import {ShellHistoryService} from "./shell-history.service";
     ReactiveFormsModule,
     MatPrefix,
     MatSuffix,
+    MatAutocompleteModule,
   ],
   templateUrl: './shell-panel.component.html',
   styleUrl: './shell-panel.component.css',
@@ -37,14 +41,42 @@ export class ShellPanelComponent {
 
   hasFocus = false;
   errorMsg = '';
+  filteredCommands$: Observable<string[]> = of([]);
 
   constructor(
     private readonly shellService: ShellService,
+    private readonly shellAutocompleteService: ShellAutocompleteService,
     private readonly cdr: ChangeDetectorRef,
     private readonly matBottomSheet: MatBottomSheet,
     private readonly shellHistoryService: ShellHistoryService,
   ) {
-    // nothing
+    // Initialize the autocomplete functionality
+    this.initAutocomplete();
+  }
+
+  /**
+   * Initialize the autocomplete functionality
+   */
+  private initAutocomplete(): void {
+    // We'll set up the filteredCommands$ observable in the onTextChange method
+  }
+
+  /**
+   * Filter commands based on user input
+   * @param input The current input text
+   * @returns Observable of filtered commands
+   */
+  private filterCommands(input: string): Observable<string[]> {
+    return this.shellAutocompleteService.getAutocompleteSuggestions(input);
+  }
+
+  /**
+   * Handle selection of an autocomplete option
+   * @param event The selected option
+   */
+  onOptionSelected(command: string): void {
+    this.text = command;
+    this.cdr.detectChanges();
   }
 
   onOkClicked() {
@@ -95,10 +127,20 @@ export class ShellPanelComponent {
 
   onTextChange() {
     this.errorMsg = '';
+
+    // Get autocomplete suggestions based on current input
+    if (this.text && this.text.trim().length > 0) {
+      this.filteredCommands$ = this.filterCommands(this.text);
+    } else {
+      this.filteredCommands$ = of([]);
+    }
+
     this.cdr.detectChanges();
   }
 
   openShellOutput(text: string) {
+    if (!text) return; // skip
+
     const config = new MatBottomSheetConfig();
     config.panelClass = 'fnf-shell-panel-dialog';
     config.data = text;
