@@ -16,6 +16,8 @@ export const customCcsKeys = [
   "--fnf-footer-fg-color",
   "--fnf-footer-shortcut-bg-color",
   "--fnf-footer-shortcut-fg-color",
+  "--fnf-footer-error-bg-color",
+  "--fnf-footer-error-fg-color",
   "--fnf-header-bg-color",
   "--fnf-header-border-color",
   "--fnf-header-fg-color",

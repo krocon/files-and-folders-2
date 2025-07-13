@@ -1,10 +1,14 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {MatFormField, MatInput, MatPrefix} from "@angular/material/input";
+import {MatFormField, MatInput, MatPrefix, MatSuffix} from "@angular/material/input";
 import {ShellService} from "../../../../service/shell.service";
 
+
+/**
+ * TODO pfeil hoch, runter: history, esc-> clear ,
+ */
 @Component({
   selector: 'app-shell-panel',
   imports: [
@@ -15,9 +19,11 @@ import {ShellService} from "../../../../service/shell.service";
     MatInput,
     ReactiveFormsModule,
     MatPrefix,
+    MatSuffix,
   ],
   templateUrl: './shell-panel.component.html',
-  styleUrl: './shell-panel.component.css'
+  styleUrl: './shell-panel.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ShellPanelComponent {
 
@@ -27,15 +33,20 @@ export class ShellPanelComponent {
   @Output() focusChanged = new EventEmitter<boolean>();
 
   hasFocus = false;
+  errorMsg = '';
 
   constructor(
-    private readonly shellService: ShellService
+    private readonly shellService: ShellService,
+    private readonly cdr: ChangeDetectorRef,
   ) {
     // nothing
   }
 
   onOkClicked() {
-    console.log('onOkClicked', this.text, this.path);
+    this.errorMsg = '';
+    this.cdr.detectChanges();
+    if (!this.text || this.text.trim().length === 0) return; // skip
+
     this.shellService
       .shell([
         {
@@ -45,9 +56,23 @@ export class ShellPanelComponent {
         }
       ])
       .subscribe(res => {
+        const res0 = res[0];
+        // TODO ausgabe und error anzeigen
         console.info('onOkClicked RES:', res);
         console.info('\n');
-        console.info(res[0].stdout);
+
+        console.info(res0.stdout);
+
+        if (!res0.stderr && !res0.error) {
+          this.text = '';
+
+        } else {
+          this.errorMsg = res0.stderr ?? res0.error ?? '';
+          this.errorMsg = this.errorMsg
+            .replace(/\n/g, ' ')
+            .replace(/<br>/g, ' ');
+        }
+        this.cdr.detectChanges();
       });
   }
 
@@ -59,5 +84,10 @@ export class ShellPanelComponent {
   onFocusOut() {
     this.hasFocus = false;
     this.focusChanged.emit(false);
+  }
+
+  onTextChange() {
+    this.errorMsg = '';
+    this.cdr.detectChanges();
   }
 }

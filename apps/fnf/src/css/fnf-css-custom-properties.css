@@ -17,6 +17,8 @@
     --fnf-footer-fg-color: var(--fnf-header-fg-color);
     --fnf-footer-shortcut-bg-color: #444;
     --fnf-footer-shortcut-fg-color: #eee;
+    --fnf-footer-error-fg-color: #fff;
+    --fnf-footer-error-bg-color: #e00034;
     --fnf-header-bg-color: #f3f3f3;
     --fnf-header-border-color: #d2d2d2;
     --fnf-header-fg-color: #000;

@@ -5,15 +5,33 @@
 
     <div
         matPrefix
-        class="path-div">{{ path }}&gt;
+        class="path-div">
+      <div>{{ path }}&gt;</div>
+      @if (errorMsg) {
+        <div class="error-sign">!</div>
+      }
     </div>
+
     <input
         (focusin)="onFocusIn()"
         (focusout)="onFocusOut()"
         (keydown.enter)="onOkClicked()"
+        (ngModelChange)="onTextChange()"
+        [matTooltip]="errorMsg"
         [(ngModel)]="text"
         [placeholder]="'Enter shell command'"
+        [class.font-weight-bold]="hasFocus"
+        [class.fnf-warn-fg]="errorMsg"
         matInput/>
+
+    @if (errorMsg) {
+      <div
+          matSuffix
+          class="error-div"
+          [innerText]="errorMsg"></div>
+    }
+
+
     <!--fnf-select-folder-dropdown
         (onSelected)="onFolderClicked($event)"
         matSuffix></fnf-select-folder-dropdown-->

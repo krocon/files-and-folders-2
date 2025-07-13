@@ -48,5 +48,9 @@ app-shell-panel {
         background-color: transparent;
     }
 
+    .mat-mdc-form-field-flex {
+        display: grid;
+        grid-template-columns: auto auto auto 1fr;
+    }
 
 }

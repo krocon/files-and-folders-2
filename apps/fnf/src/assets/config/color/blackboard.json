@@ -18,6 +18,8 @@
     "--fnf-footer-fg-color": "var(--fnf-header-fg-color)",
     "--fnf-footer-shortcut-bg-color": "#0c1021",
     "--fnf-footer-shortcut-fg-color": "#fafafa",
+    "--fnf-footer-error-fg-color": "#fff",
+    "--fnf-footer-error-bg-color": "#e00034",
     "--fnf-header-bg-color": "#303139",
     "--fnf-header-border-color": "#26272e",
     "--fnf-header-fg-color": "#f9f9f9",

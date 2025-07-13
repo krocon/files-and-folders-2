@@ -1,5 +1,6 @@
 
 .shell-panel {
+
     padding: 6px 12px;
     /*height: 60px;*/
     overflow-y: clip;
@@ -10,9 +11,48 @@
     grid-gap: 0;
     align-items: baseline;
 
+    input {
+        min-width: 100px;
+    }
+
+    .error-sign {
+        border-radius: 50%;
+        color: var(--fnf-footer-error-fg-color);
+        background-color: var(--fnf-footer-error-bg-color);
+        width: 22px;
+        height: 22px;
+        display: grid;
+        align-items: center;
+        justify-content: center;
+    }
+
     .path-div {
         overflow-x: clip;
         text-align: right;
 
+        display: grid;
+        grid-template-columns: auto auto;
+        grid-gap: 12px;
+        align-items: center;
+
+    }
+
+    .error-div {
+        color: var(--fnf-footer-error-fg-color);
+        background-color: var(--fnf-footer-error-bg-color);
+
+        height: 22px;
+        display: flex;
+
+        line-height: 1;
+        align-items: center;
+        padding-left: 12px;
+        padding-right: 12px;
+        border-radius: 8px;
+
+    }
+
+    .font-weight-bold {
+        font-weight: bold;
     }
 }
