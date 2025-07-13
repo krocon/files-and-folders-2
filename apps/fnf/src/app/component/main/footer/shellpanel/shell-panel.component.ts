@@ -1,4 +1,12 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  Output
+} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
@@ -9,7 +17,7 @@ import {ShellOutComponent} from "./shell-out.component";
 import {ShellHistoryService} from "./shell-history.service";
 import {ShellAutocompleteService} from "../../../../service/shell-autocomplete.service";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
-import {Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, Subject} from "rxjs";
 
 
 /**
@@ -32,7 +40,9 @@ import {Observable, of} from "rxjs";
   styleUrl: './shell-panel.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ShellPanelComponent {
+export class ShellPanelComponent implements OnDestroy {
+
+  private readonly destroy$ = new Subject<void>();
 
   @Input() path = "";
   @Input() text = "ls -al";
@@ -41,7 +51,7 @@ export class ShellPanelComponent {
 
   hasFocus = false;
   errorMsg = '';
-  filteredCommands$: Observable<string[]> = of([]);
+  filteredCommands$ = new BehaviorSubject<string[]>([]);
 
   constructor(
     private readonly shellService: ShellService,
@@ -72,7 +82,7 @@ export class ShellPanelComponent {
 
   /**
    * Handle selection of an autocomplete option
-   * @param event The selected option
+   * @param command The selected option
    */
   onOptionSelected(command: string): void {
     this.text = command;
@@ -130,9 +140,11 @@ export class ShellPanelComponent {
 
     // Get autocomplete suggestions based on current input
     if (this.text && this.text.trim().length > 0) {
-      this.filteredCommands$ = this.filterCommands(this.text);
+      this.filterCommands(this.text).subscribe(commands => {
+        this.filteredCommands$.next(commands);
+      });
     } else {
-      this.filteredCommands$ = of([]);
+      this.filteredCommands$.next([]);
     }
 
     this.cdr.detectChanges();
@@ -147,5 +159,11 @@ export class ShellPanelComponent {
     config.height = 'calc(100vh - 200px)';
     // config.width = 'calc(100vw - 200px)';
     this.matBottomSheet.open(ShellOutComponent, config);
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.filteredCommands$.complete();
   }
 }
