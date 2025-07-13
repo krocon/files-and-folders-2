@@ -68,12 +68,16 @@
     color: var(--fnf-footer-fg-color);
 }
 
-.fnf-footer-error-fg-color {
-    color: var(--fnf-footer-error-fg-color);
+.fnf-error-panel-fg-color {
+    color: var(--fnf-error-panel-fg-color);
 }
 
-.fnf-footer-error-bg-color {
-    background-color: var(--fnf-footer-error-bg-color);
+.fnf-error-panel-bg-color {
+    background-color: var(--fnf-error-panel-bg-color);
+}
+
+.fnf-footer-error-fg-color {
+    color: var(--fnf-footer-error-fg-color);
 }
 
 

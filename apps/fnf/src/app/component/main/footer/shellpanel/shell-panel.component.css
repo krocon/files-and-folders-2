@@ -17,8 +17,8 @@
 
     .error-sign {
         border-radius: 50%;
-        color: var(--fnf-footer-error-fg-color);
-        background-color: var(--fnf-footer-error-bg-color);
+        color: var(--fnf-error-panel-fg-color);
+        background-color: var(--fnf-error-panel-bg-color);
         width: 22px;
         height: 22px;
         display: grid;
@@ -39,7 +39,6 @@
 
     .error-div {
         color: var(--fnf-footer-error-fg-color);
-        background-color: var(--fnf-footer-error-bg-color);
 
         height: 22px;
         display: flex;
