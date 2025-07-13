@@ -18,7 +18,7 @@ import {ShellHistoryService} from "./shell-history.service";
 import {ShellAutocompleteService} from "../../../../service/shell-autocomplete.service";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {BehaviorSubject, Observable, Subject} from "rxjs";
-import {takeUntil} from "rxjs/operators";
+import {debounceTime, takeUntil} from "rxjs/operators";
 
 
 /**
@@ -43,16 +43,15 @@ import {takeUntil} from "rxjs/operators";
 })
 export class ShellPanelComponent implements OnDestroy {
 
-  private readonly destroy$ = new Subject<void>();
-
   @Input() path = "";
   @Input() text = "ls -al";
-
   @Output() focusChanged = new EventEmitter<boolean>();
-
   hasFocus = false;
   errorMsg = '';
   filteredCommands$ = new BehaviorSubject<string[]>([]);
+
+  private readonly destroy$ = new Subject<void>();
+  private readonly textChange$ = new Subject<string>();
 
   constructor(
     private readonly shellService: ShellService,
@@ -63,22 +62,6 @@ export class ShellPanelComponent implements OnDestroy {
   ) {
     // Initialize the autocomplete functionality
     this.initAutocomplete();
-  }
-
-  /**
-   * Initialize the autocomplete functionality
-   */
-  private initAutocomplete(): void {
-    // We'll set up the filteredCommands$ observable in the onTextChange method
-  }
-
-  /**
-   * Filter commands based on user input
-   * @param input The current input text
-   * @returns Observable of filtered commands
-   */
-  private filterCommands(input: string): Observable<string[]> {
-    return this.shellAutocompleteService.getAutocompleteSuggestions(input);
   }
 
   /**
@@ -140,18 +123,9 @@ export class ShellPanelComponent implements OnDestroy {
   onTextChange() {
     this.errorMsg = '';
 
-    // Get autocomplete suggestions based on current input
-    if (this.text && this.text.trim().length > 0) {
-      this.filterCommands(this.text)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(commands => {
-          this.filteredCommands$.next(commands);
-        });
-    } else {
-      this.filteredCommands$.next([]);
-    }
-
-    this.cdr.detectChanges();
+    // Emit the current text value to the textChange$ Subject
+    // The debounced subscription in initAutocomplete will handle the API call
+    this.textChange$.next(this.text);
   }
 
   openShellOutput(text: string) {
@@ -168,6 +142,42 @@ export class ShellPanelComponent implements OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+    this.textChange$.complete();
     this.filteredCommands$.complete();
+  }
+
+  /**
+   * Initialize the autocomplete functionality
+   */
+  private initAutocomplete(): void {
+    // Set up the textChange$ observable with debounce
+    this.textChange$
+      .pipe(
+        debounceTime(500), // 500ms debounce time
+        takeUntil(this.destroy$)
+      )
+      .subscribe(_s => {
+        if (this.text && this.text.trim().length > 0) {
+          console.info('initAutocomplete text:', this.text);
+          this.filterCommands(this.text)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(commands => {
+              this.filteredCommands$.next(commands);
+              this.cdr.detectChanges();
+            });
+        } else {
+          this.filteredCommands$.next([]);
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  /**
+   * Filter commands based on user input
+   * @param input The current input text
+   * @returns Observable of filtered commands
+   */
+  private filterCommands(input: string): Observable<string[]> {
+    return this.shellAutocompleteService.getAutocompleteSuggestions(input);
   }
 }
