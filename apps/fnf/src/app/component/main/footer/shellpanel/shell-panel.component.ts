@@ -6,6 +6,7 @@ import {MatFormField, MatInput, MatPrefix, MatSuffix} from "@angular/material/in
 import {ShellService} from "../../../../service/shell.service";
 import {MatBottomSheet, MatBottomSheetConfig} from "@angular/material/bottom-sheet";
 import {ShellOutComponent} from "./shell-out.component";
+import {ShellHistoryService} from "./shell-history.service";
 
 
 /**
@@ -41,6 +42,7 @@ export class ShellPanelComponent {
     private readonly shellService: ShellService,
     private readonly cdr: ChangeDetectorRef,
     private readonly matBottomSheet: MatBottomSheet,
+    private readonly shellHistoryService: ShellHistoryService,
   ) {
     // nothing
   }
@@ -67,6 +69,7 @@ export class ShellPanelComponent {
 
 
         if (!res0.stderr && !res0.error) {
+          this.shellHistoryService.addHistory(this.text);
           this.text = '';
           this.openShellOutput(res0.stdout ?? '');
 
