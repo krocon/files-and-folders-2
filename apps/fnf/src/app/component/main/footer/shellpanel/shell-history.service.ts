@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {TypedDataService} from "../../../../common/typed-data.service";
+import {BehaviorSubject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +31,7 @@ export class ShellHistoryService {
     this.innerService.update([]);
   }
 
-  valueChanges$() {
-    this.innerService.valueChanges$;
+  valueChanges$(): BehaviorSubject<string[]> {
+    return this.innerService.valueChanges$;
   }
 }
