@@ -12,6 +12,7 @@ export class MultiMkdirService {
   /**
    * Generates directory names based on the multi-mkdir configuration
    * @param data The multi-mkdir configuration data
+   * @param parentDir
    * @returns An array of directory names
    */
   generateDirectoryNames(data: MultiMkdirData, parentDir: string): string[] {
