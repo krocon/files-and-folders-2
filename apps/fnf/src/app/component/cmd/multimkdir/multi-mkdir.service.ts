@@ -56,12 +56,63 @@ export class MultiMkdirService {
         .replace(/\[R]/g, parentOfParentOfParent);
     }
 
+    // Process parent dir ranges
+    result = this.processPlaceholder(result, parent, 'P');
+    result = this.processPlaceholder(result, parentOfParent, 'Q');
+    result = this.processPlaceholder(result, parentOfParentOfParent, 'R');
+
     // Process parent dir placeholders
     // These will be replaced with actual values when creating directories
     // For now, we just keep the placeholders
 
     return result;
   }
+
+  /**
+   * Processes placeholder patterns in a string for file name manipulation.
+   * This function handles three different types of placeholder patterns for extracting substrings:
+   *
+   * 1. `[letter#-#]` - Extracts a substring from index # to index #
+   * 2. `[letter#-]` - Extracts a substring from index # to the end
+   * 3. `[letter-#]` - Extracts a substring from start to index #
+   *
+   * Where 'letter' can be one of the following:
+   * - 'P': Parent directory name
+   * - 'Q': Parent of parent directory name
+   * - 'R': Parent of parent of parent directory name
+   *
+   * // Example 1: Extract first 2 characters of parent directory
+   * processPlaceholder("dir_[P-2]", "docs", 'P')
+   * // Returns: "dir_do"
+   *
+   * @param base - The string containing the placeholder pattern
+   * @param name - The source string from which to extract (filename, extension, or directory name)
+   * @param letter - The type of placeholder ('P'|'Q'|'R')
+   * @returns The processed string with placeholders replaced by the extracted substrings
+   */
+  private processPlaceholder(base: string, name: string, letter: 'P' | 'Q' | 'R'): string {
+    let result = base;
+    // [N#-#] - Part of name from index # to index #
+    let m = result.match(new RegExp(`\\[${letter}(\\d+)\\-(\\d+)\\]`));
+    if (m) {
+      result = result.replace(m[0], name.substring(parseInt(m[1]), parseInt(m[2])));
+    }
+
+    // [N#-] - Part of name from index # to end
+    m = result.match(new RegExp(`\\[${letter}(\\d+)\\-\\]`));
+    if (m) {
+      result = result.replace(m[0], name.substring(parseInt(m[1])));
+    }
+
+    // [N-#] - Part of name from start to index #
+    m = result.match(new RegExp(`\\[${letter}\\-(\\d+)\\]`));
+    if (m) {
+      result = result.replace(m[0], name.substring(0, parseInt(m[1])));
+    }
+
+    return result;
+  }
+
 
   /**
    * Gets the parent directory from a path
