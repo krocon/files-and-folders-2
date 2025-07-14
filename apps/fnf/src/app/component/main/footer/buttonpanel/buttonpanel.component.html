@@ -82,6 +82,11 @@
               <fnf-shortcut [keys]="getShortcutsByAction('OPEN_MULTIRENAME_DLG')"></fnf-shortcut>
             </button>
             <button
+                (click)="triggerAction('OPEN_MULTIMKDIR_DLG')"
+                mat-menu-item> Multi MkDir...
+              <fnf-shortcut [keys]="getShortcutsByAction('OPEN_MULTIMKDIR_DLG')"></fnf-shortcut>
+            </button>
+            <button
                 (click)="triggerAction('OPEN_GROUPFILES_DLG')"
                 mat-menu-item> Group Files...
               <fnf-shortcut [keys]="getShortcutsByAction('OPEN_GROUPFILES_DLG')"></fnf-shortcut>

@@ -1,0 +1,119 @@
+<h2
+    data-test-id="page-subtitle-h2"
+    mat-dialog-title>Multi MkDir</h2>
+
+<mat-dialog-content>
+  <form
+      [formGroup]="formGroup"
+      autocomplete="off">
+
+    <div class="row-1">
+      <mat-form-field>
+        <mat-label>New Folder Name</mat-label>
+        <input
+            formControlName="folderNameTemplate"
+            matInput
+            placeholder="New Folder Name"/>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Counter Start</mat-label>
+        <mat-select
+            formControlName="counterStart"
+            placeholder="Counter Start">
+          @for (option of options.starts; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Counter Steps</mat-label>
+        <mat-select
+            formControlName="counterStep"
+            placeholder="Counter Steps">
+          @for (option of options.steps; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Counter End</mat-label>
+        <mat-select
+            formControlName="counterEnd"
+            placeholder="Counter End">
+          @for (option of options.ends; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Counter Digits</mat-label>
+        <mat-select
+            formControlName="counterDigits"
+            placeholder="Counter Digits">
+          @for (option of options.digits; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="row-2">
+      <label>
+        [C] Counter,
+        [P] Parent Dir,
+        [Q] Parent<sup>2</sup>,
+        [R] Parent<sup>3</sup>,
+        [P#-#] Part of Parent Dir Name (Example: [P1-8])
+      </label>
+    </div>
+
+    <div class="row-3">
+      <table class="multi-mkdir-table">
+        <thead>
+        <tr>
+          <th>New Directory Names</th>
+        </tr>
+        </thead>
+        <tbody>
+          @for (dirName of directoryNames; track dirName) {
+            <tr>
+              <td>{{ parentDir }}/{{ dirName }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button
+      (click)="onResetClicked()"
+      data-test-id="dialog-reset-button"
+      mat-raised-button>
+    Reset
+  </button>
+
+  <div></div>
+
+  <button
+      (click)="onCancelClicked()"
+      data-test-id="dialog-cancel-button"
+      mat-raised-button>
+    Cancel
+  </button>
+
+  <button
+      (click)="onCreateAllClicked()"
+      [disabled]="!formGroup.valid"
+      color="primary"
+      data-test-id="dialog-ok-button"
+      mat-raised-button>
+    Create All
+  </button>
+</mat-dialog-actions>

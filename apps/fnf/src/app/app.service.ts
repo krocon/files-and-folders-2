@@ -56,6 +56,7 @@ import {FindDialogService} from "./component/cmd/find/find-dialog.service";
 import {FindSocketService} from "./service/find.socketio.service";
 import {MultiRenameDialogService} from "./component/cmd/multirename/multi-rename-dialog.service";
 import {MultiRenameDialogData} from "./component/cmd/multirename/data/multi-rename-dialog.data";
+import {MultiMkdirDialogService} from "./component/cmd/multimkdir/multi-mkdir-dialog.service";
 import {GroupFilesDialogData} from "./component/cmd/groupfiles/data/group-files-dialog.data";
 import {GroupFilesDialogService} from "./component/cmd/groupfiles/group-files-dialog.service";
 import {ChangeDirDialogService} from "./component/cmd/changedir/change-dir-dialog.service";
@@ -120,6 +121,7 @@ export class AppService {
     private readonly findDialogService: FindDialogService,
     private readonly findSocketService: FindSocketService,
     private readonly multiRenameDialogService: MultiRenameDialogService,
+    private readonly multiMkdirDialogService: MultiMkdirDialogService,
     private readonly groupFilesDialogService: GroupFilesDialogService,
     private readonly changeDirDialogService: ChangeDirDialogService,
     private readonly walkSocketService: WalkSocketService,
@@ -415,6 +417,9 @@ export class AppService {
 
     } else if (id === "OPEN_MULTIRENAME_DLG") {
       this.multiRename();
+
+    } else if (id === "OPEN_MULTIMKDIR_DLG") {
+      this.multiMkdir();
 
     } else if (id === "OPEN_GROUPFILES_DLG") {
       this.groupFiles();
@@ -817,6 +822,18 @@ export class AppService {
     this.walkSocketService.cancelWalkDir(cancelKey);
   }
 
+  setShellVisible(visible: boolean = true) {
+    this.shellLocalStorage.setShellVisible(visible);
+  }
+
+  isShellVisible() {
+    return this.shellLocalStorage.isShellVisible();
+  }
+
+  shellVisibilityChanges$(): BehaviorSubject<boolean> {
+    return this.shellLocalStorage.valueChanges$();
+  }
+
   private getInActivePanelIndex(): PanelIndex {
     return this.panelSelectionService.getValue() ? 0 : 1;
   }
@@ -880,6 +897,51 @@ export class AppService {
           }
         });
     }
+  }
+
+  private multiMkdir() {
+    const srcPanelIndex = this.getActivePanelIndex();
+    const activeTabData = this.getActiveTabOnActivePanel();
+
+    this.multiMkdirDialogService
+      .openDialog(
+        activeTabData.path,
+        "S[C]",
+        (dirNames: string[] | undefined) => {
+          console.info('multi mkdir', dirNames);
+          /*
+          if (dirNames && dirNames.length) {
+            const actionEvents: QueueActionEvent[] = [];
+
+            for (const dirName of dirNames) {
+              const target: FileItemIf = {
+                dir: activeTabData.path,
+                base: dirName,
+                isDir: true,
+                size: 0,
+                ext: '',
+                mtime: new Date()
+              };
+
+              actionEvents.push(
+                this.commandService.createQueueActionEventForMkdir({
+                  bulk: dirNames.length > 1,
+                  source: target,
+                  srcPanelIndex: srcPanelIndex,
+                  targetPanelIndex: srcPanelIndex,
+                  target: target
+                })
+              );
+            }
+
+            if (actionEvents.length > 0) {
+              actionEvents.push(this.commandService.createQueueActionEventForRefreshPanel(srcPanelIndex));
+              this.commandService.addActions(actionEvents);
+            }
+          }
+          */
+        }
+      );
   }
 
   private groupFiles() {
@@ -968,18 +1030,6 @@ export class AppService {
       return fileItems.map(fi => `${fi.dir}/${fi.base}`);
     }
     return [this.getActiveTabOnActivePanel().path];
-  }
-
-  setShellVisible(visible: boolean = true) {
-    this.shellLocalStorage.setShellVisible(visible);
-  }
-
-  isShellVisible() {
-    return this.shellLocalStorage.isShellVisible();
-  }
-
-  shellVisibilityChanges$(): BehaviorSubject<boolean> {
-    return this.shellLocalStorage.valueChanges$();
   }
 
 }

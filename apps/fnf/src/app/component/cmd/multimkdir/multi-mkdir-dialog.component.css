@@ -1,0 +1,53 @@
+.mat-mdc-dialog-content {
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr;
+
+    form {
+        height: 100%;
+        display: grid;
+        grid-template-rows: auto auto auto 1fr;
+        grid-gap: 12px;
+        align-items: start;
+        align-content: start;
+
+        & > div {
+            height: 100%;
+            width: 100%;
+        }
+
+        .row-1 {
+            display: grid;
+            grid-template-columns: minmax(100px, 1fr) 160px 160px 160px 160px;
+            grid-gap: 12px;
+        }
+
+        .row-2 {
+            padding-left: 12px;
+        }
+
+        .row-3 {
+            height: 100%;
+            display: grid;
+            grid-template-rows: 1fr;
+        }
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+        display: none
+    }
+}
+
+.multi-mkdir-table {
+    height: 100%;
+}
+
+.mat-mdc-dialog-actions {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    grid-gap: 12px;
+
+    .mdc-button {
+        min-width: 200px;
+    }
+}

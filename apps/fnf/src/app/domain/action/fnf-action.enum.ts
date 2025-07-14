@@ -3,6 +3,7 @@ export const actionIds = [
   "OPEN_GOTO_ANYTHING_DLG",
   "OPEN_JOB_QUEUE_DLG",
   "OPEN_MULTIRENAME_DLG",
+  "OPEN_MULTIMKDIR_DLG",
   "OPEN_RENAME_DLG",
 
   "COPY_2_CLIPBOARD_FULLNAMES",
@@ -64,4 +65,3 @@ export const actionIds = [
 ] as const;
 
 export type ActionId = typeof actionIds[number];
-
