@@ -3,6 +3,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {MultiMkdirDialogComponent} from './multi-mkdir-dialog.component';
 import {MultiMkdirDialogData} from './data/multi-mkdir-dialog.data';
 import {takeWhile} from "rxjs/operators";
+import {MultiMkDirDialogConfig} from "./multi-mkdir-dialog.config";
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,7 @@ export class MultiMkdirDialogService {
 
     this.dialog
       .open(MultiMkdirDialogComponent, {
-        width: '1100px',
+        ...new MultiMkDirDialogConfig(),
         data: new MultiMkdirDialogData(parentDir, name)
       })
       .afterClosed()

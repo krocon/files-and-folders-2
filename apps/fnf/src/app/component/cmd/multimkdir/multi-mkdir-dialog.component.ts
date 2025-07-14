@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit} from "@angular/core";
+import {ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MultiMkdirDialogData} from "./data/multi-mkdir-dialog.data";
 import {
@@ -19,6 +19,18 @@ import {MatOption, MatSelect} from "@angular/material/select";
 import {debounceTime} from "rxjs";
 import {MultiMkdirService} from "./multi-mkdir.service";
 import {TypedDataService} from "../../../common/typed-data.service";
+import {RenderWrapperFactory, TableComponent} from "@guiexpert/angular-table";
+import {
+  AutoRestoreOptions,
+  ColumnDef,
+  Size,
+  TableApi,
+  TableFactory,
+  TableModelIf,
+  TableOptions,
+  TableOptionsIf
+} from "@guiexpert/table";
+import {FileItemIf} from "@fnf/fnf-data";
 
 @Component({
   selector: "fnf-multi-mkdir-dialog",
@@ -34,7 +46,8 @@ import {TypedDataService} from "../../../common/typed-data.service";
     MatFormField,
     MatSelect,
     MatOption,
-    MatLabel
+    MatLabel,
+    TableComponent
   ],
   styleUrls: ["./multi-mkdir-dialog.component.css"]
 })
@@ -49,6 +62,32 @@ export class MultiMkdirDialogComponent implements OnInit, OnDestroy {
   options: MultiMkdirOptions;
   directoryNames: string[] = [];
 
+  private readonly rowHeight = 34;
+  tableModel: TableModelIf;
+  readonly tableOptions: TableOptionsIf = {
+    ...new TableOptions(),
+    hoverColumnVisible: false,
+    defaultRowHeights: {
+      header: this.rowHeight,
+      body: this.rowHeight,
+      footer: 0
+    },
+    horizontalBorderVisible: false,
+    verticalBorderVisible: false,
+    autoRestoreOptions: {
+      ...new AutoRestoreOptions<FileItemIf>(),
+      getStorageKeyFn: () => `fnf-multimkdir-table`,
+      autoRestoreCollapsedExpandedState: true,
+      autoRestoreScrollPosition: true,
+      autoRestoreSortingState: true,
+      autoRestoreSelectedState: false
+    },
+    // externalFilterFunction: this.filterFn.bind(this),
+    getSelectionModel: () => undefined,
+    getFocusModel: () => undefined,
+    shortcutActionsDisabled: true,
+  };
+  private tableApi: TableApi | undefined;
   private alive = true;
 
 
@@ -57,11 +96,13 @@ export class MultiMkdirDialogComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public multiMkdirDialogData: MultiMkdirDialogData,
     private readonly formBuilder: FormBuilder,
     private readonly cdr: ChangeDetectorRef,
-    private readonly multiMkdirService: MultiMkdirService
+    private readonly multiMkdirService: MultiMkdirService,
+    private readonly rwf: RenderWrapperFactory,
+    private readonly zone: NgZone
   ) {
     this.data = multiMkdirDialogData.data ? multiMkdirDialogData.data : MultiMkdirDialogComponent.innerServiceMultiMkdirData.getValue();
     this.options = multiMkdirDialogData.options as MultiMkdirOptions;
-    this.parentDir = multiMkdirDialogData.parentDir;
+    this.parentDir = multiMkdirDialogData.parentDir ?? '';
     this.formGroup = this.formBuilder.group(
       {
         folderNameTemplate: new FormControl(this.data.folderNameTemplate, [Validators.required, Validators.minLength(1)]),
@@ -71,6 +112,23 @@ export class MultiMkdirDialogComponent implements OnInit, OnDestroy {
         counterDigits: new FormControl(this.data.counterDigits, [])
       }
     );
+
+    const columnDefs = [
+      ColumnDef.create({
+        property: "directoryName",
+        headerLabel: "New Directory Names",
+        width: new Size(100, 'weight'),
+        minWidth: new Size(200, 'px'),
+        headerClasses: ["ge-table-text-align-left"],
+        bodyClasses: ["ge-table-text-align-left"],
+      })
+    ];
+
+    this.tableModel = TableFactory.createTableModel({
+      rows: this.directoryNames.map(name => ({directoryName: this.parentDir + '/' + name})),
+      columnDefs,
+      tableOptions: this.tableOptions,
+    });
   }
 
   ngOnDestroy(): void {
@@ -113,9 +171,24 @@ export class MultiMkdirDialogComponent implements OnInit, OnDestroy {
     this.dialogRef.close(undefined);
   }
 
+  onTableReady(tableApi: TableApi) {
+    this.tableApi = tableApi;
+    this.updateTable();
+  }
+
   private updateDirectoryNames(formValue: any) {
     const data = {...new MultiMkdirData(), ...formValue};
     this.directoryNames = this.multiMkdirService.generateDirectoryNames(data, this.parentDir);
+    this.updateTable();
+
     this.cdr.detectChanges();
+  }
+
+  private updateTable() {
+    if (this.tableApi && this.directoryNames?.length) {
+      const rows = this.directoryNames.map(name => ({directoryName: this.parentDir + '/' + name}));
+      this.tableApi.setRows(rows);
+      this.tableApi.repaint();
+    }
   }
 }

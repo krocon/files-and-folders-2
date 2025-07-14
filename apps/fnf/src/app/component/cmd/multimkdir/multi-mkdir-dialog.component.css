@@ -6,7 +6,7 @@
     form {
         height: 100%;
         display: grid;
-        grid-template-rows: auto auto auto 1fr;
+        grid-template-rows: auto auto 1fr;
         grid-gap: 12px;
         align-items: start;
         align-content: start;
@@ -35,6 +35,11 @@
 
     .mat-mdc-form-field-subscript-wrapper {
         display: none
+    }
+
+    .multi-mkdir-table {
+        /*height: 500px;*/
+        height: 100%;
     }
 }
 

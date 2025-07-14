@@ -72,20 +72,12 @@
     </div>
 
     <div class="row-3">
-      <table class="multi-mkdir-table">
-        <thead>
-        <tr>
-          <th>New Directory Names</th>
-        </tr>
-        </thead>
-        <tbody>
-          @for (dirName of directoryNames; track dirName) {
-            <tr>
-              <td>{{ parentDir }}/{{ dirName }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
+      <guiexpert-table
+          (tableReady)="onTableReady($event)"
+          [debounceMouseClickDelay]="150"
+          [tableModel]="tableModel"
+          [tableOptions]="tableOptions"
+          class="ge-table multi-mkdir-table"></guiexpert-table>
     </div>
 
   </form>
