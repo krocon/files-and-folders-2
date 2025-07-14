@@ -13,6 +13,7 @@ import {TaskList} from "../../../task/task-list/task-list";
 import {ButtonEnableStates, buttonEnableStatesKey, CmdIf} from "@fnf/fnf-data";
 import {MatList} from "@angular/material/list";
 import {TaskButtonComponent} from "../../../task/task-list/task-button.component";
+import {FnfActionLabels} from "../../../../domain/action/fnf-action-labels";
 
 @Component({
   selector: 'app-button-panel',
@@ -76,6 +77,58 @@ export class ButtonPanelComponent implements OnInit {
     // },
   ];
 
+
+  menuItems0: ActionId[] = [
+    'OPEN_GOTO_ANYTHING_DLG',
+    '-',
+    'RELOAD_DIR',
+    'OPEN_FIND_DLG',
+    'OPEN_CHDIR_DLG',
+    'TOGGLE_FILTER',
+    'TOGGLE_HIDDEN_FILES',
+    'TOGGLE_SHELL',
+    "-",
+    "COPY_2_CLIPBOARD_NAMES",
+    "COPY_2_CLIPBOARD_NAMES_AS_JSON",
+    "COPY_2_CLIPBOARD_FULLNAMES",
+    "COPY_2_CLIPBOARD_FULLNAMES_AS_JSON",
+    "-",
+    "OPEN_SETUP_DLG"
+  ];
+
+  menuItems1: ActionId[] = [
+    "OPEN_COPY_DLG",
+    "OPEN_MOVE_DLG",
+    "OPEN_DELETE_DLG",
+    "OPEN_MKDIR_DLG",
+    "OPEN_RENAME_DLG",
+    "-",
+    "OPEN_MULTIRENAME_DLG",
+    "OPEN_MULTIMKDIR_DLG",
+    "OPEN_GROUPFILES_DLG",
+    "OPEN_DELETE_EMPTY_FOLDERS_DLG",
+  ];
+
+  menuItems2: ActionId[] = [
+    "ENHANCE_SELECTION",
+    "REDUCE_SELECTION",
+    "TOGGLE_SELECTION",
+    "SELECT_ALL",
+    "DESELECT_ALL",
+    "-",
+    "NAVIGATE_LEVEL_DOWN",
+    "NAVIGATE_BACK",
+    // 'NAVIGATE_FORWARD',
+    "-",
+    "SELECT_LEFT_PANEL",
+    "SELECT_RIGHT_PANEL",
+    "TOGGLE_PANEL",
+    "-",
+    'ADD_NEW_TAB',
+    'REMOVE_TAB'
+  ];
+
+
   tools: CmdIf[] = [];
 
   constructor(
@@ -118,15 +171,6 @@ export class ButtonPanelComponent implements OnInit {
   }
 
 
-  onAddTabClicked() {
-    this.appService.triggerAction('ADD_NEW_TAB');
-  }
-
-  onRemoveTabClicked() {
-    this.appService.triggerAction('REMOVE_TAB');
-  }
-
-
   triggerAction(id: ActionId) {
     this.appService.triggerAction(id);
   }
@@ -159,7 +203,12 @@ export class ButtonPanelComponent implements OnInit {
     return this.appService.getFirstShortcutByActionAsTokens(action);
   }
 
+
   getShortcutAsLabelTokens(sc: string): string[] {
     return this.appService.getShortcutAsLabelTokens(sc);
+  }
+
+  getLabelByAction(action: ActionId): string {
+    return FnfActionLabels.actionIdLabelMap[action] ?? action;
   }
 }

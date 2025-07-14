@@ -20,6 +20,7 @@ export class FnfActionLabels {
     TOGGLE_HIDDEN_FILES: "Toggle Hidden Files",
     TOGGLE_SHELL: "Toggle Shell",
 
+    OPEN_SETUP_DLG: "Setup...",
     OPEN_JOB_QUEUE_DLG: "Open Action Queue Dialog",
     OPEN_GOTO_ANYTHING_DLG: "Go to anything...",
     SAVE_CONFIG: "Save Config",
@@ -27,6 +28,7 @@ export class FnfActionLabels {
     OPEN_CHDIR_DLG: "Change Dir...",
     OPEN_FIND_DUBLICATES_DLG: "Find Dublicates...",
     OPEN_MULTIRENAME_DLG: "Multi Rename...",
+    OPEN_MULTIMKDIR_DLG: "Multi MkDir...",
     OPEN_RENAME_DLG: "Rename...",
     OPEN_DELETE_EMPTY_FOLDERS_DLG: "Clean Folders...",
     OPEN_FIND_DLG: "Find...",

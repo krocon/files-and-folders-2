@@ -61,7 +61,10 @@ export const actionIds = [
   "TOGGLE_SHELL",
   "OPEN_SHORTCUT_DLG",
 
-  "DO_NOTHING"
+  "OPEN_SETUP_DLG",
+
+  "DO_NOTHING",
+  "-"
 ] as const;
 
 export type ActionId = typeof actionIds[number];
