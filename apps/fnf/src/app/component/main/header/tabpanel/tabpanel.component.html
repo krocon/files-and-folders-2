@@ -1,6 +1,6 @@
 <div
-    class="tabpanel-div"
-    [class.filter-active]="tabsPanelData && tabsPanelData.tabs[tabsPanelData.selectedTabIndex].filterActive">
+    [class.filter-active]="tabsPanelData && tabsPanelData.tabs[tabsPanelData.selectedTabIndex].filterActive"
+    class="tabpanel-div">
 
   <div class="fnf-border-bottom">
     <fnf-fav-menu
@@ -153,7 +153,11 @@
           class="icon-only-button float-right"
           (click)="toggleFilterInput()"
           mat-button>
-        <mat-icon class="fnf-header-fg-color">filter_alt</mat-icon>
+        @if (tabsPanelData.tabs[tabsPanelData.selectedTabIndex].filterActive) {
+          <mat-icon class="fnf-header-fg-color">filter_alt</mat-icon>
+        } @else {
+          <mat-icon class="fnf-header-fg-color">filter_alt_off</mat-icon>
+        }
       </button><input
           matTooltip="Double click to clear"
           (change)="onFilterChangedByUser()"
@@ -168,8 +172,6 @@
           class="filter border-0 float-right mr-1"
           matInput
           placeholder="Filter">
-
-
     }
   </div>
 </div>
