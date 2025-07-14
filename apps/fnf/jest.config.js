@@ -3,7 +3,7 @@ module.exports = {
   setupFilesAfterEnv: ["<rootDir>/setup-jest.ts"],
   testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/dist/"],
   transform: {
-    "^.+\\.(ts|js|html)$": ["jest-preset-angular", {
+    "^.+\\.(ts|js)$": ["jest-preset-angular", {
       tsconfig: "<rootDir>/tsconfig.spec.json"
     }]
   },
@@ -14,7 +14,8 @@ module.exports = {
   moduleNameMapper: {
     "^@fnf-data$": "<rootDir>/../../libs/fnf-data/src/index.ts",
     "^@fnf-data/(.*)$": "<rootDir>/../../libs/fnf-data/$1",
-    "^@fnf/fnf-data$": "<rootDir>/../../libs/fnf-data/src/index.ts"
+    "^@fnf/fnf-data$": "<rootDir>/../../libs/fnf-data/src/index.ts",
+    "\\.(html|css)$": "<rootDir>/src/test-mocks/empty-module.js"
   },
   modulePaths: ["<rootDir>/../../"],
   moduleDirectories: ["node_modules", "<rootDir>/../../libs"],

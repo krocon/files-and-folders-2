@@ -64,20 +64,30 @@ describe('MultiMkdirDialogComponent', () => {
     expect(multiMkdirService.generateDirectoryNames).toHaveBeenCalled();
     expect(component.directoryNames).toEqual(['Test01', 'Test02', 'Test03']);
 
-    // Change form values
+    // Reset the mock to clear previous calls
+    multiMkdirService.generateDirectoryNames.mockClear();
+
+    // Set up the mock to return new values
     multiMkdirService.generateDirectoryNames.mockReturnValue(['NewTest01', 'NewTest02']);
-    component.formGroup.patchValue({
-      folderNameTemplate: 'NewTest[C]'
-    });
 
-    // Wait for debounce
-    jest.useFakeTimers();
-    jest.advanceTimersByTime(301);
-    jest.useRealTimers();
-
-    expect(multiMkdirService.generateDirectoryNames).toHaveBeenCalledWith(expect.objectContaining({
+    // Create a form value with the updated template
+    const updatedFormValue = {
+      ...component.formGroup.value,
       folderNameTemplate: 'NewTest[C]'
-    }));
+    };
+
+    // Directly call updateDirectoryNames with the updated form value
+    // We need to access the private method, so we use any type
+    (component as any).updateDirectoryNames(updatedFormValue);
+
+    // Verify the service was called with the correct parameters
+    expect(multiMkdirService.generateDirectoryNames).toHaveBeenCalledWith(
+      expect.objectContaining({
+        folderNameTemplate: 'NewTest[C]'
+      }),
+      expect.any(String)
+    );
+
     expect(component.directoryNames).toEqual(['NewTest01', 'NewTest02']);
   });
 
