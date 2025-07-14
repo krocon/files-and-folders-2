@@ -5,18 +5,25 @@ ENV NODE_ENV build
 # Create app directory
 WORKDIR /usr/src/app
 
-RUN apt-get update
+RUN apt-get update && apt-get install python3 -y
 
 RUN npm install -g pnpm
 
-RUN apt-get install python3 -y
+# Copy package files first to leverage Docker cache
+COPY package*.json pnpm-*.yaml ./
+COPY apps/fnf/package*.json ./apps/fnf/
+COPY apps/fnf-api/package*.json ./apps/fnf-api/
+COPY apps/fnf-api-test/package*.json ./apps/fnf-api-test/
+COPY libs/fnf-data/package*.json ./libs/fnf-data/
+
+# Install dependencies
+RUN pnpm install
 
 # Bundle app source
 COPY . .
 
-RUN pnpm install --frozen-lockfile \
-    && npm build:all \
-    && npm prune --production
+# Build the application
+RUN pnpm build:all && pnpm prune --prod
 
 # ---
 
@@ -28,19 +35,14 @@ ENV NODE_ENV production
 
 WORKDIR /usr/src/app
 
-RUN apt-get update
+RUN apt-get update && apt-get install rsync -y && npm install -g pnpm
 
-RUN npm install -g pnpm
+# Copy package files and install production dependencies
+COPY package*.json pnpm-*.yaml ./
+COPY --from=builder /usr/src/app/node_modules ./node_modules
 
-RUN apt-get install rsync -y
-
-COPY package*.json ./
-
-RUN pnpm install --frozen-lockfile
-
-COPY --chown=node:node . .
-
-COPY --chown=node:node --from=builder /usr/src/app/dist ./dist
+# Copy built application from builder stage
+COPY --from=builder /usr/src/app/dist ./dist
 
 # friends don’t let friends run containers as root!
 USER node
