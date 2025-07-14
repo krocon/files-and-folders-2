@@ -1,8 +1,8 @@
-import {ApplicationConfig, provideZoneChangeDetection} from '@angular/core';
+import {ApplicationConfig, ApplicationRef, provideZoneChangeDetection} from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {provideAnimations} from '@angular/platform-browser/animations';
 import {provideHttpClient} from '@angular/common/http';
-import {provideSocketIo, Socket, SOCKET_CONFIG_TOKEN, SocketIoConfig} from 'ngx-socket-io';
+import {Socket, SOCKET_CONFIG_TOKEN, SocketIoConfig} from 'ngx-socket-io';
 
 import {routes} from './app.routes';
 
@@ -19,9 +19,9 @@ const config: SocketIoConfig = {
   }
 };
 
-// Factory function to create a Socket instance with the config
-export function socketFactory(config: SocketIoConfig): Socket {
-  return new Socket(config);
+// Factory function to create a Socket instance with the config and ApplicationRef
+export function socketFactory(config: SocketIoConfig, appRef: ApplicationRef): Socket {
+  return new Socket(config, appRef);
 }
 
 export const appConfig: ApplicationConfig = {
@@ -30,11 +30,13 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimations(),
     provideHttpClient(),
-    provideSocketIo(config),
-    {
-      provide: Socket,
-      useFactory: socketFactory,
-      deps: [SOCKET_CONFIG_TOKEN]
-    }
+    // provideSocketIo(config),
+    // {
+    //   provide: Socket,
+    //   useFactory: socketFactory,
+    //   deps: [SOCKET_CONFIG_TOKEN]
+    // },
+    {provide: SOCKET_CONFIG_TOKEN, useValue: config},
+    {provide: Socket, useFactory: socketFactory, deps: [SOCKET_CONFIG_TOKEN, ApplicationRef]}
   ]
 };

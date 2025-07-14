@@ -19,7 +19,10 @@ COPY libs/fnf-data/package*.json ./libs/fnf-data/
 # Install dependencies
 RUN pnpm install
 
-# Bundle app source
+# Create necessary directories for the build
+RUN mkdir -p apps/fnf/dist apps/fnf-api/dist apps/fnf-api-test/dist libs/fnf-data/dist
+
+# Bundle app source (excluding node_modules and dist directories as specified in .dockerignore)
 COPY . .
 
 # Build the application
@@ -39,10 +42,15 @@ RUN apt-get update && apt-get install rsync -y && npm install -g pnpm
 
 # Copy package files and install production dependencies
 COPY package*.json pnpm-*.yaml ./
+
+# Copy only the production dependencies from the builder stage
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 
 # Copy built application from builder stage
-COPY --from=builder /usr/src/app/dist ./dist
+# We copy the specific dist directories we need
+COPY --from=builder /usr/src/app/apps/fnf-api/dist ./apps/fnf-api/dist
+COPY --from=builder /usr/src/app/apps/fnf/dist ./apps/fnf/dist
+COPY --from=builder /usr/src/app/libs/fnf-data/dist ./libs/fnf-data/dist
 
 # friends don’t let friends run containers as root!
 USER node
