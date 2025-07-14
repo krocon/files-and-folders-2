@@ -28,6 +28,7 @@ export class MultiMkdirOptions implements Options {
 
   steps: OptionItem<number>[] = [
     {value: 1, label: '1'},
+    {value: 2, label: '2'},
     {value: 5, label: '5'},
     {value: 10, label: '10'},
     {value: 20, label: '20'},
@@ -42,7 +43,6 @@ export class MultiMkdirOptions implements Options {
     {value: 20, label: '20'},
     {value: 50, label: '50'},
     {value: 100, label: '100'},
-    {value: 1000, label: '1.000'},
-    {value: 10000, label: '10.000'}
+    {value: 1000, label: '1.000'}
   ];
 }

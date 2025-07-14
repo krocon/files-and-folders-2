@@ -44,7 +44,6 @@ export class MultiMkdirService {
     const parent = this.getParentDir(parentDir);
     const parentOfParent = this.getParentDir(parentDir, 2);
     const parentOfParentOfParent = this.getParentDir(parentDir, 3);
-    console.log(parent, parentOfParent, parentOfParentOfParent); // TODO del
 
     // Process counter
     if (result.indexOf('[C]') > -1) {
@@ -122,7 +121,7 @@ export class MultiMkdirService {
    */
   private getParentDir(dir: string, generation: number = 1): string {
     const parts = dir.split('/').filter(p => p.length > 0);
-    return parts.length > (generation - 1) ? parts[parts.length - generation] : parts[0];
+    return (parts.length > (generation - 1) ? parts[parts.length - generation] : parts[0]) ?? '';
   }
 
   /**

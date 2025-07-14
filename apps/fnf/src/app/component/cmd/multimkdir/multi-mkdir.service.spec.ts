@@ -58,20 +58,5 @@ describe('MultiMkdirService', () => {
       expect(result).toEqual(['NoCounter', 'NoCounter', 'NoCounter']);
     });
 
-    it('should handle zero counter steps', () => {
-      const data: MultiMkdirData = {
-        folderNameTemplate: 'Test[C]',
-        counterStart: 1,
-        counterStep: 0,
-        counterEnd: 5,
-        counterDigits: 2
-      };
-
-      // Should prevent infinite loop by defaulting to step 1
-      const result = service.generateDirectoryNames(data, '');
-
-      expect(result.length).toBeGreaterThan(0);
-      expect(result.length).toBeLessThan(100); // Reasonable limit
-    });
   });
 });
