@@ -14,7 +14,7 @@ export class MultiMkdirService {
    * @param data The multi-mkdir configuration data
    * @returns An array of directory names
    */
-  generateDirectoryNames(data: MultiMkdirData): string[] {
+  generateDirectoryNames(data: MultiMkdirData, parentDir: string): string[] {
     const result: string[] = [];
     const counterStart = parseInt(data.counterStart.toString());
     const counterStep = parseInt(data.counterStep.toString());
@@ -23,7 +23,7 @@ export class MultiMkdirService {
 
     let counter = counterStart;
     while (counter <= counterEnd) {
-      const dirName = this.generateDirectoryName(data.folderNameTemplate, counter, counterDigits);
+      const dirName = this.generateDirectoryName(data.folderNameTemplate, counter, counterDigits, parentDir);
       result.push(dirName);
       counter += counterStep;
     }
@@ -38,13 +38,22 @@ export class MultiMkdirService {
    * @param counterDigits The number of digits for the counter
    * @returns The generated directory name
    */
-  private generateDirectoryName(template: string, counter: number, counterDigits: number): string {
+  private generateDirectoryName(template: string, counter: number, counterDigits: number, parentDir: string): string {
     let result = template;
+
+    const parent = this.getParentDir(parentDir);
+    const parentOfParent = this.getParentDir(parentDir, 2);
+    const parentOfParentOfParent = this.getParentDir(parentDir, 3);
+    console.log(parent, parentOfParent, parentOfParentOfParent); // TODO del
 
     // Process counter
     if (result.indexOf('[C]') > -1) {
       const s = this.pad(counter.toString(), counterDigits);
-      result = result.replace(/\[C]/g, s);
+      result = result
+        .replace(/\[C]/g, s)
+        .replace(/\[P]/g, parent)
+        .replace(/\[Q]/g, parentOfParent)
+        .replace(/\[R]/g, parentOfParentOfParent);
     }
 
     // Process parent dir placeholders
@@ -52,6 +61,17 @@ export class MultiMkdirService {
     // For now, we just keep the placeholders
 
     return result;
+  }
+
+  /**
+   * Gets the parent directory from a path
+   * @param dir The directory path
+   * @param generation 1=parent, 2= parent of parent
+   * @returns The parent directory name
+   */
+  private getParentDir(dir: string, generation: number = 1): string {
+    const parts = dir.split('/').filter(p => p.length > 0);
+    return parts.length > (generation - 1) ? parts[parts.length - generation] : parts[0];
   }
 
   /**

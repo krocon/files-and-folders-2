@@ -24,7 +24,7 @@ describe('MultiMkdirService', () => {
         counterDigits: 2
       };
 
-      const result = service.generateDirectoryNames(data);
+      const result = service.generateDirectoryNames(data, '');
 
       expect(result).toEqual(['Test01', 'Test02', 'Test03']);
     });
@@ -38,7 +38,7 @@ describe('MultiMkdirService', () => {
         counterDigits: 3
       };
 
-      const result = service.generateDirectoryNames(data);
+      const result = service.generateDirectoryNames(data, '');
 
       expect(result).toEqual(['Folder010', 'Folder015', 'Folder020', 'Folder025']);
     });
@@ -52,7 +52,7 @@ describe('MultiMkdirService', () => {
         counterDigits: 2
       };
 
-      const result = service.generateDirectoryNames(data);
+      const result = service.generateDirectoryNames(data, '');
 
       // Should still create multiple directories based on counter settings
       expect(result).toEqual(['NoCounter', 'NoCounter', 'NoCounter']);
@@ -68,7 +68,7 @@ describe('MultiMkdirService', () => {
       };
 
       // Should prevent infinite loop by defaulting to step 1
-      const result = service.generateDirectoryNames(data);
+      const result = service.generateDirectoryNames(data, '');
 
       expect(result.length).toBeGreaterThan(0);
       expect(result.length).toBeLessThan(100); // Reasonable limit

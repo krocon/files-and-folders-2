@@ -115,7 +115,7 @@ export class MultiMkdirDialogComponent implements OnInit, OnDestroy {
 
   private updateDirectoryNames(formValue: any) {
     const data = {...new MultiMkdirData(), ...formValue};
-    this.directoryNames = this.multiMkdirService.generateDirectoryNames(data);
+    this.directoryNames = this.multiMkdirService.generateDirectoryNames(data, this.parentDir);
     this.cdr.detectChanges();
   }
 }
