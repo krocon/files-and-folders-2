@@ -58,7 +58,7 @@ const config = new Config(
     ),
     CustomCssModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, "..", "fnf")
+      rootPath: join(__dirname, "../../fnf/dist/fnf") /* root of the compiled UI */
     }),
     FilenameModule,
     CheckGlobModule,
