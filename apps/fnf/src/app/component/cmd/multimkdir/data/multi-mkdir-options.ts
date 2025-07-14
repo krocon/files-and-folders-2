@@ -15,6 +15,12 @@ export class MultiMkdirOptions implements Options {
     {value: 10, label: '0000000010'}
   ];
 
+  letterCases: OptionItem<string>[] = [
+    {value: '', label: ''},
+    {value: 'uppercase', label: 'Uppercase'},
+    {value: 'lowercase', label: 'Lowercase'}
+  ];
+
   starts: OptionItem<number>[] = [
     {value: 0, label: '0'},
     {value: 1, label: '1'},

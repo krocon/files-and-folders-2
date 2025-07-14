@@ -106,6 +106,7 @@ export class MultiMkdirDialogComponent implements OnInit, OnDestroy {
     this.formGroup = this.formBuilder.group(
       {
         folderNameTemplate: new FormControl(this.data.folderNameTemplate, [Validators.required, Validators.minLength(1)]),
+        letterCase: new FormControl(this.data.letterCase, []),
         counterStart: new FormControl(this.data.counterStart, []),
         counterStep: new FormControl(this.data.counterStep, []),
         counterEnd: new FormControl(this.data.counterEnd, []),

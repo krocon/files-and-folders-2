@@ -21,10 +21,11 @@ export class MultiMkdirService {
     const counterStep = parseInt(data.counterStep.toString());
     const counterEnd = parseInt(data.counterEnd.toString());
     const counterDigits = parseInt(data.counterDigits.toString());
+    const letterCase = data.letterCase;
 
     let counter = counterStart;
     while (counter <= counterEnd) {
-      const dirName = this.generateDirectoryName(data.folderNameTemplate, counter, counterDigits, parentDir);
+      const dirName = this.generateDirectoryName(data.folderNameTemplate, counter, counterDigits, parentDir, letterCase);
       result.push(dirName);
       counter += counterStep;
     }
@@ -37,33 +38,39 @@ export class MultiMkdirService {
    * @param template The directory name template
    * @param counter The current counter value
    * @param counterDigits The number of digits for the counter
+   * @param parentDir The parent directory
+   * @param letterCase The letter case option ('', 'uppercase', 'lowercase')
    * @returns The generated directory name
    */
-  private generateDirectoryName(template: string, counter: number, counterDigits: number, parentDir: string): string {
+  private generateDirectoryName(template: string, counter: number, counterDigits: number, parentDir: string, letterCase: string = ''): string {
     let result = template;
 
     const parent = this.getParentDir(parentDir);
     const parentOfParent = this.getParentDir(parentDir, 2);
     const parentOfParentOfParent = this.getParentDir(parentDir, 3);
 
-    // Process counter
-    if (result.indexOf('[C]') > -1) {
-      const s = this.pad(counter.toString(), counterDigits);
-      result = result
-        .replace(/\[C]/g, s)
-        .replace(/\[P]/g, parent)
-        .replace(/\[Q]/g, parentOfParent)
-        .replace(/\[R]/g, parentOfParentOfParent);
-    }
+    // Process counter and letter
+    const s = this.pad(counter.toString(), counterDigits);
+    const letter = this.getLetterFromCounter(counter);
+
+    result = result
+      .replace(/\[C]/g, s)
+      .replace(/\[L]/g, letter)
+      .replace(/\[P]/g, parent)
+      .replace(/\[Q]/g, parentOfParent)
+      .replace(/\[R]/g, parentOfParentOfParent);
 
     // Process parent dir ranges
     result = this.processPlaceholder(result, parent, 'P');
     result = this.processPlaceholder(result, parentOfParent, 'Q');
     result = this.processPlaceholder(result, parentOfParentOfParent, 'R');
 
-    // Process parent dir placeholders
-    // These will be replaced with actual values when creating directories
-    // For now, we just keep the placeholders
+    // Apply letter case
+    if (letterCase === 'uppercase') {
+      result = result.toUpperCase();
+    } else if (letterCase === 'lowercase') {
+      result = result.toLowerCase();
+    }
 
     return result;
   }
@@ -133,5 +140,16 @@ export class MultiMkdirService {
    */
   private pad(str: string, max: number): string {
     return str.length < max ? this.pad("0" + str, max) : str;
+  }
+
+  /**
+   * Converts a counter value to a letter (0=a, 1=b, etc.)
+   * @param counter The counter value
+   * @returns The letter corresponding to the counter value
+   */
+  private getLetterFromCounter(counter: number): string {
+    // Convert counter to letter (0=a, 1=b, etc.)
+    const baseCharCode = 'a'.charCodeAt(0);
+    return String.fromCharCode(baseCharCode + (counter % 26));
   }
 }
