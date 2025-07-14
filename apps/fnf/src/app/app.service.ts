@@ -900,46 +900,26 @@ export class AppService {
   }
 
   private multiMkdir() {
-    const srcPanelIndex = this.getActivePanelIndex();
+    const panelIndex = this.getActivePanelIndex();
     const activeTabData = this.getActiveTabOnActivePanel();
+    const dir = activeTabData.path;
 
     this.multiMkdirDialogService
       .openDialog(
-        activeTabData.path,
+        dir,
         "S[C]",
         (dirNames: string[] | undefined) => {
-          console.info('multi mkdir', dirNames);
-          /*
-          if (dirNames && dirNames.length) {
-            const actionEvents: QueueActionEvent[] = [];
-
-            for (const dirName of dirNames) {
-              const target: FileItemIf = {
-                dir: activeTabData.path,
-                base: dirName,
-                isDir: true,
-                size: 0,
-                ext: '',
-                mtime: new Date()
-              };
-
-              actionEvents.push(
-                this.commandService.createQueueActionEventForMkdir({
-                  bulk: dirNames.length > 1,
-                  source: target,
-                  srcPanelIndex: srcPanelIndex,
-                  targetPanelIndex: srcPanelIndex,
-                  target: target
-                })
-              );
-            }
-
-            if (actionEvents.length > 0) {
-              actionEvents.push(this.commandService.createQueueActionEventForRefreshPanel(srcPanelIndex));
-              this.commandService.addActions(actionEvents);
+          if (dirNames) {
+            for (const base of dirNames) {
+              this.callActionMkDir({
+                dir,
+                base,
+                panelIndex
+              });
             }
           }
-          */
+          let id = ('RELOAD_DIR_' + panelIndex) as ActionId;
+          this.triggerAction(id);
         }
       );
   }
