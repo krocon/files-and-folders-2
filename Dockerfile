@@ -9,6 +9,8 @@ RUN apt-get update
 
 RUN apt-get install python3 -y
 
+RUN npm install -g pnpm
+
 # Bundle app source
 COPY . .
 
@@ -32,7 +34,7 @@ RUN apt-get install rsync -y
 
 COPY package*.json ./
 
-RUN npm pnpm-i
+RUN npm run pnpm-i
 
 COPY --chown=node:node . .
 
