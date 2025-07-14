@@ -7,14 +7,14 @@ WORKDIR /usr/src/app
 
 RUN apt-get update
 
-RUN apt-get install python3 -y
-
 RUN npm install -g pnpm
+
+RUN apt-get install python3 -y
 
 # Bundle app source
 COPY . .
 
-RUN npm run pnpm-i \
+RUN pnpm install --frozen-lockfile \
     && npm build:all \
     && npm prune --production
 
@@ -30,11 +30,13 @@ WORKDIR /usr/src/app
 
 RUN apt-get update
 
+RUN npm install -g pnpm
+
 RUN apt-get install rsync -y
 
 COPY package*.json ./
 
-RUN npm run pnpm-i
+RUN pnpm install --frozen-lockfile
 
 COPY --chown=node:node . .
 
