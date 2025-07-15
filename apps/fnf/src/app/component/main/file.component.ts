@@ -11,7 +11,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
-import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
+import {MatIconModule} from '@angular/material/icon';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatCardModule} from '@angular/material/card';
 import {MatDividerModule} from '@angular/material/divider';
@@ -32,7 +32,7 @@ import {SummaryLabel} from "./footer/summarylabel/summary-label";
 import {TabsPanelData} from "../../domain/filepagedata/data/tabs-panel.data";
 import {SelectionEvent} from "../../domain/filepagedata/data/selection-event";
 import {ShellPanelComponent} from "./footer/shellpanel/shell-panel.component";
-import {environment} from "../../../environments/environment";
+import {takeWhile} from "rxjs/operators";
 
 
 const CONFIG: ResizeConfig = {
@@ -92,6 +92,8 @@ export class FileComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck 
   private doCheckCount = 0;
   private idCounter = 0;
 
+  private alive = true;
+
   constructor(
     private readonly renderer: Renderer2,
     private readonly splitPaneMouseService: SplitPaneMouseService,
@@ -99,35 +101,41 @@ export class FileComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck 
     private readonly appService: AppService,
     private readonly panelSelectionService: PanelSelectionService,
     private readonly cdr: ChangeDetectorRef,
-    private readonly matIconReg: MatIconRegistry,
   ) {
-    this.matIconReg.setDefaultFontSetClass('material-symbols-outlined');
   }
 
   ngOnInit(): void {
-    const sorting = JSON.stringify([{"columnIndex": 0, "sortState": "asc"}]);
-    localStorage.setItem('fnf-file-table-0-sortingState', sorting);
-    localStorage.setItem('fnf-file-table-1-sortingState', sorting);
+    this.alive = true;
 
-    console.info('Files and Folders');
-    console.info('        > Build Version:', environment.version);
-    console.info('        > shellVisible_: ', this.shellVisible);
+    this.appService
+      .init$
+      .pipe(
+        takeWhile(() => this.alive)
+      )
+      .subscribe(
+        () => {
+          this.initialized = true;
+          // this.updatePathes();
+          // this.calcActiveData();
+          this.cdr.detectChanges();
+        })
 
     this.panelSelectionService
       .valueChanges$()
+      .pipe(
+        takeWhile(() => this.alive)
+      )
       .subscribe(panelIndex => {
         this.activePanelIndex = panelIndex;
         this.calcActiveData();
       })
 
-    this.appService.init(() => {
-      this.initialized = true;
-      console.info('        > App initialized');
-      this.cdr.detectChanges();
-    });
 
     this.appService
       .filePageDataChanges(0)
+      .pipe(
+        takeWhile(() => this.alive)
+      )
       .subscribe(fd => {
         this.normalizeFilePageData(fd);
         this.tabsPanelData[0] = {...fd};
@@ -139,6 +147,9 @@ export class FileComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck 
 
     this.appService
       .filePageDataChanges(1)
+      .pipe(
+        takeWhile(() => this.alive)
+      )
       .subscribe(fd => {
         this.normalizeFilePageData(fd);
         this.tabsPanelData[1] = {...fd};
@@ -150,6 +161,9 @@ export class FileComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck 
 
     this.appService
       .favs$()
+      .pipe(
+        takeWhile(() => this.alive)
+      )
       .subscribe(favs => {
         this.favs = favs;
         this.cdr.detectChanges();
@@ -157,6 +171,9 @@ export class FileComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck 
 
     this.appService
       .latest$()
+      .pipe(
+        takeWhile(() => this.alive)
+      )
       .subscribe(latest => {
         this.latest = latest;
         this.cdr.detectChanges();
@@ -164,12 +181,18 @@ export class FileComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck 
 
     this.appService
       .getVolumes$()
+      .pipe(
+        takeWhile(() => this.alive)
+      )
       .subscribe(volumes => {
         console.info('        > volumes: ', volumes.join(', '));
       });
 
     this.appService
       .shellVisibilityChanges$()
+      .pipe(
+        takeWhile(() => this.alive)
+      )
       .subscribe(shellVisible => {
         this.shellVisible = shellVisible;
         console.info('        > shellVisible: ', shellVisible);
@@ -178,6 +201,9 @@ export class FileComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck 
 
     this.appService
       .getSysinfo$()
+      .pipe(
+        takeWhile(() => this.alive)
+      )
       .subscribe(sysinfo => {
         this.sysinfo = sysinfo;
         this.cdr.detectChanges();
@@ -186,6 +212,9 @@ export class FileComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck 
 
     this.appService
       .getAllinfo$()
+      .pipe(
+        takeWhile(() => this.alive)
+      )
       .subscribe(allinfo => {
         console.info('        > allinfo: ', allinfo);
       });
@@ -202,6 +231,7 @@ export class FileComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck 
 
   ngOnDestroy(): void {
     this.windowResizeService.cleanup();
+    this.alive = false;
   }
 
   ngDoCheck() {

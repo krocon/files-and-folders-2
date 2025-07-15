@@ -268,6 +268,8 @@ export class AppService {
     return this.tabsPanelDataService.valueChanges(panelIndex);
   }
 
+  public init$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+
   public async init(callback: Function) {
     this.config = await this.configService.getConfig();
     this.dockerRoot = this.config?.dockerRoot ?? '';
@@ -302,6 +304,7 @@ export class AppService {
       }
     }
     callback();
+    this.init$.next(true);
   }
 
 
