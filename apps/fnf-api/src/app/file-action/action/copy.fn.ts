@@ -34,6 +34,7 @@ export async function copy(para: FilePara): Promise<DirEventIf[]> {
   function createRet(targetDir:string, targetUrl: string, para: FilePara): DirEventIf[] {
     const item = clone<FileItemIf>(para.source);
     item.dir = targetUrl;
+    item.abs = false;
     const ret: DirEventIf[] = fileUrl2CheckOrAddDirEvents(targetUrl, para.targetPanelIndex);
     ret.push(new DirEvent(para.source.dir, [para.source], false, false, 1, "", "unselect"));
     ret.push(new DirEvent(targetDir, [item], false, false, 1, "", item.isDir ? "addDir" : "add"));
