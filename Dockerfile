@@ -42,25 +42,18 @@ WORKDIR /usr/src/app
 
 RUN apt-get update && apt-get install rsync -y && npm install -g pnpm
 
-# Copy package files and install production dependencies
-# COPY package*.json pnpm-*.yaml ./
 
-# Copy only the production dependencies from the builder stage
-#COPY --from=builder /usr/src/app/node_modules ./node_modules
-#COPY --chown=node:node . .
+# Copy root node_modules
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=builder /usr/src/app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
-# Copy built application from builder stage
-# We copy the specific dist directories we need
-COPY --chown=node:node --from=builder /usr/src/app/apps/fnf-api/dist ./apps/fnf-api
-COPY --chown=node:node --from=builder /usr/src/app/apps/fnf-api/node_modules ./apps/fnf-api/node_modules
+# Copy your full app (built dist + sources if needed)
+COPY --from=builder /usr/src/app/apps/fnf-api/dist ./apps/fnf-api
+COPY --from=builder /usr/src/app/apps/fnf-api/node_modules ./apps/fnf-api/node_modules
+COPY --from=builder /usr/src/app/libs/fnf-data ./libs/fnf-data
+COPY --from=builder /usr/src/app/apps/fnf/dist/fnf ./apps/fnf-api/fnf
 
-COPY --chown=node:node --from=builder /usr/src/app/apps/fnf/dist/fnf ./apps/fnf-api/assests/
-
-#COPY --chown=node:node --from=builder /usr/src/app/apps/fnf/dist ./apps/fnf/dist
-#COPY --chown=node:node --from=builder /usr/src/app/apps/fnf/node_modules ./apps/fnf/dist/node_modules
-
-#COPY --chown=node:node --from=builder /usr/src/app/libs/fnf-data/dist ./libs/fnf-data/dist
-#COPY --chown=node:node --from=builder /usr/src/app/libs/fnf-data/node_modules ./libs/fnf-data/dist/node_modules
 
 # friends don’t let friends run containers as root!
 USER node

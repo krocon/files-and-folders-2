@@ -1,7 +1,9 @@
 import {exec, spawn} from "child_process";
 import {Logger} from "@nestjs/common";
+import * as os from "os";
 
 const logger = new Logger("execute-command");
+const isWindows = os.platform() === 'win32';
 
 /**
  * Options for executing a command
@@ -47,6 +49,7 @@ export interface ExecuteCommandOptions {
  * - Supports timeout to prevent indefinite blocking
  * - Logs errors using NestJS Logger
  * - Command runs with default shell and environment variables
+ * - Cross-platform compatible (works on Windows, Linux, and macOS)
  */
 export async function executeCommand(command: string, options: ExecuteCommandOptions = {}): Promise<void> {
   const {timeout = 0, useSpawn = true} = options;
@@ -60,23 +63,23 @@ export async function executeCommand(command: string, options: ExecuteCommandOpt
 
 /**
  * Execute command using child_process.spawn (better for large outputs)
+ *
+ * This implementation uses the shell option to ensure cross-platform compatibility.
+ * It passes the entire command as a string and lets the system's default shell handle it,
+ * which will be cmd.exe on Windows and /bin/sh on Unix-like systems.
  */
 function executeWithSpawn(command: string, timeout: number): Promise<void> {
   return new Promise<void>((resolve, reject) => {
-    // Split the command into the base command and arguments
-    const parts = command.match(/[^\s"']+|"([^"]*)"|'([^']*)'/g) || [];
-    const cmd = parts[0];
-    const args = parts.slice(1).map(arg => {
-      // Remove quotes if present
-      return arg.replace(/^["']|["']$/g, '');
-    });
+    logger.log(`Executing with spawn: ${command}`);
 
-    logger.log(`Executing with spawn: ${cmd} ${args.join(' ')}`);
+    // Use platform-specific shell
+    const spawnOptions = {
+      stdio: [0, 1, 2], // Use numeric values for stdin, stdout, stderr
+      shell: true
+    };
 
-    const childProcess = spawn(cmd, args, {
-      shell: true, // Use shell to handle complex commands
-      stdio: 'pipe'
-    });
+    // Spawn the process with the full command
+    const childProcess = spawn(command, [], spawnOptions);
 
     let timeoutId: NodeJS.Timeout | null = null;
 
@@ -108,10 +111,19 @@ function executeWithSpawn(command: string, timeout: number): Promise<void> {
 
 /**
  * Execute command using child_process.exec (legacy method)
+ *
+ * This implementation uses the shell option to ensure cross-platform compatibility.
+ * It passes the entire command as a string and lets the system's default shell handle it,
+ * which will be cmd.exe on Windows and /bin/sh on Unix-like systems.
  */
 function executeWithExec(command: string, timeout: number): Promise<void> {
   return new Promise<void>((resolve, reject) => {
-    const options = timeout > 0 ? {timeout} : {};
+    logger.log(`Executing with exec: ${command}`);
+
+    const options = {
+      ...(timeout > 0 ? {timeout} : {}),
+      shell: isWindows ? 'cmd.exe' : '/bin/sh'
+    };
 
     exec(command, options, (error, stdout, stderr) => {
       if (error) {
