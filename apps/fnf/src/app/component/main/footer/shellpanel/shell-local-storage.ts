@@ -18,7 +18,6 @@ export class ShellLocalStorage {
   }
 
   isShellVisible(): boolean {
-    console.log('ShellLocalStorage.isShellVisible', JSON.stringify(this.innerService.getValue()));
     return this.innerService.getValue();
   }
 

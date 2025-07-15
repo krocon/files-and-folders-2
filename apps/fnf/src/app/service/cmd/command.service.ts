@@ -25,7 +25,7 @@ export class CommandService {
     private actionQueueService: ActionQueueService,
     private readonly eventService: NotifyService
   ) {
-    console.info('        > CommandService initialized');
+    // console.info('        > CommandService initialized');
   }
 
 
