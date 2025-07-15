@@ -18,10 +18,20 @@
     "test": "pnpm test:fnf && pnpm test:fnf-api-test",
     "e2e": "pnpm e2e:fnf",
     "install:all": "pnpm install && pnpm --filter fnf-data install && pnpm --filter fnf install && pnpm --filter fnf-api install --filter fnf-api-test install",
+
     "docker:build": "docker build . -t krocon/files-and-folders-2",
     "docker:deploy": "docker push krocon/files-and-folders-2:latest",
     "docker:imac:imac-run": "docker run -p 3333:3333 -p 3334:3334 -v /Users/marckronberg:/files-and-folders/vols/marckronberg -v /Users/Shared:/files-and-folders/vols/Shared --name fnf --env=FNF_INCOMPATIBLE_PATHS='' -d krocon/files-and-folders-2",
-    "docker-restart": "docker container start fnf"
+    "docker-restart": "docker container start fnf",
+    "docker:kill": "docker kill files-and-folders-2",
+    "docker:kill2": "docker kill $(docker ps | grep  ' krocon/files-and-folders-2 ' | awk '{ print $1 }') ",
+    "docker:container-ls": "docker container ls",
+    "docker:container-remove": "docker container rm fnf && docker image rm krocon/files-and-folders-2 -f",
+    "docker:images": "docker images",
+    "docker:image-remove": "docker image rm krocon/files-and-folders-2 -f",
+    "docker-bash": "docker run -it --rm krocon/files-and-folders-2 /bin/bash ",
+    "docker:print-container-id": "docker ps | grep  ' krocon/files-and-folders-2 ' | awk '{ print $1 }'",
+    "docker:logs": "docker logs $(docker ps | grep  ' krocon/files-and-folders-2 ' | awk '{ print $1 }') "
 
   },
   "private": true,
