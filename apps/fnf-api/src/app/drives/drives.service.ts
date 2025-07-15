@@ -12,7 +12,7 @@ export type DrivesCallbackFn = (eror: number, sysinfo: string[]) => void;
 export class DrivesService {
 
   static config: Config = new Config();
-  readonly win = os.platform() !== 'darwin' && os.platform().indexOf('win') !== 0;
+  readonly win = os.platform().indexOf("win") === 0;
 
   get config(): Config {
     return DrivesService.config;
@@ -115,8 +115,12 @@ export class DrivesService {
         callback(code, null);
       }
     });
-    list.stdin.write('wmic logicaldisk get caption\n');
-    list.stdin.end();
+    try {
+      list.stdin.write('wmic logicaldisk get caption\n');
+      list.stdin.end();
+    } catch (e) {
+      callback(null, []);
+    }
   }
 
   private getDrivesPromise(): Promise<string[]> {

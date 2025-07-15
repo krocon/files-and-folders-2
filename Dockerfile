@@ -57,7 +57,8 @@ COPY --from=builder /usr/src/app/apps/fnf/dist/fnf ./apps/fnf-api/fnf
 
 
 # friends don’t let friends run containers as root!
-USER node
+# USER node
+USER root
 
 EXPOSE 3333 3334
 
