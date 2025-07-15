@@ -144,7 +144,8 @@ export class AppService {
     CleanService.forRoot(environment.clean);
     ShellService.forRoot(environment.shell);
     ShellAutocompleteService.forRoot(environment.shellAutocomplete);
-    WalkdirSyncService.forRoot(environment.walkdirsync);
+    WalkdirSyncService.forRoot(environment.walkdir);
+    WalkSocketService.forRoot(environment.walkdir);
 
     this.favDataService
       .valueChanges()

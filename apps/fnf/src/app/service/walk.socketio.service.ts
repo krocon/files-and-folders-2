@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {Socket} from "ngx-socket-io";
 import {Subscription} from "rxjs";
 import {WalkData, WalkParaData} from "@fnf/fnf-data";
+import {WalkdirSyncService} from "./walkdir-sync.service";
 
 export type WalkCallback = (walkData: WalkData) => void;
 
@@ -14,49 +15,32 @@ export type WalkCallback = (walkData: WalkData) => void;
 export class WalkSocketService {
 
   static runningNumber = 0;
-
+  public static syncMode: boolean = true;
+  syncMode = WalkSocketService.syncMode;
   private rid: number = Math.floor(Math.random() * 1000000) + 1;
   private cancellings: { [key: string]: Subscription } = {};
   private isConnected = false;
   private pendingWalks: Array<{ pathes: string[], filePattern: string, callback: WalkCallback }> = [];
 
+
+  private static readonly config = {
+    walkdirSyncUrl: "/api/walkdirsync",
+    syncMode: true
+  };
+
+  static forRoot(config: { [key: string]: string | boolean }) {
+    Object.assign(WalkSocketService.config, config);
+  }
+
+
+
   constructor(
-    private readonly socket: Socket
+    private readonly socket: Socket,
+    private readonly walkdirSyncService: WalkdirSyncService,
   ) {
     // Initialize connection status
     this.isConnected = this.socket.ioSocket?.connected || false;
     this.setupSocketListeners();
-  }
-
-  private setupSocketListeners(): void {
-    this.socket.on('connect', () => {
-      this.isConnected = true;
-      this.processPendingWalks();
-    });
-
-    this.socket.on('disconnect', (reason) => {
-      this.isConnected = false;
-    });
-
-    this.socket.on('reconnect', (attemptNumber) => {
-      this.isConnected = true;
-      this.processPendingWalks();
-    });
-
-    this.socket.on('reconnect_error', (error) => {
-      console.error('Socket reconnection error:', error);
-    });
-  }
-
-  private processPendingWalks(): void {
-    if (this.pendingWalks.length > 0) {
-      console.log(`Processing ${this.pendingWalks.length} pending walks`);
-      const walks = [...this.pendingWalks];
-      this.pendingWalks = [];
-      walks.forEach(walk => {
-        this.walkDir(walk.pathes, walk.filePattern, walk.callback);
-      });
-    }
   }
 
   /**
@@ -215,6 +199,18 @@ export class WalkSocketService {
     const cancelKey = `cancelwalk${this.rid}`;
     const walkParaData = new WalkParaData(pathes, filePattern, listenKey, cancelKey);
 
+    if (!walkParaData.filePattern) walkParaData.filePattern = '**/*';
+
+    if (this.syncMode) {
+      const sub = this.walkdirSyncService
+        .walkdirSync(walkParaData)
+        .subscribe((walkData: WalkData) => {
+          callback(walkData);
+          sub.unsubscribe();
+        });
+      return cancelKey;
+    }
+
     this.cancellings[cancelKey] = this.socket
       .fromEvent<WalkData, string>(listenKey)
       .subscribe(wd => {
@@ -231,6 +227,37 @@ export class WalkSocketService {
     }
 
     return cancelKey;
+  }
+
+  private setupSocketListeners(): void {
+    this.socket.on('connect', () => {
+      this.isConnected = true;
+      this.processPendingWalks();
+    });
+
+    this.socket.on('disconnect', (reason) => {
+      this.isConnected = false;
+    });
+
+    this.socket.on('reconnect', (attemptNumber) => {
+      this.isConnected = true;
+      this.processPendingWalks();
+    });
+
+    this.socket.on('reconnect_error', (error) => {
+      console.error('Socket reconnection error:', error);
+    });
+  }
+
+  private processPendingWalks(): void {
+    if (this.pendingWalks.length > 0) {
+      console.log(`Processing ${this.pendingWalks.length} pending walks`);
+      const walks = [...this.pendingWalks];
+      this.pendingWalks = [];
+      walks.forEach(walk => {
+        this.walkDir(walk.pathes, walk.filePattern, walk.callback);
+      });
+    }
   }
 
 
