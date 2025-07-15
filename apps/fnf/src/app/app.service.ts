@@ -73,6 +73,7 @@ import {ShellLocalStorage} from "./component/main/footer/shellpanel/shell-local-
 import {ShellService} from "./service/shell.service";
 import {ShellAutocompleteService} from "./service/shell-autocomplete.service";
 import {WalkdirSyncService} from "./service/walkdir-sync.service";
+import {WalkdirService} from "./service/walkdir.service";
 
 
 @Injectable({
@@ -126,7 +127,7 @@ export class AppService {
     private readonly multiMkdirDialogService: MultiMkdirDialogService,
     private readonly groupFilesDialogService: GroupFilesDialogService,
     private readonly changeDirDialogService: ChangeDirDialogService,
-    private readonly walkSocketService: WalkSocketService,
+    private readonly walkdirService: WalkdirService,
     private readonly shellLocalStorage: ShellLocalStorage,
   ) {
     // Set config to services:
@@ -144,6 +145,8 @@ export class AppService {
     CleanService.forRoot(environment.clean);
     ShellService.forRoot(environment.shell);
     ShellAutocompleteService.forRoot(environment.shellAutocomplete);
+
+    WalkdirService.forRoot(environment.walkdir);
     WalkdirSyncService.forRoot(environment.walkdir);
     WalkSocketService.forRoot(environment.walkdir);
 
@@ -828,12 +831,13 @@ export class AppService {
 
   walkDir(
     pathes: string[],
+    filePattern: string,
     callback: WalkCallback): string {
-    return this.walkSocketService.walkDir(pathes, '', callback);
+    return this.walkdirService.walkdir(pathes, filePattern, callback);
   }
 
   cancelWalkDir(cancelKey: string) {
-    this.walkSocketService.cancelWalkDir(cancelKey);
+    this.walkdirService.cancelWalkDir(cancelKey);
   }
 
   setShellVisible(visible: boolean = true) {

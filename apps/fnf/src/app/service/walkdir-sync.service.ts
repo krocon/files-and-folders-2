@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
 import {WalkData, WalkParaData} from "@fnf/fnf-data";
+import {WalkCallback} from "./walk.socketio.service";
 
 
 @Injectable({
@@ -23,13 +23,22 @@ export class WalkdirSyncService {
   }
 
 
-  walkdirSync(data: WalkParaData): Observable<WalkData> {
-    if (!data.filePattern) data.filePattern = '**/*';
+  walkdirSync(
+    data: WalkParaData,
+    callback: WalkCallback): void {
 
-    return this.httpClient
+    const sub = this.httpClient
       .post<WalkData>(
         WalkdirSyncService.config.walkdirSyncUrl,
         data
-      );
+      )
+      .subscribe((walkData: WalkData) => {
+        callback(walkData);
+        sub.unsubscribe();
+      });
+  }
+
+  cancelWalkDir(cancelKey: string) {
+    // nothing
   }
 }

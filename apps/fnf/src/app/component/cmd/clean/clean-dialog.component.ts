@@ -19,19 +19,18 @@ import {MatFormField, MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {FnfAutofocusDirective} from "../../../common/directive/fnf-autofocus.directive";
-import {CleanDialogData, CleanResult, WalkData, WalkParaData} from "@fnf/fnf-data";
+import {CleanDialogData, CleanResult, WalkData} from "@fnf/fnf-data";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {SelectFolderDropdownComponent} from "../../common/selectfolderdropdown/select-folder-dropdown.component";
 import {CleanTemplateDropdownComponent} from "../../common/cleantemplatedropdown/clean-template-dropdown.component";
 import {WalkDataComponent} from "../../../common/walkdata/walk-data.component";
-import {WalkSocketService} from "../../../service/walk.socketio.service";
 import {GlobValidatorService} from "../../../service/glob-validator.service";
 import {globPatternAsyncValidator} from "../../../common/fn/glob-pattern-validator.fn";
 import {debounceTime, distinctUntilChanged, takeWhile} from "rxjs/operators";
 import {CleanService} from "../../../service/clean.service";
 import {MatProgressBar} from "@angular/material/progress-bar";
-import {WalkdirSyncService} from "../../../service/walkdir-sync.service";
+import {WalkdirService} from "../../../service/walkdir.service";
 
 
 @Component({
@@ -62,20 +61,14 @@ export class CleanDialogComponent implements OnInit, OnDestroy {
   formGroup: FormGroup;
   walkData = new WalkData(0, 0, 0, false);
   walkCancelKey = '';
-
   alive = true;
   public cleaning = false;
-
-  public static syncMode: boolean = true;
-
-  syncMode = CleanDialogComponent.syncMode;
 
   constructor(
     public dialogRef: MatDialogRef<CleanDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: CleanDialogData,
     private readonly formBuilder: FormBuilder,
-    private readonly walkSocketService: WalkSocketService,
-    private readonly walkdirSyncService: WalkdirSyncService,
+    private readonly walkdirService: WalkdirService,
     private readonly cdr: ChangeDetectorRef,
     private readonly globValidatorService: GlobValidatorService,
     private readonly cleanService: CleanService,
@@ -109,7 +102,7 @@ export class CleanDialogComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed()
       .subscribe(result => {
         if (this.walkCancelKey) {
-          this.walkSocketService.cancelWalkDir(this.walkCancelKey);
+          this.walkdirService.cancelWalkDir(this.walkCancelKey);
         }
       });
   }
@@ -151,26 +144,13 @@ export class CleanDialogComponent implements OnInit, OnDestroy {
       });
   }
 
-  private updateFormControlsState() {
-    if (this.cleaning) {
-      this.formGroup.get('folder')?.disable();
-      this.formGroup.get('pattern')?.disable();
-      this.formGroup.get('deleteEmptyFolders')?.disable();
-    } else {
-      this.formGroup.get('folder')?.enable();
-      this.formGroup.get('pattern')?.enable();
-      this.formGroup.get('deleteEmptyFolders')?.enable();
-    }
-  }
-
   onCancelClicked() {
     this.dialogRef.close(undefined);
   }
 
-
   onCheckClicked() {
     if (this.walkCancelKey) {
-      this.walkSocketService.cancelWalkDir(this.walkCancelKey);
+      this.walkdirService.cancelWalkDir(this.walkCancelKey);
     }
     this.walkData = new WalkData(0, 0, 0, false);
     this.cdr.detectChanges();
@@ -179,28 +159,15 @@ export class CleanDialogComponent implements OnInit, OnDestroy {
     let folders = rawValue.folder.split(',');
     let pattern = rawValue.pattern ?? '';
 
-    if (this.syncMode) {
-      const sub = this.walkdirSyncService
-        .walkdirSync(new WalkParaData(
-          folders, pattern
-        ))
-        .subscribe((walkData: WalkData) => {
+
+    this.walkCancelKey = this.walkdirService
+      .walkdir(
+        folders,
+        pattern,
+        (walkData: WalkData) => {
           this.walkData = walkData;
           this.cdr.detectChanges();
-          console.info('this.walkData', this.walkData)
-          sub.unsubscribe();
         });
-
-    } else {
-      this.walkCancelKey = this.walkSocketService
-        .walkDir(
-          folders,
-          pattern,
-          (walkData: WalkData) => {
-            this.walkData = walkData;
-            this.cdr.detectChanges();
-          });
-    }
   }
 
   onSearchTemplateSelected(evt: string) {
@@ -215,5 +182,17 @@ export class CleanDialogComponent implements OnInit, OnDestroy {
 
   onFolderClicked(evt: string) {
     this.formGroup?.get('folder')?.setValue(evt, {emitEvent: true});
+  }
+
+  private updateFormControlsState() {
+    if (this.cleaning) {
+      this.formGroup.get('folder')?.disable();
+      this.formGroup.get('pattern')?.disable();
+      this.formGroup.get('deleteEmptyFolders')?.disable();
+    } else {
+      this.formGroup.get('folder')?.enable();
+      this.formGroup.get('pattern')?.enable();
+      this.formGroup.get('deleteEmptyFolders')?.enable();
+    }
   }
 }

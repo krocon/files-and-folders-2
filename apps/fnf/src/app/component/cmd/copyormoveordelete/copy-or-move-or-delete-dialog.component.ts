@@ -15,13 +15,13 @@ import {FileOperation} from "./file-operation";
 import {MatError, MatFormField, MatInput, MatSuffix} from "@angular/material/input";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
-import {WalkSocketService} from "../../../service/walk.socketio.service";
 import {FnfAutofocusDirective} from "../../../common/directive/fnf-autofocus.directive";
 import {MatDivider} from "@angular/material/divider";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {AppService} from "../../../app.service";
 import {getAllParents} from "../../../common/fn/get-all-parents.fn";
 import {WalkDataComponent} from "../../../common/walkdata/walk-data.component";
+import {WalkdirService} from "../../../service/walkdir.service";
 
 @Component({
   selector: "fnf-copy-or-move-dialog",
@@ -70,7 +70,7 @@ export class CopyOrMoveOrDeleteDialogComponent implements OnInit, OnDestroy {
     public dialogRef: MatDialogRef<CopyOrMoveOrDeleteDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: CopyOrMoveOrDeleteDialogData,
     private readonly formBuilder: FormBuilder,
-    private readonly walkSocketService: WalkSocketService,
+    private readonly walkdirService: WalkdirService,
     private readonly cdr: ChangeDetectorRef,
     private readonly appService: AppService,
   ) {
@@ -107,7 +107,7 @@ export class CopyOrMoveOrDeleteDialogComponent implements OnInit, OnDestroy {
       .afterClosed()
       .subscribe(result => {
         if (this.walkCancelKey) {
-          this.walkSocketService.cancelWalkDir(this.walkCancelKey);
+          this.walkdirService.cancelWalkDir(this.walkCancelKey);
         }
       });
   }
@@ -118,16 +118,16 @@ export class CopyOrMoveOrDeleteDialogComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.alive = false;
-    this.walkSocketService.cancelWalkDir(this.walkCancelKey);
+    this.walkdirService.cancelWalkDir(this.walkCancelKey);
   }
 
   ngOnInit(): void {
     this.alive = true;
     // start scanning selected files/folders:
-    this.walkCancelKey = this.walkSocketService
-      .walkDir(
+    this.walkCancelKey = this.walkdirService
+      .walkdir(
         this.data.source,
-        '',
+        '**/*',
         (walkData: WalkData) => {
           this.walkData = walkData;
           this.cdr.detectChanges();

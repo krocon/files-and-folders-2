@@ -498,6 +498,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
           this.cancellings.push(
             this.appService.walkDir(
               [dir],
+              '**/*',
               dirWalker.walkCallback.bind(dirWalker)
             ));
         }
