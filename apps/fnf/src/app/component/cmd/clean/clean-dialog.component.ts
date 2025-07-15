@@ -19,7 +19,7 @@ import {MatFormField, MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {FnfAutofocusDirective} from "../../../common/directive/fnf-autofocus.directive";
-import {CleanDialogData, CleanResult, WalkData} from "@fnf/fnf-data";
+import {CleanDialogData, CleanResult, WalkData, WalkParaData} from "@fnf/fnf-data";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {SelectFolderDropdownComponent} from "../../common/selectfolderdropdown/select-folder-dropdown.component";
@@ -31,6 +31,7 @@ import {globPatternAsyncValidator} from "../../../common/fn/glob-pattern-validat
 import {debounceTime, distinctUntilChanged, takeWhile} from "rxjs/operators";
 import {CleanService} from "../../../service/clean.service";
 import {MatProgressBar} from "@angular/material/progress-bar";
+import {WalkdirSyncService} from "../../../service/walkdir-sync.service";
 
 
 @Component({
@@ -65,11 +66,16 @@ export class CleanDialogComponent implements OnInit, OnDestroy {
   alive = true;
   public cleaning = false;
 
+  public static syncMode: boolean = true;
+
+  syncMode = CleanDialogComponent.syncMode;
+
   constructor(
     public dialogRef: MatDialogRef<CleanDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: CleanDialogData,
     private readonly formBuilder: FormBuilder,
     private readonly walkSocketService: WalkSocketService,
+    private readonly walkdirSyncService: WalkdirSyncService,
     private readonly cdr: ChangeDetectorRef,
     private readonly globValidatorService: GlobValidatorService,
     private readonly cleanService: CleanService,
@@ -172,14 +178,29 @@ export class CleanDialogComponent implements OnInit, OnDestroy {
     let rawValue = this.formGroup.getRawValue();
     let folders = rawValue.folder.split(',');
     let pattern = rawValue.pattern ?? '';
-    this.walkCancelKey = this.walkSocketService
-      .walkDir(
-        folders,
-        pattern,
-        (walkData: WalkData) => {
+
+    if (this.syncMode) {
+      const sub = this.walkdirSyncService
+        .walkdirSync(new WalkParaData(
+          folders, pattern
+        ))
+        .subscribe((walkData: WalkData) => {
           this.walkData = walkData;
           this.cdr.detectChanges();
+          console.info('this.walkData', this.walkData)
+          sub.unsubscribe();
         });
+
+    } else {
+      this.walkCancelKey = this.walkSocketService
+        .walkDir(
+          folders,
+          pattern,
+          (walkData: WalkData) => {
+            this.walkData = walkData;
+            this.cdr.detectChanges();
+          });
+    }
   }
 
   onSearchTemplateSelected(evt: string) {

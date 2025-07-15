@@ -31,6 +31,9 @@ export const environment = {
   shell: {
     shellUrl: "/api/shell"
   },
+  walkdirsync: {
+    walkdirSyncUrl: "/api/walkdirsync"
+  },
 
   shellAutocomplete: {
     autocompleteUrl: "/api/shell-autocomplete"

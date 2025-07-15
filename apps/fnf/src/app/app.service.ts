@@ -72,6 +72,7 @@ import {CleanService} from "./service/clean.service";
 import {ShellLocalStorage} from "./component/main/footer/shellpanel/shell-local-storage";
 import {ShellService} from "./service/shell.service";
 import {ShellAutocompleteService} from "./service/shell-autocomplete.service";
+import {WalkdirSyncService} from "./service/walkdir-sync.service";
 
 
 @Injectable({
@@ -143,6 +144,7 @@ export class AppService {
     CleanService.forRoot(environment.clean);
     ShellService.forRoot(environment.shell);
     ShellAutocompleteService.forRoot(environment.shellAutocomplete);
+    WalkdirSyncService.forRoot(environment.walkdirsync);
 
     this.favDataService
       .valueChanges()

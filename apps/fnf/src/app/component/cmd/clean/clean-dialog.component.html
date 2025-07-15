@@ -37,7 +37,7 @@
           @if (formGroup.get('pattern')?.invalid || !formGroup.get('pattern')?.value) {
             No file will be deleted.
 
-          } @else if (walkCancelKey) {
+          } @else if (walkCancelKey || syncMode) {
             Pattern found &rarr;
             <fnf-walk-data
                 [walkData]="walkData"

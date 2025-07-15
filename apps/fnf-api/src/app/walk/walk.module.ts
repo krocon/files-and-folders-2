@@ -1,10 +1,13 @@
 import {Module} from "@nestjs/common";
 import {WalkGateway} from "./walk.gateway";
+import {DirController} from "./walk.controller";
 
 
 @Module({
   imports: [],
-  controllers: [],
+  controllers: [
+    DirController
+  ],
   providers: [
     WalkGateway
   ],
