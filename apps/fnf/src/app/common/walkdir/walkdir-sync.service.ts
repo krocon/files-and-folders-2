@@ -23,7 +23,7 @@ export class WalkdirSyncService {
   }
 
 
-  walkdirSync(
+  walkDirSync(
     data: WalkParaData,
     callback: WalkCallback): void {
 

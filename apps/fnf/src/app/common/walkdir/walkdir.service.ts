@@ -27,7 +27,7 @@ export class WalkdirService {
   }
 
 
-  walkdir(
+  walkDir(
     pathes: string[],
     filePattern: string,
     callback: WalkCallback
@@ -40,7 +40,7 @@ export class WalkdirService {
     if (!walkParaData.filePattern) walkParaData.filePattern = '**/*';
 
     if (WalkdirService.config.syncMode) {
-      this.walkdirSyncService.walkdirSync(walkParaData, callback);
+      this.walkdirSyncService.walkDirSync(walkParaData, callback);
     } else {
       return this.walkSocketService.walkDir(walkParaData, callback);
     }

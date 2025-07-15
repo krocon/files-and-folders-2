@@ -64,7 +64,7 @@ import {ChangeDirDialogService} from "./component/cmd/changedir/change-dir-dialo
 import {ChangeDirDialogData} from "./component/cmd/changedir/data/change-dir-dialog.data";
 import {map} from "rxjs/operators";
 import {TabsPanelData} from "./domain/filepagedata/data/tabs-panel.data";
-import {WalkCallback, WalkSocketService} from "./service/walk.socketio.service";
+import {WalkSocketService} from "./common/walkdir/walk.socketio.service";
 import {MultiRenameAiService} from "./component/cmd/multirename/multi-rename-ai.service";
 import {CleanDialogService} from "./component/cmd/clean/clean-dialog.service";
 import {GlobValidatorService} from "./service/glob-validator.service";
@@ -72,8 +72,8 @@ import {CleanService} from "./service/clean.service";
 import {ShellLocalStorage} from "./component/main/footer/shellpanel/shell-local-storage";
 import {ShellService} from "./service/shell.service";
 import {ShellAutocompleteService} from "./service/shell-autocomplete.service";
-import {WalkdirSyncService} from "./service/walkdir-sync.service";
-import {WalkdirService} from "./service/walkdir.service";
+import {WalkdirSyncService} from "./common/walkdir/walkdir-sync.service";
+import {WalkdirService} from "./common/walkdir/walkdir.service";
 
 
 @Injectable({
@@ -127,7 +127,6 @@ export class AppService {
     private readonly multiMkdirDialogService: MultiMkdirDialogService,
     private readonly groupFilesDialogService: GroupFilesDialogService,
     private readonly changeDirDialogService: ChangeDirDialogService,
-    private readonly walkdirService: WalkdirService,
     private readonly shellLocalStorage: ShellLocalStorage,
   ) {
     // Set config to services:
@@ -825,20 +824,6 @@ export class AppService {
     this.commandService.addActions([actionEvent]);
   }
 
-  // cancelFind(findData: FindData) {
-  //   this.findSocketService.cancelFind(findData.emmitCancelKey);
-  // }
-
-  walkDir(
-    pathes: string[],
-    filePattern: string,
-    callback: WalkCallback): string {
-    return this.walkdirService.walkdir(pathes, filePattern, callback);
-  }
-
-  cancelWalkDir(cancelKey: string) {
-    this.walkdirService.cancelWalkDir(cancelKey);
-  }
 
   setShellVisible(visible: boolean = true) {
     this.shellLocalStorage.setShellVisible(visible);

@@ -24,13 +24,13 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {SelectFolderDropdownComponent} from "../../common/selectfolderdropdown/select-folder-dropdown.component";
 import {CleanTemplateDropdownComponent} from "../../common/cleantemplatedropdown/clean-template-dropdown.component";
-import {WalkDataComponent} from "../../../common/walkdata/walk-data.component";
+import {WalkDataComponent} from "../../../common/walkdir/walk-data.component";
 import {GlobValidatorService} from "../../../service/glob-validator.service";
 import {globPatternAsyncValidator} from "../../../common/fn/glob-pattern-validator.fn";
 import {debounceTime, distinctUntilChanged, takeWhile} from "rxjs/operators";
 import {CleanService} from "../../../service/clean.service";
 import {MatProgressBar} from "@angular/material/progress-bar";
-import {WalkdirService} from "../../../service/walkdir.service";
+import {WalkdirService} from "../../../common/walkdir/walkdir.service";
 
 
 @Component({
@@ -161,7 +161,7 @@ export class CleanDialogComponent implements OnInit, OnDestroy {
 
 
     this.walkCancelKey = this.walkdirService
-      .walkdir(
+      .walkDir(
         folders,
         pattern,
         (walkData: WalkData) => {

@@ -20,8 +20,8 @@ import {MatDivider} from "@angular/material/divider";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {AppService} from "../../../app.service";
 import {getAllParents} from "../../../common/fn/get-all-parents.fn";
-import {WalkDataComponent} from "../../../common/walkdata/walk-data.component";
-import {WalkdirService} from "../../../service/walkdir.service";
+import {WalkDataComponent} from "../../../common/walkdir/walk-data.component";
+import {WalkdirService} from "../../../common/walkdir/walkdir.service";
 
 @Component({
   selector: "fnf-copy-or-move-dialog",
@@ -125,7 +125,7 @@ export class CopyOrMoveOrDeleteDialogComponent implements OnInit, OnDestroy {
     this.alive = true;
     // start scanning selected files/folders:
     this.walkCancelKey = this.walkdirService
-      .walkdir(
+      .walkDir(
         this.data.source,
         '**/*',
         (walkData: WalkData) => {

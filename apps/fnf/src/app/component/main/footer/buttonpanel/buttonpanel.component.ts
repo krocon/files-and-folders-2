@@ -14,6 +14,7 @@ import {ButtonEnableStates, buttonEnableStatesKey, CmdIf} from "@fnf/fnf-data";
 import {MatList} from "@angular/material/list";
 import {TaskButtonComponent} from "../../../task/task-list/task-button.component";
 import {FnfActionLabels} from "../../../../domain/action/fnf-action-labels";
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-button-panel',
@@ -29,6 +30,7 @@ import {FnfActionLabels} from "../../../../domain/action/fnf-action-labels";
     MatDivider,
     MatList,
     TaskButtonComponent,
+    RouterLink,
   ],
   templateUrl: './buttonpanel.component.html',
   styleUrls: ['./buttonpanel.component.css']

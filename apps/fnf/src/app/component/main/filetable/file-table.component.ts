@@ -72,6 +72,7 @@ import {MkdirDialogService} from "../../cmd/mkdir/mkdir-dialog.service";
 import {DirWalker} from "./dir-walker";
 import {equalFileItem} from "../../../common/fn/equal-file-item.fn";
 import {fileItemSorter} from "../../../common/fn/file-item-sorter.fn";
+import {WalkdirService} from "../../../common/walkdir/walkdir.service";
 
 
 @Component({
@@ -194,6 +195,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly selectionLocalStorage: SelectionLocalStorage,
     private readonly focusLocalStorage: FocusLocalStorage,
     private readonly mkdirDialogService: MkdirDialogService,
+    private readonly walkdirService: WalkdirService,
   ) {
     this.columnDefs.forEach(def => {
       def.sortable = () => true;
@@ -496,7 +498,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
           });
 
           this.cancellings.push(
-            this.appService.walkDir(
+            this.walkdirService.walkDir(
               [dir],
               '**/*',
               dirWalker.walkCallback.bind(dirWalker)
@@ -926,7 +928,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
     while (this.cancellings.length > 0) {
       const id = this.cancellings.pop();
       if (id) {
-        this.appService.cancelWalkDir(id);
+        this.walkdirService.cancelWalkDir(id);
       }
     }
     this.appService.changeDir(new ChangeDirEvent(this._panelIndex, path));
