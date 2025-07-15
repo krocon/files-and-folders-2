@@ -21,7 +21,7 @@
 
     "docker:build": "docker build . -t krocon/files-and-folders-2",
     "docker:deploy": "docker push krocon/files-and-folders-2:latest",
-    "docker:imac:imac-run": "docker run -p 3333:3333 -p 3334:3334 -v /Users/marckronberg:/files-and-folders/vols/marckronberg -v /Users/Shared:/files-and-folders/vols/Shared --name fnf --env=FNF_INCOMPATIBLE_PATHS='' -d krocon/files-and-folders-2",
+    "docker:imac:imac-run": "docker run -p 3333:3333 -p 3334:3334 -v /Users/marckronberg:/files-and-folders/vols/marckronberg -v /Users/Shared:/files-and-folders/vols/Shared --name fnf --env=FNF_INCOMPATIBLE_PATHS='' --env=FNF_START_PATH='files-and-folders' -d krocon/files-and-folders-2",
     "docker-restart": "docker container start fnf",
     "docker:kill": "docker kill files-and-folders-2",
     "docker:kill2": "docker kill $(docker ps | grep  ' krocon/files-and-folders-2 ' | awk '{ print $1 }') ",

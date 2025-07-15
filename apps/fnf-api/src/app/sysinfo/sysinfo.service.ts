@@ -1,11 +1,13 @@
 import {Injectable} from "@nestjs/common";
 import * as os from "os";
 import * as process from "process";
+import * as util from "util";
 
 import {exec} from "child_process";
 import {from, Observable} from "rxjs";
-import {Sysinfo, SysinfoIf} from "@fnf/fnf-data";
+import {Allinfo, AllinfoIf, Sysinfo, SysinfoIf} from "@fnf/fnf-data";
 import {SysInfoCallbackFn} from "./sysInfo-callback.fn";
+
 
 const env = process.env;
 const FNF_START_PATH = env.FNF_START_PATH;
@@ -22,6 +24,61 @@ const platform = os.platform();
 export class SysinfoService {
   /** Cached system information to avoid redundant system calls */
   private systemInfo: SysinfoIf;
+
+
+  async getSystemInfoSync(): Promise<SysinfoIf> {
+    if (this.systemInfo) {
+      return this.systemInfo;
+    }
+
+    const ret = new Sysinfo();
+    ret.type = os.type();
+    ret.platform = platform;
+    ret.arch = os.arch();
+    ret.linux = platform.indexOf("linux") === 0;
+    ret.osx = platform === "darwin";
+    ret.windows = platform.indexOf("win") === 0;
+    ret.smartMachine = platform === "sunos";
+    ret.hostname = os.hostname();
+    ret.username = env.LOGNAME || env.USER || env.LNAME || env.USERNAME;
+    ret.homedir = os.homedir().replace(/\\/g, "/");
+    ret.tmpdir = os.tmpdir().replace(/\\/g, "/");
+    //ret.docker = ?
+
+    if (ret.username) {
+      this.systemInfo = ret;
+      return ret;
+    }
+
+    const execPromise = util.promisify(exec);
+
+    if (ret.osx || ret.linux) {
+      try {
+        const {stdout} = await execPromise("id -un");
+        ret.username = stdout.trim();
+        this.systemInfo = ret;
+        return ret;
+      } catch (err) {
+        // If command fails, return what we have
+        this.systemInfo = ret;
+        return ret;
+      }
+    } else if (ret.windows) {
+      try {
+        const {stdout} = await execPromise("whoami");
+        ret.username = stdout.trim().replace(/^.*\\/, ""); // xyz\user -> user
+        this.systemInfo = ret;
+        return ret;
+      } catch (err) {
+        // If command fails, return what we have
+        this.systemInfo = ret;
+        return ret;
+      }
+    } else {
+      this.systemInfo = ret;
+      return ret;
+    }
+  }
 
   /**
    * Retrieves detailed system information asynchronously using a callback pattern
@@ -130,6 +187,23 @@ export class SysinfoService {
    */
   getData(): Observable<SysinfoIf> {
     return from(this.getSystemInfoPromise());
+  }
+
+  async getAllInfo(): Promise<AllinfoIf> {
+
+    let ret = new Allinfo();
+    ret.sysinfo = await this.getSystemInfoSync();
+    ret.env['LOGNAME'] = env.LOGNAME;
+    ret.env['USER'] = env.USER;
+    ret.env['LNAME'] = env.LNAME;
+    ret.env['USERNAME'] = env.USERNAME;
+    ret.env['HOME'] = env.HOME;
+    ret.env['FNF_START_PATH'] = env.FNF_START_PATH;
+    ret.env['FNF_CONTAINER_PATHS'] = env.FNF_CONTAINER_PATHS;
+    ret.env['FNF_INCOMPATIBLE_PATHS'] = env.FNF_INCOMPATIBLE_PATHS;
+    ret.env['FNF_DOCKER_ROOT'] = env.FNF_DOCKER_ROOT;
+
+    return ret;
   }
 
   /**

@@ -54,6 +54,8 @@ export * from './models/findfolder/find-folder.para';
 
 export * from './models/sysinfo/sysinfo.if';
 export * from './models/sysinfo/sysinfo';
+export * from './models/sysinfo/allinfo';
+export * from './models/sysinfo/allinfo.if';
 
 export * from './models/shell/cmd.if';
 export * from './models/shell/shell-cmd.if';

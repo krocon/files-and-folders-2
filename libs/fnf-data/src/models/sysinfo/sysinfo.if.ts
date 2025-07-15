@@ -6,6 +6,7 @@ export interface SysinfoIf {
   osx: boolean;
   windows: boolean;
   smartMachine: boolean;
+  docker: boolean;
   hostname: string;
   username: string;
   homedir: string;

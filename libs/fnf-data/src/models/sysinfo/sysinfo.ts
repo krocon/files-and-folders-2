@@ -10,6 +10,8 @@ export class Sysinfo implements SysinfoIf {
   public osx = false;
   public windows = false;
   public smartMachine = false;
+  public docker = false;
+
   public hostname = '';
   public username = '';
   public homedir = '';
