@@ -121,7 +121,7 @@ export async function move(para: FilePara): Promise<DirEventIf[]> {
     logger.log(`Moving ${sourceIsDirectory ? 'directory' : 'file'} of size ${fileSize} bytes with timeout ${timeout}ms`);
 
     await executeCommand(cmd, {
-      useSpawn: true,
+      useSpawn: osx,
       timeout: timeout
     });
 

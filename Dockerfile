@@ -52,6 +52,7 @@ COPY --from=builder /usr/src/app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 COPY --from=builder /usr/src/app/apps/fnf-api/dist ./apps/fnf-api
 COPY --from=builder /usr/src/app/apps/fnf-api/node_modules ./apps/fnf-api/node_modules
 COPY --from=builder /usr/src/app/libs/fnf-data ./libs/fnf-data
+
 COPY --from=builder /usr/src/app/apps/fnf/dist/fnf ./apps/fnf-api/fnf
 
 
