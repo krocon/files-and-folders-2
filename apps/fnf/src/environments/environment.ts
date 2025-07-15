@@ -15,6 +15,7 @@ export const environment = {
   sysinfo: {
     getDrivesUrl: prefix + "/api/drives",
     getSysinfoUrl: prefix + "/api/sysinfo",
+    getAllinfoUrl: prefix + "/api/allinfo",
     getFirstStartFolderUrl: prefix + "/api/firststartfolder"
   },
   fileSystem: {

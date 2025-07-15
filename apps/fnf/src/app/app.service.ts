@@ -7,6 +7,7 @@ import {ConfigService} from "./service/config.service";
 import {FileSystemService} from "./service/file-system.service";
 import {environment} from "../environments/environment";
 import {
+  AllinfoIf,
   CleanDialogData,
   CmdIf,
   Config,
@@ -157,6 +158,7 @@ export class AppService {
       .getDrives()
       .subscribe(winDrives => this.winDrives = winDrives);
 
+
     this.tabsPanelDataService
       .valueChanges(0)
       .subscribe(data => this.tabsPanelDatas[0] = data);
@@ -173,6 +175,14 @@ export class AppService {
         this.setPathToActiveTabInGivenPanel(changeDirEvent.path, changeDirEvent.panelIndex);
       }
     });
+  }
+
+  public getSysinfo$(): Observable<SysinfoIf> {
+    return this.sysinfoService.getSysinfo$();
+  }
+
+  public getAllinfo$(): Observable<AllinfoIf> {
+    return this.sysinfoService.getAllinfo$();
   }
 
   public getVolumes$(): Observable<string[]> {
@@ -265,6 +275,7 @@ export class AppService {
     const sysInfo: SysinfoIf | undefined = await this.sysinfoService.getSysinfo();
     if (sysInfo) {
       this.sysinfo = sysInfo;
+      console.info('        > sysinfo_    :', this.sysinfo); // TODO
       const sys = sysInfo.osx ? 'osx' : 'windows';
 
       // init shortcuts:

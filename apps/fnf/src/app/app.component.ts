@@ -20,7 +20,7 @@ import {SplitPaneMouseService} from './service/splitpane/split-pane-mouse.servic
 import {WindowResizeService} from './service/splitpane/window-resize.service';
 import {ButtonPanelComponent} from './component/main/footer/buttonpanel/buttonpanel.component';
 import {environment} from "../environments/environment";
-import {ButtonEnableStates, FileItemIf} from "@fnf-data";
+import {ButtonEnableStates, FileItemIf, Sysinfo, SysinfoIf} from "@fnf-data";
 import {AppService} from "./app.service";
 import {FileTableComponent} from "./component/main/filetable/file-table.component";
 import {CommonModule} from "@angular/common";
@@ -65,7 +65,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
 
   // Using signals directly from appService
   readonly winDrives = this.appService.winDrives;
-  readonly sysinfo = this.appService.sysinfo;
+  sysinfo: SysinfoIf = new Sysinfo();
   latest: string[] = this.appService.latest;
   favs: string[] = this.appService.favs;
   readonly dockerRoot = this.appService.dockerRoot;
@@ -78,7 +78,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
   activePanelPath: string = '';
 
 
-
   selectionEvents: SelectionEvent[] = this.panelIndices
     .map(i => new SelectionEvent());
   buttonEnableStatesArr = [
@@ -86,13 +85,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
     new ButtonEnableStates()
   ];
   shellVisible: boolean = this.appService.isShellVisible();
-
+  shellInputHasFocus = false;
   @ViewChild('splitPaneMain') private readonly splitPaneMainRef!: ElementRef<HTMLDivElement>;
   @ViewChild('splitPaneLeft') private readonly splitPaneLeftRef!: ElementRef<HTMLDivElement>;
-
   private doCheckCount = 0;
   private idCounter = 0;
-
 
   constructor(
     private readonly renderer: Renderer2,
@@ -177,12 +174,20 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
         console.info('        > shellVisible: ', shellVisible);
         this.cdr.detectChanges();
       });
-  }
 
-  private calcActiveData() {
-    this.activeTabsPanelData = this.tabsPanelData[this.activePanelIndex];
-    let tabData = this.activeTabsPanelData.tabs[this.activeTabsPanelData.selectedTabIndex];
-    this.activePanelPath = tabData?.path ?? '';
+    this.appService
+      .getSysinfo$()
+      .subscribe(sysinfo => {
+        this.sysinfo = sysinfo;
+        this.cdr.detectChanges();
+      });
+
+
+    this.appService
+      .getAllinfo$()
+      .subscribe(allinfo => {
+        console.info('        > allinfo: ', allinfo);
+      });
   }
 
   onSelectionChanged(selectionLabelData: SelectionEvent, panelIndex: PanelIndex) {
@@ -225,12 +230,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
     this.appService.onChangeDir(path, panelIndex);
   }
 
-
-  private isInputElement(event: KeyboardEvent): boolean {
-    const target = event.target as HTMLElement;
-    return target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
-  }
-
   onKeyUp(keyboardEvent: KeyboardEvent) {
     if (this.shellInputHasFocus || this.isInputElement(keyboardEvent)) return; // skip
     this.appService.onKeyUp$.next(keyboardEvent);
@@ -248,11 +247,26 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
     this.appService.onKeyDown$.next(keyboardEvent);
   }
 
+  onButtonStatesChanged(states: ButtonEnableStates, number: number) {
+    this.buttonEnableStatesArr[number] = states;
+  }
+
 
   // ----------------------------------
 
-  onButtonStatesChanged(states: ButtonEnableStates, number: number) {
-    this.buttonEnableStatesArr[number] = states;
+  onShellfocusChanged(hasFocus: boolean) {
+    this.shellInputHasFocus = hasFocus;
+  }
+
+  private calcActiveData() {
+    this.activeTabsPanelData = this.tabsPanelData[this.activePanelIndex];
+    let tabData = this.activeTabsPanelData.tabs[this.activeTabsPanelData.selectedTabIndex];
+    this.activePanelPath = tabData?.path ?? '';
+  }
+
+  private isInputElement(event: KeyboardEvent): boolean {
+    const target = event.target as HTMLElement;
+    return target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
   }
 
   private updatePathes(): void {
@@ -294,11 +308,5 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
    */
   private normalizePath(path: string): string {
     return path.replace(/\\/g, "/").replace(/\/\//g, "/");
-  }
-
-  shellInputHasFocus = false;
-
-  onShellfocusChanged(hasFocus: boolean) {
-    this.shellInputHasFocus = hasFocus;
   }
 }

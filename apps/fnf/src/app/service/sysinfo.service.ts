@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {SysinfoIf} from "@fnf/fnf-data";
+import {AllinfoIf, SysinfoIf} from "@fnf/fnf-data";
 import {firstValueFrom, Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 
@@ -12,6 +12,7 @@ export class SysinfoService {
   private static readonly config = {
     getDrivesUrl: "/api/drives",
     getSysinfoUrl: "/api/sysinfo",
+    getAllinfoUrl: "/api/allinfo",
     getFirstStartFolderUrl: "/api/firststartfolder"
   };
 
@@ -25,6 +26,14 @@ export class SysinfoService {
 
   getDrives(): Observable<string[]> {
     return this.httpClient.get<string[]>(SysinfoService.config.getDrivesUrl);
+  }
+
+  getSysinfo$(): Observable<SysinfoIf> {
+    return this.httpClient.get<SysinfoIf>(SysinfoService.config.getSysinfoUrl);
+  }
+
+  getAllinfo$(): Observable<AllinfoIf> {
+    return this.httpClient.get<AllinfoIf>(SysinfoService.config.getAllinfoUrl);
   }
 
   getSysinfo(): Promise<SysinfoIf> {

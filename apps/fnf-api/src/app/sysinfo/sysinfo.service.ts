@@ -2,6 +2,7 @@ import {Injectable} from "@nestjs/common";
 import * as os from "os";
 import * as process from "process";
 import * as util from "util";
+import * as fs from "fs";
 
 import {exec} from "child_process";
 import {from, Observable} from "rxjs";
@@ -25,6 +26,35 @@ export class SysinfoService {
   /** Cached system information to avoid redundant system calls */
   private systemInfo: SysinfoIf;
 
+  /**
+   * Detects if the application is running inside a Docker container
+   *
+   * @returns {boolean} True if running in Docker, false otherwise
+   */
+  private isRunningInDocker(): boolean {
+    // Check for .dockerenv file
+    if (fs.existsSync('/.dockerenv')) {
+      return true;
+    }
+
+    // Check for Docker in cgroup
+    try {
+      if (fs.existsSync('/proc/1/cgroup')) {
+        const content = fs.readFileSync('/proc/1/cgroup', 'utf8');
+        return content.includes('docker');
+      }
+    } catch (err) {
+      // Ignore errors, just means we're not in a Linux environment
+    }
+
+    // Check for Docker-specific environment variables
+    if (env.DOCKER_CONTAINER || env.DOCKER_ENV || env.DOCKER) {
+      return true;
+    }
+
+    return false;
+  }
+
 
   async getSystemInfoSync(): Promise<SysinfoIf> {
     if (this.systemInfo) {
@@ -43,7 +73,7 @@ export class SysinfoService {
     ret.username = env.LOGNAME || env.USER || env.LNAME || env.USERNAME;
     ret.homedir = os.homedir().replace(/\\/g, "/");
     ret.tmpdir = os.tmpdir().replace(/\\/g, "/");
-    //ret.docker = ?
+    ret.docker = this.isRunningInDocker();
 
     if (ret.username) {
       this.systemInfo = ret;
@@ -126,6 +156,7 @@ export class SysinfoService {
     ret.username = env.LOGNAME || env.USER || env.LNAME || env.USERNAME;
     ret.homedir = os.homedir().replace(/\\/g, "/");
     ret.tmpdir = os.tmpdir().replace(/\\/g, "/");
+    ret.docker = this.isRunningInDocker();
 
     if (ret.username) {
       return cb(null, ret);
@@ -202,6 +233,9 @@ export class SysinfoService {
     ret.env['FNF_CONTAINER_PATHS'] = env.FNF_CONTAINER_PATHS;
     ret.env['FNF_INCOMPATIBLE_PATHS'] = env.FNF_INCOMPATIBLE_PATHS;
     ret.env['FNF_DOCKER_ROOT'] = env.FNF_DOCKER_ROOT;
+    ret.env['DOCKER_CONTAINER'] = env.DOCKER_CONTAINER ?? '';
+    ret.env['DOCKER_ENV'] = env.DOCKER_ENV ?? '';
+    ret.env['DOCKER'] = env.DOCKER ?? '';
 
     return ret;
   }
