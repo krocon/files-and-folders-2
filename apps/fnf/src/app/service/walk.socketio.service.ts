@@ -15,8 +15,8 @@ export type WalkCallback = (walkData: WalkData) => void;
 export class WalkSocketService {
 
   static runningNumber = 0;
-  public static syncMode: boolean = true;
-  syncMode = WalkSocketService.syncMode;
+
+
   private rid: number = Math.floor(Math.random() * 1000000) + 1;
   private cancellings: { [key: string]: Subscription } = {};
   private isConnected = false;
@@ -201,7 +201,7 @@ export class WalkSocketService {
 
     if (!walkParaData.filePattern) walkParaData.filePattern = '**/*';
 
-    if (this.syncMode) {
+    if (WalkSocketService.config.syncMode) {
       const sub = this.walkdirSyncService
         .walkdirSync(walkParaData)
         .subscribe((walkData: WalkData) => {
