@@ -54,7 +54,7 @@ RUN apt-get update && apt-get install rsync -y && npm install -g pnpm
 COPY --chown=node:node --from=builder /usr/src/app/apps/fnf-api/dist ./apps/fnf-api
 COPY --chown=node:node --from=builder /usr/src/app/apps/fnf-api/node_modules ./apps/fnf-api/node_modules
 
-COPY --chown=node:node --from=builder /usr/src/app/apps/fnf/dist ./apps/fnf-api/assests/
+COPY --chown=node:node --from=builder /usr/src/app/apps/fnf/dist/fnf ./apps/fnf-api/assests/
 
 #COPY --chown=node:node --from=builder /usr/src/app/apps/fnf/dist ./apps/fnf/dist
 #COPY --chown=node:node --from=builder /usr/src/app/apps/fnf/node_modules ./apps/fnf/dist/node_modules

@@ -27,8 +27,11 @@
     "docker:kill2": "docker kill $(docker ps | grep  ' krocon/files-and-folders-2 ' | awk '{ print $1 }') ",
     "docker:container-ls": "docker container ls",
     "docker:container-remove": "docker container rm fnf && docker image rm krocon/files-and-folders-2 -f",
+    "docker:container-remove-danling": "docker rmi $(docker images -f \"dangling=true\" -q)",
     "docker:images": "docker images",
     "docker:image-remove": "docker image rm krocon/files-and-folders-2 -f",
+    "docker:image-remove-danling": "docker images -f \"dangling=true\" -q | xargs docker rmi",
+    "docker:image-prune": "docker image prune -f",
     "docker-bash": "docker run -it --rm krocon/files-and-folders-2 /bin/bash ",
     "docker:print-container-id": "docker ps | grep  ' krocon/files-and-folders-2 ' | awk '{ print $1 }'",
     "docker:logs": "docker logs $(docker ps | grep  ' krocon/files-and-folders-2 ' | awk '{ print $1 }') "
