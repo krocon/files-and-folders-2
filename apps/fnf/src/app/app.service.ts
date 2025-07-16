@@ -180,6 +180,12 @@ export class AppService {
         this.setPathToActiveTabInGivenPanel(changeDirEvent.path, changeDirEvent.panelIndex);
       }
     });
+
+    this
+      .getAllinfo$()
+      .subscribe(allinfo => {
+        console.info('        > allinfo: ', allinfo);
+      });
   }
 
   public getSysinfo$(): Observable<SysinfoIf> {
@@ -270,6 +276,7 @@ export class AppService {
 
   public init$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
+
   public async init(callback: Function) {
     this.config = await this.configService.getConfig();
     this.dockerRoot = this.config?.dockerRoot ?? '';
@@ -290,6 +297,7 @@ export class AppService {
 
       // init tools:
       const defaultTools: CmdIf[] | undefined = await this.toolService.fetchTools(sys);
+      // console.info('        > defaultTools:', defaultTools);
       if (defaultTools) {
         this.defaultTools = defaultTools;
         const toolMappings: ShortcutActionMapping = {};

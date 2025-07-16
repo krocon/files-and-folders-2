@@ -114,11 +114,13 @@ export class FileComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck 
       )
       .subscribe(
         () => {
-          this.initialized = true;
-          // this.updatePathes();
-          // this.calcActiveData();
-          this.cdr.detectChanges();
+          this.init();
         })
+  }
+
+  init() {
+    this.initialized = true;
+    this.cdr.detectChanges();
 
     this.panelSelectionService
       .valueChanges$()
@@ -209,15 +211,6 @@ export class FileComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck 
         this.cdr.detectChanges();
       });
 
-
-    this.appService
-      .getAllinfo$()
-      .pipe(
-        takeWhile(() => this.alive)
-      )
-      .subscribe(allinfo => {
-        console.info('        > allinfo: ', allinfo);
-      });
   }
 
   onSelectionChanged(selectionLabelData: SelectionEvent, panelIndex: PanelIndex) {

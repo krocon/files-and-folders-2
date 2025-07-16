@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -15,6 +15,7 @@ import {MatList} from "@angular/material/list";
 import {TaskButtonComponent} from "../../../task/task-list/task-button.component";
 import {FnfActionLabels} from "../../../../domain/action/fnf-action-labels";
 import {RouterLink} from "@angular/router";
+import {takeWhile} from "rxjs/operators";
 
 @Component({
   selector: 'app-button-panel',
@@ -35,7 +36,7 @@ import {RouterLink} from "@angular/router";
   templateUrl: './buttonpanel.component.html',
   styleUrls: ['./buttonpanel.component.css']
 })
-export class ButtonPanelComponent implements OnInit {
+export class ButtonPanelComponent implements OnInit, OnDestroy {
 
   @Input() buttonEnableStates = new ButtonEnableStates();
 
@@ -132,6 +133,7 @@ export class ButtonPanelComponent implements OnInit {
 
 
   tools: CmdIf[] = [];
+  private alive = true;
 
   constructor(
     private readonly appService: AppService,
@@ -139,7 +141,25 @@ export class ButtonPanelComponent implements OnInit {
   ) {
   }
 
+  ngOnDestroy(): void {
+    this.alive = false;
+  }
+
   ngOnInit(): void {
+    this.alive = true;
+
+    this.appService
+      .init$
+      .pipe(
+        takeWhile(() => this.alive)
+      )
+      .subscribe(
+        () => {
+          this.init();
+        })
+  }
+
+  init() {
     this.tools = this.appService.getDefaultTools();
   }
 
