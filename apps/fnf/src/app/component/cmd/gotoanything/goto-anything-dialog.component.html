@@ -9,7 +9,9 @@
     <form
         [formGroup]="formGroup">
 
+
       <mat-form-field class="example-full-width">
+
         <input
             type="text"
             placeholder="Enter command OR a directory (CD)"
@@ -27,7 +29,8 @@
             [autoSelectActiveOption]="auto"
             (optionSelected)="onOptionSelected($event)"
             [displayWith]="displayFn">
-          @for (option of filteredOptions(); track option.cmd + option.value) {
+
+          @for (option of filteredOptions$ | async; track option.cmd + option.value) {
             <mat-option [value]="option">
               <div class="option-div">
                 <b>{{ option.cmd|uppercase }}</b>&nbsp;{{ option.value }}
@@ -38,6 +41,10 @@
 
       </mat-form-field>
 
+      <br>
+      @if (result) {
+        &rarr; {{ result.cmd }} {{ result.value }}
+      }
       <div>
         @if (hasError) {
           <mat-error [innerText]="errorMesasage"></mat-error>

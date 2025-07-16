@@ -581,7 +581,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
         ),
         (result: GotoAnythingOptionData | undefined) => {
           if (result) {
-            if (result.cmd === 'cd') {
+            if (result.cmd?.toLowerCase() === 'cd') {
               this.appService.onChangeDir(result.value, this._panelIndex);
             } else {
               this.appService.triggerAction(result.cmd as ActionId);

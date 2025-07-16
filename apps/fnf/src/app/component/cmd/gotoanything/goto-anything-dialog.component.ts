@@ -1,14 +1,4 @@
-import {
-  Component,
-  effect,
-  Inject,
-  inject,
-  Injector,
-  OnDestroy,
-  OnInit,
-  runInInjectionContext,
-  signal,
-} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit,} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {GotoAnythingDialogData} from "./goto-anything-dialog.data";
 import {
@@ -28,10 +18,11 @@ import {
   MatAutocompleteTrigger,
   MatOption
 } from "@angular/material/autocomplete";
-import {UpperCasePipe} from "@angular/common";
+import {AsyncPipe, UpperCasePipe} from "@angular/common";
 import {GotoAnythingOptionData} from "./goto-anything-option.data";
 import {GotoAnythingDialogService} from "./goto-anything-dialog.service";
-import {takeWhile} from "rxjs/operators";
+import {BehaviorSubject, combineLatest, Observable} from "rxjs";
+import {map, takeWhile} from "rxjs/operators";
 import {AppService} from "../../../app.service";
 
 
@@ -52,9 +43,11 @@ import {AppService} from "../../../app.service";
     MatAutocompleteTrigger,
     MatOption,
     MatInput,
-    UpperCasePipe
+    UpperCasePipe,
+    AsyncPipe
   ],
-  styleUrls: ["./goto-anything-dialog.component.css"]
+  styleUrls: ["./goto-anything-dialog.component.css"],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GotoAnythingDialogComponent implements OnInit, OnDestroy {
 
@@ -65,18 +58,16 @@ export class GotoAnythingDialogComponent implements OnInit, OnDestroy {
 
   public alive = true;
 
-  filteredOptions = signal<GotoAnythingOptionData[]>([]);
-  searchTerm = signal<string>('');
+  filteredOptions$: Observable<GotoAnythingOptionData[]>;
+  searchTerm$ = new BehaviorSubject<string>('');
   volumes: string[] = [];
 
   private readonly openTabDirsOptions: GotoAnythingOptionData[] = [];
-  private localResults = signal<GotoAnythingOptionData[]>([]);
-  private remoteResults = signal<GotoAnythingOptionData[]>([]);
-  private commandsResults = signal<GotoAnythingOptionData[]>([]);
-  private volumesResults = signal<GotoAnythingOptionData[]>([]);
-  private injector = inject(Injector);
-  private result: GotoAnythingOptionData = new GotoAnythingOptionData('cd', '');
-
+  private localResults$ = new BehaviorSubject<GotoAnythingOptionData[]>([]);
+  private remoteResults$ = new BehaviorSubject<GotoAnythingOptionData[]>([]);
+  private commandsResults$ = new BehaviorSubject<GotoAnythingOptionData[]>([]);
+  private volumesResults$ = new BehaviorSubject<GotoAnythingOptionData[]>([]);
+  result: GotoAnythingOptionData = new GotoAnythingOptionData('cd', '');
 
 
   constructor(
@@ -85,12 +76,27 @@ export class GotoAnythingDialogComponent implements OnInit, OnDestroy {
     private readonly formBuilder: FormBuilder,
     private readonly gotoAnythingDialogService: GotoAnythingDialogService,
     private readonly appService: AppService,
+    private readonly cdr: ChangeDetectorRef,
   ) {
     this.openTabDirsOptions.push(...data.dirs.map(s => new GotoAnythingOptionData('cd', s)))
     this.formGroup = this.formBuilder.group(
       {
         target: new FormControl(data.firstInput, [Validators.required, Validators.minLength(1)])
       }
+    );
+    // Set up combineLatest to combine results whenever any source changes
+    this.filteredOptions$ = combineLatest([
+      this.commandsResults$,
+      this.localResults$,
+      this.remoteResults$,
+      this.volumesResults$
+    ]).pipe(
+      map(([commands, local, remote, volumes]) => [
+        ...commands,
+        ...local,
+        ...remote,
+        ...volumes
+      ])
     );
   }
 
@@ -100,7 +106,7 @@ export class GotoAnythingDialogComponent implements OnInit, OnDestroy {
   }
 
   displayFn(option: GotoAnythingOptionData) {
-    return option?.value ?? '';
+    return option?.value ?? option ?? '';
   };
 
   onOkClicked() {
@@ -117,17 +123,6 @@ export class GotoAnythingDialogComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    runInInjectionContext(this.injector, () => {
-      // Set up effect to combine results whenever either source changes
-      effect(() => {
-        this.filteredOptions.set([
-          ...this.commandsResults(),
-          ...this.localResults(),
-          ...this.remoteResults(),
-          ...this.volumesResults()
-        ]);
-      });
-    });
     // Initialize with empty search
     this.updateSearchTerm(this.data.firstInput);
 
@@ -138,12 +133,14 @@ export class GotoAnythingDialogComponent implements OnInit, OnDestroy {
       )
       .subscribe(volumes => {
         this.volumes = volumes;
-        this.volumesResults.set(volumes.map(v => new GotoAnythingOptionData('cd', v)));
+        this.volumesResults$.next(volumes.map(v => new GotoAnythingOptionData('cd', v)));
       });
   }
 
   onOptionSelected(evt: MatAutocompleteSelectedEvent) {
     this.result = evt.option.value;
+    this.formGroup.patchValue({target: this.result.value}, {emitEvent: true});
+    this.cdr.detectChanges();
   }
 
   onKeyup(evt: KeyboardEvent) {
@@ -154,12 +151,12 @@ export class GotoAnythingDialogComponent implements OnInit, OnDestroy {
 
   private async fetchFolders(value: string): Promise<void> {
     let results: GotoAnythingOptionData[] = await this.gotoAnythingDialogService.fetchFolders(value, this.data.dirs);
-    this.remoteResults.set(results);
+    this.remoteResults$.next(results);
   }
 
 
   private updateLocalResults(filterValue: string): void {
-    this.localResults.set(
+    this.localResults$.next(
       this.openTabDirsOptions
         .filter(option =>
           option.value.toLowerCase().includes(filterValue)
@@ -168,7 +165,7 @@ export class GotoAnythingDialogComponent implements OnInit, OnDestroy {
   }
 
   private updateCommands(value: string): void {
-    this.commandsResults.set(this.data.commands
+    this.commandsResults$.next(this.data.commands
       .filter(
         c => c.cmd.toLowerCase().includes(value) || c.value.toLowerCase().includes(value)
       ));
@@ -178,7 +175,7 @@ export class GotoAnythingDialogComponent implements OnInit, OnDestroy {
     if (!value) value = '';
 
     if (typeof value === 'string') {
-      this.searchTerm.set(value);
+      this.searchTerm$.next(value);
 
       const filterValue = value.toLowerCase();
       // Update sources:

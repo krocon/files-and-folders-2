@@ -36,8 +36,8 @@ export class GotoAnythingDialogService {
       .afterClosed()
       .pipe(takeWhile(() => alive))
       .subscribe(item => {
-        alive = false;
         cb(item);
+        alive = false;
       });
   }
 
