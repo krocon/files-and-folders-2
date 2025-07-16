@@ -22,6 +22,7 @@ import {
   SysinfoIf
 } from "@fnf-data";
 import {BehaviorSubject, combineLatest, firstValueFrom, Observable, Subject} from "rxjs";
+import {map, tap} from "rxjs/operators";
 import {QueueActionEvent} from "./domain/cmd/queue-action-event";
 import {BrowserOsType, PanelIndex} from "@fnf/fnf-data";
 import {DockerRootDeletePipe} from "./component/main/header/tabpanel/filemenu/docker-root-delete.pipe";
@@ -62,7 +63,6 @@ import {GroupFilesDialogData} from "./component/cmd/groupfiles/data/group-files-
 import {GroupFilesDialogService} from "./component/cmd/groupfiles/group-files-dialog.service";
 import {ChangeDirDialogService} from "./component/cmd/changedir/change-dir-dialog.service";
 import {ChangeDirDialogData} from "./component/cmd/changedir/data/change-dir-dialog.data";
-import {map} from "rxjs/operators";
 import {TabsPanelData} from "./domain/filepagedata/data/tabs-panel.data";
 import {WalkSocketService} from "./common/walkdir/walk.socketio.service";
 import {MultiRenameAiService} from "./component/cmd/multirename/multi-rename-ai.service";
@@ -90,6 +90,7 @@ export class AppService {
   public favs: string[] = [];
   public latest: string[] = [];
   public winDrives: string[] = [];
+  public volumes: string[] = [];
   public tabsPanelDatas: [TabsPanelData, TabsPanelData] = [
     this.tabsPanelDataService.getValue(0),
     this.tabsPanelDataService.getValue(1)
@@ -182,12 +183,6 @@ export class AppService {
         this.setPathToActiveTabInGivenPanel(changeDirEvent.path, changeDirEvent.panelIndex);
       }
     });
-
-    this
-      .getAllinfo$()
-      .subscribe(allinfo => {
-        console.info('        > allinfo: ', allinfo);
-      });
   }
 
   // Get browserOs from BrowserOs service
@@ -196,11 +191,11 @@ export class AppService {
   }
 
   public getSysinfo$(): Observable<SysinfoIf> {
-    return this.sysinfoService.getSysinfo$();
+    return this.sysinfoService.getSysinfo();
   }
 
   public getAllinfo$(): Observable<AllinfoIf> {
-    return this.sysinfoService.getAllinfo$();
+    return this.sysinfoService.getAllinfo();
   }
 
   public getVolumes$(): Observable<string[]> {
@@ -281,43 +276,77 @@ export class AppService {
     return this.tabsPanelDataService.valueChanges(panelIndex);
   }
 
-  public async init(callback: Function) {
-    this.config = await this.configService.getConfig();
-    this.dockerRoot = this.config?.dockerRoot ?? '';
-    DockerRootDeletePipe.dockerRoot = this.dockerRoot;
-    console.info('        > Config       :', this.config);
 
-    // init look and feel (LaF):
-    await this.lookAndFeelService.init();
+  public init(callback: Function) {
+    console.info('        > Browser OS       :', this.browserOs);
 
-    const sysInfo: SysinfoIf | undefined = await this.sysinfoService.getSysinfo();
-    if (sysInfo) {
-      this.sysinfo = sysInfo;
-      console.info('        > sysinfo_    :', this.sysinfo);
-      console.info('        > browser os  :', this.browserOs);
-      const sys = sysInfo.osx ? 'osx' : 'windows';
+    const obs: [
+      Observable<Config | undefined>,
+      Observable<SysinfoIf>,
+      Observable<string[]>,
+      Observable<AllinfoIf>,
+      Observable<ShortcutActionMapping | undefined>,
+      Observable<CmdIf[] | undefined>,
+      // Observable<string[]>
+    ] = [
+      this.configService.getConfig(),
+      this.sysinfoService.getSysinfo(),
+      this.sysinfoService.getDrives(),
+      this.sysinfoService.getAllinfo(),
 
-      // init shortcuts:
-      ActionShortcutPipe.shortcutCache = await this.shortcutService.init(this.browserOs);
+      this.shortcutService.getShortcuts(this.browserOs),
+      this.toolService.fetchTools(this.browserOs),
+      // this.fileSystemService.getVolumes$()
+    ];
 
-      // init tools:
-      const defaultTools: CmdIf[] | undefined = await this.toolService.fetchTools(this.browserOs);
-      // console.info('        > defaultTools:', defaultTools);
-      if (defaultTools) {
-        this.defaultTools = defaultTools;
-        const toolMappings: ShortcutActionMapping = {};
-        for (const tool of defaultTools) {
-          toolMappings[tool.shortcut] = tool.id;
+    combineLatest(obs)
+      .pipe(
+        // Set initial values from combineLatest
+        tap(([
+               config,
+               sysinfo,
+               winDrives,
+               allInfo,
+               shortcutActionMapping,
+               defaultTools,
+               // volumes
+             ]) => {
+          this.config = config;
+          this.dockerRoot = this.config?.dockerRoot ?? '';
+          DockerRootDeletePipe.dockerRoot = this.dockerRoot;
+          this.sysinfo = sysinfo;
+          this.winDrives = winDrives;
+          // this.volumes = volumes;
+
+          ActionShortcutPipe.shortcutCache = shortcutActionMapping ?? {};
+
+          if (defaultTools) {
+            this.defaultTools = defaultTools;
+            const toolMappings: ShortcutActionMapping = {};
+            for (const tool of defaultTools) {
+              toolMappings[tool.shortcut] = tool.id;
+            }
+            this.shortcutService.addAdditionalShortcutMappings(toolMappings);
+            console.info('        > Tool Mappings    :', toolMappings);
+          }
+          // console.info('        > Volumes          :', this.volumes.join(', '));
+          console.info('        > Default Tools    :', defaultTools);
+          console.info('        > Active shortcuts :', this.shortcutService.getActiveShortcuts());
+          console.info('        > Sysinfo          :', this.sysinfo);
+          console.info('        > Config           :', this.config);
+          console.info('        > All Info         :', allInfo);
+        }),
+      )
+      .subscribe({
+        next: () => {
+          callback();
+          this.init$.next(true);
+        },
+        error: (err) => {
+          console.error('Error in init:', err);
+          this.init$.next(false);
         }
-        this.shortcutService.addAdditionalShortcutMappings(toolMappings);
-
-        console.info('        > defaultTools', defaultTools);
-        console.info('        > toolMappings', toolMappings);
-        console.info('        > active shortcuts', this.shortcutService.getActiveShortcuts());
-      }
-    }
-    callback();
-    this.init$.next(true);
+      });
   }
 
 

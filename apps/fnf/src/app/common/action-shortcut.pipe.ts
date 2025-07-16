@@ -1,11 +1,11 @@
 import {Pipe, PipeTransform} from "@angular/core";
-import {ShortcutService} from "../service/shortcut.service";
+import {ShortcutActionMapping, ShortcutService} from "../service/shortcut.service";
 
 
 @Pipe({name: "fnfShortcut", pure: false})
 export class ActionShortcutPipe implements PipeTransform {
 
-  public static shortcutCache: { [key: string]: string } = {};
+  public static shortcutCache: ShortcutActionMapping = {};
 
   constructor(
     private readonly shortcutService: ShortcutService

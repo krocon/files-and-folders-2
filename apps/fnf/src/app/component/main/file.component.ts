@@ -187,7 +187,7 @@ export class FileComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck 
         takeWhile(() => this.alive)
       )
       .subscribe(volumes => {
-        console.info('        > volumes: ', volumes.join(', '));
+        // TODO console.info('        > Volumes          :', volumes.join(', '));
       });
 
     this.appService
@@ -197,7 +197,7 @@ export class FileComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck 
       )
       .subscribe(shellVisible => {
         this.shellVisible = shellVisible;
-        console.info('        > shellVisible: ', shellVisible);
+        console.info('        > Shell Visible    : ', shellVisible);
         this.cdr.detectChanges();
       });
 

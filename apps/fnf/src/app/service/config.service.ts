@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {firstValueFrom, Observable} from "rxjs";
+import {Observable} from "rxjs";
 import {Config} from "@fnf/fnf-data";
 import {HttpClient} from "@angular/common/http";
 
@@ -23,8 +23,8 @@ export class ConfigService {
   }
 
 
-  public getConfig(): Promise<Config|undefined> {
-    return firstValueFrom(this.httpClient.get<Config>(ConfigService.config.getUrl));
+  public getConfig(): Observable<Config | undefined> {
+    return this.httpClient.get<Config>(ConfigService.config.getUrl);
   }
 
 }

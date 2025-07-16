@@ -2,6 +2,8 @@ import {Injectable} from "@angular/core";
 import {ActionId, createHarmonizedShortcutByKeyboardEvent, harmonizeShortcut} from "@guiexpert/table";
 import {HttpClient} from "@angular/common/http";
 import {BrowserOsType} from "@fnf/fnf-data";
+import {Observable} from "rxjs";
+import {tap} from "rxjs/operators";
 
 export type ShortcutActionMapping = { [key: string]: string };
 
@@ -27,21 +29,15 @@ export class ShortcutService {
     Object.assign(ShortcutService.config, config);
   }
 
-  async init(sys: BrowserOsType): Promise<ShortcutActionMapping> {
-    // console.info('Shortcuts init...',sys);
-    // console.info('harmonizeShortcut(\'ctrl+shift+f\')',harmonizeShortcut('ctrl+shift+f'));
-    try {
-      const shortcutMappings = await this.fetchShortcutMappings(sys);
-      if (shortcutMappings) {
-        this.activeShortcuts = this.updateShortcutMappings(shortcutMappings);
-        // console.info('Shortcuts initialized ('+sys+'):', this.activeShortcuts);
-      }
-
-    } catch (error) {
-      console.error('Failed to initialize shortcuts:', error);
-      throw error;
-    }
-    return this.activeShortcuts;
+  getShortcuts(sys: BrowserOsType): Observable<ShortcutActionMapping | undefined> {
+    return this.fetchShortcutMappings(sys)
+      .pipe(
+        tap(shortcutMappings => {
+          if (shortcutMappings) {
+            this.activeShortcuts = this.updateShortcutMappings(shortcutMappings);
+          }
+        })
+      );
   }
 
   createHarmonizedShortcutByKeyboardEvent(keyboardEvent: KeyboardEvent): string {
@@ -103,10 +99,8 @@ export class ShortcutService {
     return this.activeShortcuts;
   }
 
-  private async fetchShortcutMappings(sys: BrowserOsType): Promise<ShortcutActionMapping | undefined> {
-    return await this.httpClient
-      .get<ShortcutActionMapping>(ShortcutService.config.getShortcutActionMappingUrl+sys+'.json')
-      .toPromise();
+  private fetchShortcutMappings(sys: BrowserOsType): Observable<ShortcutActionMapping | undefined> {
+    return this.httpClient.get<ShortcutActionMapping>(ShortcutService.config.getShortcutActionMappingUrl + sys + '.json');
   }
 
   public addAdditionalShortcutMappings(map: ShortcutActionMapping): void {

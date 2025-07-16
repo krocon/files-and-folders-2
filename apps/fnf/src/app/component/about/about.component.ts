@@ -25,7 +25,7 @@ export class AboutComponent implements OnInit {
 
   ngOnInit(): void {
     this.sysinfoService
-      .getSysinfo$()
+      .getSysinfo()
       .pipe(
         takeWhile(() => this.alive)
       )

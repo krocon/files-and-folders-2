@@ -40,7 +40,6 @@ export class AppComponent implements OnInit {
     this.appService.init(() => {
       this.initialized = true;
       console.info('        > App initialized');
-      // this.router.navigate(['/files']);
     });
   }
 }
