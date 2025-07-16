@@ -340,6 +340,10 @@ export class AppService {
     return await firstValueFrom(this.fileSystemService.checkPath(path));
   }
 
+  public async filterExists(files: string[]): Promise<string[]> {
+    return await firstValueFrom(this.fileSystemService.filterExists(files));
+  }
+
   public updateTabsPanelData(panelIndex: PanelIndex, fileData: TabsPanelData) {
     // Update both the signal and the service
     // console.info(JSON.stringify(fileData, null, 4));

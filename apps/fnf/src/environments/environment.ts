@@ -20,6 +20,7 @@ export const environment = {
   },
   fileSystem: {
     checkPathUrl: prefix + "/api/checkpath",
+    filterExistsUrl: prefix + "/api/filterexists",
     readDirUrl: prefix + "/api/readdir",
     defaultRoot: "/",
     fileWatcher: false

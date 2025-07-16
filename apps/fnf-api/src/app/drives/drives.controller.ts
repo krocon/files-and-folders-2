@@ -77,4 +77,43 @@ export class DrivesController {
   checkPath(@MessageBody() para: DirPara): string {
     return this.drivesService.checkAndFixPath(para.path);
   }
+
+  /**
+   * Filters an array of paths to return only those that exist in the file system.
+   *
+   * This endpoint takes an array of file or directory paths and returns a new array
+   * containing only the paths that actually exist on the system. It's useful for
+   * validating multiple paths in a single request and filtering out invalid or
+   * non-existent locations.
+   *
+   * If running in a container environment, paths are validated against the container's
+   * root directory configuration to ensure security.
+   *
+   * @param para - An array of strings representing file or directory paths to check
+   * @returns An array of strings containing only the paths that exist in the file system
+   *
+   * @example
+   * // Request
+   * POST /filterexists
+   * Content-Type: application/json
+   *
+   * [
+   *   "/path/to/existing/file.txt",
+   *   "/path/to/non-existing/file.txt",
+   *   "/path/to/existing/directory"
+   * ]
+   *
+   * // Response
+   * [
+   *   "/path/to/existing/file.txt",
+   *   "/path/to/existing/directory"
+   * ]
+   *
+   * @throws {BadRequestException} If the input array is not properly formatted
+   * @throws {UnauthorizedException} If any path violates container security constraints
+   */
+  @Post("filterexists")
+  filterExists(@MessageBody() para: string[]): string[] {
+    return this.drivesService.filterExists(para);
+  }
 }

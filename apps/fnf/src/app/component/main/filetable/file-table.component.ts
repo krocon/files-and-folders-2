@@ -457,7 +457,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
 
-  actionCall(action: string) {
+  async actionCall(action: string) {
     if (action === 'RELOAD_DIR') {
       this.reload();
 
@@ -560,13 +560,14 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       const activeTabOnActivePanel = this.appService.getActiveTabOnActivePanel();
       const firstInput = activeTabOnActivePanel.path;
       const firstOptions: string[] = [];
-      const dirs: string[] =
+      let dirs: string[] =
         [
           ...this.appService.getDirsFromAllTabs(),
           ...this.appService.getAllHistories(),
         ]
           .filter((his, i, arr) => arr.indexOf(his) === i) // remove double entries
           .sort();
+      dirs = await this.appService.filterExists(dirs);
 
       const commands: GotoAnythingOptionData[] = actionIds.map((id) => {
         return new GotoAnythingOptionData(id, FnfActionLabels.getLabel(id))

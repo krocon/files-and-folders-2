@@ -24,6 +24,7 @@ export class FileSystemService {
   private static readonly config = {
     checkPathUrl: "/api/checkpath",
     readDirUrl: "/api/readdir",
+    filterExistsUrl: "/api/filterexists",
     defaultRoot: "/",
     fileWatcher: false
   };
@@ -64,7 +65,7 @@ export class FileSystemService {
       );
   }
 
-  static forRoot(config: { [key: string]: string|boolean }) {
+  static forRoot(config: { [key: string]: string | boolean }) {
     Object.assign(FileSystemService.config, config);
   }
 
@@ -160,7 +161,7 @@ export class FileSystemService {
             return arr;
           }
         ),
-        map(dirEvents=> {
+        map(dirEvents => {
           dirEvents.forEach(dirEvent => {
             dirEvent.items = dirEvent.items.sort((row1, row2) => {
               return fileItemSorter(row1, row2);
@@ -185,6 +186,60 @@ export class FileSystemService {
         para,
         {responseType: "text"}
       );
+  }
+
+  /**
+   * Filters an array of file paths to return only those that exist in the file system.
+   * This method makes a POST request to the server's filterExists endpoint to validate
+   * the existence of multiple files in a single operation.
+   *
+   * @param files - An array of file paths to check for existence
+   * @returns An Observable that emits an array of strings containing only the paths that exist
+   *
+   * @example
+   * ```typescript
+   * // Create an instance of FileSystemService
+   * const fileSystemService = new FileSystemService(socket, httpClient);
+   *
+   * // Array of paths to check
+   * const pathsToCheck = [
+   *   '/path/to/file1.txt',
+   *   '/path/to/file2.txt',
+   *   '/path/to/non-existent.txt'
+   * ];
+   *
+   * // Filter existing files
+   * fileSystemService.filterExists(pathsToCheck).subscribe(
+   *   existingFiles => {
+   *     console.log('Existing files:', existingFiles);
+   *     // Output might be: ['/path/to/file1.txt', '/path/to/file2.txt']
+   *   },
+   *   error => {
+   *     console.error('Error checking files:', error);
+   *   }
+   * );
+   * ```
+   *
+   * @remarks
+   * - The method uses the HTTP POST method to send the array of paths to the server
+   * - The server endpoint is defined in the configuration as `filterExistsUrl`
+   * - The response will only include paths that actually exist in the file system
+   * - This method is useful for validating multiple paths in a single request
+   * - Non-existent paths are automatically filtered out from the response
+   *
+   * @throws Will throw an error if:
+   * - The server request fails
+   * - The paths are inaccessible due to permissions
+   * - The server endpoint is not properly configured
+   *
+   * @see {@link ConfigService} for configuration settings
+   * @see {@link HttpClient} for the underlying HTTP client implementation
+   */
+  filterExists(files: string[]): Observable<string[]> {
+    return this.httpClient
+      .post<string[]>(
+        FileSystemService.config.filterExistsUrl,
+        files);
   }
 
   private unwatch(para: DirPara) {

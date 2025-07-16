@@ -14,6 +14,7 @@ export const environment = {
   },
   fileSystem: {
     checkPathUrl: "/api/checkpath",
+    filterExistsUrl: "/api/filterexists",
     readDirUrl: "/api/readdir",
     defaultRoot: "/",
     fileWatcher: false

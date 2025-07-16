@@ -4,6 +4,7 @@ import * as os from 'os';
 import {spawn} from 'child_process';
 import {from, Observable, of} from 'rxjs';
 import * as fse from 'fs-extra';
+import * as fs from 'fs-extra';
 import {Config, fixPath} from '@fnf/fnf-data';
 
 export type DrivesCallbackFn = (eror: number, sysinfo: string[]) => void;
@@ -49,6 +50,17 @@ export class DrivesService {
         return false;
       }
     }
+  }
+
+
+  filterExists(files: string[]): string[] {
+    return files.filter(f => {
+      try {
+        return fs.existsSync(f);
+      } catch (e) {
+        return false;
+      }
+    });
   }
 
   /**
