@@ -72,6 +72,8 @@ export class ExampleComponent {
 
 ## Best Practices
 
+- **IMPORTANT NOTICE**: For UI tables, you should use guiexpert-table. Please refer to the comprehensive guide at
+  `.junie/instructions_guiexpert-table.md` for detailed implementation instructions.
 - Keep components small and focused on a single responsibility.
 - Use typed forms for form handling.
 - Implement lazy loading for feature modules.
