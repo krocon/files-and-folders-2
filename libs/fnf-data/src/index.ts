@@ -1,4 +1,5 @@
 // Export all models
+export * from './models/browseros/browser-os-type';
 export * from './models/customcss/css-colors.data';
 
 

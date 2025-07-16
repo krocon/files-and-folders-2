@@ -1,0 +1,1 @@
+export type BrowserOsType = 'osx' | 'windows' | 'linux';

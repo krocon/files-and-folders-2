@@ -23,7 +23,7 @@ import {
 } from "@fnf-data";
 import {BehaviorSubject, combineLatest, firstValueFrom, Observable, Subject} from "rxjs";
 import {QueueActionEvent} from "./domain/cmd/queue-action-event";
-import {PanelIndex} from "@fnf/fnf-data";
+import {BrowserOsType, PanelIndex} from "@fnf/fnf-data";
 import {DockerRootDeletePipe} from "./component/main/header/tabpanel/filemenu/docker-root-delete.pipe";
 import {PanelSelectionService} from "./domain/filepagedata/service/panel-selection.service";
 import {LatestDataService} from "./domain/filepagedata/service/latest-data.service";
@@ -74,6 +74,7 @@ import {ShellService} from "./service/shell.service";
 import {ShellAutocompleteService} from "./service/shell-autocomplete.service";
 import {WalkdirSyncService} from "./common/walkdir/walkdir-sync.service";
 import {WalkdirService} from "./common/walkdir/walkdir.service";
+import {BrowserOsService} from "./service/browseros/browser-os.service";
 
 
 @Injectable({
@@ -98,9 +99,9 @@ export class AppService {
   public readonly actionEvents$ = new Subject<ActionId>();
   public bodyAreaModels: [FileTableBodyModel | undefined, FileTableBodyModel | undefined] = [undefined, undefined];
   public selectionManagers: [SelectionManagerForObjectModels<FileItemIf> | undefined, SelectionManagerForObjectModels<FileItemIf> | undefined] = [undefined, undefined];
+  public init$: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private MAX_HISTORY_LENGTH = 15;
   private defaultTools: CmdIf[] = [];
-
 
   constructor(
     private readonly lookAndFeelService: LookAndFeelService,
@@ -128,6 +129,7 @@ export class AppService {
     private readonly groupFilesDialogService: GroupFilesDialogService,
     private readonly changeDirDialogService: ChangeDirDialogService,
     private readonly shellLocalStorage: ShellLocalStorage,
+    private readonly browserOsService: BrowserOsService,
   ) {
     // Set config to services:
     ConfigService.forRoot(environment.config);
@@ -186,6 +188,11 @@ export class AppService {
       .subscribe(allinfo => {
         console.info('        > allinfo: ', allinfo);
       });
+  }
+
+  // Get browserOs from BrowserOs service
+  public get browserOs(): BrowserOsType {
+    return this.browserOsService.browserOs;
   }
 
   public getSysinfo$(): Observable<SysinfoIf> {
@@ -274,9 +281,6 @@ export class AppService {
     return this.tabsPanelDataService.valueChanges(panelIndex);
   }
 
-  public init$: BehaviorSubject<boolean> = new BehaviorSubject(false);
-
-
   public async init(callback: Function) {
     this.config = await this.configService.getConfig();
     this.dockerRoot = this.config?.dockerRoot ?? '';
@@ -289,14 +293,15 @@ export class AppService {
     const sysInfo: SysinfoIf | undefined = await this.sysinfoService.getSysinfo();
     if (sysInfo) {
       this.sysinfo = sysInfo;
-      console.info('        > sysinfo_    :', this.sysinfo); // TODO
+      console.info('        > sysinfo_    :', this.sysinfo);
+      console.info('        > browser os  :', this.browserOs);
       const sys = sysInfo.osx ? 'osx' : 'windows';
 
       // init shortcuts:
-      ActionShortcutPipe.shortcutCache = await this.shortcutService.init(sys);
+      ActionShortcutPipe.shortcutCache = await this.shortcutService.init(this.browserOs);
 
       // init tools:
-      const defaultTools: CmdIf[] | undefined = await this.toolService.fetchTools(sys);
+      const defaultTools: CmdIf[] | undefined = await this.toolService.fetchTools(this.browserOs);
       // console.info('        > defaultTools:', defaultTools);
       if (defaultTools) {
         this.defaultTools = defaultTools;

@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {CmdIf, DirEventIf} from "@fnf/fnf-data";
+import {BrowserOsType, CmdIf, DirEventIf} from "@fnf/fnf-data";
 import {HttpClient} from "@angular/common/http";
 
 @Injectable({
@@ -22,7 +22,7 @@ export class ToolService {
   }
 
 
-  public async fetchTools(f: 'osx' | 'windows'): Promise<CmdIf[] | undefined> {
+  public async fetchTools(f: BrowserOsType): Promise<CmdIf[] | undefined> {
     return await this.httpClient
       .get<CmdIf[]>(ToolService.config.loadUrl + f + '.json')
       .toPromise();

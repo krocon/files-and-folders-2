@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
 import {ActionId, createHarmonizedShortcutByKeyboardEvent, harmonizeShortcut} from "@guiexpert/table";
 import {HttpClient} from "@angular/common/http";
+import {BrowserOsType} from "@fnf/fnf-data";
 
 export type ShortcutActionMapping = { [key: string]: string };
 
@@ -26,7 +27,7 @@ export class ShortcutService {
     Object.assign(ShortcutService.config, config);
   }
 
-  async init(sys:'osx' | 'windows'): Promise<ShortcutActionMapping> {
+  async init(sys: BrowserOsType): Promise<ShortcutActionMapping> {
     // console.info('Shortcuts init...',sys);
     // console.info('harmonizeShortcut(\'ctrl+shift+f\')',harmonizeShortcut('ctrl+shift+f'));
     try {
@@ -102,7 +103,7 @@ export class ShortcutService {
     return this.activeShortcuts;
   }
 
-  private async fetchShortcutMappings(sys:'osx' | 'windows'): Promise<ShortcutActionMapping | undefined> {
+  private async fetchShortcutMappings(sys: BrowserOsType): Promise<ShortcutActionMapping | undefined> {
     return await this.httpClient
       .get<ShortcutActionMapping>(ShortcutService.config.getShortcutActionMappingUrl+sys+'.json')
       .toPromise();
