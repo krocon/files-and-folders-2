@@ -73,6 +73,7 @@ import {DirWalker} from "./dir-walker";
 import {equalFileItem} from "../../../common/fn/equal-file-item.fn";
 import {fileItemSorter} from "../../../common/fn/file-item-sorter.fn";
 import {WalkdirService} from "../../../common/walkdir/walkdir.service";
+import {ExtensionCellRendererComponent} from "./renderer/extension-cell-renderer.component";
 
 
 @Component({
@@ -117,7 +118,6 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       property: "base",
       headerLabel: "Name",
       width: new Size(100, 'weight'),
-      // width: new Size(60, '%'),
       minWidth: new Size(200, 'px'),
       bodyRenderer: this.rwf.create(NameCellRendererComponent, this.cdr),
       headerClasses: ["ge-table-text-align-left"],
@@ -129,7 +129,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
       property: "ext",
       headerLabel: "Ext",
       width: new Size(60, 'px'),
-      //bodyRenderer: this.rwf.create(EmailRendererComponent, this.cdr),
+      bodyRenderer: this.rwf.create(ExtensionCellRendererComponent, this.cdr),
       headerClasses: ["ge-table-text-align-left"],
       bodyClasses: ["ge-table-text-align-left"],
       sortable: () => true,
