@@ -6,11 +6,7 @@ settings:
 
 importers:
 
-  .:
-    devDependencies:
-      pnpm:
-        specifier: ^10.13.1
-        version: 10.13.1
+  .: {}
 
   apps/fnf:
     dependencies:
@@ -45,11 +41,11 @@ importers:
         specifier: ^20.0.0
         version: 20.1.0(@angular/common@20.1.0(@angular/core@20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.1.0(@angular/animations@20.1.0(@angular/common@20.1.0(@angular/core@20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@20.1.0(@angular/core@20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
       '@guiexpert/angular-table':
-        specifier: ^20.1.78
-        version: 20.1.78(@angular/common@20.1.0(@angular/core@20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1))
+        specifier: ^20.1.79
+        version: 20.1.79(@angular/common@20.1.0(@angular/core@20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1))
       '@guiexpert/table':
-        specifier: ^1.1.78
-        version: 1.1.78
+        specifier: ^1.1.79
+        version: 1.1.79
       hammerjs:
         specifier: ^2.0.8
         version: 2.0.8
@@ -1536,14 +1532,14 @@ packages:
     resolution: {integrity: sha512-d9zaMRSTIKDLhctzH12MtXvJKSSUhaHcjV+2Z+GK+EEY7XKpP5yR4x+N3TAcHTcu963nIr+TMcCb4DBCYX1z6Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  '@guiexpert/angular-table@20.1.78':
-    resolution: {integrity: sha512-6jIRyAKDMsESwzCBG3pSXG/rkxlgGiCd9qmIyN/UFXbKSVGS6SKi4UsxXzgEk6SMj8vl7iiV+ARNBXeTqVsRaQ==}
+  '@guiexpert/angular-table@20.1.79':
+    resolution: {integrity: sha512-GEf77oeKqwZX3x9m57WUTHo6XXfsWzxdUn5SxJTfhIWHz8UmjF9J8xqHtPSxzavSkwV29pnu8dSPZQ5nujGbCw==}
     peerDependencies:
       '@angular/common': ^20.0.0
       '@angular/core': ^20.0.0
 
-  '@guiexpert/table@1.1.78':
-    resolution: {integrity: sha512-wzOf454LTa9OOQ0DeagOk7eRCx/vKB46XDkDPftrsvhRig0oxSremand/LmKUSN6Xzr+DunfJHeekN/IMyi2eA==}
+  '@guiexpert/table@1.1.79':
+    resolution: {integrity: sha512-+YVyPjY+VLfkeETg7yyocO8HvhzwYyDWfnmZ588rPKH1SivbS4o8FEAi7qaIx8+m2Mi4wg4OxZ9mW1CTZG7zqw==}
 
   '@humanwhocodes/config-array@0.13.0':
     resolution: {integrity: sha512-DZLEEqFWQFiyK6h5YIeynKx7JlvCYWL0cImfSRXZ9l4Sg2efkFGTuFf6vzXjK1cq6IYkU+Eg/JizXw+TD2vRNw==}
@@ -5375,11 +5371,6 @@ packages:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
     engines: {node: '>=4'}
 
-  pnpm@10.13.1:
-    resolution: {integrity: sha512-N+vxpcejDV+r4MXfRO6NpMllygxa89urKMOhaBtwolYhjQXIHJwNz3Z+9rhVHrW5YAQrntQwDFkkIzY3fgHPrQ==}
-    engines: {node: '>=18.12'}
-    hasBin: true
-
   postcss-loader@8.1.1:
     resolution: {integrity: sha512-0IeqyAsG6tYiDRCYKQJLAmgQr47DX6N7sFSWvQxt6AcupX8DIdmykuk/o/tx0Lze3ErGHJEp5OSRxrelC6+NdQ==}
     engines: {node: '>= 18.12.0'}
@@ -8002,13 +7993,13 @@ snapshots:
 
   '@eslint/js@8.57.1': {}
 
-  '@guiexpert/angular-table@20.1.78(@angular/common@20.1.0(@angular/core@20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1))':
+  '@guiexpert/angular-table@20.1.79(@angular/common@20.1.0(@angular/core@20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1))':
     dependencies:
       '@angular/common': 20.1.0(@angular/core@20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
       '@angular/core': 20.1.0(@angular/compiler@20.1.0)(rxjs@7.8.2)(zone.js@0.15.1)
       tslib: 2.8.1
 
-  '@guiexpert/table@1.1.78':
+  '@guiexpert/table@1.1.79':
     dependencies:
       tslib: 2.8.1
 
@@ -12442,8 +12433,6 @@ snapshots:
       find-up: 4.1.0
 
   pluralize@8.0.0: {}
-
-  pnpm@10.13.1: {}
 
   postcss-loader@8.1.1(postcss@8.5.6)(typescript@5.8.3)(webpack@5.99.9(esbuild@0.25.5)):
     dependencies:
