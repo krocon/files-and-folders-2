@@ -233,7 +233,6 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
       setTimeout(() => {
         this.zone.run(() => {
           this.formGroup.patchValue({strategy: this.data.strategy}, {emitEvent: true, onlySelf: false});
-          console.log("patchValue", this.data.strategy);
         })
       }, 0);
     });

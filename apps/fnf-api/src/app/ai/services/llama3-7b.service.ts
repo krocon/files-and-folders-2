@@ -6,9 +6,9 @@ import {ConvertPara, ConvertResponseType} from '@fnf-data/src';
 
 @Injectable()
 export class Llama3_7bService {
-  // This would be the API endpoint for Llama 3 7B
-  private readonly apiUrl = 'http://localhost:11434/api/generate'; // Replace with actual Llama API endpoint
-  private readonly model = 'llama3';
+  // Get API endpoint and model from environment variables
+  private readonly apiUrl = environment.llamaApiUrl;
+  private readonly model = environment.llamaModel;
 
   constructor(private readonly httpService: HttpService) {
   }
@@ -113,10 +113,11 @@ Input:
       try {
         // This parsing logic might need to be adjusted based on the actual Llama API response format
         const s = response.data.response;
-        console.log('Llama response:', s);
+
         return JSON.parse(s.replace(/Here is the JSON output:/g, '').trim());
 
       } catch (e) {
+        console.log('Llama response:', response.data.response);
         console.error('Error parsing Llama response:', e);
         return {'error': e + ''};
       }

@@ -6,9 +6,6 @@ import {ConvertPara, ConvertResponseType} from '@fnf-data/src';
 
 @Injectable()
 export class OpenAiCompletionService {
-  private readonly apiUrl = 'https://api.openai.com/v1/chat/completions';
-  private readonly model = 'gpt-4';
-
   constructor(private readonly httpService: HttpService) {
   }
 
@@ -83,7 +80,7 @@ Input:
     };
 
     const body = {
-      model: this.model,
+      model: environment.openaiModel,
       messages: [
         {
           role: 'user',
@@ -94,7 +91,7 @@ Input:
 
     try {
       const response = await firstValueFrom(
-        this.httpService.post(this.apiUrl, body, {headers}),
+        this.httpService.post(environment.openaiApiUrl, body, {headers}),
       );
 
       try {
