@@ -65,11 +65,11 @@ Example:
 
 Rule:
 Make sure that the last part of the filename (behind last '/') containes {Snn} and {Enn} placeholders. 
-Do not write " - TheEpisodeTitle" or " - EpisodeNotAvailable". 
-Do not change names of sample files. 
+Do not write "TheEpisodeTitle" or "EpisodeNotAvailable". 
+Do not change the name of sample files. 
 Sample files are in a (sub) folder "/Sample/" or they have ".sample." in the name. 
 Do not include sample files in the output.
-Output must parsable JSON.
+Output must be parsable JSON.
 
 Your answer should be a valid (parsable) JSON in the form: {[key:string]: string} (key is the input file, value is the new name).
 Just return the parsable JSON in the field "response", no explanations.
