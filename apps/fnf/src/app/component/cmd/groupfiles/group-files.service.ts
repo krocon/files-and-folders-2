@@ -19,19 +19,6 @@ export class GroupFilesService {
   ) {
   }
 
-  /**
-   * Updates the target property of each row based on the multi-rename configuration
-   * @param rows The file operation parameters to update
-   * @param data The multi-rename configuration data
-   */
-  updateTargets(rows: QueueFileOperationParams[], data: GroupFilesData): void {
-    rows.forEach((row, index) => {
-      if (row.source) {
-        // row.target = this.rename(row.source, data, index);
-      }
-    });
-  }
-
 
   createActionEvents(rows: QueueFileOperationParams[], groupFilesDialogData: GroupFilesDialogData): QueueActionEvent[] {
     const actions: QueueActionEvent[] = [];

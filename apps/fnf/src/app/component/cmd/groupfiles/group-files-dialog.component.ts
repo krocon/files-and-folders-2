@@ -242,13 +242,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
   @AvoidDoubleExecution()
   onFetchAiClicked() {
     this.fetchAiButtonDisabled = true;
-
-    this.rows.map(r => {
-      r.target.dir = '';
-      r.target.base = '';
-      r.target.ext = '';
-      return r;
-    });
+    this.initTargets();
     this.cdr.detectChanges();
 
     this.aiCompletionService
