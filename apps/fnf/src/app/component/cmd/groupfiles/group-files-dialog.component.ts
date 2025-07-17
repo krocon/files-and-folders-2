@@ -278,19 +278,19 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
     const formRawValue = this.formGroup.getRawValue();
     this.groupFilesDialogData.data = formRawValue;
 
-    if (this.groupFilesDialogData.data.strategy !== 'AI') {
+    if (this.groupFilesDialogData.data.strategy === 'AI') {
       const actionEvents = this.groupFilesService.createActionEventsForAi(
         this.rows,
         this.groupFilesDialogData,
       );
-      console.info("actionEvents", actionEvents); // TODO del
+      this.dialogRef.close(actionEvents); // TODO
 
     } else {
       const actionEvents = this.groupFilesService.createActionEvents(
         this.rows,
         this.groupFilesDialogData,
       );
-      this.dialogRef.close(actionEvents); // TODO
+      this.dialogRef.close(actionEvents);
     }
 
   }

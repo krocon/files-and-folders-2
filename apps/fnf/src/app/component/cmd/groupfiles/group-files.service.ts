@@ -7,6 +7,7 @@ import {CommandService} from '../../../service/cmd/command.service';
 import {GroupFilesDialogData} from './data/group-files-dialog.data';
 import {GroupFilesResult} from './data/group-files-result';
 import {GroupFilesRow} from './data/group-files-row';
+import {path2DirBase} from "../../../common/fn/get-parent-dir.fn";
 
 @Injectable({
   providedIn: 'root'
@@ -56,19 +57,50 @@ export class GroupFilesService {
     const actions: QueueActionEvent[] = [];
 
     for (const row of rows) {
-      if (row.source && row.target && this.isFileRelevant(row.source, row.target)) {
+      if (row.source && row.target && row.target.dir && row.target.base) {
+
+
+        const targetUrl = (row.target.dir + '/' + row.target.base).replaceAll(/ \/\//g, '/');
+        const {dir, base} = path2DirBase(targetUrl);
+        row.target.dir = dir;
+        row.target.base = base;
+        const renameAfter = row.target.base !== row.source.base;
+
+
+        const targetPanelIndex = groupFilesDialogData.data.useSourceDir ? row.srcPanelIndex : row.targetPanelIndex;
+
+        // first move:
         let fop: QueueFileOperationParams = {
           bulk: rows.length > CommandService.BULK_LOWER_LIMIT,
           source: row.source,
           srcPanelIndex: row.srcPanelIndex,
-          targetPanelIndex: groupFilesDialogData.data.useSourceDir ? row.srcPanelIndex : row.targetPanelIndex,
+          targetPanelIndex: targetPanelIndex,
           target: row.target
         };
         actions.push(
           this.commandService.createQueueActionEventForMove(fop)
         );
+
+        // then rename:
+        if (renameAfter) {
+          let fop: QueueFileOperationParams = {
+            bulk: rows.length > CommandService.BULK_LOWER_LIMIT,
+            source: row.target,
+            srcPanelIndex: targetPanelIndex,
+            targetPanelIndex: targetPanelIndex,
+            target: {
+              ...row.target,
+              base
+            }
+          };
+          actions.push(
+            this.commandService.createQueueActionEventForRename(fop)
+          );
+        }
       }
     }
+    actions.push(this.commandService.createQueueActionEventForRefreshPanel(0));
+    actions.push(this.commandService.createQueueActionEventForRefreshPanel(1));
     return actions;
   }
 
