@@ -1,5 +1,5 @@
 import {Test, TestingModule} from '@nestjs/testing';
-import {FilenameController} from '@fnf/fnf-api/src/app/filename/filename.controller';
+import {AiCompletionsController} from '@fnf/fnf-api/src/app/ai/ai-completions.controller';
 import {HttpService} from '@nestjs/axios';
 import {of} from 'rxjs';
 import {AxiosResponse} from 'axios';
@@ -21,7 +21,7 @@ jest.mock('@fnf/fnf-api/src/environments/environment', () => ({
 }));
 
 describe('FilenameController', () => {
-  let controller: FilenameController;
+  let controller: AiCompletionsController;
   let httpService: HttpService;
 
   const input = [
@@ -50,7 +50,7 @@ describe('FilenameController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [FilenameController],
+      controllers: [AiCompletionsController],
       providers: [
         {
           provide: HttpService,
@@ -61,7 +61,7 @@ describe('FilenameController', () => {
       ],
     }).compile();
 
-    controller = module.get<FilenameController>(FilenameController);
+    controller = module.get<AiCompletionsController>(AiCompletionsController);
     httpService = module.get<HttpService>(HttpService);
   });
 

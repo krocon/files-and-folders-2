@@ -19,15 +19,15 @@ import {Config} from "@fnf/fnf-data";
 import {FindFolderModule} from "./findfolder/find-folder.module";
 import {ShellModule} from "./shell/shell.module";
 import {VolumeModule} from "./volumes/volume.module";
-import {FilenameModule} from "./filename/filename.module";
 import {CheckGlobModule} from "./checkglob/checkglob.module";
 import {CleanModule} from "./clean/clean.module";
+import {AiCompletionsModule} from "./ai/ai-completions.module";
 
 const config = new Config(
   process.env.FNF_INCOMPATIBLE_PATHS ? process.env.FNF_INCOMPATIBLE_PATHS.split(",") : [],
   process.env.FNF_CONTAINER_PATHS ? process.env.FNF_CONTAINER_PATHS.split(",") : [],
   process.env.FNF_START_PATH ? process.env.FNF_START_PATH :
-  process.env.FNF_CONTAINER_PATHS ? process.env.FNF_CONTAINER_PATHS.split(",")[0] : '/',
+    process.env.FNF_CONTAINER_PATHS ? process.env.FNF_CONTAINER_PATHS.split(",")[0] : '/',
   process.env.FNF_DOCKER_ROOT ? process.env.FNF_DOCKER_ROOT : undefined,
 );
 
@@ -60,7 +60,7 @@ const config = new Config(
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, "fnf") /* root of the compiled UI */
     }),
-    FilenameModule,
+    AiCompletionsModule,
     CheckGlobModule,
     CleanModule
   ],
@@ -71,4 +71,5 @@ const config = new Config(
     AppService
   ]
 })
-export class AppModule {}
+export class AppModule {
+}

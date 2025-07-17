@@ -43,7 +43,7 @@ import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-to
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {FnfConfirmationDialogService} from "../../../common/confirmationdialog/fnf-confirmation-dialog.service";
 import {TypedDataService} from "../../../common/typed-data.service";
-import {MultiRenameAiService} from "../multirename/multi-rename-ai.service";
+import {AiCompletionService} from "../../../service/ai/ai-completion.service";
 
 @Component({
   selector: "fnf-group-files-dialog",
@@ -121,7 +121,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
     private readonly groupFilesService: GroupFilesService,
     private readonly zone: NgZone,
     private readonly confirmationDialogService: FnfConfirmationDialogService,
-    private readonly multiRenameAiService: MultiRenameAiService, // TODO should be more  generic!
+    private readonly aiCompletionService: AiCompletionService, // TODO should be more  generic!
   ) {
     this.data = groupFilesDialogData.data;
     this.options = groupFilesDialogData.options;
@@ -206,7 +206,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
   ngOnInit(): void {
     this.alive = true;
 
-    this.multiRenameAiService
+    this.aiCompletionService
       .hasOpenAiApiKey()
       .pipe(
         takeWhile(() => this.alive),
@@ -242,27 +242,27 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
   @AvoidDoubleExecution()
   onFetchAiClicked() {
     this.fetchAiButtonDisabled = true;
-    // this.multiRenameAiService
-    //   .convert({
-    //     files: this.rows.map(this.fileOperationParams2Url.bind(this)),
-    //   })
-    //   .pipe(
-    //     takeWhile(() => this.alive),
-    //   )
-    //   .subscribe(res => {
-    //
-    //     this.rows.forEach((r, i) => {
-    //       const url = this.fileOperationParams2Url(r);
-    //       if (res[url]) {
-    //         r.target.base = res[url];
-    //       }
-    //     });
-    //     this.tableApi?.setRows(this.rows);
-    //     this.tableApi?.repaint();
-    //
-    //     this.fetchAiButtonDisabled = false;
-    //     this.cdr.detectChanges();
-    //   });
+    this.aiCompletionService
+      .groupfiles({
+        files: this.rows.map(this.aiCompletionService.fileOperationParams2Url),
+      })
+      .pipe(
+        takeWhile(() => this.alive),
+      )
+      .subscribe(res => {
+
+        this.rows.forEach((r, i) => {
+          const url = this.aiCompletionService.fileOperationParams2Url(r);
+          if (res[url]) {
+            r.target.base = res[url];
+          }
+        });
+        this.tableApi?.setRows(this.rows);
+        this.tableApi?.repaint();
+
+        this.fetchAiButtonDisabled = false;
+        this.cdr.detectChanges();
+      });
   }
 
   openInfo() {
@@ -305,4 +305,6 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
   private clone<T>(r: T): T {
     return JSON.parse(JSON.stringify(r));
   }
+
+
 }

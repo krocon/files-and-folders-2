@@ -61,7 +61,7 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {Makro} from "./data/makro";
 import {MatDivider} from "@angular/material/divider";
 import {TypedDataService} from "../../../common/typed-data.service";
-import {MultiRenameAiService} from "./multi-rename-ai.service";
+import {AiCompletionService} from "../../../service/ai/ai-completion.service";
 import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-toggle";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {FnfConfirmationDialogService} from "../../../common/confirmationdialog/fnf-confirmation-dialog.service";
@@ -98,8 +98,10 @@ import {FnfConfirmationDialogService} from "../../../common/confirmationdialog/f
 export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private static readonly innerServiceMultiRenameData = new TypedDataService<MultiRenameData>("multiRenameData", new MultiRenameData());
+
   @ViewChild(MatButtonToggleGroup) buttonToggleGroup?: MatButtonToggleGroup;
   @ViewChildren(MatButtonToggle) buttonToggles?: QueryList<MatButtonToggle>;
+
   formGroup: FormGroup;
   source = "";
   data: MultiRenameData;
@@ -144,7 +146,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
     private readonly cdr: ChangeDetectorRef,
     private readonly multiRenameService: MultiRenameService,
     private readonly zone: NgZone,
-    private readonly multiRenameAiService: MultiRenameAiService,
+    private readonly aiCompletionService: AiCompletionService,
     private readonly confirmationDialogService: FnfConfirmationDialogService,
   ) {
     this.data = multiRenameDialogData.data ? multiRenameDialogData.data : MultiRenameDialogComponent.innerServiceMultiRenameData.getValue();
@@ -247,7 +249,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
   ngOnInit(): void {
     this.alive = true;
 
-    this.multiRenameAiService
+    this.aiCompletionService
       .hasOpenAiApiKey()
       .pipe(
         takeWhile(() => this.alive),
@@ -323,9 +325,9 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
   @AvoidDoubleExecution()
   onFetchAiClicked() {
     this.fetchAiButtonDisabled = true;
-    this.multiRenameAiService
-      .convert({
-        files: this.rows.map(this.fileOperationParams2Url.bind(this)),
+    this.aiCompletionService
+      .convertnames({
+        files: this.rows.map(this.aiCompletionService.fileOperationParams2Url),
       })
       .pipe(
         takeWhile(() => this.alive),
@@ -333,7 +335,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
       .subscribe(res => {
 
         this.rows.forEach((r, i) => {
-          const url = this.fileOperationParams2Url(r);
+          const url = this.aiCompletionService.fileOperationParams2Url(r);
           if (res[url]) {
             r.target.base = res[url];
           }
@@ -350,7 +352,5 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
     return JSON.parse(JSON.stringify(r));
   }
 
-  private fileOperationParams2Url(r: QueueFileOperationParams): string {
-    return r.source.dir + '/' + r.source.base;
-  }
+
 }

@@ -20,7 +20,8 @@ export const environment = {
     fileWatcher: false
   },
   multiRename: {
-    convertUrl: "/api/ai/convertnames",
+    convertnamesUrl: "/api/ai/convertnames",
+    groupfilesUrl: "/api/ai/groupfiles",
     hasOpenAiApiKeyUrl: "/api/ai/hasopenaiapikey"
   },
   checkGlob: {

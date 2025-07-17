@@ -5,38 +5,29 @@ import {environment} from "../../environments/environment";
 import {ConvertPara, ConvertResponseType} from "@fnf-data/src";
 import {MessageBody} from "@nestjs/websockets";
 
-// TODO make a generic ai controller
-@Controller()
-export class FilenameController {
+@Controller('ai')
+export class AiCompletionsController {
+
+  private readonly apiUrl = 'https://api.openai.com/v1/chat/completions';
+  private readonly model = 'gpt-4';
 
   constructor(private readonly httpService: HttpService) {
   }
 
-  @Post("ai/hasopenaiapikey")
+  @Post("hasopenaiapikey")
   async hasOpenAiApiKey(): Promise<boolean> {
     return !!environment.openaiApiKey;
   }
 
-
-  @Post("ai/convertnames")
+  @Post("convertnames")
   async convertFilenames(
     @MessageBody() para: ConvertPara
   ): Promise<ConvertResponseType> {
-
-    const files: string[] = para.files;
-    const fs = files.join('\n');
-
-    if (!environment.openaiApiKey) {
-      throw new Error('OpenAI API key is missing. Please set the FNF_OPENAI_API_KEY environment variable.');
-    }
-
-    const apiUrl = 'https://api.openai.com/v1/chat/completions';
-
     const prompt = `I have a list of filenames. 
 Please create a new filename for each file.
 The files are well-known movies, books, music, ...
 
-Try to use these pattern:
+Try to use these patterns:
 Movie: TITLE (yyyy).ext
 Music: ARTIST - TITLE. ext or Album ARTIST - ALBUM (yyyy) /TRACK - TITLE.ext
 Book: AUTHOR - TITLE (yyyy).ext
@@ -51,65 +42,20 @@ Your answer should be a valid (parsable) JSON in the form: {[key:string]: string
 
 Input:
 
-` + fs;
+`;
 
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${environment.openaiApiKey}`,
-    };
-
-    const body = {
-      model: 'gpt-4',
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-    };
-
-    try {
-      const response = await firstValueFrom(
-        this.httpService.post(apiUrl, body, {headers}),
-      );
-
-      try {
-        const reply = response.data.choices?.[0]?.message?.content;
-        return JSON.parse(reply.replace(/Output:/g, '').trim());
-
-      } catch (e) {
-        console.error(e);
-        return {'error': e + ''};
-      }
-
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        console.error(error);
-        throw new Error('Authentication failed with OpenAI API. Please check your API key.');
-      }
-      throw error;
-    }
+    return this.processOpenAiRequest(para.files, prompt);
   }
 
 
-  @Post("ai/groupfiles")
+  @Post("groupfiles")
   async groupfiles(
     @MessageBody() para: ConvertPara
   ): Promise<ConvertResponseType> {
-
-    const files: string[] = para.files;
-    const fs = files.join('\n');
-
-    if (!environment.openaiApiKey) {
-      throw new Error('OpenAI API key is missing. Please set the FNF_OPENAI_API_KEY environment variable.');
-    }
-
-    const apiUrl = 'https://api.openai.com/v1/chat/completions';
-
     const prompt = `I have a list of filenames (television series). 
 Please create a new filename for each file.
 
-Try to use these pattern:
+Try to use this pattern:
 new name (path):  "/TITLE/Snn/SnnEnn - EPISODE.EXT"
 TITLE: title of television series
 Snn: Series Number (for example S01)
@@ -117,13 +63,29 @@ Enn: Episode Number (for example E01)
 EPISODE: title of episode (if not available use TITLE)
 EXT: file extension
 
-Do not change names of sample files. Sample file are in a (sub) folder "/Sample/" or they have "*.sample.*" in the name.
+Do not change the name of sample files. Sample files are in a (sub) folder "/Sample/" or they have "*.sample.*" in the name.
 
 Your answer should be a valid (parsable) JSON in the form: {[key:string]: string} (key is the input file, value is the new name).
 
 Input:
 
-` + fs;
+`;
+
+    return this.processOpenAiRequest(para.files, prompt);
+  }
+
+  /**
+   * Process a request to OpenAI API with the given files and prompt
+   * @param files Array of filenames to process
+   * @param promptTemplate The prompt template to use for the request
+   * @returns Converted response from OpenAI
+   * @throws Error if OpenAI API key is missing or authentication fails
+   */
+  private async processOpenAiRequest(files: string[], promptTemplate: string): Promise<ConvertResponseType> {
+    this.validateApiKey();
+
+    const fileList = files.join('\n');
+    const prompt = promptTemplate + fileList;
 
     const headers = {
       'Content-Type': 'application/json',
@@ -131,7 +93,7 @@ Input:
     };
 
     const body = {
-      model: 'gpt-4',
+      model: this.model,
       messages: [
         {
           role: 'user',
@@ -142,7 +104,7 @@ Input:
 
     try {
       const response = await firstValueFrom(
-        this.httpService.post(apiUrl, body, {headers}),
+        this.httpService.post(this.apiUrl, body, {headers}),
       );
 
       try {
@@ -150,16 +112,35 @@ Input:
         return JSON.parse(reply.replace(/Output:/g, '').trim());
 
       } catch (e) {
-        console.error(e);
+        console.error('Error parsing OpenAI response:', e);
         return {'error': e + ''};
       }
-
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        console.error(error);
-        throw new Error('Authentication failed with OpenAI API. Please check your API key.');
-      }
-      throw error;
+      this.handleApiError(error);
     }
+  }
+
+  /**
+   * Validate that the OpenAI API key is present
+   * @throws Error if the API key is missing
+   */
+  private validateApiKey(): void {
+    if (!environment.openaiApiKey) {
+      throw new Error('OpenAI API key is missing. Please set the FNF_OPENAI_API_KEY environment variable.');
+    }
+  }
+
+  /**
+   * Handle errors from the OpenAI API
+   * @param error The error object from the API call
+   * @throws Error with appropriate message based on the error type
+   */
+  private handleApiError(error: any): never {
+    if (error.response && error.response.status === 401) {
+      console.error('Authentication error with OpenAI API:', error);
+      throw new Error('Authentication failed with OpenAI API. Please check your API key.');
+    }
+    console.error('Error calling OpenAI API:', error);
+    throw error;
   }
 }

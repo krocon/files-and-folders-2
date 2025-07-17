@@ -65,7 +65,7 @@ import {ChangeDirDialogService} from "./component/cmd/changedir/change-dir-dialo
 import {ChangeDirDialogData} from "./component/cmd/changedir/data/change-dir-dialog.data";
 import {TabsPanelData} from "./domain/filepagedata/data/tabs-panel.data";
 import {WalkSocketService} from "./common/walkdir/walk.socketio.service";
-import {MultiRenameAiService} from "./component/cmd/multirename/multi-rename-ai.service";
+import {AiCompletionService} from "./service/ai/ai-completion.service";
 import {CleanDialogService} from "./component/cmd/clean/clean-dialog.service";
 import {GlobValidatorService} from "./service/glob-validator.service";
 import {CleanService} from "./service/clean.service";
@@ -142,7 +142,7 @@ export class AppService {
     GotoAnythingDialogService.forRoot(environment.gotoAnything);
     ToolService.forRoot(environment.tool);
     FiletypeExtensionsService.forRoot(environment.filetypeExtensions);
-    MultiRenameAiService.forRoot(environment.multiRename);
+    AiCompletionService.forRoot(environment.multiRename);
     GlobValidatorService.forRoot(environment.checkGlob);
     CleanService.forRoot(environment.clean);
     ShellService.forRoot(environment.shell);

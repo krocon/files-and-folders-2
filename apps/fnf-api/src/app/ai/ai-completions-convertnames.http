@@ -1,11 +1,11 @@
 ### hasopenaiapikey test
-POST http://localhost:3333/api/hasopenaiapikey
+POST http://localhost:3333/api/ai/hasopenaiapikey
 Content-Type: application/json
 
 {}
 
 ### convert file names test
-POST http://localhost:3333/api/convertnames
+POST http://localhost:3333/api/ai/convertnames
 Content-Type: application/json
 
 {
