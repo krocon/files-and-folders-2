@@ -1,6 +1,6 @@
 import {Controller, Post} from '@nestjs/common';
 import {environment} from "../../environments/environment";
-import {ConvertPara, ConvertResponseType} from "@fnf-data/src";
+import {ConvertPara, ConvertResponseType} from "@fnf-data";
 import {MessageBody} from "@nestjs/websockets";
 import {OpenAiCompletionService} from "./services/open-ai-completion.service";
 import {Llama3_7bService} from "./services/llama3-7b.service";

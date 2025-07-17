@@ -18,7 +18,9 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@fnf-data/*": ["../../libs/fnf-data/*"],
+      "@fnf-data": [
+        "../../libs/fnf-data/src/index.ts"
+      ],
       "@fnf/fnf-data": ["../../libs/fnf-data/src/index.ts"]
     }
   }

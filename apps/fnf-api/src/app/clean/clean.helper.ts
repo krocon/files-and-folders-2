@@ -3,7 +3,7 @@ import {CleanDialogData} from '@fnf/fnf-data';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as micromatch from 'micromatch';
-import {CleanResult} from "@fnf-data/src/models/clean/clean-result";
+import {CleanResult} from "@fnf-data";
 
 @Injectable()
 export class CleanHelper {

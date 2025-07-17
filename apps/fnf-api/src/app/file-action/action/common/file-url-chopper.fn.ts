@@ -1,4 +1,4 @@
-import {DirEvent, FileItem, PanelIndex} from "@fnf-data/src";
+import {DirEvent, FileItem, PanelIndex} from "@fnf-data";
 import {DirBaseIf, processFileUrl} from "./url-processor.fn";
 import {fileExt} from "./fielext";
 

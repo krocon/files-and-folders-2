@@ -2,7 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {HttpService} from '@nestjs/axios';
 import {firstValueFrom} from 'rxjs';
 import {environment} from '../../../environments/environment';
-import {ConvertPara, ConvertResponseType} from '@fnf-data/src';
+import {ConvertPara, ConvertResponseType} from '@fnf-data';
 
 @Injectable()
 export class OpenAiCompletionService {

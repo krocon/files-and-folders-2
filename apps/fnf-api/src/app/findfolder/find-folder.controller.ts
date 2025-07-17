@@ -1,7 +1,7 @@
 import {Body, Controller, Post} from "@nestjs/common";
 import {FindFolderService} from "./find-folder.service";
 import {Observable} from "rxjs";
-import {FindFolderPara} from "@fnf-data/src";
+import {FindFolderPara} from "@fnf-data";
 import {fromPromise} from "rxjs/internal/observable/innerFrom";
 
 

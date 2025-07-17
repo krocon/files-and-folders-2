@@ -1,4 +1,4 @@
-import {PanelIndex} from "@fnf-data/src";
+import {PanelIndex} from "@fnf-data";
 
 
 export function getOtherPanelIndex(index: PanelIndex): PanelIndex {

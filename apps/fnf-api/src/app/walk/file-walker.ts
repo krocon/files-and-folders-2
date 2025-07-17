@@ -1,4 +1,4 @@
-import {FileItem, FileItemIf, WalkData, WalkParaData} from "@fnf-data/src";
+import {FileItem, FileItemIf, WalkData, WalkParaData} from "@fnf-data";
 import {Server} from "socket.io";
 import * as fs from "fs-extra";
 import * as path from "path";

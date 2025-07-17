@@ -15,6 +15,8 @@ export * from './models/system-meta-data';
 export * from './models/cmd/button-enable-states';
 export * from './models/cmd/get-button-enable-states.fn';
 
+
+export * from './models/dir/file-attribute.type';
 export * from './models/dir/file-item';
 export * from './models/dir/file-item.if';
 export * from './models/dir/file-item-meta.if';
