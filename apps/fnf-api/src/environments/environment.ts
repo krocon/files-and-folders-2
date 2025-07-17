@@ -3,11 +3,15 @@ const getEnvironmentVariables = () => {
   const frontendPort = process.env.frontendPort ? Number(process.env.frontendPort) : 4201;
   const websocketPort = process.env.websocketPort ? Number(process.env.websocketPort) : 3334;
   const openaiApiKey = process.env.FNF_OPENAI_API_KEY || '';
+  const llamaApiKey = process.env.FNF_LLAMA_API_KEY || '';
+  const aiCompletionService = process.env.FNF_AI_COMPLETION_SERVICE || 'openai';
 
   return {
     frontendPort,
     websocketPort,
-    openaiApiKey
+    openaiApiKey,
+    llamaApiKey,
+    aiCompletionService
   };
 };
 
@@ -23,6 +27,12 @@ export const environment = {
   },
   get openaiApiKey() {
     return getEnvironmentVariables().openaiApiKey;
+  },
+  get llamaApiKey() {
+    return getEnvironmentVariables().llamaApiKey;
+  },
+  get aiCompletionService() {
+    return getEnvironmentVariables().aiCompletionService;
   },
   get websocketOptions() {
     const {frontendPort, websocketPort} = getEnvironmentVariables();
