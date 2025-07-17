@@ -8,7 +8,7 @@ import {
   MatDialogRef,
   MatDialogTitle
 } from "@angular/material/dialog";
-import {FileItemIf} from "@fnf/fnf-data";
+import {ConvertResponseType, FileItemIf} from "@fnf/fnf-data";
 
 import {takeWhile} from "rxjs/operators";
 import {MatFormField, MatLabel} from "@angular/material/input";
@@ -109,6 +109,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
   };
   private tableApi: TableApi | undefined;
   private alive = true;
+  private convertResponse: ConvertResponseType | undefined;
 
   constructor(
     public dialogRef: MatDialogRef<GroupFilesDialogComponent>,
@@ -119,7 +120,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
     private readonly groupFilesService: GroupFilesService,
     private readonly zone: NgZone,
     private readonly confirmationDialogService: FnfConfirmationDialogService,
-    private readonly aiCompletionService: AiCompletionService, // TODO should be more  generic!
+    private readonly aiCompletionService: AiCompletionService,
   ) {
     this.data = groupFilesDialogData.data;
     this.options = groupFilesDialogData.options;
@@ -130,7 +131,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
     this.formGroup = this.formBuilder.group(
       {
         strategy: new FormControl('x', []),
-        targetDir: new FormControl(groupFilesDialogData.targetDirs[0], []),
+        // targetDir: new FormControl(groupFilesDialogData.targetDirs[0], []),
 
         modus: new FormControl(this.data.modus, [Validators.required]),
         ignoreBrackets: new FormControl(this.data.ignoreBrackets, []),
@@ -198,7 +199,6 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
     });
   }
 
-
   ngOnDestroy(): void {
     this.alive = false;
   }
@@ -242,6 +242,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
   @AvoidDoubleExecution()
   onFetchAiClicked() {
     this.fetchAiButtonDisabled = true;
+
     this.rows.map(r => {
       r.target.dir = '';
       r.target.base = '';
@@ -258,25 +259,10 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
         takeWhile(() => this.alive),
       )
       .subscribe(res => {
-
-        const targetDir = this.formGroup.getRawValue().targetDir;
-        this.rows.forEach((r, i) => {
-          const url = this.aiCompletionService.fileOperationParams2Url(r);
-
-          if (res[url] === url) {
-            r.target.dir = '';
-            r.target.base = '';
-
-          } else if (res[url]) {
-            r.target.dir = targetDir;
-            r.target.base = (targetDir.endsWith('/') && res[url].startsWith('/')) ? res[url].substring(1) : res[url];
-          }
-        });
-        this.tableApi?.setRows(this.rows);
-        this.tableApi?.repaint();
-
+        this.convertResponse = res;
         this.fetchAiButtonDisabled = false;
         this.cdr.detectChanges();
+        this.handleConvertResponse();
       });
   }
 
@@ -289,12 +275,24 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   onOkClicked() {
-    this.groupFilesDialogData.data = this.formGroup.getRawValue();
-    const actionEvents = this.groupFilesService.createActionEvents(
-      this.rows,
-      this.groupFilesDialogData,
-    );
-    this.dialogRef.close(actionEvents);
+    const formRawValue = this.formGroup.getRawValue();
+    this.groupFilesDialogData.data = formRawValue;
+
+    if (this.groupFilesDialogData.data.strategy !== 'AI') {
+      const actionEvents = this.groupFilesService.createActionEventsForAi(
+        this.rows,
+        this.groupFilesDialogData,
+      );
+      console.info("actionEvents", actionEvents); // TODO del
+
+    } else {
+      const actionEvents = this.groupFilesService.createActionEvents(
+        this.rows,
+        this.groupFilesDialogData,
+      );
+      this.dialogRef.close(actionEvents); // TODO
+    }
+
   }
 
   onCancelClicked() {
@@ -305,23 +303,51 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
     this.tableApi = tableApi
   }
 
+  private handleConvertResponse() {
+    const cr = this.convertResponse;
+
+    if (cr) {
+      let rawValue = this.formGroup.getRawValue();
+      const targetDir = (rawValue.useSourceDir) ? this.groupFilesDialogData.sourceDir : this.groupFilesDialogData.targetDir;
+
+      this.rows.forEach((r, i) => {
+        const url = this.aiCompletionService.fileOperationParams2Url(r);
+
+        if (cr[url] === url) {
+          r.target.dir = '';
+          r.target.base = '';
+
+        } else if (cr[url]) {
+          r.target.dir = targetDir;
+          r.target.base = (targetDir.endsWith('/') && cr[url].startsWith('/')) ? cr[url].substring(1) : cr[url];
+        }
+      });
+      this.tableApi?.setRows(this.rows);
+      this.tableApi?.repaint();
+    }
+    this.cdr.detectChanges();
+  }
+
   private updateTableRows() {
-    this.rows.map(r => {
-      r.target.dir = '';
-      r.target.base = '';
-      r.target.ext = '';
-      return r;
-    });
-    const dialogData = this.clone<GroupFilesDialogData>(this.groupFilesDialogData);
-    dialogData.data = this.formGroup.getRawValue();
-    if (dialogData.data.strategy !== 'AI') {
-      const updateModel: GroupFilesResult = this.groupFilesService.getUpdateModel(dialogData);
-      this.rows = this.groupFilesService.getFileOperationParams(
-        updateModel.rows,
-        dialogData.sourcePanelIndex,
-        dialogData.targetPanelIndex
-      );
-      this.groupCount = updateModel.groupCount;
+    this.initTargets();
+    const rawValue = this.formGroup.getRawValue();
+
+    if (rawValue.strategy === 'AI') {
+      this.handleConvertResponse();
+
+    } else {
+
+      const dialogData = this.clone<GroupFilesDialogData>(this.groupFilesDialogData);
+      dialogData.data = rawValue;
+      if (dialogData.data.strategy !== 'AI') {
+        const updateModel: GroupFilesResult = this.groupFilesService.getUpdateModel(dialogData);
+        this.rows = this.groupFilesService.getFileOperationParams(
+          updateModel.rows,
+          dialogData.sourcePanelIndex,
+          dialogData.targetPanelIndex
+        );
+        this.groupCount = updateModel.groupCount;
+      }
     }
   }
 
@@ -329,5 +355,13 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
     return JSON.parse(JSON.stringify(r));
   }
 
+  private initTargets() {
+    this.rows.map(r => {
+      r.target.dir = '';
+      r.target.base = '';
+      r.target.ext = '';
+      return r;
+    });
+  }
 
 }

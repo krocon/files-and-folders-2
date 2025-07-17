@@ -52,6 +52,26 @@ export class GroupFilesService {
     return actions;
   }
 
+  createActionEventsForAi(rows: QueueFileOperationParams[], groupFilesDialogData: GroupFilesDialogData): QueueActionEvent[] {
+    const actions: QueueActionEvent[] = [];
+
+    for (const row of rows) {
+      if (row.source && row.target && this.isFileRelevant(row.source, row.target)) {
+        let fop: QueueFileOperationParams = {
+          bulk: rows.length > CommandService.BULK_LOWER_LIMIT,
+          source: row.source,
+          srcPanelIndex: row.srcPanelIndex,
+          targetPanelIndex: groupFilesDialogData.data.useSourceDir ? row.srcPanelIndex : row.targetPanelIndex,
+          target: row.target
+        };
+        actions.push(
+          this.commandService.createQueueActionEventForMove(fop)
+        );
+      }
+    }
+    return actions;
+  }
+
   private isFileRelevant(source: FileItemIf, target: FileItemIf): boolean {
     return source.base === target.base
       && source.dir !== target.dir

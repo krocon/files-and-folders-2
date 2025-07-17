@@ -29,7 +29,7 @@
 
       @if (formGroup.get('strategy')?.value === 'AI') {
 
-        <mat-form-field class="target-dir-field">
+        <!--mat-form-field class="target-dir-field">
           <mat-label>Target Dir</mat-label>
           <mat-select
               formControlName="targetDir"
@@ -38,7 +38,7 @@
               <mat-option [value]="option">{{ option }}</mat-option>
             }
           </mat-select>
-        </mat-form-field>
+        </mat-form-field-->
 
         <button
             (click)="onFetchAiClicked()"
@@ -55,7 +55,6 @@
           }
         </div>
 
-
         <div>
           @if (!hasOpenAiApiKey) {
             <span>Your OpenAI API key is not installed properly (<a
@@ -63,6 +62,8 @@
                 (click)="openInfo()">More Information</a>).</span>
           }
         </div>
+
+        <mat-checkbox formControlName="useSourceDir">Use Source Directory</mat-checkbox>
       }
 
     </div>
