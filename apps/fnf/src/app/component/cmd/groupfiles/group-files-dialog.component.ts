@@ -130,6 +130,8 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
     this.formGroup = this.formBuilder.group(
       {
         strategy: new FormControl('x', []),
+        targetDir: new FormControl(groupFilesDialogData.targetDirs[0], []),
+
         modus: new FormControl(this.data.modus, [Validators.required]),
         ignoreBrackets: new FormControl(this.data.ignoreBrackets, []),
         useSourceDir: new FormControl(this.data.useSourceDir, []),
@@ -257,10 +259,17 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
       )
       .subscribe(res => {
 
+        const targetDir = this.formGroup.getRawValue().targetDir;
         this.rows.forEach((r, i) => {
           const url = this.aiCompletionService.fileOperationParams2Url(r);
-          if (res[url]) {
-            r.target.base = res[url];
+
+          if (res[url] === url) {
+            r.target.dir = '';
+            r.target.base = '';
+
+          } else if (res[url]) {
+            r.target.dir = targetDir;
+            r.target.base = (targetDir.endsWith('/') && res[url].startsWith('/')) ? res[url].substring(1) : res[url];
           }
         });
         this.tableApi?.setRows(this.rows);

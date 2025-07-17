@@ -54,8 +54,11 @@ export class GroupFilesTargetCellRendererComponent implements ComponentRendererI
       return undefined;
     }
 
-    this.dir = fileItem.dir + '/';
+    this.dir = fileItem.dir.endsWith('/') ? fileItem.dir : fileItem.dir + '/';
     this.base = fileItem.isDir ?  '['+fileItem.base+']' : fileItem.base;
+    if (this.base.startsWith('/')) {
+      this.base = this.base.substring(1);
+    }
 
     return undefined;
   }

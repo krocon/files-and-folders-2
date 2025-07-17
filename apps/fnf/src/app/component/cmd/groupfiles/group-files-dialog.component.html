@@ -28,6 +28,18 @@
       </mat-button-toggle-group>
 
       @if (formGroup.get('strategy')?.value === 'AI') {
+
+        <mat-form-field class="target-dir-field">
+          <mat-label>Target Dir</mat-label>
+          <mat-select
+              formControlName="targetDir"
+              placeholder="Mode">
+            @for (option of groupFilesDialogData.targetDirs; track groupFilesDialogData.targetDirs) {
+              <mat-option [value]="option">{{ option }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
         <button
             (click)="onFetchAiClicked()"
             [disabled]="fetchAiButtonDisabled || !hasOpenAiApiKey"
