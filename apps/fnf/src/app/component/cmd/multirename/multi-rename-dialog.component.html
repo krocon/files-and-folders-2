@@ -27,14 +27,16 @@
         </mat-button-toggle>
       </mat-button-toggle-group>
 
-      <button
-          (click)="onFetchAiClicked()"
-          [disabled]="fetchAiButtonDisabled || !hasOpenAiApiKey"
-          data-test-id="fetch-ai-button"
-          color="primary"
-          mat-raised-button>
-        Fetch AI
-      </button>
+      @if (formGroup.get('strategy')?.value === 'AI') {
+        <button
+            (click)="onFetchAiClicked()"
+            [disabled]="fetchAiButtonDisabled || !hasOpenAiApiKey"
+            data-test-id="fetch-ai-button"
+            color="primary"
+            mat-raised-button>
+          Fetch AI
+        </button>
+      }
 
       <div class="fetch-ai-spinner">
         @if (fetchAiButtonDisabled) {
