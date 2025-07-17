@@ -11,8 +11,8 @@ import {map} from "rxjs/operators";
 export class MultiRenameAiService {
 
   private static readonly config = {
-    convertUrl: "/api/convertnames",
-    hasOpenAiApiKeyUrl: "/api/hasopenaiapikey"
+    convertUrl: "/api/ai/convertnames",
+    hasOpenAiApiKeyUrl: "/api/ai/hasopenaiapikey"
   };
 
   constructor(

@@ -10,6 +10,50 @@
       [class.replacements-checked]="!formGroup.get('replacementsChecked')?.value"
       autocomplete="off">
 
+    <div class="row-0">
+      <mat-button-toggle-group
+          [hideSingleSelectionIndicator]="false"
+          formControlName="strategy"
+          name="strategy"
+          aria-label="Strategy">
+
+        <mat-button-toggle
+            value="Manual">Manual
+        </mat-button-toggle>
+
+        <mat-button-toggle
+            value="AI">AI
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      @if (formGroup.get('strategy')?.value === 'AI') {
+        <button
+            (click)="onFetchAiClicked()"
+            [disabled]="fetchAiButtonDisabled || !hasOpenAiApiKey"
+            data-test-id="fetch-ai-button"
+            color="primary"
+            mat-raised-button>
+          Fetch AI
+        </button>
+
+        <div class="fetch-ai-spinner">
+          @if (fetchAiButtonDisabled) {
+            <mat-spinner [diameter]="36"></mat-spinner>
+          }
+        </div>
+
+
+        <div>
+          @if (!hasOpenAiApiKey) {
+            <span>Your OpenAI API key is not installed properly (<a
+                href="javascript:void(0)"
+                (click)="openInfo()">More Information</a>).</span>
+          }
+        </div>
+      }
+
+    </div>
+
     <div class="row-1">
 
       <mat-form-field>

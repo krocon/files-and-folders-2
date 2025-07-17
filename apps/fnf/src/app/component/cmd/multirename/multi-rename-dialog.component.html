@@ -36,22 +36,23 @@
             mat-raised-button>
           Fetch AI
         </button>
+
+
+        <div class="fetch-ai-spinner">
+          @if (fetchAiButtonDisabled) {
+            <mat-spinner [diameter]="36"></mat-spinner>
+          }
+        </div>
+
+
+        <div>
+          @if (!hasOpenAiApiKey) {
+            <span>Your OpenAI API key is not installed properly (<a
+                href="javascript:void(0)"
+                (click)="openInfo()">More Information</a>).</span>
+          }
+        </div>
       }
-
-      <div class="fetch-ai-spinner">
-        @if (fetchAiButtonDisabled) {
-          <mat-spinner [diameter]="36"></mat-spinner>
-        }
-      </div>
-
-
-      <div>
-        @if (!hasOpenAiApiKey) {
-          <span>Your OpenAI API key is not installed properly (<a
-              href="javascript:void(0)"
-              (click)="openInfo()">More Information</a>).</span>
-        }
-      </div>
 
     </div>
 

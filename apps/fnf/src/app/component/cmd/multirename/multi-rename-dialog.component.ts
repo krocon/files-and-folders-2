@@ -310,6 +310,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   ngAfterViewInit(): void {
+    // hack: we want to see a change in toggle buttons (After that we will see the check mark icon on the button)
     this.zone.runOutsideAngular(() => {
       setTimeout(() => {
         this.zone.run(() => {

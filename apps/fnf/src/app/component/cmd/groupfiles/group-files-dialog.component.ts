@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit} from "@angular/core";
+import {AfterViewInit, ChangeDetectorRef, Component, Inject, NgZone, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {GroupFilesDialogData} from "./data/group-files-dialog.data";
 import {
@@ -21,6 +21,7 @@ import {MatCheckbox} from "@angular/material/checkbox";
 import {RenderWrapperFactory, TableComponent} from "@guiexpert/angular-table";
 import {
   AutoRestoreOptions,
+  AvoidDoubleExecution,
   ColumnDef,
   Size,
   TableApi,
@@ -38,6 +39,11 @@ import {debounceTime} from "rxjs";
 import {GroupFilesResult} from "./data/group-files-result";
 import {GroupFilesTargetCellRendererComponent} from "./group-files-target-cell-renderer.component";
 import {fileItemComparator} from "../../../common/comparator/file-item-comparator";
+import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-toggle";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {FnfConfirmationDialogService} from "../../../common/confirmationdialog/fnf-confirmation-dialog.service";
+import {TypedDataService} from "../../../common/typed-data.service";
+import {MultiRenameAiService} from "../multirename/multi-rename-ai.service";
 
 @Component({
   selector: "fnf-group-files-dialog",
@@ -55,10 +61,16 @@ import {fileItemComparator} from "../../../common/comparator/file-item-comparato
     MatLabel,
     MatCheckbox,
     TableComponent,
+    MatButtonToggle,
+    MatButtonToggleGroup,
+    MatProgressSpinner,
   ],
   styleUrls: ["./group-files-dialog.component.css"]
 })
-export class GroupFilesDialogComponent implements OnInit, OnDestroy {
+export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewInit {
+
+  private static readonly innerService = new TypedDataService<GroupFilesData>("groupFilesData", new GroupFilesData());
+
 
   formGroup: FormGroup;
   source = "";
@@ -96,6 +108,9 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
   private tableApi: TableApi | undefined;
   private alive = true;
 
+  public hasOpenAiApiKey: boolean = false;
+  fetchAiButtonDisabled = false;
+
 
   constructor(
     public dialogRef: MatDialogRef<GroupFilesDialogComponent>,
@@ -105,12 +120,18 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
     private readonly cdr: ChangeDetectorRef,
     private readonly groupFilesService: GroupFilesService,
     private readonly zone: NgZone,
+    private readonly confirmationDialogService: FnfConfirmationDialogService,
+    private readonly multiRenameAiService: MultiRenameAiService, // TODO should be more  generic!
   ) {
     this.data = groupFilesDialogData.data;
     this.options = groupFilesDialogData.options;
 
+    this.data = groupFilesDialogData.data ? groupFilesDialogData.data : GroupFilesDialogComponent.innerService.getValue();
+    if (!this.data.strategy) this.data.strategy = 'Manual';
+
     this.formGroup = this.formBuilder.group(
       {
+        strategy: new FormControl('x', []),
         modus: new FormControl(this.data.modus, [Validators.required]),
         ignoreBrackets: new FormControl(this.data.ignoreBrackets, []),
         useSourceDir: new FormControl(this.data.useSourceDir, []),
@@ -184,6 +205,16 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.alive = true;
+
+    this.multiRenameAiService
+      .hasOpenAiApiKey()
+      .pipe(
+        takeWhile(() => this.alive),
+      )
+      .subscribe(res => {
+        this.hasOpenAiApiKey = res;
+      });
+
     this.formGroup.valueChanges
       .pipe(
         takeWhile(() => this.alive),
@@ -194,6 +225,52 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy {
         this.tableApi?.setRows(this.rows);
         this.tableApi?.repaint();
       });
+  }
+
+  ngAfterViewInit(): void {
+    // hack: we want to see a change in toggle buttons (After that we will see the check mark icon on the button)
+    this.zone.runOutsideAngular(() => {
+      setTimeout(() => {
+        this.zone.run(() => {
+          this.formGroup.patchValue({strategy: this.data.strategy}, {emitEvent: true, onlySelf: false});
+          console.log("patchValue", this.data.strategy);
+        })
+      }, 0);
+    });
+  }
+
+  @AvoidDoubleExecution()
+  onFetchAiClicked() {
+    this.fetchAiButtonDisabled = true;
+    // this.multiRenameAiService
+    //   .convert({
+    //     files: this.rows.map(this.fileOperationParams2Url.bind(this)),
+    //   })
+    //   .pipe(
+    //     takeWhile(() => this.alive),
+    //   )
+    //   .subscribe(res => {
+    //
+    //     this.rows.forEach((r, i) => {
+    //       const url = this.fileOperationParams2Url(r);
+    //       if (res[url]) {
+    //         r.target.base = res[url];
+    //       }
+    //     });
+    //     this.tableApi?.setRows(this.rows);
+    //     this.tableApi?.repaint();
+    //
+    //     this.fetchAiButtonDisabled = false;
+    //     this.cdr.detectChanges();
+    //   });
+  }
+
+  openInfo() {
+    this.confirmationDialogService.showInfo([
+      "To run the AI mode, you'll need an OpenAI account and associated API key (https://platform.openai.com/signup). ",
+      "Set an environment variable called `FNF_OPENAI_API_KEY` with your API key.",
+      "Alternatively you can create an `.env` file at the root of this app containing `FNF_OPENAI_API_KEY=<your API key>`, which will be picked up by nestjs."
+    ]);
   }
 
   onOkClicked() {
