@@ -13,6 +13,8 @@ import {DOT_DOT, FileItemIf} from "@fnf/fnf-data";
           width: 100%;
           height: 100%;
           display: flex;
+          padding-top: 2px;
+          padding-left: 12px;
       }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
