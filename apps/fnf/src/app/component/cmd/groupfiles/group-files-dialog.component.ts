@@ -283,7 +283,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
         this.rows,
         this.groupFilesDialogData,
       );
-      this.dialogRef.close(actionEvents); // TODO
+      this.dialogRef.close(actionEvents);
 
     } else {
       const actionEvents = this.groupFilesService.createActionEvents(

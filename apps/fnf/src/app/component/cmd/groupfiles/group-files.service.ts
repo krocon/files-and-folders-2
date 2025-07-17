@@ -7,7 +7,7 @@ import {CommandService} from '../../../service/cmd/command.service';
 import {GroupFilesDialogData} from './data/group-files-dialog.data';
 import {GroupFilesResult} from './data/group-files-result';
 import {GroupFilesRow} from './data/group-files-row';
-import {path2DirBase} from "../../../common/fn/get-parent-dir.fn";
+import {fixPath, path2DirBase} from "../../../common/fn/path-2-dir-base.fn";
 
 @Injectable({
   providedIn: 'root'
@@ -59,8 +59,7 @@ export class GroupFilesService {
     for (const row of rows) {
       if (row.source && row.target && row.target.dir && row.target.base) {
 
-
-        const targetUrl = (row.target.dir + '/' + row.target.base).replaceAll(/ \/\//g, '/');
+        const targetUrl = fixPath(row.target.dir + '/' + row.target.base);
         const {dir, base} = path2DirBase(targetUrl);
         row.target.dir = dir;
         row.target.base = base;
@@ -75,7 +74,11 @@ export class GroupFilesService {
           source: row.source,
           srcPanelIndex: row.srcPanelIndex,
           targetPanelIndex: targetPanelIndex,
-          target: row.target
+          target: {
+            ...row.source,
+            dir: row.target.dir
+          }
+
         };
         actions.push(
           this.commandService.createQueueActionEventForMove(fop)
@@ -85,12 +88,16 @@ export class GroupFilesService {
         if (renameAfter) {
           let fop: QueueFileOperationParams = {
             bulk: rows.length > CommandService.BULK_LOWER_LIMIT,
-            source: row.target,
+            source: {
+              ...row.source,
+              dir: row.target.dir
+            },
             srcPanelIndex: targetPanelIndex,
             targetPanelIndex: targetPanelIndex,
             target: {
-              ...row.target,
-              base
+              ...row.source,
+              dir: row.target.dir,
+              base: row.target.base
             }
           };
           actions.push(
