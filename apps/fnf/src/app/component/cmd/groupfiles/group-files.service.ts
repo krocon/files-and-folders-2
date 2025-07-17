@@ -332,6 +332,10 @@ export class GroupFilesService {
   getUpdateModel(
     dialogData: GroupFilesDialogData
   ): GroupFilesResult {
+
+    if (dialogData.data.strategy === 'AI') {
+      new GroupFilesResult(1, []);
+    }
     let mode = dialogData.data.modus;
     if (mode === 'new_folder') {
       return this.updateTableModelNewFolder(dialogData);

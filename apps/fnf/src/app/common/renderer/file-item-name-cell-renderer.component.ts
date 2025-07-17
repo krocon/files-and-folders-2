@@ -3,7 +3,7 @@ import {ChangeDetectionStrategy, Component} from "@angular/core";
 import {AreaIdent, AreaModelIf, RendererCleanupFnType} from "@guiexpert/table";
 import {DOT_DOT, FileItemIf} from "@fnf/fnf-data";
 import {MatTooltip} from "@angular/material/tooltip";
-import {QueueFileOperationParams} from "../../../domain/cmd/queue-file-operation-params";
+import {QueueFileOperationParams} from "../../domain/cmd/queue-file-operation-params";
 
 @Component({
   selector: 'multi-rename-name-cell-renderer',
@@ -49,7 +49,7 @@ import {QueueFileOperationParams} from "../../../domain/cmd/queue-file-operation
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MultiRenameNameCellRendererComponent implements ComponentRendererIf<QueueFileOperationParams> {
+export class FileItemNameCellRendererComponent implements ComponentRendererIf<QueueFileOperationParams> {
 
   iconClass: string = '';
   text: string = '';

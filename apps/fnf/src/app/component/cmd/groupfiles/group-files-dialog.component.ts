@@ -33,17 +33,18 @@ import {
 
 import {QueueFileOperationParams} from "../../../domain/cmd/queue-file-operation-params";
 import {CommandService} from "../../../service/cmd/command.service";
-import {GroupFilesNameCellRendererComponent} from "./group-files-name-cell-renderer.component";
+import {GroupFilesNameCellRendererComponent} from "./renderer/group-files-name-cell-renderer.component";
 import {GroupFilesService} from "./group-files.service";
 import {debounceTime} from "rxjs";
 import {GroupFilesResult} from "./data/group-files-result";
-import {GroupFilesTargetCellRendererComponent} from "./group-files-target-cell-renderer.component";
+import {GroupFilesTargetCellRendererComponent} from "./renderer/group-files-target-cell-renderer.component";
 import {fileItemComparator} from "../../../common/comparator/file-item-comparator";
 import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-toggle";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {FnfConfirmationDialogService} from "../../../common/confirmationdialog/fnf-confirmation-dialog.service";
 import {TypedDataService} from "../../../common/typed-data.service";
 import {AiCompletionService} from "../../../service/ai/ai-completion.service";
+import {GroupfilesChangeCellRendererComponent} from "./renderer/groupfiles-change-cell-renderer.component";
 
 @Component({
   selector: "fnf-group-files-dialog",
@@ -80,7 +81,8 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
 
   tableModel?: TableModelIf;
   rows: QueueFileOperationParams[];
-
+  public hasOpenAiApiKey: boolean = false;
+  fetchAiButtonDisabled = false;
   private readonly rowHeight = 34;
   readonly tableOptions: TableOptionsIf = {
     ...new TableOptions(),
@@ -107,10 +109,6 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
   };
   private tableApi: TableApi | undefined;
   private alive = true;
-
-  public hasOpenAiApiKey: boolean = false;
-  fetchAiButtonDisabled = false;
-
 
   constructor(
     public dialogRef: MatDialogRef<GroupFilesDialogComponent>,
@@ -164,17 +162,17 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
         sortIconVisible: () => true,
         sortComparator: fileItemComparator,
       }),
-      // ColumnDef.create({
-      //   property: "target",
-      //   headerLabel: " ",
-      //   width: new Size(30, 'px'),
-      //   minWidth: new Size(30, 'px'),
-      //   headerClasses: ["ge-table-text-align-left"],
-      //   bodyClasses: ["ge-table-text-align-left"],
-      //   bodyRenderer: this.rwf.create(ChangeCellRendererComponent, this.cdr),
-      //   sortable: () => true,
-      //   sortIconVisible: () => true,
-      // }),
+      ColumnDef.create({
+        property: "target",
+        headerLabel: " ",
+        width: new Size(30, 'px'),
+        minWidth: new Size(30, 'px'),
+        headerClasses: ["ge-table-text-align-left"],
+        bodyClasses: ["ge-table-text-align-left"],
+        bodyRenderer: this.rwf.create(GroupfilesChangeCellRendererComponent, this.cdr),
+        sortable: () => true,
+        sortIconVisible: () => true,
+      }),
       ColumnDef.create({
         property: "target",
         headerLabel: "Target",
@@ -242,6 +240,14 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
   @AvoidDoubleExecution()
   onFetchAiClicked() {
     this.fetchAiButtonDisabled = true;
+    this.rows.map(r => {
+      r.target.dir = '';
+      r.target.base = '';
+      r.target.ext = '';
+      return r;
+    });
+    this.cdr.detectChanges();
+
     this.aiCompletionService
       .groupfiles({
         files: this.rows.map(this.aiCompletionService.fileOperationParams2Url),
@@ -278,7 +284,7 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
     const actionEvents = this.groupFilesService.createActionEvents(
       this.rows,
       this.groupFilesDialogData,
-      );
+    );
     this.dialogRef.close(actionEvents);
   }
 
@@ -291,15 +297,23 @@ export class GroupFilesDialogComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   private updateTableRows() {
+    this.rows.map(r => {
+      r.target.dir = '';
+      r.target.base = '';
+      r.target.ext = '';
+      return r;
+    });
     const dialogData = this.clone<GroupFilesDialogData>(this.groupFilesDialogData);
     dialogData.data = this.formGroup.getRawValue();
-    const updateModel: GroupFilesResult = this.groupFilesService.getUpdateModel(dialogData);
-    this.rows = this.groupFilesService.getFileOperationParams(
-      updateModel.rows,
-      dialogData.sourcePanelIndex,
-      dialogData.targetPanelIndex
-    );
-    this.groupCount = updateModel.groupCount;
+    if (dialogData.data.strategy !== 'AI') {
+      const updateModel: GroupFilesResult = this.groupFilesService.getUpdateModel(dialogData);
+      this.rows = this.groupFilesService.getFileOperationParams(
+        updateModel.rows,
+        dialogData.sourcePanelIndex,
+        dialogData.targetPanelIndex
+      );
+      this.groupCount = updateModel.groupCount;
+    }
   }
 
   private clone<T>(r: T): T {

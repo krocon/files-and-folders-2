@@ -52,8 +52,8 @@ import {
 
 import {QueueFileOperationParams} from "../../../domain/cmd/queue-file-operation-params";
 import {CommandService} from "../../../service/cmd/command.service";
-import {ChangeCellRendererComponent} from "./change-cell-renderer.component";
-import {MultiRenameNameCellRendererComponent} from "./multi-rename-name-cell-renderer.component";
+import {ChangeCellRendererComponent} from "../../../common/renderer/change-cell-renderer.component";
+import {FileItemNameCellRendererComponent} from "../../../common/renderer/file-item-name-cell-renderer.component";
 import {MultiRenameService} from "./multi-rename.service";
 import {debounceTime} from "rxjs";
 import {fileItemComparator} from "../../../common/comparator/file-item-comparator";
@@ -130,7 +130,6 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
       autoRestoreSortingState: true,
       autoRestoreSelectedState: false
     },
-    // externalFilterFunction: this.filterFn.bind(this),
     getSelectionModel: () => undefined,
     getFocusModel: () => undefined,
     shortcutActionsDisabled: true,
@@ -200,7 +199,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
         headerLabel: "Old Name",
         width: new Size(50, 'weight'),
         minWidth: new Size(200, 'px'),
-        bodyRenderer: this.rwf.create(MultiRenameNameCellRendererComponent, this.cdr),
+        bodyRenderer: this.rwf.create(FileItemNameCellRendererComponent, this.cdr),
         headerClasses: ["ge-table-text-align-left"],
         bodyClasses: ["ge-table-text-align-left"],
         sortComparator: fileItemComparator,
@@ -225,7 +224,7 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
         minWidth: new Size(200, 'px'),
         headerClasses: ["ge-table-text-align-left"],
         bodyClasses: ["ge-table-text-align-left"],
-        bodyRenderer: this.rwf.create(MultiRenameNameCellRendererComponent, this.cdr),
+        bodyRenderer: this.rwf.create(FileItemNameCellRendererComponent, this.cdr),
         sortComparator: fileItemComparator,
         sortable: () => true,
         sortIconVisible: () => true,
@@ -325,6 +324,14 @@ export class MultiRenameDialogComponent implements OnInit, OnDestroy, AfterViewI
   @AvoidDoubleExecution()
   onFetchAiClicked() {
     this.fetchAiButtonDisabled = true;
+    this.rows.map(r => {
+      r.target.dir = '';
+      r.target.base = '';
+      r.target.ext = '';
+      return r;
+    });
+    this.cdr.detectChanges();
+
     this.aiCompletionService
       .convertnames({
         files: this.rows.map(this.aiCompletionService.fileOperationParams2Url),

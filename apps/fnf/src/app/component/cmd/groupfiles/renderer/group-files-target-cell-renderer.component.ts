@@ -2,10 +2,10 @@ import {ComponentRendererIf} from "@guiexpert/angular-table";
 import {ChangeDetectionStrategy, Component} from "@angular/core";
 import {AreaIdent, AreaModelIf, RendererCleanupFnType} from "@guiexpert/table";
 import {FileItemIf} from "@fnf/fnf-data";
-import {QueueFileOperationParams} from "../../../domain/cmd/queue-file-operation-params";
+import {QueueFileOperationParams} from "../../../../domain/cmd/queue-file-operation-params";
 
 @Component({
-  selector: 'multi-rename-target-cell-renderer',
+  selector: 'group-files-target-cell-renderer',
   template: `
     <div class="ffn-name-cell-label">{{ base }}<b>{{ dir }}</b></div>
   `,
@@ -48,6 +48,12 @@ export class GroupFilesTargetCellRendererComponent implements ComponentRendererI
     cellValue: FileItemIf): RendererCleanupFnType | undefined {
 
     const fileItem = cellValue;
+    if (!fileItem.dir && !fileItem.base) {
+      this.dir = '';
+      this.base = '';
+      return undefined;
+    }
+
     this.dir = fileItem.dir + '/';
     this.base = fileItem.isDir ?  '['+fileItem.base+']' : fileItem.base;
 

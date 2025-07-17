@@ -14,16 +14,34 @@
 
         &.replacements-checked {
             grid-template-rows: auto auto auto auto auto 0 1fr;
+
+            div.row-5 {
+                visibility: hidden;
+                height: 0;
+                overflow: clip;
+            }
         }
 
-        &.ai-mode > div.row-1,
-        &.ai-mode > div.row-2,
-        &.ai-mode > div.row-3,
-        &.ai-mode > div.row-4,
-        &.ai-mode > div.row-5 {
-            display: none;
+        &.replacements-checked.ai-mode,
+        &.ai-mode {
+            grid-template-rows: auto 0 0 0 0 0 1fr;
+
+            div.row-1, div.row-2, div.row-3, div.row-4, div.row-5 {
+                visibility: hidden;
+                height: 0;
+                overflow: clip;
+            }
         }
 
+        /*
+                &.ai-mode > div.row-1,
+                &.ai-mode > div.row-2,
+                &.ai-mode > div.row-3,
+                &.ai-mode > div.row-4,
+                &.ai-mode > div.row-5 {
+                    display: none;
+                }
+        */
         & > div {
             height: 100%;
             width: 100%;

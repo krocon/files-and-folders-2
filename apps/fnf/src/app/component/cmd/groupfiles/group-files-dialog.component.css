@@ -12,6 +12,17 @@
         align-items: start;
         align-content: start;
 
+        &.replacements-checked.ai-mode,
+        &.ai-mode {
+            grid-template-rows: auto 0  1fr;
+
+            div.row-1 {
+                visibility: hidden;
+                height: 0;
+                overflow: clip;
+            }
+        }
+
         & > div {
             height: 100%;
             width: 100%;

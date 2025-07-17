@@ -8,6 +8,7 @@
   <form
       [formGroup]="formGroup"
       [class.replacements-checked]="!formGroup.get('replacementsChecked')?.value"
+      [class.ai-mode]="formGroup.get('strategy')?.value==='AI'"
       autocomplete="off">
 
     <div class="row-0">
