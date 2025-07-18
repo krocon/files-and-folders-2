@@ -213,7 +213,7 @@ export class FileComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck 
 
   }
 
-  onSelectionChanged(selectionLabelData: SelectionEvent, panelIndex: PanelIndex) {
+  setSelectionChanged(selectionLabelData: SelectionEvent, panelIndex: PanelIndex) {
     this.selectionEvents[panelIndex] = selectionLabelData;
   }
 
@@ -271,7 +271,7 @@ export class FileComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck 
     this.appService.onKeyDown$.next(keyboardEvent);
   }
 
-  onButtonStatesChanged(states: ButtonEnableStates, number: number) {
+  setButtonStatesChanged(states: ButtonEnableStates, number: number) {
     this.buttonEnableStatesArr[number] = states;
   }
 

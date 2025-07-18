@@ -75,6 +75,7 @@ import {ShellAutocompleteService} from "./service/shell-autocomplete.service";
 import {WalkdirSyncService} from "./common/walkdir/walkdir-sync.service";
 import {WalkdirService} from "./common/walkdir/walkdir.service";
 import {BrowserOsService} from "./service/browseros/browser-os.service";
+import {EditService} from "./service/edit.service";
 
 
 @Injectable({
@@ -147,6 +148,7 @@ export class AppService {
     CleanService.forRoot(environment.clean);
     ShellService.forRoot(environment.shell);
     ShellAutocompleteService.forRoot(environment.shellAutocomplete);
+    EditService.forRoot(environment.edit);
 
     WalkdirService.forRoot(environment.walkdir);
     WalkdirSyncService.forRoot(environment.walkdir);
@@ -561,6 +563,16 @@ export class AppService {
           }
         }
       );
+  }
+
+  onEditClicked() {
+    const selectedData: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
+    if (selectedData.length === 1) {
+      localStorage.setItem('edit-selected-data', JSON.stringify(selectedData[0]));
+      const strWindowFeatures = "location=no,height=600,width=800,scrollbars=yes,status=yes";
+      const url = location.origin + "/edit";
+      window.open(url, "_blank", strWindowFeatures);
+    }
   }
 
   delete() {
@@ -1063,5 +1075,6 @@ export class AppService {
     }
     return [this.getActiveTabOnActivePanel().path];
   }
+
 
 }

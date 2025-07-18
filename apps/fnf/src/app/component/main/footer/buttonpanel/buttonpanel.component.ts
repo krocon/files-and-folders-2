@@ -48,13 +48,12 @@ export class ButtonPanelComponent implements OnInit, OnDestroy {
       action: 'copy',
       shortcut: 'F3'
     },
-    // TODO edit command
-    // {
-    //   label: 'Edit',
-    //   icon: '',
-    //   action: 'edit',
-    //   shortcut: 'F4'
-    // },
+    {
+      label: 'Edit',
+      icon: '',
+      action: 'edit',
+      shortcut: 'F4'
+    },
     {
       label: 'Move',
       icon: '',
@@ -178,8 +177,10 @@ export class ButtonPanelComponent implements OnInit, OnDestroy {
   onButtonClick(action: string): void {
     if (action === 'copy') {
       this.appService.copy();
-      // } else if (action === 'edit') {
-      //   this.appService.onEditClicked();
+
+    } else if (action === 'edit') {
+      this.appService.onEditClicked();
+
     } else if (action === 'move') {
       this.appService.move();
 
