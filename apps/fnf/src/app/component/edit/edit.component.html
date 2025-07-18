@@ -7,6 +7,7 @@
 <ngx-monaco-editor
     class="monaco-editor"
     [options]="editorOptions"
+    (onInit)="onInit($event)"
     [(ngModel)]="text"></ngx-monaco-editor>
 
 <div class="button-div">

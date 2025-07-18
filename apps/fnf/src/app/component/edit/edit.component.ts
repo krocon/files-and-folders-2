@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit} from "@angular/core";
 import {FormsModule} from "@angular/forms";
 import {EditorComponent} from "ngx-monaco-editor-v2";
 import {FileItemIf} from "@fnf/fnf-data";
@@ -18,7 +18,7 @@ import {MatButton} from "@angular/material/button";
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditComponent implements OnInit, AfterViewInit {
+export class EditComponent implements OnInit {
 
   editorOptions = {theme: 'vs-dark', language: 'javascript'};
 
@@ -80,25 +80,6 @@ export class EditComponent implements OnInit, AfterViewInit {
     return map;
   }
 
-  ngAfterViewInit() {
-    // Wait for Monaco editor to initialize
-    setTimeout(() => {
-      const editorElement = this.elementRef.nativeElement.querySelector('.monaco-editor');
-      if (editorElement) {
-        const properties = this.getVSCodeProperties(editorElement);
-
-        const buf: string[] = [];
-        properties.forEach(([prop, value]) => {
-          buf.push(`${prop}: ${value};`);
-        })
-        console.info(buf.sort().join('\n'));
-
-        properties.forEach(([prop, value]) => {
-          this.elementRef.nativeElement.style.setProperty(prop, value);
-        });
-      }
-    }, 1000);
-  }
 
   save() {
     if (!this.fileItem) return; // skip
@@ -192,4 +173,20 @@ export class EditComponent implements OnInit, AfterViewInit {
     return extensionToLanguageMap[normalizedSuffix] || 'plaintext';
   }
 
+  onInit(evt: any) {
+    const editorElement = this.elementRef.nativeElement.querySelector('.monaco-editor');
+    if (editorElement) {
+      const properties = this.getVSCodeProperties(editorElement);
+
+      // const buf: string[] = [];
+      // properties.forEach(([prop, value]) => {
+      //   buf.push(`${prop}: ${value};`);
+      // })
+      // console.info(buf.sort().join('\n'));
+
+      properties.forEach(([prop, value]) => {
+        this.elementRef.nativeElement.style.setProperty(prop, value);
+      });
+    }
+  }
 }
