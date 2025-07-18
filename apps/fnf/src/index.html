@@ -23,6 +23,14 @@
       href="assets/font-awesome-4.5.0/css/font-awesome.min.css"
       rel="stylesheet">
 
+  <!-- Configure Monaco Editor worker paths -->
+  <script>
+    window.MonacoEnvironment = {
+      getWorkerUrl: function (moduleId, label) {
+        return "./assets/monaco/vs/editor/editor.worker.js";
+      }
+    };
+  </script>
 </head>
 <body class="mat-typography mat-app-background">
 <fnf-root></fnf-root>

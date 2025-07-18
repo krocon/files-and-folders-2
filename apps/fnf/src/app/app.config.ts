@@ -10,7 +10,22 @@ import {routes} from './app.routes';
 
 const monacoConfig = {
   baseUrl: 'assets/monaco/vs',  // Configure the base path for Monaco editor assets
-  defaultOptions: {scrollBeyondLastLine: false}  // Default editor options
+  defaultOptions: {scrollBeyondLastLine: false},  // Default editor options
+  // Configure worker paths explicitly
+  onMonacoLoad: () => {
+    const monaco = (window as any).monaco;
+    if (monaco) {
+      // Use AMD loader for TypeScript workers
+      monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+        target: monaco.languages.typescript.ScriptTarget.ES2015,
+        allowNonTsExtensions: true
+      });
+      monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+        target: monaco.languages.typescript.ScriptTarget.ES2015,
+        allowNonTsExtensions: true
+      });
+    }
+  }
 };
 
 const config: SocketIoConfig = {
