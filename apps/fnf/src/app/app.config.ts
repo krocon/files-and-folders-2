@@ -3,9 +3,15 @@ import {provideRouter, withDebugTracing} from '@angular/router';
 import {provideAnimations} from '@angular/platform-browser/animations';
 import {provideHttpClient} from '@angular/common/http';
 import {Socket, SOCKET_CONFIG_TOKEN, SocketIoConfig} from 'ngx-socket-io';
+import {NGX_MONACO_EDITOR_CONFIG} from 'ngx-monaco-editor-v2';
 
 import {routes} from './app.routes';
 
+
+const monacoConfig = {
+  baseUrl: 'assets',  // Configure the base path for Monaco editor assets
+  defaultOptions: {scrollBeyondLastLine: false}  // Default editor options
+};
 
 const config: SocketIoConfig = {
   url: "http://localhost:3334",
@@ -37,6 +43,7 @@ export const appConfig: ApplicationConfig = {
     //   deps: [SOCKET_CONFIG_TOKEN]
     // },
     {provide: SOCKET_CONFIG_TOKEN, useValue: config},
-    {provide: Socket, useFactory: socketFactory, deps: [SOCKET_CONFIG_TOKEN, ApplicationRef]}
+    {provide: Socket, useFactory: socketFactory, deps: [SOCKET_CONFIG_TOKEN, ApplicationRef]},
+    {provide: NGX_MONACO_EDITOR_CONFIG, useValue: monacoConfig}
   ]
 };
