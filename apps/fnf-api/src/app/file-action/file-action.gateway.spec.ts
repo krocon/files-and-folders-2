@@ -1,6 +1,6 @@
 import {Test, TestingModule} from '@nestjs/testing';
-import {FileActionGateway} from '@fnf/fnf-api/src/app/file-action/file-action.gateway';
-import {FileService} from '@fnf/fnf-api/src/app/file-action/file.service';
+import {FileActionGateway} from './file-action.gateway';
+import {FileService} from './file.service';
 import {ActionGatewayKeys as keys, FileItem, FilePara} from '@fnf/fnf-data';
 import * as path from 'path';
 import {Server} from 'socket.io';

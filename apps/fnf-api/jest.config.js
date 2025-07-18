@@ -15,7 +15,7 @@ module.exports = {
     "^@fnf-data$": "<rootDir>/../../../libs/fnf-data/src/index.ts",
     "^@fnf-data/(.*)$": "<rootDir>/../../../libs/fnf-data/$1",
     "^@fnf/fnf-data$": "<rootDir>/../../../libs/fnf-data/src/index.ts",
-    "^@fnf/fnf-api/(.*)$": "<rootDir>/../../../apps/fnf-api/$1",
+    "^@fnf/fnf-api/(.*)$": "<rootDir>/$1",
     "^ngx-socket-io$": "<rootDir>/../__mocks__/ngx-socket-io.ts"
   },
   modulePaths: ["<rootDir>/../../../"],

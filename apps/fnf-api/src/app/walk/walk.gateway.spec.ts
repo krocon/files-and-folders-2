@@ -1,6 +1,6 @@
 import {Test, TestingModule} from '@nestjs/testing';
-import {CustomCssGateway} from '@fnf/fnf-api/src/app/customcss/custom-css.gateway';
-import {CssColors} from '@fnf/fnf-data';
+import {WalkGateway} from './walk.gateway';
+import {WalkParaData} from '@fnf/fnf-data';
 import {
   cleanupTestEnvironment,
   restoreTestEnvironment,
@@ -8,9 +8,13 @@ import {
 } from '../file-action/action/common/test-setup-helper';
 import * as path from 'path';
 import {Server} from 'socket.io';
+import {FileWalker} from './file-walker';
 
-describe('CustomCssGateway', () => {
-  let gateway: CustomCssGateway;
+// Mock FileWalker
+jest.mock('./file-walker');
+
+describe('WalkGateway', () => {
+  let gateway: WalkGateway;
 
   // Mock for WebSocketServer
   const mockServer = {
@@ -43,41 +47,56 @@ describe('CustomCssGateway', () => {
     // Restore the test environment before each test
     await restoreTestEnvironment();
 
+    // Reset mocks
+    jest.clearAllMocks();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        CustomCssGateway,
+        WalkGateway,
       ],
     }).compile();
 
-    gateway = module.get<CustomCssGateway>(CustomCssGateway);
+    gateway = module.get<WalkGateway>(WalkGateway);
 
     // Manually set the server property
     gateway['server'] = mockServer;
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
     expect(gateway).toBeDefined();
   });
 
-  describe('updateCss', () => {
-    it('should emit onCssUpdate event with the provided CSS variables', () => {
+  describe('walkdir', () => {
+    it('should create a new FileWalker instance with the provided parameters', () => {
       // Arrange
-      const cssVars: CssColors = {
-        primary: '#ff0000',
-        secondary: '#00ff00',
-        background: '#0000ff'
-      };
+      const walkParaData = new WalkParaData();
+      walkParaData.files = [sourceDir];
+      walkParaData.stepsPerMessage = 100;
+      walkParaData.emmitDataKey = 'walk-data';
+      walkParaData.emmitCancelKey = 'cancel-walk';
 
       // Act
-      gateway.updateCss(cssVars);
+      gateway.walkdir(walkParaData);
 
       // Assert
-      expect(mockServer.emit).toHaveBeenCalledTimes(1);
-      expect(mockServer.emit).toHaveBeenCalledWith('onCssUpdate', cssVars);
+      expect(FileWalker).toHaveBeenCalledWith(
+        walkParaData,
+        gateway['cancellings'],
+        mockServer
+      );
+    });
+  });
+
+  describe('cancelWalk', () => {
+    it('should set the cancellation flag for the specified ID', () => {
+      // Arrange
+      const cancelId = 'test-cancel-id';
+
+      // Act
+      gateway.cancelWalk(cancelId);
+
+      // Assert
+      expect(gateway['cancellings'][cancelId]).toBe(cancelId);
     });
   });
 });

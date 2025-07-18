@@ -1,4 +1,4 @@
-import {copy} from '@fnf/fnf-api/src/app/file-action/action/copy.fn';
+import {copy} from './copy.fn';
 import {FileItem, FilePara} from '@fnf/fnf-data';
 import * as fse from 'fs-extra';
 import * as path from 'path';

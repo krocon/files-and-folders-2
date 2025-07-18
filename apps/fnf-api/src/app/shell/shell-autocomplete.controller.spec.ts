@@ -1,9 +1,9 @@
 import {Test, TestingModule} from '@nestjs/testing';
-import {ShellAutocompleteController} from '@fnf/fnf-api/src/app/shell/shell-autocomplete.controller';
-import {ShellCommandsWindows} from '@fnf/fnf-api/src/app/shell/shell-commands-windows';
-import {ShellCommandsLinux} from '@fnf/fnf-api/src/app/shell/shell-commands-linux';
-import {ShellCommandsMacOS} from '@fnf/fnf-api/src/app/shell/shell-commands-macos';
 import * as os from 'os';
+import {ShellCommandsMacOS} from "./shell-commands-macos";
+import {ShellAutocompleteController} from "./shell-autocomplete.controller";
+import {ShellCommandsWindows} from "./shell-commands-windows";
+import {ShellCommandsLinux} from "./shell-commands-linux";
 
 // Mock the os.platform function
 jest.mock('os', () => ({

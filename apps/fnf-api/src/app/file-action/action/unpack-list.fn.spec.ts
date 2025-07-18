@@ -1,4 +1,4 @@
-import {unpacklist} from '@fnf/fnf-api/src/app/file-action/action/unpack-list.fn';
+import {unpacklist} from './unpack-list.fn';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as StreamZip from 'node-stream-zip';

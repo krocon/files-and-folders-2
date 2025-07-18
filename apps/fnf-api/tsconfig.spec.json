@@ -16,7 +16,7 @@
         "../../libs/fnf-data/src/index.ts"
       ],
       "@fnf/fnf-api/*": [
-        "../../apps/fnf-api/*"
+        "./*"
       ]
     }
   },

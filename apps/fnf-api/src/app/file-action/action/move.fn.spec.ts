@@ -1,4 +1,4 @@
-import {move} from '@fnf/fnf-api/src/app/file-action/action/move.fn';
+import {move} from './move.fn';
 import {FileItem, FilePara} from '@fnf/fnf-data';
 import * as fse from 'fs-extra';
 import * as path from 'path';

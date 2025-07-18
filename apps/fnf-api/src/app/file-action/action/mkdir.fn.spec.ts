@@ -1,4 +1,4 @@
-import {mkdir} from '@fnf/fnf-api/src/app/file-action/action/mkdir.fn';
+import {mkdir} from './mkdir.fn';
 import {FileItem, FilePara} from '@fnf/fnf-data';
 import * as fse from 'fs-extra';
 import * as path from 'path';

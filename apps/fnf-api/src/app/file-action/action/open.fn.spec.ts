@@ -1,14 +1,14 @@
-import {open} from '@fnf/fnf-api/src/app/file-action/action/open.fn';
+import {open} from './open.fn';
 import {FileItem, FilePara} from '@fnf/fnf-data';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
 import {cleanupTestEnvironment, restoreTestEnvironment, setupTestEnvironment} from './common/test-setup-helper';
 // Import the mocked module
-import * as executeCommandModule from '@fnf/fnf-api/src/app/file-action/action/common/execute-command';
+import * as executeCommandModule from './common/execute-command';
 
 // Mock the executeCommand module
-jest.mock('@fnf/fnf-api/src/app/file-action/action/common/execute-command', () => ({
+jest.mock('./common/execute-command', () => ({
   executeCommand: jest.fn()
 }));
 
