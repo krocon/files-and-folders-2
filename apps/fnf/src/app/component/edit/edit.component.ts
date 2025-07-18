@@ -4,6 +4,7 @@ import {EditorComponent} from "ngx-monaco-editor-v2";
 import {FileItemIf} from "@fnf/fnf-data";
 import {EditService} from "../../service/edit.service";
 import {fixPath} from "../../common/fn/path-2-dir-base.fn";
+import {MatButton} from "@angular/material/button";
 
 // TODO 2 buttons:  close, save
 @Component({
@@ -12,7 +13,8 @@ import {fixPath} from "../../common/fn/path-2-dir-base.fn";
   styleUrls: ['edit.component.css'],
   imports: [
     FormsModule,
-    EditorComponent
+    EditorComponent,
+    MatButton
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -54,7 +56,7 @@ export class EditComponent implements OnInit, AfterViewInit {
       this.name = fixPath(this.fileItem.dir + '/' + this.fileItem.base);
 
       this.editorOptions.language = this.getMonacoLanguageFromFileSuffix(this.fileItem.ext);
-      console.info('editorOptions.language', this.editorOptions.language); // TODO
+
       this.editService
         .loadFile(this.name)
         .subscribe(
@@ -66,21 +68,36 @@ export class EditComponent implements OnInit, AfterViewInit {
     }
   }
 
+  private getVSCodeProperties(element: Element): Array<[string, string]> {
+    const computedStyle = getComputedStyle(element);
+    let map: Array<[string, string]> = Array.from(computedStyle)
+      .filter(prop => {
+        const value = computedStyle.getPropertyValue(prop);
+        return prop.startsWith('--vscode')
+          && (value.startsWith('rgb') || value.startsWith('#'));
+      })
+      .map(prop => [prop, computedStyle.getPropertyValue(prop)]);
+    return map;
+  }
+
   ngAfterViewInit() {
     // Wait for Monaco editor to initialize
     setTimeout(() => {
       const editorElement = this.elementRef.nativeElement.querySelector('.monaco-editor');
-      console.info('editorElement', editorElement)
       if (editorElement) {
-        const computedStyle = getComputedStyle(editorElement);
+        const properties = this.getVSCodeProperties(editorElement);
 
-        const background = computedStyle.getPropertyValue('--vscode-editor-background');
-        const foreground = computedStyle.getPropertyValue('--vscode-editor-foreground');
-        console.info('background', background);
-        this.elementRef.nativeElement.style.setProperty('--vscode-editor-background', background);
-        this.elementRef.nativeElement.style.setProperty('--vscode-editor-foreground', foreground);
+        const buf: string[] = [];
+        properties.forEach(([prop, value]) => {
+          buf.push(`${prop}: ${value};`);
+        })
+        console.info(buf.sort().join('\n'));
+
+        properties.forEach(([prop, value]) => {
+          this.elementRef.nativeElement.style.setProperty(prop, value);
+        });
       }
-    }, 100);
+    }, 1000);
   }
 
   save() {
