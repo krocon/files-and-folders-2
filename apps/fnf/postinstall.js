@@ -2,8 +2,8 @@ const fs = require("fs-extra");
 const path = require("path");
 
 // Define paths
-const monacoMinVsSource = path.resolve(__dirname, "node_modules/monaco-editor/min/vs");
-const monacoVsTarget = path.resolve(__dirname, "src/assets/monaco/vs");
+const monacoMinVsSource = path.resolve(__dirname, "node_modules/monaco-editor/min");
+const monacoVsTarget = path.resolve(__dirname, "src/assets/monaco/min");
 
 // Copy main Monaco VS files (min only)
 console.log("Copying from", monacoMinVsSource, "to", monacoVsTarget);

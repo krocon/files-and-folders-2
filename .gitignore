@@ -180,4 +180,4 @@ apps/fnf/src/assets/screens_old/
 !/.github/workflows/deploy.yml
 /apps/fnf/cypress/screenshots/app.cy.js/
 /apps/fnf/cypress/screenshots/shell-autocomplete.cy.js/
-/apps/fnf/src/assets/monaco/vs/
+/apps/fnf/src/assets/monaco/min/vs/

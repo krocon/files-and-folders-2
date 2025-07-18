@@ -3,30 +3,10 @@ import {provideRouter, withDebugTracing} from '@angular/router';
 import {provideAnimations} from '@angular/platform-browser/animations';
 import {provideHttpClient} from '@angular/common/http';
 import {Socket, SOCKET_CONFIG_TOKEN, SocketIoConfig} from 'ngx-socket-io';
-import {NGX_MONACO_EDITOR_CONFIG} from 'ngx-monaco-editor-v2';
+import {provideMonacoEditor} from 'ngx-monaco-editor-v2';
 
 import {routes} from './app.routes';
 
-
-const monacoConfig = {
-  baseUrl: 'assets/monaco/vs',  // Configure the base path for Monaco editor assets
-  defaultOptions: {scrollBeyondLastLine: false},  // Default editor options
-  // Configure worker paths explicitly
-  onMonacoLoad: () => {
-    const monaco = (window as any).monaco;
-    if (monaco) {
-      // Use AMD loader for TypeScript workers
-      monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-        target: monaco.languages.typescript.ScriptTarget.ES2015,
-        allowNonTsExtensions: true
-      });
-      monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-        target: monaco.languages.typescript.ScriptTarget.ES2015,
-        allowNonTsExtensions: true
-      });
-    }
-  }
-};
 
 const config: SocketIoConfig = {
   url: "http://localhost:3334",
@@ -51,14 +31,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withDebugTracing()),
     provideAnimations(),
     provideHttpClient(),
-    // provideSocketIo(config),
-    // {
-    //   provide: Socket,
-    //   useFactory: socketFactory,
-    //   deps: [SOCKET_CONFIG_TOKEN]
-    // },
     {provide: SOCKET_CONFIG_TOKEN, useValue: config},
     {provide: Socket, useFactory: socketFactory, deps: [SOCKET_CONFIG_TOKEN, ApplicationRef]},
-    {provide: NGX_MONACO_EDITOR_CONFIG, useValue: monacoConfig}
+    provideMonacoEditor()
   ]
 };
