@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {CommonModule} from "@angular/common";
-import {Router, RouterOutlet} from "@angular/router";
+import {RouterOutlet} from "@angular/router";
 import {MatIconRegistry} from "@angular/material/icon";
 import {environment} from "../environments/environment";
 import {AppService} from "./app.service";
@@ -23,8 +23,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     private readonly matIconReg: MatIconRegistry,
-    private readonly appService: AppService,
-    private readonly router: Router,
+    private readonly appService: AppService
   ) {
     this.matIconReg.setDefaultFontSetClass('material-symbols-outlined');
 

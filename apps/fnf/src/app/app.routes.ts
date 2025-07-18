@@ -8,11 +8,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import("./component/main/file.component").then(m => m.FileComponent)
   },
-  // {
-  //   path: "init",
-  //   loadComponent: () =>
-  //     import("./component/init/init.component").then(m => m.InitComponent)
-  // },
+  {
+    path: "edit",
+    loadComponent: () =>
+      import("./component/edit/edit.component").then(m => m.EditComponent)
+  },
 
   {
     path: "about",

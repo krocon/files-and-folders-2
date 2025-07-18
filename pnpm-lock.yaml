@@ -49,6 +49,12 @@ importers:
       hammerjs:
         specifier: ^2.0.8
         version: 2.0.8
+      monaco-editor:
+        specifier: ^0.52.2
+        version: 0.52.2
+      ngx-monaco-editor-v2:
+        specifier: ^20.0.0
+        version: 20.0.0(@angular/common@20.1.2)(@angular/core@20.1.2)(monaco-editor@0.52.2)
       ngx-socket-io:
         specifier: ^4.8.5
         version: 4.9.1(@angular/common@20.1.2)(@angular/core@20.1.2)(rxjs@7.8.2)
@@ -9439,6 +9445,10 @@ packages:
     hasBin: true
     dev: true
 
+  /monaco-editor@0.52.2:
+    resolution: {integrity: sha512-GEQWEZmfkOGLdd3XK8ryrfWz3AIP8YymVXiPHEdewrUq7mh0qrKrfHLNCXcbB6sTnMLnOZ3ztSiKcciFUkIJwQ==}
+    dev: false
+
   /mrmime@2.0.1:
     resolution: {integrity: sha512-Y3wQdFg2Va6etvQ5I82yUhGdsKrcYox6p7FfL1LbK2J4V01F9TGlepTIhnK24t7koZibmg82KGglhA1XK5IsLQ==}
     engines: {node: '>=10'}
@@ -9546,6 +9556,19 @@ packages:
   /neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
     dev: true
+
+  /ngx-monaco-editor-v2@20.0.0(@angular/common@20.1.2)(@angular/core@20.1.2)(monaco-editor@0.52.2):
+    resolution: {integrity: sha512-h0gWxuXKWqEReklnOrLzfa6KQ2aYkOB5f3TJurOxgJPztZKKE8kNKtsa2Zpjs+vQw8IgE9UIl79lueUuhys5aw==}
+    peerDependencies:
+      '@angular/common': 20.1.2
+      '@angular/core': 20.1.2
+      monaco-editor: ^0.52.2
+    dependencies:
+      '@angular/common': 20.1.2(@angular/core@20.1.2)(rxjs@7.8.2)
+      '@angular/core': 20.1.2(@angular/compiler@20.1.2)(rxjs@7.8.2)(zone.js@0.15.1)
+      monaco-editor: 0.52.2
+      tslib: 2.8.1
+    dev: false
 
   /ngx-socket-io@4.9.1(@angular/common@20.1.2)(@angular/core@20.1.2)(rxjs@7.8.2):
     resolution: {integrity: sha512-r+6KY41UpItqLckGiFJAaS/p5xRVEp+KohxpNMG4NS/6hCk89HT75hVgCRNWQ/wEcxCzBP3Mwqz9+un5wnzUNg==}
