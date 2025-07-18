@@ -11,7 +11,7 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "e2e": "cypress run",
-    "postinstall": "node -e \"const fs = require('fs-extra'); const path = require('path'); let source = path.resolve(__dirname, 'node_modules/monaco-editor/min/vs'); const target = path.resolve(__dirname, 'src/assets/monaco/vs'); console.log('Copying from', source, 'to', target); fs.copySync(source, target); const editorWorkerSource = path.resolve(__dirname, 'node_modules/monaco-editor/esm/vs/editor/editor.worker.js'); const editorWorkerTarget = path.resolve(__dirname, 'src/assets/monaco/vs/editor/editor.worker.js'); if (fs.existsSync(editorWorkerSource)) { console.log('Copying editor worker from', editorWorkerSource, 'to', editorWorkerTarget); fs.copySync(editorWorkerSource, editorWorkerTarget); } const basicWorkerSource = path.resolve(__dirname, 'node_modules/monaco-editor/esm/vs/basic-languages'); const basicWorkerTarget = path.resolve(__dirname, 'src/assets/monaco/vs/basic-languages'); if (fs.existsSync(basicWorkerSource)) { console.log('Copying basic languages from', basicWorkerSource, 'to', basicWorkerTarget); fs.copySync(basicWorkerSource, basicWorkerTarget); } const tsWorkerSource = path.resolve(__dirname, 'node_modules/monaco-editor/esm/vs/language/typescript/tsWorker.js'); const tsWorkerTarget = path.resolve(__dirname, 'src/assets/monaco/vs/language/typescript/tsWorker.js'); if (fs.existsSync(tsWorkerSource)) { console.log('Copying TypeScript worker from', tsWorkerSource, 'to', tsWorkerTarget); fs.copySync(tsWorkerSource, tsWorkerTarget); }\""
+    "postinstall": "node postinstall.js"
   },
   "private": false,
   "dependencies": {
