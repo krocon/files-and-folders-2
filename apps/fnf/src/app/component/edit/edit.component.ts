@@ -25,7 +25,7 @@ import {FormsModule} from "@angular/forms";
 })
 export class EditComponent {
 
-  editorOptions = {theme: 'vs-dark', language: 'javascript'};
-  text: string = 'function x() {\nconsole.log("Hello world!");\n}';
+  editorOptions = {theme: 'vs-dark', language: 'text'};
+  text: string = 'function x() {\n\tconsole.log("Hello world!");\n}';
 
 }

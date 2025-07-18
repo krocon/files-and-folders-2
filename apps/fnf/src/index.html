@@ -26,9 +26,25 @@
   <!-- Configure Monaco Editor worker paths -->
   <script>
     window.MonacoEnvironment = {
+      globalAPI: true
+      /*
       getWorkerUrl: function (moduleId, label) {
-        return "./assets/monaco/vs/editor/editor.worker.js";
+        if (label === 'typescript' || label === 'javascript') {
+          return './assets/monaco/vs/language/typescript/tsWorker.js';
+        }
+        if (label === 'json') {
+          return './assets/monaco/vs/language/json/jsonWorker.js';
+        }
+        if (label === 'css' || label === 'scss' || label === 'less') {
+          return './assets/monaco/vs/language/css/cssWorker.js';
+        }
+        if (label === 'html' || label === 'handlebars' || label === 'razor') {
+          return './assets/monaco/vs/language/html/htmlWorker.js';
+        }
+        return './assets/monaco/vs/base/worker/workerMain.js';
       }
+
+       */
     };
   </script>
 </head>
