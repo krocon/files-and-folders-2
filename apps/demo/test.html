@@ -9,7 +9,7 @@
   <style>
     :root {
       --word-collapsed-width: 1ch;
-      --word-files-expanded-width: 4.1ch;
+      --word-files-expanded-width: 3.8ch;
       --word-and-expanded-width: 3ch;
       --word-folders-expanded-width: 7.1ch;
       --animation-duration: 0.6s;
@@ -41,19 +41,20 @@
       height: 60px;
       position: relative;
 
+      &:hover,
       &.expanded {
         .div-left {
-          animation: expandFiles var(--animation-duration) steps(5, end) forwards;
+          animation: expandFiles var(--animation-duration) forwards;
           width: fit-content; 
         }
 
         .div-middle {
-          animation: expandAnd var(--animation-duration) steps(3, end) forwards;
+          animation: expandAnd var(--animation-duration) forwards;
           width: fit-content; 
         }
 
         .div-right {
-          animation: expandFolders var(--animation-duration) steps(7, end) forwards;
+          animation: expandFolders var(--animation-duration) forwards;
           width: fit-content; 
         }
 
@@ -62,19 +63,20 @@
         }
       }
 
+      &:not(:hover),
       &.collapsed {
         grid-gap: 0;
 
         .div-left {
-          animation: collapseFiles var(--animation-duration) steps(5, end) forwards;
+          animation: collapseFiles var(--animation-duration) forwards;
         }
 
         .div-middle {
-          animation: collapseAnd var(--animation-duration) steps(3, end) forwards;
+          animation: collapseAnd var(--animation-duration) forwards;
         }
 
         .div-right {
-          animation: collapseFolders var(--animation-duration) steps(7, end) forwards;
+          animation: collapseFolders var(--animation-duration) forwards;
         }
       }
 
@@ -85,6 +87,8 @@
         overflow: clip;
         white-space: nowrap;
         text-overflow: clip;
+        letter-spacing: -0.05em;
+
 
         &.div-left {
           justify-content: left;
