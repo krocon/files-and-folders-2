@@ -7,6 +7,14 @@
       content="width=device-width, initial-scale=1.0">
   <title>FnF Animation Demo</title>
   <style>
+    :root {
+      --word-collapsed-width: 1ch;
+      --word-files-expanded-width: 4.1ch;
+      --word-and-expanded-width: 3ch;
+      --word-folders-expanded-width: 7.1ch;
+      --animation-duration: 0.6s;
+    }
+
     body {
       font-family: Arial, sans-serif;
       display: flex;
@@ -18,18 +26,16 @@
       background-color: #fff;
     }
 
-    .container {
-      text-align: center;
-      margin-bottom: 50px;
-      max-width: 800px;
-    }
+
 
 
     .div-logo {
       font-size: 48px;
       font-weight: bold;
       color: #000;
-      display: flex;
+      display: grid;
+      grid-template-columns: auto auto auto;
+      grid-gap: 8px;
       justify-content: center;
       align-items: center;
       height: 60px;
@@ -37,26 +43,61 @@
 
       &.expanded {
         .div-left {
-          animation: expandFiles 1.5s steps(5, end) forwards;
+          animation: expandFiles var(--animation-duration) steps(5, end) forwards;
+          width: fit-content; 
         }
 
         .div-middle {
-          animation: expandAnd 1.5s steps(3, end) forwards;
+          animation: expandAnd var(--animation-duration) steps(3, end) forwards;
+          width: fit-content; 
         }
 
         .div-right {
-          animation: expandFolders 1.5s steps(7, end) forwards;
+          animation: expandFolders var(--animation-duration) steps(7, end) forwards;
+          width: fit-content; 
+        }
+
+        .div-word {
+          width: fit-content;
+        }
+      }
+
+      &.collapsed {
+        grid-gap: 0;
+
+        .div-left {
+          animation: collapseFiles var(--animation-duration) steps(5, end) forwards;
+        }
+
+        .div-middle {
+          animation: collapseAnd var(--animation-duration) steps(3, end) forwards;
+        }
+
+        .div-right {
+          animation: collapseFolders var(--animation-duration) steps(7, end) forwards;
         }
       }
 
       .div-word {
-        display: inline-block;
+        display: grid;
         position: relative;
-        transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        margin: 0 2px;
+        transition: all var(--animation-duration) cubic-bezier(0.175, 0.885, 0.32, 1.275);
         overflow: clip;
         white-space: nowrap;
         text-overflow: clip;
+
+        &.div-left {
+          justify-content: left;
+        }
+
+        &.div-middle {
+          justify-content: center;
+        }
+
+        &.div-right {
+          justify-content: left;
+        }
+
 
         > div {
           overflow-x: clip;
@@ -64,271 +105,105 @@
           place-items: center;
         }
 
-        /* Initial state - only show first letter */
-
-        &.div-left {
-          width: 30px; /* Width of "F" */
-        }
-
-        &.div-middle {
-          width: 30px; /* Width of "n" */
-          text-align: center; /* Center the text */
-          position: relative; /* For positioning */
-          display: grid;
-          justify-content: center;
-        }
-
-        &.div-right {
-          width: 30px; /* Width of "F" */
-        }
       }
+
+
     }
 
 
-    /* Expanded state */
-    &.expanded {
-      .div-left {
-        width: 110px; /* Width of "Files" */
-      }
-
-      .expanded .div-middle {
-        width: 80px; /* Width of "and" */
-        transform: translateX(-20px); /* Shift left to center the growth */
-      }
-
-      .expanded .div-right {
-        width: 160px; /* Width of "Folders" */
-      }
-    }
-
-    &.collapsed {
-      .div-left {
-        animation: collapseFiles 1.2s steps(5, end) forwards;
-      }
-
-      .div-middle {
-        animation: collapseAnd 1.2s steps(3, end) forwards;
-        transform: translateX(0);
-      }
-
-      .div-right {
-        animation: collapseFolders 1.2s steps(7, end) forwards;
-      }
-    }
-
-
-    /* Animation steps for pixel-by-pixel growth */
+    /* Animation steps for growth using relative units */
     @keyframes expandFiles {
       0% {
-        width: 30px;
+        width: var(--word-collapsed-width);
       }
-      /* F */
-      10% {
-        width: 35px;
-      }
-      /* F */
-      15% {
-        width: 40px;
-      }
-      /* Fi */
-      30% {
-        width: 50px;
-      }
-      /* Fil */
-      45% {
-        width: 65px;
-      }
-      /* File */
-      60% {
-        width: 80px;
-      }
-      /* Files */
       100% {
-        width: 110px;
+        width: var(--word-files-expanded-width);
       }
-      /* Files (final width) */
+    }
+
+    @keyframes collapseFiles {
+      0% {
+        width: var(--word-files-expanded-width);
+      }
+      100% {
+        width: var(--word-collapsed-width);
+      }
     }
 
     @keyframes expandAnd {
       0% {
-        width: 30px;
+        width: var(--word-collapsed-width);
       }
-      /* n */
-      20% {
-        width: 40px;
-      }
-      /* a */
-      40% {
-        width: 50px;
-      }
-      /* an */
-      60% {
-        width: 60px;
-      }
-      /* and */
       100% {
-        width: 90px;
+        width: var(--word-and-expanded-width);
       }
-      /* and (final width) */
-    }
-
-    @keyframes expandFolders {
-      0% {
-        width: 30px;
-      }
-      /* F */
-      10% {
-        width: 40px;
-      }
-      /* Fo */
-      20% {
-        width: 55px;
-      }
-      /* Fol */
-      30% {
-        width: 70px;
-      }
-      /* Fold */
-      40% {
-        width: 85px;
-      }
-      /* Folde */
-      50% {
-        width: 110px;
-      }
-      /* Folder */
-      60% {
-        width: 150px;
-      }
-      /* Folders */
-      100% {
-        width: 170px;
-      }
-      /* Folders (final width) */
-    }
-
-
-    /* Collapse animation */
-    @keyframes collapseFiles {
-      0% {
-        width: 100px;
-      }
-      /* Files */
-      20% {
-        width: 80px;
-      }
-      /* File */
-      40% {
-        width: 60px;
-      }
-      /* Fil */
-      60% {
-        width: 45px;
-      }
-      /* Fi */
-      100% {
-        width: 30px;
-      }
-      /* F */
     }
 
     @keyframes collapseAnd {
       0% {
-        width: 70px;
+        width: var(--word-and-expanded-width);
       }
-      /* and */
-      33% {
-        width: 55px;
-      }
-      /* an */
-      66% {
-        width: 40px;
-      }
-      /* a */
       100% {
-        width: 30px;
+        width: var(--word-collapsed-width);
       }
-      /* n */
+    }
+
+    @keyframes expandFolders {
+      0% {
+        width: var(--word-collapsed-width);
+      }
+      100% {
+        width: var(--word-folders-expanded-width);
+      }
     }
 
     @keyframes collapseFolders {
       0% {
-        width: 140px;
+        width: var(--word-folders-expanded-width);
       }
-      /* Folders */
-      14% {
-        width: 120px;
-      }
-      /* Folder */
-      28% {
-        width: 100px;
-      }
-      /* Folde */
-      42% {
-        width: 85px;
-      }
-      /* Fold */
-      56% {
-        width: 70px;
-      }
-      /* Fol */
-      70% {
-        width: 55px;
-      }
-      /* Fo */
       100% {
-        width: 30px;
+        width: var(--word-collapsed-width);
       }
-      /* F */
     }
 
-
-    /*!* Initial state - make sure only first letter is visible *!*/
-    /*.div-logo:not(.expanded):not(.collapsed) .div-left {*/
-    /*    width: 30px;*/
-    /*    overflow: hidden;*/
-    /*}*/
-
-    /*.div-logo:not(.expanded):not(.collapsed) .div-middle {*/
-    /*    width: 30px;*/
-    /*    overflow: hidden;*/
-    /*}*/
-
-    /*.div-logo:not(.expanded):not(.collapsed) .div-right {*/
-    /*    width: 30px;*/
-    /*    overflow: hidden;*/
-    /*}*/
   </style>
 </head>
+
+
 <body>
 <div class="container">
   <h1>FnF Animation Demo</h1>
   <p>Watch as "FnF" transforms into "Files and Folders" with smooth CSS animations</p>
 
-  <div class="div-logo">
+  <div class="div-logo collapsed">
     <div class="div-word div-left">Files</div>
     <div class="div-word div-middle">
       <div>and</div>
     </div>
     <div class="div-word div-right">Folders</div>
   </div>
+
+  <br>
+  <br>
   <div class="buttons">
     <button id="toggleBtn">Toggle Animation</button>
   </div>
 </div>
 
 <script>
-  document.getElementById("toggleBtn").addEventListener("click", function () {
-    const textContainer = document.querySelector(".div-logo");
+  document
+      .getElementById("toggleBtn")
+      .addEventListener("click", function () {
+        const textContainer = document.querySelector(".div-logo");
 
-    if (textContainer.classList.contains("expanded")) {
-      textContainer.classList.remove("expanded");
-      textContainer.classList.add("collapsed");
-    } else {
-      textContainer.classList.remove("collapsed");
-      textContainer.classList.add("expanded");
-    }
-  });
+        if (textContainer.classList.contains("expanded")) {
+          textContainer.classList.remove("expanded");
+          textContainer.classList.add("collapsed");
+        } else {
+          textContainer.classList.remove("collapsed");
+          textContainer.classList.add("expanded");
+        }
+      });
 </script>
 </body>
 </html>
