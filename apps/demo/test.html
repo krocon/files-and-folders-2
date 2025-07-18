@@ -23,7 +23,6 @@
       align-items: center;
       height: 100vh;
       margin: 0;
-      background-color: #fff;
     }
 
 
@@ -32,51 +31,45 @@
     .div-logo {
       font-size: 48px;
       font-weight: bold;
-      color: #000;
       display: grid;
       grid-template-columns: auto auto auto;
-      grid-gap: 8px;
+      grid-gap: 0;
       justify-content: center;
       align-items: center;
       height: 60px;
       position: relative;
 
-      &:hover,
-      &.expanded {
-        .div-left {
-          animation: expandFiles var(--animation-duration) forwards;
-          width: fit-content; 
-        }
+      /* Default state is collapsed */
 
-        .div-middle {
-          animation: expandAnd var(--animation-duration) forwards;
-          width: fit-content; 
-        }
-
-        .div-right {
-          animation: expandFolders var(--animation-duration) forwards;
-          width: fit-content; 
-        }
-
-        .div-word {
-          width: fit-content;
-        }
+      .div-left {
+        animation: collapseFiles var(--animation-duration) forwards;
       }
 
-      &:not(:hover),
-      &.collapsed {
-        grid-gap: 0;
+      .div-middle {
+        animation: collapseAnd var(--animation-duration) forwards;
+      }
+
+      .div-right {
+        animation: collapseFolders var(--animation-duration) forwards;
+      }
+
+      /* On hover, expand everything */
+
+      &.expanded,
+      &:hover {
+        grid-gap: 8px;
 
         .div-left {
-          animation: collapseFiles var(--animation-duration) forwards;
+          animation: expandFiles var(--animation-duration) forwards;
         }
-
         .div-middle {
-          animation: collapseAnd var(--animation-duration) forwards;
+          animation: expandAnd var(--animation-duration) forwards;
         }
-
         .div-right {
-          animation: collapseFolders var(--animation-duration) forwards;
+          animation: expandFolders var(--animation-duration) forwards;
+        }
+        .div-word {
+          width: fit-content;
         }
       }
 
@@ -102,16 +95,12 @@
           justify-content: left;
         }
 
-
         > div {
           overflow-x: clip;
           display: grid;
           place-items: center;
         }
-
       }
-
-
     }
 
 
@@ -179,7 +168,7 @@
   <h1>FnF Animation Demo</h1>
   <p>Watch as "FnF" transforms into "Files and Folders" with smooth CSS animations</p>
 
-  <div class="div-logo collapsed">
+  <div class="div-logo">
     <div class="div-word div-left">Files</div>
     <div class="div-word div-middle">
       <div>and</div>
@@ -202,9 +191,7 @@
 
         if (textContainer.classList.contains("expanded")) {
           textContainer.classList.remove("expanded");
-          textContainer.classList.add("collapsed");
         } else {
-          textContainer.classList.remove("collapsed");
           textContainer.classList.add("expanded");
         }
       });
