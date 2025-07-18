@@ -1,5 +1,5 @@
 import {ApplicationConfig, ApplicationRef, provideZoneChangeDetection} from '@angular/core';
-import {provideRouter, withDebugTracing} from '@angular/router';
+import {provideRouter} from '@angular/router';
 import {provideAnimations} from '@angular/platform-browser/animations';
 import {provideHttpClient} from '@angular/common/http';
 import {Socket, SOCKET_CONFIG_TOKEN, SocketIoConfig} from 'ngx-socket-io';
@@ -28,7 +28,7 @@ export function socketFactory(config: SocketIoConfig, appRef: ApplicationRef): S
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({eventCoalescing: true}),
-    provideRouter(routes, withDebugTracing()),
+    provideRouter(routes/*, withDebugTracing()*/),
     provideAnimations(),
     provideHttpClient(),
     {provide: SOCKET_CONFIG_TOKEN, useValue: config},

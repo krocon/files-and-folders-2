@@ -19,6 +19,21 @@ import {fixPath} from "../../common/fn/path-2-dir-base.fn";
 export class EditComponent implements OnInit {
 
   editorOptions = {theme: 'vs-dark', language: 'javascript'};
+
+  /*
+
+  editorOptions = {
+    language: 'json',
+    minimap: { enabled: false },
+    scrollBeyondLastLine: false,
+    lineHeight: 20,
+    fontSize: 14,
+    wordWrap: 'on',
+    wrappingIndent: 'indent',
+};
+
+   */
+
   text: string = 'Loading...';
 
   fileItem: FileItemIf | null = null;
@@ -35,6 +50,9 @@ export class EditComponent implements OnInit {
     if (item) {
       this.fileItem = JSON.parse(item) as FileItemIf;
       let name = fixPath(this.fileItem.dir + '/' + this.fileItem.base);
+
+      this.editorOptions.language = this.getMonacoLanguageFromFileSuffix(this.fileItem.ext);
+      console.info('editorOptions.language', this.editorOptions.language); // TODO
       this.editService
         .loadFile(name)
         .subscribe(
@@ -60,5 +78,82 @@ export class EditComponent implements OnInit {
       );
   }
 
+  /**
+   * Returns the appropriate Monaco Editor language identifier for a given file extension
+   * @param fileSuffix The file extension including the dot (e.g., '.json', '.ts')
+   * @returns The corresponding Monaco Editor language identifier or 'plaintext' if not found
+   */
+  getMonacoLanguageFromFileSuffix(fileSuffix: string): string {
+    // Normalize the file suffix by ensuring it starts with a dot and converting to lowercase
+    const normalizedSuffix = fileSuffix.startsWith('.')
+      ? fileSuffix.toLowerCase()
+      : `.${fileSuffix.toLowerCase()}`;
+
+    // Map of file extensions to Monaco Editor language identifiers
+    const extensionToLanguageMap: Record<string, string> = {
+      // Common web languages
+      '.html': 'html',
+      '.htm': 'html',
+      '.css': 'css',
+      '.scss': 'scss',
+      '.less': 'less',
+      '.js': 'javascript',
+      '.jsx': 'javascript',
+      '.ts': 'typescript',
+      '.tsx': 'typescript',
+      '.json': 'json',
+      '.jsonc': 'json',
+      '.xml': 'xml',
+      '.svg': 'xml',
+
+      // Markdown and documentation
+      '.md': 'markdown',
+      '.markdown': 'markdown',
+      '.txt': 'plaintext',
+
+      // Backend languages
+      '.java': 'java',
+      '.py': 'python',
+      '.rb': 'ruby',
+      '.php': 'php',
+      '.cs': 'csharp',
+      '.cpp': 'cpp',
+      '.c': 'c',
+      '.h': 'cpp',
+      '.hpp': 'cpp',
+      '.go': 'go',
+      '.rs': 'rust',
+      '.swift': 'swift',
+      '.kt': 'kotlin',
+
+      // Configuration files
+      '.yaml': 'yaml',
+      '.yml': 'yaml',
+      '.toml': 'toml',
+      '.ini': 'ini',
+      '.config': 'xml',
+      '.properties': 'properties',
+
+      // Shell scripts
+      '.sh': 'shell',
+      '.bash': 'shell',
+      '.zsh': 'shell',
+      '.ps1': 'powershell',
+      '.bat': 'bat',
+      '.cmd': 'bat',
+
+      // Database
+      '.sql': 'sql',
+
+      // Other
+      '.docker': 'dockerfile',
+      '.dockerfile': 'dockerfile',
+      '.graphql': 'graphql',
+      '.gql': 'graphql',
+    };
+
+    // Return the mapped language or 'plaintext' if no mapping exists
+    return extensionToLanguageMap[normalizedSuffix] || 'plaintext';
+  }
 
 }

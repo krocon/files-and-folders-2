@@ -4,7 +4,7 @@ import {AreaIdent, AreaModelIf, RendererCleanupFnType} from "@guiexpert/table";
 import {QueueFileOperationParams} from "../../../../domain/cmd/queue-file-operation-params";
 
 @Component({
-  selector: 'change-cell-renderer',
+  selector: 'groupfiles-change-cell-renderer',
   template: `
     <div class="ffn-name-cell-label">{{ text }}</div>
   `,
