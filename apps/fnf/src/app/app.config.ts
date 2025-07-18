@@ -9,7 +9,7 @@ import {routes} from './app.routes';
 
 
 const monacoConfig = {
-  baseUrl: 'assets/monaco',  // Configure the base path for Monaco editor assets
+  baseUrl: 'assets/monaco/vs',  // Configure the base path for Monaco editor assets
   defaultOptions: {scrollBeyondLastLine: false}  // Default editor options
 };
 

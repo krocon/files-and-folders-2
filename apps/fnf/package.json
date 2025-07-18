@@ -10,7 +10,8 @@
     "test:watch": "jest --watch",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "e2e": "cypress run"
+    "e2e": "cypress run",
+    "postinstall": "node -e \"const fs = require('fs-extra'); const path = require('path'); const source = path.resolve(__dirname, 'node_modules/monaco-editor/min/vs'); const target = path.resolve(__dirname, 'src/assets/monaco/vs'); console.log('Copying from', source, 'to', target); fs.copySync(source, target)\""
   },
   "private": false,
   "dependencies": {
@@ -48,4 +49,3 @@
     "typescript": "~5.8.3"
   }
 }
-
