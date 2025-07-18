@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from "@angular/core";
+import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit} from "@angular/core";
 import {FormsModule} from "@angular/forms";
 import {EditorComponent} from "ngx-monaco-editor-v2";
 import {FileItemIf} from "@fnf/fnf-data";
@@ -16,7 +16,7 @@ import {fixPath} from "../../common/fn/path-2-dir-base.fn";
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditComponent implements OnInit {
+export class EditComponent implements OnInit, AfterViewInit {
 
   editorOptions = {theme: 'vs-dark', language: 'javascript'};
 
@@ -37,10 +37,12 @@ export class EditComponent implements OnInit {
   text: string = 'Loading...';
 
   fileItem: FileItemIf | null = null;
+  name = '';
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
     private readonly editService: EditService,
+    private readonly elementRef: ElementRef
   ) {
   }
 
@@ -49,12 +51,12 @@ export class EditComponent implements OnInit {
     let item = localStorage.getItem('edit-selected-data');
     if (item) {
       this.fileItem = JSON.parse(item) as FileItemIf;
-      let name = fixPath(this.fileItem.dir + '/' + this.fileItem.base);
+      this.name = fixPath(this.fileItem.dir + '/' + this.fileItem.base);
 
       this.editorOptions.language = this.getMonacoLanguageFromFileSuffix(this.fileItem.ext);
       console.info('editorOptions.language', this.editorOptions.language); // TODO
       this.editService
-        .loadFile(name)
+        .loadFile(this.name)
         .subscribe(
           s => {
             this.text = s;
@@ -62,6 +64,23 @@ export class EditComponent implements OnInit {
           }
         );
     }
+  }
+
+  ngAfterViewInit() {
+    // Wait for Monaco editor to initialize
+    setTimeout(() => {
+      const editorElement = this.elementRef.nativeElement.querySelector('.monaco-editor');
+      console.info('editorElement', editorElement)
+      if (editorElement) {
+        const computedStyle = getComputedStyle(editorElement);
+
+        const background = computedStyle.getPropertyValue('--vscode-editor-background');
+        const foreground = computedStyle.getPropertyValue('--vscode-editor-foreground');
+        console.info('background', background);
+        this.elementRef.nativeElement.style.setProperty('--vscode-editor-background', background);
+        this.elementRef.nativeElement.style.setProperty('--vscode-editor-foreground', foreground);
+      }
+    }, 100);
   }
 
   save() {

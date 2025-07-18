@@ -1,5 +1,37 @@
-
-.monaco-editor {
+:host {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
     width: 100vw;
     height: 100vh;
+
+    background-color: var(--vscode-editor-background, #000);
+    color: var(--vscode-editor-foreground, #fff);
+
+    .title-div {
+        padding: 8px 16px;
+
+        .name {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .folder {
+            font-weight: normal;
+            font-size: 0.8em;
+        }
+    }
+
+    .button-div {
+        padding: 8px 16px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+    }
+
+    .monaco-editor {
+        width: 100vw;
+        height: 100%;
+    }
+
+
 }
+

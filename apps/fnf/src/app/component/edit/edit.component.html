@@ -1,4 +1,19 @@
+<div class="title-div">
+  <div class="name">{{ this.fileItem?.base }}</div>
+  <div class="folder">{{ this.fileItem?.dir }}</div>
+</div>
+
+
 <ngx-monaco-editor
     class="monaco-editor"
     [options]="editorOptions"
     [(ngModel)]="text"></ngx-monaco-editor>
+
+<div class="button-div">
+
+  <button>Close</button>
+  <div></div>
+  <button>Save</button>
+
+
+</div>
