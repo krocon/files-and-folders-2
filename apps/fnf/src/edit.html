@@ -9,6 +9,13 @@
       type="image/x-icon">
 
   <style>
+    :root {
+      --toast-background: rgba(76, 175, 80, 0.6);
+      --toast-text-color: #ffffff;
+      --toast-animation-time: 0.5s;
+      --toast-display-time: 5s;
+    }
+
     html, body {
       margin: 0;
       padding: 0;
@@ -16,6 +23,7 @@
       width: 100vw;
       height: 100vh;
       overflow: clip;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     }
 
     body {
@@ -26,6 +34,52 @@
 
       background-color: var(--vscode-breadcrumb-background, #1e1e1e);
       color: var(--vscode-breadcrumb-foreground, rgba(204, 204, 204, 0.8));
+    }
+
+    .toast-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .toast {
+      background-color: var(--toast-background);
+      color: var(--toast-text-color);
+      padding: 12px 24px;
+      border-radius: 4px;
+      margin-top: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-width: 250px;
+      max-width: 80%;
+      opacity: 0;
+      transform: translateY(-100%);
+      transition: transform var(--toast-animation-time), opacity var(--toast-animation-time);
+      pointer-events: auto;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast-message {
+      flex-grow: 1;
+      margin-right: 12px;
+    }
+
+    .toast-close {
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1;
     }
 
     .title-div {
@@ -78,6 +132,22 @@
   <script src="/assets/monaco/min/vs/loader.js"></script>
 </head>
 <body>
+
+<div
+    class="toast-container"
+    id="toastContainer">
+  <div
+      class="toast"
+      id="toast">
+    <div
+        class="toast-message"
+        id="toastMessage"></div>
+    <div
+        class="toast-close"
+        id="toastClose">&times;
+    </div>
+  </div>
+</div>
 
 <div class="title-div">
   <div class="base">&nbsp;</div>
@@ -230,7 +300,7 @@
           if (response.error) {
             alert("Error saving file: " + response.error);
           } else {
-            alert("File saved successfully");
+            showToast("File saved successfully");
           }
         })
         .catch(error => {
@@ -279,10 +349,41 @@
     });
   }
 
+  // Toast notification functions
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    const toastMessage = document.getElementById("toastMessage");
+
+    // Set the message
+    toastMessage.textContent = message;
+
+    // Show the toast
+    toast.classList.add("show");
+
+    // Hide the toast after the display time
+    const displayTime = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--toast-display-time")) * 1000 || 5000;
+
+    // Clear any existing timeout
+    if (toast.timeoutId) {
+      clearTimeout(toast.timeoutId);
+    }
+
+    // Set new timeout
+    toast.timeoutId = setTimeout(() => {
+      hideToast();
+    }, displayTime);
+  }
+
+  function hideToast() {
+    const toast = document.getElementById("toast");
+    toast.classList.remove("show");
+  }
+
   // Event handlers
   function setupEventListeners() {
     const closeButton = document.getElementById("closeBtn");
     const saveButton = document.getElementById("saveBtn");
+    const toastClose = document.getElementById("toastClose");
 
     closeButton.addEventListener("click", () => {
       window.close();
@@ -290,6 +391,10 @@
 
     saveButton.addEventListener("click", () => {
       saveFileContent();
+    });
+
+    toastClose.addEventListener("click", () => {
+      hideToast();
     });
   }
 
