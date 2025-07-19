@@ -94,6 +94,11 @@
       line-height: 1;
     }
 
+    .two-columns {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-gap: 12px;
+    }
     .title-div {
       padding: 8px 16px;
     }
@@ -247,9 +252,14 @@
   </div>
 </div>
 
-<div class="title-div">
-  <div class="base">&nbsp;</div>
-  <div class="dir">&nbsp;</div>
+<div class="two-columns">
+  <div class="title-div">
+    <div class="base">&nbsp;</div>
+    <div class="dir">&nbsp;</div>
+  </div>
+  <div>
+    TODO icon buttons here
+  </div>
 </div>
 
 <div id="container"></div>
