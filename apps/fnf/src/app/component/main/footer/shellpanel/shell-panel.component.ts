@@ -133,8 +133,9 @@ export class ShellPanelComponent implements OnDestroy {
 
     const config = new MatBottomSheetConfig();
     config.panelClass = 'fnf-shell-panel-dialog';
-    config.data = text;
-    config.height = 'calc(100vh - 200px)';
+    config.data = {text: text};
+    config.height = 'calc(100vh - 60px)';
+    config.maxHeight = 'calc(100vh - 60px)';
     // config.width = 'calc(100vw - 200px)';
     this.matBottomSheet.open(ShellOutComponent, config);
   }
