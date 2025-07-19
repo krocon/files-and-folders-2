@@ -25,8 +25,30 @@
       href="assets/font-awesome-4.5.0/css/font-awesome.min.css"
       rel="stylesheet">
 
+  <!-- AMD loader shim for Monaco Editor workers -->
+  <!--script>
+    // This is a simple AMD loader shim to fix the "define is not defined" error
+    // that occurs when Monaco Editor workers try to use AMD without a proper loader
+    window.define = function(deps, callback) {
+      // Simple AMD define shim
+      if (typeof deps === 'function') {
+        // No dependencies case
+        callback = deps;
+        deps = [];
+      }
+
+      // Execute the callback immediately
+      callback();
+    };
+
+    // Add other AMD-related functions that might be needed
+    window.define.amd = {};
+  </script-->
+
+  <!--  <script src="assets/monaco/min/vs/loader.js"></script>-->
+
   <!-- Configure Monaco Editor worker paths -->
-  <script>
+  <!--script>
     window.MonacoEnvironment = {
       globalAPI: true,
 
@@ -48,7 +70,7 @@
       }
 
     };
-  </script>
+  </script-->
 </head>
 <body class="mat-typography mat-app-background">
 <fnf-root></fnf-root>

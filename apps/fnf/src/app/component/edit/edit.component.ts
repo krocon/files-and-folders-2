@@ -7,7 +7,8 @@ import {fixPath} from "../../common/fn/path-2-dir-base.fn";
 import {MatButton} from "@angular/material/button";
 import {FnfConfirmationDialogService} from "../../common/confirmationdialog/fnf-confirmation-dialog.service";
 
-// TODO 2 buttons:  close, save
+// TODO https://www.npmjs.com/package/@monaco-editor/loader
+// TODO https://blog.expo.dev/building-a-code-editor-with-monaco-f84b3a06deaf
 @Component({
   selector: "fnf-edit",
   templateUrl: "./edit.component.html",
