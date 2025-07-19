@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Monaco Editor</title>
+  <style>
+    #container {
+      width: 100%;
+      height: 90vh;
+    }
+  </style>
+  <script src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
+</head>
+<body>
+<div id="container"></div>
+<script>
+  //require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@latest/min/vs' } });
+  require.config({paths: {vs: location.origin + "/assets/monaco/min/vs"}});
+  require(["vs/editor/editor.main"], function () {
+    monaco.editor.create(document.getElementById("container"), {
+      value: ["function hello() {", "\talert(\"Hello world!\");", "}"].join("\n"),
+      language: "javascript"
+    });
+  });
+</script>
+</body>
+</html>
