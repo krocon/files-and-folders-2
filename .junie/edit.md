@@ -1595,3 +1595,168 @@ body {
 
 }
 ```
+
+Possible values for the monaco editor options are:
+
+```js
+
+editor.updateOptions({
+  acceptSuggestionOnCommitCharacter: true,
+  acceptSuggestionOnEnter: "on",
+  accessibilitySupport: "auto",
+  ariaLabel: "Editor content",
+  autoClosingBrackets: "always",
+  autoClosingDelete: "auto",
+  autoClosingOvertype: "auto",
+  autoClosingQuotes: "always",
+  autoIndent: "advanced",
+  automaticLayout: true,
+  autoSurround: "languageDefined",
+  bracketPairColorization: {enabled: true},
+  codeLens: true,
+  colorDecorators: true,
+  columnSelection: false,
+  comments: {
+    insertSpace: true,
+    ignoreEmptyLines: true
+  },
+  contextmenu: true,
+  copyWithSyntaxHighlighting: true,
+  cursorBlinking: "blink",        // or "smooth", "phase", "expand", "solid"
+  cursorSmoothCaretAnimation: "on",
+  cursorStyle: "line",            // or "block", "underline", etc.
+  cursorSurroundingLines: 3,
+  cursorSurroundingLinesStyle: "default",
+  cursorWidth: 2,
+  disableLayerHinting: false,
+  disableMonospaceOptimizations: false,
+  domReadOnly: false,
+  dragAndDrop: true,
+  dropIntoEditor: {
+    enabled: true
+  },
+  emptySelectionClipboard: true,
+  fastScrollSensitivity: 5,
+  find: {
+    addExtraSpaceOnTop: true,
+    autoFindInSelection: "never",
+    seedSearchStringFromSelection: true
+  },
+  fixedOverflowWidgets: false,
+  folding: true,
+  foldingHighlight: true,
+  foldingStrategy: "auto",
+  fontFamily: "Fira Code",
+  fontLigatures: true,
+  fontSize: 14,
+  fontWeight: "normal",
+  formatOnPaste: false,
+  formatOnType: false,
+  glyphMargin: true,
+  guides: {
+    indentation: true,
+    bracketPairs: "active"
+  },
+  hideCursorInOverviewRuler: false,
+  highlightActiveIndentGuide: true,
+  hover: {
+    enabled: true,
+    delay: 300,
+    sticky: true
+  },
+  inlineHints: {
+    enabled: "on"
+  },
+  inlayHints: {
+    enabled: "on"
+  },
+  letterSpacing: 0,
+  lightbulb: {
+    enabled: true
+  },
+  lineDecorationsWidth: "10",
+  lineHeight: 22,
+  lineNumbers: "on",              // or "off", "relative", "interval", fn
+  lineNumbersMinChars: 3,
+  linkedEditing: true,
+  links: true,
+  matchBrackets: "always",        // or "never", "near"
+  minimap: {
+    enabled: true,
+    side: "right",
+    size: "proportional",
+    showSlider: "mouseover"
+  },
+  mouseStyle: "text",
+  mouseWheelScrollSensitivity: 1,
+  mouseWheelZoom: false,
+  multiCursorMergeOverlapping: true,
+  multiCursorModifier: "alt",     // or "ctrlCmd"
+  occurrencesHighlight: true,
+  overviewRulerBorder: true,
+  overviewRulerLanes: 2,
+  padding: {
+    top: 4,
+    bottom: 4
+  },
+  parameterHints: {
+    enabled: true
+  },
+  peekWidgetDefaultFocus: "tree",
+  quickSuggestions: true,
+  quickSuggestionsDelay: 100,
+  readOnly: false,
+  renderControlCharacters: false,
+  renderFinalNewline: true,
+  renderLineHighlight: "line",    // or "gutter", "all", "none"
+  renderWhitespace: "none",       // or "boundary", "all", "selection"
+  revealHorizontalRightPadding: 30,
+  roundedSelection: true,
+  rulers: [80, 120],
+  scrollBeyondLastColumn: 5,
+  scrollBeyondLastLine: true,
+  scrollPredominantAxis: true,
+  scrollbar: {
+    vertical: "auto",
+    horizontal: "auto"
+  },
+  selectOnLineNumbers: true,
+  selectionClipboard: true,
+  selectionHighlight: true,
+  semanticHighlighting: true,
+  showDeprecated: true,
+  showFoldingControls: "mouseover", // or "always"
+  showUnused: true,
+  smoothScrolling: true,
+  snippetSuggestions: "inline",
+  stickyScroll: {
+    enabled: true
+  },
+  suggest: {
+    preview: true,
+    showIcons: true
+  },
+  suggestFontSize: null,
+  suggestLineHeight: null,
+  suggestOnTriggerCharacters: true,
+  suggestSelection: "recentlyUsed",
+  tabCompletion: "on",
+  tabIndex: 0,
+  tabSize: 4,
+  theme: "vs-dark",              // set via monaco.editor.setTheme()
+  unicodeHighlight: {
+    ambiguousCharacters: true,
+    invisibleCharacters: true
+  },
+  useTabStops: true,
+  value: "// code here",
+  wordBasedSuggestions: true,
+  wordWrap: "off",               // or "on", "wordWrapColumn", "bounded"
+  wordWrapColumn: 80,
+  wrappingIndent: "none"         // or "same", "indent", "deepIndent"
+});
+
+```
+
+
+
