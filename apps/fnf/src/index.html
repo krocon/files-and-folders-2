@@ -17,7 +17,9 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet">
 
-  <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <link
+      href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined"
+      rel="stylesheet"/>
 
   <link
       href="assets/font-awesome-4.5.0/css/font-awesome.min.css"
@@ -26,25 +28,25 @@
   <!-- Configure Monaco Editor worker paths -->
   <script>
     window.MonacoEnvironment = {
-      globalAPI: false
-      /*
+      globalAPI: true,
+
       getWorkerUrl: function (moduleId, label) {
-        if (label === 'typescript' || label === 'javascript') {
-          return './assets/monaco/vs/language/typescript/tsWorker.js';
+        console.info("getWorkerUrl", moduleId, label);
+        if (label === "typescript" || label === "javascript") {
+          return location.origin + "/assets/monaco/dev/vs/language/typescript/tsWorker.js";
         }
-        if (label === 'json') {
-          return './assets/monaco/vs/language/json/jsonWorker.js';
+        if (label === "json") {
+          return location.origin + "/assets/monaco/dev/vs/language/json/jsonWorker.js";
         }
-        if (label === 'css' || label === 'scss' || label === 'less') {
-          return './assets/monaco/vs/language/css/cssWorker.js';
+        if (label === "css" || label === "scss" || label === "less") {
+          return location.origin + "/assets/monaco/dev/vs/language/css/cssWorker.js";
         }
-        if (label === 'html' || label === 'handlebars' || label === 'razor') {
-          return './assets/monaco/vs/language/html/htmlWorker.js';
+        if (label === "html" || label === "handlebars" || label === "razor") {
+          return location.origin + "/assets/monaco/dev/vs/language/html/htmlWorker.js";
         }
-        return './assets/monaco/vs/base/worker/workerMain.js';
+        return location.origin + "/assets/monaco/dev/vs/base/worker/workerMain.js";
       }
 
-       */
     };
   </script>
 </head>

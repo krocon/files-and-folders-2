@@ -56,7 +56,7 @@ export class FileController {
    * @param query - The query parameters object containing the file path
    * @param query.name - The full path to the file where content should be saved
    * @param text - The text content to be written to the file (provided in request body)
-   * @returns void
+   * @returns Object with error field containing empty string on success or error message on failure
    *
    * @throws {BadRequestException} If the request body is invalid or missing
    * @throws {Error} If the file cannot be written to the specified location
@@ -76,8 +76,13 @@ export class FileController {
    * - Parent directories must exist
    */
   @Post("")
-  async saveFile(@Query() query, @PlainBody() text: string) {
+  async saveFile(@Query() query, @PlainBody() text: string): Promise<{ [key: string]: string }> {
     const filename = query.name;
-    writeFileSync(filename, text, {encoding: "utf-8"});
+    try {
+      writeFileSync(filename, text, {encoding: "utf-8"});
+      return {error: ''};
+    } catch (e) {
+      return {error: e.message};
+    }
   }
 }

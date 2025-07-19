@@ -5,6 +5,7 @@ import {FileItemIf} from "@fnf/fnf-data";
 import {EditService} from "../../service/edit.service";
 import {fixPath} from "../../common/fn/path-2-dir-base.fn";
 import {MatButton} from "@angular/material/button";
+import {FnfConfirmationDialogService} from "../../common/confirmationdialog/fnf-confirmation-dialog.service";
 
 // TODO 2 buttons:  close, save
 @Component({
@@ -20,7 +21,7 @@ import {MatButton} from "@angular/material/button";
 })
 export class EditComponent implements OnInit {
 
-  editorOptions = {theme: 'vs-dark', language: 'javascript'};
+  editorOptions: any = {theme: 'vs-dark', language: 'javascript'};
 
   /*
 
@@ -44,7 +45,8 @@ export class EditComponent implements OnInit {
   constructor(
     private readonly cdr: ChangeDetectorRef,
     private readonly editService: EditService,
-    private readonly elementRef: ElementRef
+    private readonly elementRef: ElementRef,
+    private readonly confirmationDialogService: FnfConfirmationDialogService,
   ) {
   }
 
@@ -68,32 +70,6 @@ export class EditComponent implements OnInit {
     }
   }
 
-  private getVSCodeProperties(element: Element): Array<[string, string]> {
-    const computedStyle = getComputedStyle(element);
-    let map: Array<[string, string]> = Array.from(computedStyle)
-      .filter(prop => {
-        const value = computedStyle.getPropertyValue(prop);
-        return prop.startsWith('--vscode')
-          && (value.startsWith('rgb') || value.startsWith('#'));
-      })
-      .map(prop => [prop, computedStyle.getPropertyValue(prop)]);
-    return map;
-  }
-
-
-  save() {
-    if (!this.fileItem) return; // skip
-
-    let name = fixPath(this.fileItem.dir + '/' + this.fileItem.base);
-    this.editService
-      .saveFile(name, this.text)
-      .subscribe(
-        s => {
-          this.text = s;
-          this.cdr.detectChanges();
-        }
-      );
-  }
 
   /**
    * Returns the appropriate Monaco Editor language identifier for a given file extension
@@ -188,5 +164,42 @@ export class EditComponent implements OnInit {
         this.elementRef.nativeElement.style.setProperty(prop, value);
       });
     }
+  }
+
+  onCancelClicked() {
+    this.confirmationDialogService
+      .simpleConfirm(
+        'Do you want to close this window?',
+        ['OK', 'Cancel'],
+        (ok: boolean) => {
+          if (ok) {
+            localStorage.removeItem('edit-selected-data');
+            window.close();
+          }
+        }
+      );
+  }
+
+  onSaveClicked(evt: MouseEvent) {
+    if (!this.fileItem) return; // skip
+
+    let name = fixPath(this.fileItem.dir + '/' + this.fileItem.base);
+    this.editService
+      .saveFile(name, this.text)
+      .subscribe(
+        console.info
+      );
+  }
+
+  private getVSCodeProperties(element: Element): Array<[string, string]> {
+    const computedStyle = getComputedStyle(element);
+    let map: Array<[string, string]> = Array.from(computedStyle)
+      .filter(prop => {
+        const value = computedStyle.getPropertyValue(prop);
+        return prop.startsWith('--vscode')
+          && (value.startsWith('rgb') || value.startsWith('#'));
+      })
+      .map(prop => [prop, computedStyle.getPropertyValue(prop)]);
+    return map;
   }
 }

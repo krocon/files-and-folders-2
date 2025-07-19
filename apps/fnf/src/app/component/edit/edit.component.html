@@ -14,10 +14,14 @@
 
   <button
       mat-stroked-button
+      (click)="onCancelClicked()"
       class="secondary">Close
   </button>
   <div></div>
-  <button mat-stroked-button>Save</button>
+  <button
+      mat-stroked-button
+      (click)="onSaveClicked($event)">Save
+  </button>
 
 
 </div>
