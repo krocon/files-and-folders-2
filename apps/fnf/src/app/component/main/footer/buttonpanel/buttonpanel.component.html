@@ -56,10 +56,6 @@
             }
             <button
                 mat-menu-item
-                routerLink="/edit">Edit...
-            </button>
-            <button
-                mat-menu-item
                 routerLink="/about">About...
             </button>
           </mat-list>
@@ -110,7 +106,10 @@
 
 
     <!-- Tasks -->
-    <fnf-task-button class="panel-button" (onClick)="openButtonSheet()" (onClose)="closeButtonSheet()" ></fnf-task-button>
+    <fnf-task-button
+        (onClick)="openButtonSheet()"
+        (onClose)="closeButtonSheet()"
+        class="panel-button"></fnf-task-button>
 
 
     <button
@@ -147,7 +146,6 @@
         mat-stroked-button>
       <mat-icon>bug_report</mat-icon>
     </button>
-
 
 
     <button

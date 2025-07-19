@@ -272,7 +272,7 @@ editorOptions = {
       if (item) {
         fileItem = JSON.parse(item);
         console.info(fileItem);
-        document.querySelector(".base").innerText = "__" + fileItem.base;
+        document.querySelector(".base").innerText = fileItem.base;
         document.querySelector(".dir").innerText = fileItem.dir;
         name = fixPath(fileItem.dir + "/" + fileItem.base);
 
@@ -284,10 +284,9 @@ editorOptions = {
             "Accept": "application/text"
           }
         })
-            .then(res => {
-              console.info(res);
-              let text = "marc";
-              res.text();
+            .then(async res => {
+
+              let text = await res.text();
               console.info(text);
 
               editorOptions = {
@@ -300,6 +299,7 @@ editorOptions = {
               let editorelement = document.getElementById("container");
               monaco.editor.onDidCreateEditor(codeEditor => {
                 console.info("onDidCreateEditor", codeEditor);
+                initCss(editorelement);
                 //setTimeout(() => initCss(editorelement), 1000);
                 //loadFile();
               });
