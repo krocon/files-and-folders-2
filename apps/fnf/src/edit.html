@@ -373,7 +373,13 @@
   let fileItem = null;
   let filePath = null;
   let contentModified = false;
-  let lineNumbers = "on";
+
+  let userOptions = {
+    theme: "vs-dark",
+    lineNumbers: "on",
+    minimap: true,
+    wordWrap: "off"
+  };
 
   // Language mapping for Monaco editor
   function getMonacoLanguageFromFileSuffix(fileSuffix) {
@@ -527,21 +533,27 @@
     const editorOptions = {
       value: content,
       language: getMonacoLanguageFromFileSuffix(fileItem.ext),
-      theme: "vs-dark",
+      theme: userOptions.theme,
       automaticLayout: true,
-      lineNumbers: "on",
-      minimap: {enabled: true},
-      wordWrap: "off",
+      lineNumbers: userOptions.lineNumbers,
+      minimap: {enabled: userOptions.minimap},
+      wordWrap: userOptions.wordWrap,
       readOnly: false,
     };
 
     const editorElement = document.getElementById("container");
     editor = monaco.editor.create(editorElement, editorOptions);
 
+    // Ensure theme is set
+    monaco.editor.setTheme(userOptions.theme);
+
     // Add change listener to detect modifications
     editor.onDidChangeModelContent(() => {
       contentModified = true;
     });
+
+    // Update UI to match current options
+    updateUIFromOptions();
 
     return editor;
   }
@@ -654,53 +666,77 @@
   function toggleLineNumbers() {
     if (!editor) return;
 
-    lineNumbers = (lineNumbers === "on") ? "off" : "on";
-    editor.updateOptions({lineNumbers: lineNumbers});
+    // Update userOptions
+    userOptions.lineNumbers = (userOptions.lineNumbers === "on") ? "off" : "on";
+
+    // Update editor
+    editor.updateOptions({lineNumbers: userOptions.lineNumbers});
 
     // Update button state
     const button = document.getElementById("lineNumbersToggle");
-    if (lineNumbers === "on") {
+    if (userOptions.lineNumbers === "on") {
       button.classList.add("active");
     } else {
       button.classList.remove("active");
     }
+
+    // Save to localStorage
+    saveUserOptions();
   }
 
   function toggleMinimap() {
     if (!editor) return;
 
-    const currentState = editor.getOption(monaco.editor.EditorOption.minimap).enabled;
-    editor.updateOptions({minimap: {enabled: !currentState}});
+    // Update userOptions
+    userOptions.minimap = !userOptions.minimap;
+
+    // Update editor
+    editor.updateOptions({minimap: {enabled: userOptions.minimap}});
 
     // Update button state
     const button = document.getElementById("minimapToggle");
-    if (!currentState) {
+    if (userOptions.minimap) {
       button.classList.add("active");
     } else {
       button.classList.remove("active");
     }
+
+    // Save to localStorage
+    saveUserOptions();
   }
 
   function toggleWordWrap() {
     if (!editor) return;
 
-    const currentState = editor.getOption(monaco.editor.EditorOption.wordWrap);
-    const newState = currentState === "off" ? "on" : "off";
+    // Update userOptions
+    userOptions.wordWrap = userOptions.wordWrap === "off" ? "on" : "off";
 
-    editor.updateOptions({wordWrap: newState});
+    // Update editor
+    editor.updateOptions({wordWrap: userOptions.wordWrap});
 
     // Update button state
     const button = document.getElementById("wordWrapToggle");
-    if (newState === "on") {
+    if (userOptions.wordWrap === "on") {
       button.classList.add("active");
     } else {
       button.classList.remove("active");
     }
+
+    // Save to localStorage
+    saveUserOptions();
   }
 
   function changeTheme(theme) {
     if (!editor) return;
+
+    // Update userOptions
+    userOptions.theme = theme;
+
+    // Update editor
     monaco.editor.setTheme(theme);
+
+    // Save to localStorage
+    saveUserOptions();
   }
 
   function openSearchReplace() {
@@ -802,8 +838,74 @@
     //    });
   //}
 
+  // Load user options from localStorage
+  function loadUserOptions() {
+    const savedOptions = localStorage.getItem("monaco-editor-user-options");
+    if (savedOptions) {
+      try {
+        const parsedOptions = JSON.parse(savedOptions);
+        // Merge saved options with default options
+        userOptions = {...userOptions, ...parsedOptions};
+      } catch (e) {
+        console.error("Error parsing saved editor options:", e);
+      }
+    }
+  }
+
+  // Save user options to localStorage
+  function saveUserOptions() {
+    localStorage.setItem("monaco-editor-user-options", JSON.stringify(userOptions));
+  }
+
+  // Apply user options to the Monaco editor
+  function applyUserOptions() {
+    if (!editor) return;
+
+    editor.updateOptions({
+      theme: userOptions.theme,
+      lineNumbers: userOptions.lineNumbers,
+      minimap: {enabled: userOptions.minimap},
+      wordWrap: userOptions.wordWrap
+    });
+
+    // Also update the UI to reflect current options
+    updateUIFromOptions();
+  }
+
+  // Update UI elements to reflect current options
+  function updateUIFromOptions() {
+    // Update theme selector
+    const themeSelector = document.getElementById("themeSelector");
+    themeSelector.value = userOptions.theme;
+
+    // Update line numbers toggle
+    const lineNumbersToggle = document.getElementById("lineNumbersToggle");
+    if (userOptions.lineNumbers === "on") {
+      lineNumbersToggle.classList.add("active");
+    } else {
+      lineNumbersToggle.classList.remove("active");
+    }
+
+    // Update minimap toggle
+    const minimapToggle = document.getElementById("minimapToggle");
+    if (userOptions.minimap) {
+      minimapToggle.classList.add("active");
+    } else {
+      minimapToggle.classList.remove("active");
+    }
+
+    // Update word wrap toggle
+    const wordWrapToggle = document.getElementById("wordWrapToggle");
+    if (userOptions.wordWrap === "on") {
+      wordWrapToggle.classList.add("active");
+    } else {
+      wordWrapToggle.classList.remove("active");
+    }
+  }
+
   // Initialize application
   function init() {
+    loadUserOptions();
     setupEventListeners();
     initMonacoEditor();
     //initMoreThemes();
