@@ -41,12 +41,20 @@ export class ButtonPanelComponent implements OnInit, OnDestroy {
   @Input() buttonEnableStates = new ButtonEnableStates();
 
   themes = cssThemes;
+
+  // TODO merge to actionIds and config of shortcuts! apps/fnf/src/assets/config/shortcut/osx.json
   readonly buttons: { label: string, shortcut?: string, icon?: string, action: buttonEnableStatesKey }[] = [
     {
       label: 'Copy',
       icon: '',
       action: 'copy',
       shortcut: 'F3'
+    },
+    {
+      label: 'View',
+      icon: '',
+      action: 'view',
+      shortcut: '⇧ F4'
     },
     {
       label: 'Edit',
@@ -71,12 +79,7 @@ export class ButtonPanelComponent implements OnInit, OnDestroy {
       icon: '',
       action: 'remove',
       shortcut: 'F8'
-    },
-    // {
-    //   label: 'Button 2',
-    //   icon: 'close',
-    //   action: 'edit'
-    // },
+    }
   ];
 
 
@@ -180,6 +183,9 @@ export class ButtonPanelComponent implements OnInit, OnDestroy {
 
     } else if (action === 'edit') {
       this.appService.onEditClicked();
+
+    } else if (action === 'view') {
+      this.appService.onViewClicked();
 
     } else if (action === 'move') {
       this.appService.move();

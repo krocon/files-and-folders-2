@@ -372,6 +372,7 @@
   let editor = null;
   let fileItem = null;
   let filePath = null;
+  let readonly = false;
   let contentModified = false;
 
   let userOptions = {
@@ -439,7 +440,7 @@
     return extensionToLanguageMap[normalizedSuffix] || "plaintext";
   }
 
-  // Path utilities
+
   function fixPath(dir) {
     return dir.replace(/\/{2,}/g, "/");
   }
@@ -528,7 +529,7 @@
         });
   }
 
-  // Editor initialization
+
   function createEditor(content) {
     const editorOptions = {
       value: content,
@@ -538,7 +539,7 @@
       lineNumbers: userOptions.lineNumbers,
       minimap: {enabled: userOptions.minimap},
       wordWrap: userOptions.wordWrap,
-      readOnly: false,
+      readOnly: readonly,
     };
 
     const editorElement = document.getElementById("container");
@@ -559,6 +560,12 @@
   }
 
   function initMonacoEditor() {
+    readonly = localStorage.getItem("edit-readonly") === "true";
+    if (readonly) {
+      document.getElementById("saveBtn").style.display = "none";
+      document.getElementById("searchReplaceBtn").style.display = "none";
+    }
+
     require.config({paths: {vs: location.origin + "/assets/monaco/min/vs"}});
     require(["vs/editor/editor.main"], function () {
       monaco.editor.onDidCreateEditor(editor => {
@@ -583,7 +590,7 @@
     });
   }
 
-  // Toast notification functions
+
   function showToast(message) {
     const toast = document.getElementById("toast");
     const toastMessage = document.getElementById("toastMessage");
@@ -613,7 +620,7 @@
     toast.classList.remove("show");
   }
 
-  // Modal dialog functions
+
   function showConfirmModal(onConfirm, onCancel) {
     const modal = document.getElementById("confirmModal");
     const confirmBtn = document.getElementById("confirmCloseBtn");
@@ -662,14 +669,10 @@
   }
 
 
-  // Editor customization functions
   function toggleLineNumbers() {
     if (!editor) return;
 
-    // Update userOptions
     userOptions.lineNumbers = (userOptions.lineNumbers === "on") ? "off" : "on";
-
-    // Update editor
     editor.updateOptions({lineNumbers: userOptions.lineNumbers});
 
     // Update button state
@@ -679,18 +682,13 @@
     } else {
       button.classList.remove("active");
     }
-
-    // Save to localStorage
     saveUserOptions();
   }
 
   function toggleMinimap() {
     if (!editor) return;
 
-    // Update userOptions
     userOptions.minimap = !userOptions.minimap;
-
-    // Update editor
     editor.updateOptions({minimap: {enabled: userOptions.minimap}});
 
     // Update button state
@@ -708,10 +706,7 @@
   function toggleWordWrap() {
     if (!editor) return;
 
-    // Update userOptions
     userOptions.wordWrap = userOptions.wordWrap === "off" ? "on" : "off";
-
-    // Update editor
     editor.updateOptions({wordWrap: userOptions.wordWrap});
 
     // Update button state
@@ -729,10 +724,7 @@
   function changeTheme(theme) {
     if (!editor) return;
 
-    // Update userOptions
     userOptions.theme = theme;
-
-    // Update editor
     monaco.editor.setTheme(theme);
 
     // Save to localStorage

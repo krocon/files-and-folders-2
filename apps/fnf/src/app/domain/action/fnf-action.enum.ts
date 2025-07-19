@@ -1,5 +1,6 @@
 export const actionIds = [
   "OPEN_CHDIR_DLG",
+  "OPEN_CHDIR_DLG",
   "OPEN_GOTO_ANYTHING_DLG",
   "OPEN_JOB_QUEUE_DLG",
   "OPEN_MULTIRENAME_DLG",

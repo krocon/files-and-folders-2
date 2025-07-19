@@ -569,6 +569,18 @@ export class AppService {
     const selectedData: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
     if (selectedData.length === 1) {
       localStorage.setItem('edit-selected-data', JSON.stringify(selectedData[0]));
+      localStorage.setItem('edit-readonly', 'false');
+      const strWindowFeatures = "location=no,height=600,width=800,scrollbars=yes,status=yes";
+      const url = location.origin + "/edit.html";
+      window.open(url, "_blank", strWindowFeatures);
+    }
+  }
+
+  onViewClicked() {
+    const selectedData: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
+    if (selectedData.length === 1) {
+      localStorage.setItem('edit-selected-data', JSON.stringify(selectedData[0]));
+      localStorage.setItem('edit-readonly', 'true');
       const strWindowFeatures = "location=no,height=600,width=800,scrollbars=yes,status=yes";
       const url = location.origin + "/edit.html";
       window.open(url, "_blank", strWindowFeatures);

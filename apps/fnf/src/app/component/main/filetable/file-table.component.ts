@@ -368,6 +368,7 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
     states.copy = !!items?.length && !items[0].dir?.match(EXP_ZIP_FILE_URL);
     states.edit = items?.length === 1 && !items[0].dir?.match(EXP_ZIP_FILE_URL) && !items[0].isDir;
+    states.view = states.edit;
     states.move = !!items?.length && !items[0].dir?.match(EXP_ZIP_FILE_URL);
     states.remove = !!items?.length && !items[0].dir?.match(EXP_ZIP_FILE_URL);
     states.mkdir = !this.dirPara?.path.startsWith('tabfind');
