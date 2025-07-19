@@ -113,7 +113,12 @@
     .button-div {
       padding: 8px 16px;
       display: grid;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns:  1fr auto auto;
+      grid-gap: 12px;
+
+      > button {
+        min-width: 100px;
+      }
     }
 
     button {
@@ -250,11 +255,11 @@
 <div id="container"></div>
 
 <div class="button-div">
+  <div></div>
   <button
       class="secondary"
       id="closeBtn">Close
   </button>
-  <div></div>
   <button id="saveBtn">Save</button>
 </div>
 
@@ -341,8 +346,17 @@
         .map(prop => [prop, computedStyle.getPropertyValue(prop)]);
   }
 
+  function debugCssProps(properties) {
+    const buf = [];
+    properties.forEach(([prop, value]) => {
+      buf.push(`${prop}: ${value};`);
+    });
+    console.log(buf.sort().join("\n"));
+  }
+
   function applyVSCodeTheme(editorElement) {
     const properties = getVSCodeProperties(editorElement);
+    debugCssProps(properties);
     properties.forEach(([prop, value]) => {
       document.body.style.setProperty(prop, value);
     });
