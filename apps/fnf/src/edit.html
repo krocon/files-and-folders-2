@@ -751,10 +751,20 @@
     searchReplaceBtn.addEventListener("click", openSearchReplace);
   }
 
+  function initMoreThemes() {
+    fetch("/assets/themes/onedark.json")
+        .then(res => res.json())
+        .then(theme => {
+          monaco.editor.defineTheme("onedark", theme);
+          //monaco.editor.setTheme("onedark");
+        });
+  }
+
   // Initialize application
   function init() {
     setupEventListeners();
     initMonacoEditor();
+    initMorethemes();
   }
 
   // Start the application
