@@ -195,13 +195,17 @@
           .map(prop => [prop, computedStyle.getPropertyValue(prop)]);
     }
 
+    function debugCssProps() {
+      const buf = [];
+      properties.forEach(([prop, value]) => {
+        buf.push(`${prop}: ${value};`);
+      });
+      console.log(buf.sort().join("\n"));
+    }
+
     function initCss(editorElement) {
       const properties = getVSCodeProperties(editorElement);
-      //const buf = [];
-      //properties.forEach(([prop, value]) => {
-      //  buf.push(`${prop}: ${value};`);
-      //});
-      //console.info(buf.sort().join("\n"));
+      // debugCssProps();
       properties.forEach(([prop, value]) => {
         document.body.style.setProperty(prop, value);
       });
