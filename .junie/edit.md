@@ -1,4 +1,16 @@
-when you are working on apps/fnf/src/edit.html, you can use following css variables:
+# When you are working on apps/fnf/src/edit.html
+
+- Use plain html, js and css. No third party lib!
+
+- Make smaller function.
+
+- Don't write comments in the code.
+
+- Try to use css variables as much as possible. No hardcoded values in css rules.
+
+- Try use following css variables (they will be loaded dynamically):
+
+```css
 
 body {
 
@@ -322,3 +334,4 @@ body {
     --vscode-widget-shadow: rgba(0, 0, 0, 0.36);
 
 }
+```
