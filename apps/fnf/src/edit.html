@@ -183,6 +183,7 @@
   let editor = null;
   let fileItem = null;
   let filePath = null;
+  let contentModified = false;
 
   // Language mapping for Monaco editor
   function getMonacoLanguageFromFileSuffix(fileSuffix) {
@@ -312,6 +313,7 @@
           if (response.error) {
             alert("Error saving file: " + response.error);
           } else {
+            contentModified = false;
             showToast("File saved successfully");
           }
         })
@@ -332,6 +334,11 @@
 
     const editorElement = document.getElementById("container");
     editor = monaco.editor.create(editorElement, editorOptions);
+
+    // Add change listener to detect modifications
+    editor.onDidChangeModelContent(() => {
+      contentModified = true;
+    });
 
     return editor;
   }
@@ -398,7 +405,13 @@
     const toastClose = document.getElementById("toastClose");
 
     closeButton.addEventListener("click", () => {
-      window.close();
+      if (contentModified) {
+        if (confirm("You have unsaved changes. Do you want to close without saving?")) {
+          window.close();
+        }
+      } else {
+        window.close();
+      }
     });
 
     saveButton.addEventListener("click", () => {
