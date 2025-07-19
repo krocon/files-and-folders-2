@@ -107,11 +107,7 @@
     let dir;
     let editorOptions;
 
-    /**
-     * Returns the appropriate Monaco Editor language identifier for a given file extension
-     * @param fileSuffix The file extension including the dot (e.g., '.json', '.ts')
-     * @returns The corresponding Monaco Editor language identifier or 'plaintext' if not found
-     */
+
     function getMonacoLanguageFromFileSuffix(fileSuffix) {
       // Normalize the file suffix by ensuring it starts with a dot and converting to lowercase
       const normalizedSuffix = fileSuffix.startsWith(".")
@@ -189,32 +185,6 @@
       return dir.replace(/\/{2,}/g, "/");
     }
 
-    //function loadFile() {
-    //  let item = localStorage.getItem("edit-selected-data");
-    //  if (item) {
-    //    fileItem = JSON.parse(item);
-    //    console.info(fileItem);
-    //    document.querySelector(".base").innerText = '__'+fileItem.base;
-    //    document.querySelector(".dir").innerText = fileItem.dir;
-    //    name = fixPath(fileItem.dir + "/" + fileItem.base);
-    //
-    //    let url = `${location.protocol}//${location.hostname}:3000/api/file?name=${name}`;
-    //    console.info(url);
-    //     fetch(url, {responseType: 'text'}).then(res=>{
-    //       console.info(res);
-    //     });
-    //    //editorOptions.language = getMonacoLanguageFromFileSuffix(fileItem.ext);
-    //    //
-    //    //editService
-    //    //    .loadFile(name)
-    //    //    .subscribe(
-    //    //        s => {
-    //    //          text = s;
-    //    //          cdr.detectChanges();
-    //    //        }
-    //    //    );
-    //  }
-    //}
 
     function getVSCodeProperties(element) {
       const computedStyle = getComputedStyle(element);
@@ -245,28 +215,6 @@
 
     require.config({paths: {vs: location.origin + "/assets/monaco/min/vs"}});
     require(["vs/editor/editor.main"], function () {
-
-      /*
-editorOptions = {
-  language: 'json',
-  minimap: { enabled: false },
-  scrollBeyondLastLine: false,
-  lineHeight: 20,
-  fontSize: 14,
-  wordWrap: 'on',
-  wrappingIndent: 'indent',
-};
-
-
-
-      this.editor = monaco.editor.create(editorContainer, {
-        value: '// Type your code here',
-        language: 'typescript',
-        theme: 'vs-dark',
-        automaticLayout: true
-      });
-
- */
 
       let item = localStorage.getItem("edit-selected-data");
       if (item) {
@@ -299,22 +247,12 @@ editorOptions = {
               let editorelement = document.getElementById("container");
               monaco.editor.onDidCreateEditor(codeEditor => {
                 console.info("onDidCreateEditor", codeEditor);
-                initCss(editorelement);
-                //setTimeout(() => initCss(editorelement), 1000);
+                //initCss(editorelement);
+                setTimeout(() => initCss(editorelement), 100);
                 //loadFile();
               });
               monaco.editor.create(editorelement, editorOptions);
             });
-        //editorOptions.language = getMonacoLanguageFromFileSuffix(fileItem.ext);
-        //
-        //editService
-        //    .loadFile(name)
-        //    .subscribe(
-        //        s => {
-        //          text = s;
-        //          cdr.detectChanges();
-        //        }
-        //    );
       }
 
 
