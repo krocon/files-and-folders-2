@@ -2,26 +2,326 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>Monaco Editor</title>
+  <title>FnF Edit</title>
+  <link
+      href="assets/favicon-folder-open-o.ico"
+      rel="shortcut icon"
+      type="image/x-icon">
+
   <style>
-    #container {
-      width: 100%;
-      height: 90vh;
+    html, body {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: clip;
     }
+
+    body {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      width: 100vw;
+      height: 100vh;
+
+      /*background-color: var(--vscode-editor-background, #000);*/
+      /*color: var(--vscode-editor-foreground, #fff);*/
+      background-color: var(--vscode-breadcrumb-background, #1e1e1e);
+      color: var(--vscode-breadcrumb-foreground, rgba(204, 204, 204, 0.8));
+
+      .title-div {
+        padding: 8px 16px;
+
+        .base {
+          font-weight: bold;
+          font-size: 1.2em;
+          background-color: var(--vscode-breadcrumb-background, #1e1e1e);
+          color: var(--vscode-breadcrumb-foreground, rgba(204, 204, 204, 0.8));
+        }
+
+        .dir {
+          font-weight: normal;
+          font-size: 0.8em;
+        }
+      }
+
+      .button-div {
+        padding: 8px 16px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+      }
+
+
+      button {
+        padding: 8px 18px;
+        border-radius: 4px;
+        background-color: var(--vscode-button-background, #0e639c);
+        color: var(--vscode-button-foreground, #ffffff) !important;
+        border-color: var(--vscode-button-separator, rgba(255, 255, 255, 0.4));
+      }
+
+      button:hover {
+        background-color: var(--vscode-button-hoverBackground, #1177bb);
+      }
+
+      button:focus {
+        border-color: var(--vscode-focusBorder, #007fd4);
+      }
+
+
+      button.secondary {
+        background-color: var(--vscode-button-secondaryBackground, #0e639c);
+        color: var(--vscode-button-secondaryForeground, #ffffff);
+      }
+
+      button.secondary:hover {
+        background-color: var(--vscode-button-secondaryHoverBackground, #1177bb);
+      }
+    }
+
   </style>
-  <script src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
+  <script src="/assets/monaco/min/vs/loader.js"></script>
 </head>
 <body>
+
+
+<div class="title-div">
+  <div class="base">&nbsp;</div>
+  <div class="dir">&nbsp;</div>
+</div>
+
 <div id="container"></div>
+
+<div class="button-div">
+  <button class="secondary">Close</button>
+  <div></div>
+  <button>Save</button>
+</div>
+
 <script>
-  //require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@latest/min/vs' } });
-  require.config({paths: {vs: location.origin + "/assets/monaco/min/vs"}});
-  require(["vs/editor/editor.main"], function () {
-    monaco.editor.create(document.getElementById("container"), {
-      value: ["function hello() {", "\talert(\"Hello world!\");", "}"].join("\n"),
-      language: "javascript"
+  function init() {
+
+    let apiPort = 3333;
+    let fileItem;
+    let name;
+    let dir;
+    let editorOptions;
+
+    /**
+     * Returns the appropriate Monaco Editor language identifier for a given file extension
+     * @param fileSuffix The file extension including the dot (e.g., '.json', '.ts')
+     * @returns The corresponding Monaco Editor language identifier or 'plaintext' if not found
+     */
+    function getMonacoLanguageFromFileSuffix(fileSuffix) {
+      // Normalize the file suffix by ensuring it starts with a dot and converting to lowercase
+      const normalizedSuffix = fileSuffix.startsWith(".")
+          ? fileSuffix.toLowerCase()
+          : `.${fileSuffix.toLowerCase()}`;
+
+      // Map of file extensions to Monaco Editor language identifiers
+      const extensionToLanguageMap = {
+        // Common web languages
+        ".html": "html",
+        ".htm": "html",
+        ".css": "css",
+        ".scss": "scss",
+        ".less": "less",
+        ".js": "javascript",
+        ".jsx": "javascript",
+        ".ts": "typescript",
+        ".tsx": "typescript",
+        ".json": "json",
+        ".jsonc": "json",
+        ".xml": "xml",
+        ".svg": "xml",
+
+        // Markdown and documentation
+        ".md": "markdown",
+        ".markdown": "markdown",
+        ".txt": "plaintext",
+
+        // Backend languages
+        ".java": "java",
+        ".py": "python",
+        ".rb": "ruby",
+        ".php": "php",
+        ".cs": "csharp",
+        ".cpp": "cpp",
+        ".c": "c",
+        ".h": "cpp",
+        ".hpp": "cpp",
+        ".go": "go",
+        ".rs": "rust",
+        ".swift": "swift",
+        ".kt": "kotlin",
+
+        // Configuration files
+        ".yaml": "yaml",
+        ".yml": "yaml",
+        ".toml": "toml",
+        ".ini": "ini",
+        ".config": "xml",
+        ".properties": "properties",
+
+        // Shell scripts
+        ".sh": "shell",
+        ".bash": "shell",
+        ".zsh": "shell",
+        ".ps1": "powershell",
+        ".bat": "bat",
+        ".cmd": "bat",
+
+        // Database
+        ".sql": "sql",
+
+        // Other
+        ".docker": "dockerfile",
+        ".dockerfile": "dockerfile",
+        ".graphql": "graphql",
+        ".gql": "graphql",
+      };
+
+      // Return the mapped language or 'plaintext' if no mapping exists
+      return extensionToLanguageMap[normalizedSuffix] || "plaintext";
+    }
+
+    function fixPath(dir) {
+      return dir.replace(/\/{2,}/g, "/");
+    }
+
+    //function loadFile() {
+    //  let item = localStorage.getItem("edit-selected-data");
+    //  if (item) {
+    //    fileItem = JSON.parse(item);
+    //    console.info(fileItem);
+    //    document.querySelector(".base").innerText = '__'+fileItem.base;
+    //    document.querySelector(".dir").innerText = fileItem.dir;
+    //    name = fixPath(fileItem.dir + "/" + fileItem.base);
+    //
+    //    let url = `${location.protocol}//${location.hostname}:3000/api/file?name=${name}`;
+    //    console.info(url);
+    //     fetch(url, {responseType: 'text'}).then(res=>{
+    //       console.info(res);
+    //     });
+    //    //editorOptions.language = getMonacoLanguageFromFileSuffix(fileItem.ext);
+    //    //
+    //    //editService
+    //    //    .loadFile(name)
+    //    //    .subscribe(
+    //    //        s => {
+    //    //          text = s;
+    //    //          cdr.detectChanges();
+    //    //        }
+    //    //    );
+    //  }
+    //}
+
+    function getVSCodeProperties(element) {
+      const computedStyle = getComputedStyle(element);
+      console.info("getVSCodeProperties", computedStyle);
+      return Array.from(computedStyle)
+          .filter(prop => {
+            const value = computedStyle.getPropertyValue(prop);
+            return prop.startsWith("--vscode");
+            //  && (value.startsWith("rgb") || value.startsWith("#"));
+          })
+          .map(prop => [prop, computedStyle.getPropertyValue(prop)]);
+    }
+
+    function initCss(editorElement) {
+      console.info("initCss", editorElement);
+      const properties = getVSCodeProperties(editorElement);
+      console.info(properties);
+      const buf = [];
+      properties.forEach(([prop, value]) => {
+        buf.push(`${prop}: ${value};`);
+      });
+      console.info(buf.sort().join("\n"));
+
+      properties.forEach(([prop, value]) => {
+        document.body.style.setProperty(prop, value);
+      });
+    }
+
+    require.config({paths: {vs: location.origin + "/assets/monaco/min/vs"}});
+    require(["vs/editor/editor.main"], function () {
+
+      /*
+editorOptions = {
+  language: 'json',
+  minimap: { enabled: false },
+  scrollBeyondLastLine: false,
+  lineHeight: 20,
+  fontSize: 14,
+  wordWrap: 'on',
+  wrappingIndent: 'indent',
+};
+
+
+
+      this.editor = monaco.editor.create(editorContainer, {
+        value: '// Type your code here',
+        language: 'typescript',
+        theme: 'vs-dark',
+        automaticLayout: true
+      });
+
+ */
+
+      let item = localStorage.getItem("edit-selected-data");
+      if (item) {
+        fileItem = JSON.parse(item);
+        console.info(fileItem);
+        document.querySelector(".base").innerText = "__" + fileItem.base;
+        document.querySelector(".dir").innerText = fileItem.dir;
+        name = fixPath(fileItem.dir + "/" + fileItem.base);
+
+        let url = `${location.protocol}//${location.hostname}:${apiPort}/api/file?name=${name}`;
+        console.info(url);
+
+        fetch(url, {
+          headers: {
+            "Accept": "application/text"
+          }
+        })
+            .then(res => {
+              console.info(res);
+              let text = "marc";
+              res.text();
+              console.info(text);
+
+              editorOptions = {
+                value: text,
+                language: getMonacoLanguageFromFileSuffix(fileItem.ext),
+                theme: "vs-dark",
+                automaticLayout: true
+              };
+
+              let editorelement = document.getElementById("container");
+              monaco.editor.onDidCreateEditor(codeEditor => {
+                console.info("onDidCreateEditor", codeEditor);
+                //setTimeout(() => initCss(editorelement), 1000);
+                //loadFile();
+              });
+              monaco.editor.create(editorelement, editorOptions);
+            });
+        //editorOptions.language = getMonacoLanguageFromFileSuffix(fileItem.ext);
+        //
+        //editService
+        //    .loadFile(name)
+        //    .subscribe(
+        //        s => {
+        //          text = s;
+        //          cdr.detectChanges();
+        //        }
+        //    );
+      }
+
+
     });
-  });
+  }
+
+  init();
 </script>
 </body>
 </html>
