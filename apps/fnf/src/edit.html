@@ -213,6 +213,57 @@
     }
   </style>
   <script src="/assets/monaco/min/vs/loader.js"></script>
+  <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+  <style>
+    .icon-button-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+    }
+
+    .icon-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      background-color: var(--vscode-button-background);
+      color: var(--vscode-button-foreground);
+      border: 1px solid var(--vscode-button-separator);
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .icon-button:hover {
+      background-color: var(--vscode-button-hoverBackground);
+    }
+
+    .icon-button.active {
+      background-color: var(--vscode-actionBar-toggledBackground, rgba(0, 127, 212, 0.4));
+    }
+
+    .icon-button .material-icons {
+      font-size: 20px;
+    }
+
+    .theme-selector {
+      height: 36px;
+      background-color: var(--vscode-dropdown-background);
+      color: var(--vscode-dropdown-foreground);
+      border: 1px solid var(--vscode-dropdown-border);
+      border-radius: 4px;
+      padding: 0 8px;
+      cursor: pointer;
+    }
+
+    .theme-selector:focus {
+      outline: 1px solid var(--vscode-focusBorder);
+    }
+  </style>
 </head>
 <body>
 
@@ -257,8 +308,43 @@
     <div class="base">&nbsp;</div>
     <div class="dir">&nbsp;</div>
   </div>
-  <div>
-    TODO icon buttons here
+  <div class="icon-button-container">
+    <select
+        id="themeSelector"
+        class="theme-selector"
+        title="Select editor theme">
+      <option value="vs">Light</option>
+      <option
+          value="vs-dark"
+          selected>Dark
+      </option>
+      <option value="hc-black">High Contrast Dark</option>
+      <option value="hc-light">High Contrast Light</option>
+    </select>
+    <div
+        id="lineNumbersToggle"
+        class="icon-button active"
+        title="Toggle line numbers">
+      <span class="material-icons">format_list_numbered</span>
+    </div>
+    <div
+        id="minimapToggle"
+        class="icon-button active"
+        title="Toggle minimap">
+      <span class="material-icons">view_sidebar</span>
+    </div>
+    <div
+        id="wordWrapToggle"
+        class="icon-button"
+        title="Toggle word wrap">
+      <span class="material-icons">wrap_text</span>
+    </div>
+    <div
+        id="searchReplaceBtn"
+        class="icon-button"
+        title="Search and replace">
+      <span class="material-icons">search</span>
+    </div>
   </div>
 </div>
 
@@ -434,7 +520,10 @@
       value: content,
       language: getMonacoLanguageFromFileSuffix(fileItem.ext),
       theme: "vs-dark",
-      automaticLayout: true
+      automaticLayout: true,
+      lineNumbers: "on",
+      minimap: {enabled: true},
+      wordWrap: "off"
     };
 
     const editorElement = document.getElementById("container");
@@ -551,11 +640,80 @@
     modal.classList.remove("show");
   }
 
+  // Editor customization functions
+  function toggleLineNumbers() {
+    if (!editor) return;
+
+    const currentState = editor.getOption(monaco.editor.EditorOption.lineNumbers);
+    const newState = currentState === monaco.editor.LineNumbersType.On
+        ? monaco.editor.LineNumbersType.Off
+        : monaco.editor.LineNumbersType.On;
+
+    editor.updateOptions({lineNumbers: newState});
+
+    // Update button state
+    const button = document.getElementById("lineNumbersToggle");
+    if (newState === monaco.editor.LineNumbersType.On) {
+      button.classList.add("active");
+    } else {
+      button.classList.remove("active");
+    }
+  }
+
+  function toggleMinimap() {
+    if (!editor) return;
+
+    const currentState = editor.getOption(monaco.editor.EditorOption.minimap).enabled;
+    editor.updateOptions({minimap: {enabled: !currentState}});
+
+    // Update button state
+    const button = document.getElementById("minimapToggle");
+    if (!currentState) {
+      button.classList.add("active");
+    } else {
+      button.classList.remove("active");
+    }
+  }
+
+  function toggleWordWrap() {
+    if (!editor) return;
+
+    const currentState = editor.getOption(monaco.editor.EditorOption.wordWrap);
+    const newState = currentState === "off" ? "on" : "off";
+
+    editor.updateOptions({wordWrap: newState});
+
+    // Update button state
+    const button = document.getElementById("wordWrapToggle");
+    if (newState === "on") {
+      button.classList.add("active");
+    } else {
+      button.classList.remove("active");
+    }
+  }
+
+  function changeTheme(theme) {
+    if (!editor) return;
+    monaco.editor.setTheme(theme);
+  }
+
+  function openSearchReplace() {
+    if (!editor) return;
+    editor.getAction("actions.find").run();
+  }
+
   // Event handlers
   function setupEventListeners() {
     const closeButton = document.getElementById("closeBtn");
     const saveButton = document.getElementById("saveBtn");
     const toastClose = document.getElementById("toastClose");
+
+    // Editor customization buttons
+    const themeSelector = document.getElementById("themeSelector");
+    const lineNumbersToggle = document.getElementById("lineNumbersToggle");
+    const minimapToggle = document.getElementById("minimapToggle");
+    const wordWrapToggle = document.getElementById("wordWrapToggle");
+    const searchReplaceBtn = document.getElementById("searchReplaceBtn");
 
     closeButton.addEventListener("click", () => {
       if (contentModified) {
@@ -581,6 +739,16 @@
     toastClose.addEventListener("click", () => {
       hideToast();
     });
+
+    // Add event listeners for editor customization buttons
+    themeSelector.addEventListener("change", (e) => {
+      changeTheme(e.target.value);
+    });
+
+    lineNumbersToggle.addEventListener("click", toggleLineNumbers);
+    minimapToggle.addEventListener("click", toggleMinimap);
+    wordWrapToggle.addEventListener("click", toggleWordWrap);
+    searchReplaceBtn.addEventListener("click", openSearchReplace);
   }
 
   // Initialize application
