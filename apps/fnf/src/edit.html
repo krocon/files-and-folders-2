@@ -38,6 +38,12 @@
 
       --vscode-breadcrumb-background: #1e1e1e;
       --vscode-breadcrumb-foreground: rgba(204, 204, 204, 0.8);
+      --vscode-breadcrumb-focusForeground: #e0e0e0;
+
+      --vscode-actionBar-toggledBackground: rgba(0, 127, 212, 0.4);
+      --vscode-dropdown-background: #3c3c3c;
+      --vscode-dropdown-foreground: #f0f0f0;
+      --vscode-dropdown-border: #3c3c3c;
 
       background-color: var(--vscode-breadcrumb-background);
       color: var(--vscode-breadcrumb-foreground);
@@ -107,8 +113,8 @@
     .base {
       font-weight: bold;
       font-size: 1.2em;
-      background-color: var(--vscode-breadcrumb-background, #1e1e1e);
-      color: var(--vscode-breadcrumb-foreground, rgba(204, 204, 204, 0.8));
+      background-color: var(--vscode-breadcrumb-background);
+      color: var(--vscode-breadcrumb-foreground);
     }
 
     .dir {
@@ -196,18 +202,18 @@
 
     .modal-header h3 {
       margin: 0;
-      color: var(--vscode-breadcrumb-foreground, rgba(204, 204, 204, 0.8));
+      color: var(--vscode-breadcrumb-foreground);
       font-size: 1.2em;
     }
 
     .modal-body {
       padding: 20px;
-      color: var(--vscode-breadcrumb-foreground, rgba(204, 204, 204, 0.8));
+      color: var(--vscode-breadcrumb-foreground);
     }
 
     .modal-footer {
       padding: 15px 20px;
-      border-top: 1px solid rgba(204, 204, 204, 0.2);
+      border-top: solid 1px var(--vscode-breadcrumb-focusForeground);
       display: flex;
       justify-content: flex-end;
       gap: 10px;
@@ -244,7 +250,7 @@
     }
 
     .icon-button.active {
-      background-color: var(--vscode-actionBar-toggledBackground, rgba(0, 127, 212, 0.4));
+      background-color: var(--vscode-actionBar-toggledBackground);
     }
 
     .icon-button .material-icons {
@@ -784,15 +790,15 @@
 
   function initMoreThemes() {
     renderThemeOptions();
-
-    fetch("/assets/monaco/themes/onedark.json")
-        .then(res => res.json())
-        .then(theme => {
-          console.info(theme);
-          //monaco.editor.defineTheme("onedark", theme);
-          //monaco.editor.setTheme("onedark");
-          renderThemeOptions();
-        });
+    //
+    //fetch("/assets/monaco/themes/onedark.json")
+    //    .then(res => res.json())
+    //    .then(theme => {
+    //      console.info(theme);
+    //      //monaco.editor.defineTheme("onedark", theme);
+    //      //monaco.editor.setTheme("onedark");
+    //      renderThemeOptions();
+    //    });
   }
 
   // Initialize application
