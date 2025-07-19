@@ -24,66 +24,60 @@
       width: 100vw;
       height: 100vh;
 
-      /*background-color: var(--vscode-editor-background, #000);*/
-      /*color: var(--vscode-editor-foreground, #fff);*/
       background-color: var(--vscode-breadcrumb-background, #1e1e1e);
       color: var(--vscode-breadcrumb-foreground, rgba(204, 204, 204, 0.8));
-
-      .title-div {
-        padding: 8px 16px;
-
-        .base {
-          font-weight: bold;
-          font-size: 1.2em;
-          background-color: var(--vscode-breadcrumb-background, #1e1e1e);
-          color: var(--vscode-breadcrumb-foreground, rgba(204, 204, 204, 0.8));
-        }
-
-        .dir {
-          font-weight: normal;
-          font-size: 0.8em;
-        }
-      }
-
-      .button-div {
-        padding: 8px 16px;
-        display: grid;
-        grid-template-columns: auto 1fr auto;
-      }
-
-
-      button {
-        padding: 8px 18px;
-        border-radius: 4px;
-        background-color: var(--vscode-button-background, #0e639c);
-        color: var(--vscode-button-foreground, #ffffff) !important;
-        border-color: var(--vscode-button-separator, rgba(255, 255, 255, 0.4));
-      }
-
-      button:hover {
-        background-color: var(--vscode-button-hoverBackground, #1177bb);
-      }
-
-      button:focus {
-        border-color: var(--vscode-focusBorder, #007fd4);
-      }
-
-
-      button.secondary {
-        background-color: var(--vscode-button-secondaryBackground, #0e639c);
-        color: var(--vscode-button-secondaryForeground, #ffffff);
-      }
-
-      button.secondary:hover {
-        background-color: var(--vscode-button-secondaryHoverBackground, #1177bb);
-      }
     }
 
+    .title-div {
+      padding: 8px 16px;
+    }
+
+    .base {
+      font-weight: bold;
+      font-size: 1.2em;
+      background-color: var(--vscode-breadcrumb-background, #1e1e1e);
+      color: var(--vscode-breadcrumb-foreground, rgba(204, 204, 204, 0.8));
+    }
+
+    .dir {
+      font-weight: normal;
+      font-size: 0.8em;
+    }
+
+    .button-div {
+      padding: 8px 16px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+    }
+
+    button {
+      padding: 8px 18px;
+      border-radius: 4px;
+      background-color: var(--vscode-button-background, #0e639c);
+      color: var(--vscode-button-foreground, #ffffff) !important;
+      border-color: var(--vscode-button-separator, rgba(255, 255, 255, 0.4));
+    }
+
+    button:hover {
+      background-color: var(--vscode-button-hoverBackground, #1177bb);
+    }
+
+    button:focus {
+      border-color: var(--vscode-focusBorder, #007fd4);
+    }
+
+    button.secondary {
+      background-color: var(--vscode-button-secondaryBackground, #0e639c);
+      color: var(--vscode-button-secondaryForeground, #ffffff);
+    }
+
+    button.secondary:hover {
+      background-color: var(--vscode-button-secondaryHoverBackground, #1177bb);
+    }
   </style>
   <script src="/assets/monaco/min/vs/loader.js"></script>
 </head>
 <body>
-
 
 <div class="title-div">
   <div class="base">&nbsp;</div>
@@ -93,162 +87,219 @@
 <div id="container"></div>
 
 <div class="button-div">
-  <button class="secondary">Close</button>
+  <button
+      id="closeBtn"
+      class="secondary">Close
+  </button>
   <div></div>
-  <button>Save</button>
+  <button id="saveBtn">Save</button>
 </div>
 
 <script>
-  function init() {
+  // Configuration
+  const API_PORT = 3333;
+  let editor = null;
+  let fileItem = null;
+  let filePath = null;
 
-    let apiPort = 3333;
-    let fileItem;
-    let name;
-    let editorOptions;
+  // Language mapping for Monaco editor
+  function getMonacoLanguageFromFileSuffix(fileSuffix) {
+    const normalizedSuffix = fileSuffix.startsWith(".")
+        ? fileSuffix.toLowerCase()
+        : `.${fileSuffix.toLowerCase()}`;
 
-    function getMonacoLanguageFromFileSuffix(fileSuffix) {
-      // Normalize the file suffix by ensuring it starts with a dot and converting to lowercase
-      const normalizedSuffix = fileSuffix.startsWith(".")
-          ? fileSuffix.toLowerCase()
-          : `.${fileSuffix.toLowerCase()}`;
+    const extensionToLanguageMap = {
+      ".html": "html",
+      ".htm": "html",
+      ".css": "css",
+      ".scss": "scss",
+      ".less": "less",
+      ".js": "javascript",
+      ".jsx": "javascript",
+      ".ts": "typescript",
+      ".tsx": "typescript",
+      ".json": "json",
+      ".jsonc": "json",
+      ".xml": "xml",
+      ".svg": "xml",
+      ".md": "markdown",
+      ".markdown": "markdown",
+      ".txt": "plaintext",
+      ".java": "java",
+      ".py": "python",
+      ".rb": "ruby",
+      ".php": "php",
+      ".cs": "csharp",
+      ".cpp": "cpp",
+      ".c": "c",
+      ".h": "cpp",
+      ".hpp": "cpp",
+      ".go": "go",
+      ".rs": "rust",
+      ".swift": "swift",
+      ".kt": "kotlin",
+      ".yaml": "yaml",
+      ".yml": "yaml",
+      ".toml": "toml",
+      ".ini": "ini",
+      ".config": "xml",
+      ".properties": "properties",
+      ".sh": "shell",
+      ".bash": "shell",
+      ".zsh": "shell",
+      ".ps1": "powershell",
+      ".bat": "bat",
+      ".cmd": "bat",
+      ".sql": "sql",
+      ".docker": "dockerfile",
+      ".dockerfile": "dockerfile",
+      ".graphql": "graphql",
+      ".gql": "graphql",
+    };
 
-      // Map of file extensions to Monaco Editor language identifiers
-      const extensionToLanguageMap = {
-        // Common web languages
-        ".html": "html",
-        ".htm": "html",
-        ".css": "css",
-        ".scss": "scss",
-        ".less": "less",
-        ".js": "javascript",
-        ".jsx": "javascript",
-        ".ts": "typescript",
-        ".tsx": "typescript",
-        ".json": "json",
-        ".jsonc": "json",
-        ".xml": "xml",
-        ".svg": "xml",
+    return extensionToLanguageMap[normalizedSuffix] || "plaintext";
+  }
 
-        // Markdown and documentation
-        ".md": "markdown",
-        ".markdown": "markdown",
-        ".txt": "plaintext",
+  // Path utilities
+  function fixPath(dir) {
+    return dir.replace(/\/{2,}/g, "/");
+  }
 
-        // Backend languages
-        ".java": "java",
-        ".py": "python",
-        ".rb": "ruby",
-        ".php": "php",
-        ".cs": "csharp",
-        ".cpp": "cpp",
-        ".c": "c",
-        ".h": "cpp",
-        ".hpp": "cpp",
-        ".go": "go",
-        ".rs": "rust",
-        ".swift": "swift",
-        ".kt": "kotlin",
-
-        // Configuration files
-        ".yaml": "yaml",
-        ".yml": "yaml",
-        ".toml": "toml",
-        ".ini": "ini",
-        ".config": "xml",
-        ".properties": "properties",
-
-        // Shell scripts
-        ".sh": "shell",
-        ".bash": "shell",
-        ".zsh": "shell",
-        ".ps1": "powershell",
-        ".bat": "bat",
-        ".cmd": "bat",
-
-        // Database
-        ".sql": "sql",
-
-        // Other
-        ".docker": "dockerfile",
-        ".dockerfile": "dockerfile",
-        ".graphql": "graphql",
-        ".gql": "graphql",
-      };
-
-      // Return the mapped language or 'plaintext' if no mapping exists
-      return extensionToLanguageMap[normalizedSuffix] || "plaintext";
-    }
-
-    function fixPath(dir) {
-      return dir.replace(/\/{2,}/g, "/");
-    }
-
-
-    function getVSCodeProperties(element) {
-      const computedStyle = getComputedStyle(element);
-      return Array.from(computedStyle)
-          .filter(prop => {
-            const value = computedStyle.getPropertyValue(prop);
-            return prop.startsWith("--vscode")
-                && (value.startsWith("rgb") || value.startsWith("#"));
-          })
-          .map(prop => [prop, computedStyle.getPropertyValue(prop)]);
-    }
-
-    function debugCssProps() {
-      const buf = [];
-      properties.forEach(([prop, value]) => {
-        buf.push(`${prop}: ${value};`);
-      });
-      console.log(buf.sort().join("\n"));
-    }
-
-    function initCss(editorElement) {
-      const properties = getVSCodeProperties(editorElement);
-      // debugCssProps();
-      properties.forEach(([prop, value]) => {
-        document.body.style.setProperty(prop, value);
-      });
-    }
-
-    require.config({paths: {vs: location.origin + "/assets/monaco/min/vs"}});
-    require(["vs/editor/editor.main"], function () {
-
-      let item = localStorage.getItem("edit-selected-data");
-      if (item) {
-        fileItem = JSON.parse(item);
-        document.querySelector(".base").innerText = fileItem.base;
-        document.querySelector(".dir").innerText = fileItem.dir;
-        name = fixPath(fileItem.dir + "/" + fileItem.base);
-        let url = `${location.protocol}//${location.hostname}:${apiPort}/api/file?name=${name}`;
-
-        fetch(url, {
-          headers: {
-            "Accept": "application/text"
-          }
+  // CSS utilities
+  function getVSCodeProperties(element) {
+    const computedStyle = getComputedStyle(element);
+    return Array.from(computedStyle)
+        .filter(prop => {
+          const value = computedStyle.getPropertyValue(prop);
+          return prop.startsWith("--vscode")
+              && (value.startsWith("rgb") || value.startsWith("#"));
         })
-            .then(async res => {
-              let text = await res.text();
-              editorOptions = {
-                value: text,
-                language: getMonacoLanguageFromFileSuffix(fileItem.ext),
-                theme: "vs-dark",
-                automaticLayout: true
-              };
+        .map(prop => [prop, computedStyle.getPropertyValue(prop)]);
+  }
 
-              let editorelement = document.getElementById("container");
-              monaco.editor.onDidCreateEditor(codeEditor => {
-                setTimeout(() => initCss(document.querySelector(".monaco-editor")), 100);
-              });
-
-              monaco.editor.create(editorelement, editorOptions);
-            });
-      }
-
-
+  function applyVSCodeTheme(editorElement) {
+    const properties = getVSCodeProperties(editorElement);
+    properties.forEach(([prop, value]) => {
+      document.body.style.setProperty(prop, value);
     });
   }
 
+  // File operations
+  function loadFileData() {
+    const storedData = localStorage.getItem("edit-selected-data");
+    if (!storedData) {
+      return false;
+    }
+
+    fileItem = JSON.parse(storedData);
+    updateFileInfo(fileItem);
+    filePath = fixPath(fileItem.dir + "/" + fileItem.base);
+    return true;
+  }
+
+  function updateFileInfo(fileData) {
+    document.querySelector(".base").innerText = fileData.base;
+    document.querySelector(".dir").innerText = fileData.dir;
+  }
+
+  function fetchFileContent() {
+    const url = `${location.protocol}//${location.hostname}:${API_PORT}/api/file?name=${filePath}`;
+
+    return fetch(url, {
+      headers: {
+        "Accept": "application/text"
+      }
+    })
+        .then(response => response.text());
+  }
+
+  function saveFileContent() {
+    if (!editor || !filePath) return;
+
+    const content = editor.getValue();
+    const url = `${location.protocol}//${location.hostname}:${API_PORT}/api/file?name=${filePath}`;
+
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/text"
+      },
+      body: content
+    })
+        .then(response => {
+          if (response.ok) {
+            alert("File saved successfully");
+          } else {
+            alert("Error saving file");
+          }
+        })
+        .catch(error => {
+          console.error("Error saving file:", error);
+          alert("Error saving file");
+        });
+  }
+
+  // Editor initialization
+  function createEditor(content) {
+    const editorOptions = {
+      value: content,
+      language: getMonacoLanguageFromFileSuffix(fileItem.ext),
+      theme: "vs-dark",
+      automaticLayout: true
+    };
+
+    const editorElement = document.getElementById("container");
+    editor = monaco.editor.create(editorElement, editorOptions);
+
+    return editor;
+  }
+
+  function initMonacoEditor() {
+    require.config({paths: {vs: location.origin + "/assets/monaco/min/vs"}});
+    require(["vs/editor/editor.main"], function () {
+      monaco.editor.onDidCreateEditor(editor => {
+        setTimeout(() => {
+          const monacoElement = document.querySelector(".monaco-editor");
+          if (monacoElement) {
+            applyVSCodeTheme(monacoElement);
+          }
+        }, 100);
+      });
+
+      if (loadFileData()) {
+        fetchFileContent()
+            .then(content => {
+              createEditor(content);
+            })
+            .catch(error => {
+              console.error("Error loading file:", error);
+              alert("Error loading file content");
+            });
+      }
+    });
+  }
+
+  // Event handlers
+  function setupEventListeners() {
+    const closeButton = document.getElementById("closeBtn");
+    const saveButton = document.getElementById("saveBtn");
+
+    closeButton.addEventListener("click", () => {
+      window.close();
+    });
+
+    saveButton.addEventListener("click", () => {
+      saveFileContent();
+    });
+  }
+
+  // Initialize application
+  function init() {
+    setupEventListeners();
+    initMonacoEditor();
+  }
+
+  // Start the application
   init();
 </script>
 </body>
