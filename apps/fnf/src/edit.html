@@ -99,6 +99,7 @@
       grid-template-columns: 1fr auto;
       grid-gap: 12px;
     }
+
     .title-div {
       padding: 8px 16px;
     }
@@ -295,8 +296,8 @@
     </div>
     <div class="modal-footer">
       <button
-          id="cancelCloseBtn"
-          class="secondary">Cancel
+          class="secondary"
+          id="cancelCloseBtn">Cancel
       </button>
       <button id="confirmCloseBtn">Close without saving</button>
     </div>
@@ -310,8 +311,8 @@
   </div>
   <div class="icon-button-container">
     <select
-        id="themeSelector"
         class="theme-selector"
+        id="themeSelector"
         title="Select editor theme">
       <!--option value="vs">Light</option>
       <option
@@ -322,26 +323,26 @@
       <option value="hc-light">High Contrast Light</option-->
     </select>
     <div
-        id="lineNumbersToggle"
         class="icon-button active"
+        id="lineNumbersToggle"
         title="Toggle line numbers">
       <span class="material-icons">format_list_numbered</span>
     </div>
     <div
-        id="minimapToggle"
         class="icon-button active"
+        id="minimapToggle"
         title="Toggle minimap">
       <span class="material-icons">view_sidebar</span>
     </div>
     <div
-        id="wordWrapToggle"
         class="icon-button"
+        id="wordWrapToggle"
         title="Toggle word wrap">
       <span class="material-icons">wrap_text</span>
     </div>
     <div
-        id="searchReplaceBtn"
         class="icon-button"
+        id="searchReplaceBtn"
         title="Search and replace">
       <span class="material-icons">search</span>
     </div>
@@ -366,6 +367,7 @@
   let fileItem = null;
   let filePath = null;
   let contentModified = false;
+  let lineNumbers = "on";
 
   // Language mapping for Monaco editor
   function getMonacoLanguageFromFileSuffix(fileSuffix) {
@@ -640,20 +642,17 @@
     modal.classList.remove("show");
   }
 
+
   // Editor customization functions
   function toggleLineNumbers() {
     if (!editor) return;
 
-    const currentState = editor.getOption(monaco.editor.EditorOption.lineNumbers);
-    const newState = currentState === monaco.editor.LineNumbersType.On
-        ? monaco.editor.LineNumbersType.Off
-        : monaco.editor.LineNumbersType.On;
-
-    editor.updateOptions({lineNumbers: newState});
+    lineNumbers = (lineNumbers === "on") ? "off" : "on";
+    editor.updateOptions({lineNumbers: lineNumbers});
 
     // Update button state
     const button = document.getElementById("lineNumbersToggle");
-    if (newState === monaco.editor.LineNumbersType.On) {
+    if (lineNumbers === "on") {
       button.classList.add("active");
     } else {
       button.classList.remove("active");
@@ -743,6 +742,7 @@
     // Add event listeners for editor customization buttons
     themeSelector.addEventListener("change", (e) => {
       changeTheme(e.target.value);
+      applyVSCodeTheme(document.querySelector(".monaco-editor"));
     });
 
     lineNumbersToggle.addEventListener("click", toggleLineNumbers);
