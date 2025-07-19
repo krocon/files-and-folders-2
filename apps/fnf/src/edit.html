@@ -104,9 +104,7 @@
     let apiPort = 3333;
     let fileItem;
     let name;
-    let dir;
     let editorOptions;
-
 
     function getMonacoLanguageFromFileSuffix(fileSuffix) {
       // Normalize the file suffix by ensuring it starts with a dot and converting to lowercase
@@ -188,26 +186,22 @@
 
     function getVSCodeProperties(element) {
       const computedStyle = getComputedStyle(element);
-      console.info("getVSCodeProperties", computedStyle);
       return Array.from(computedStyle)
           .filter(prop => {
             const value = computedStyle.getPropertyValue(prop);
-            return prop.startsWith("--vscode");
-            //  && (value.startsWith("rgb") || value.startsWith("#"));
+            return prop.startsWith("--vscode")
+                && (value.startsWith("rgb") || value.startsWith("#"));
           })
           .map(prop => [prop, computedStyle.getPropertyValue(prop)]);
     }
 
     function initCss(editorElement) {
-      console.info("initCss", editorElement);
       const properties = getVSCodeProperties(editorElement);
-      console.info(properties);
-      const buf = [];
-      properties.forEach(([prop, value]) => {
-        buf.push(`${prop}: ${value};`);
-      });
-      console.info(buf.sort().join("\n"));
-
+      //const buf = [];
+      //properties.forEach(([prop, value]) => {
+      //  buf.push(`${prop}: ${value};`);
+      //});
+      //console.info(buf.sort().join("\n"));
       properties.forEach(([prop, value]) => {
         document.body.style.setProperty(prop, value);
       });
@@ -219,13 +213,10 @@
       let item = localStorage.getItem("edit-selected-data");
       if (item) {
         fileItem = JSON.parse(item);
-        console.info(fileItem);
         document.querySelector(".base").innerText = fileItem.base;
         document.querySelector(".dir").innerText = fileItem.dir;
         name = fixPath(fileItem.dir + "/" + fileItem.base);
-
         let url = `${location.protocol}//${location.hostname}:${apiPort}/api/file?name=${name}`;
-        console.info(url);
 
         fetch(url, {
           headers: {
@@ -233,10 +224,7 @@
           }
         })
             .then(async res => {
-
               let text = await res.text();
-              console.info(text);
-
               editorOptions = {
                 value: text,
                 language: getMonacoLanguageFromFileSuffix(fileItem.ext),
@@ -246,11 +234,9 @@
 
               let editorelement = document.getElementById("container");
               monaco.editor.onDidCreateEditor(codeEditor => {
-                console.info("onDidCreateEditor", codeEditor);
-                //initCss(editorelement);
-                setTimeout(() => initCss(editorelement), 100);
-                //loadFile();
+                setTimeout(() => initCss(document.querySelector(".monaco-editor")), 100);
               });
+
               monaco.editor.create(editorelement, editorOptions);
             });
       }
