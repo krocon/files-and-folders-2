@@ -27,13 +27,25 @@
     }
 
     body {
+      --vscode-button-background: #0e639c;
+      --vscode-button-foreground: #ffffff;
+      --vscode-button-separator: rgba(255, 255, 255, 0.4);
+      --vscode-button-hoverBackground: #1177bb;
+      --vscode-focusBorder: #007fd4;
+      --vscode-button-secondaryBackground: #0e639c;
+      --vscode-button-secondaryForeground: #ffffff;
+      --vscode-button-secondaryHoverBackground: #1177bb;
+
+      --vscode-breadcrumb-background: #1e1e1e;
+      --vscode-breadcrumb-foreground: rgba(204, 204, 204, 0.8);
+
+      background-color: var(--vscode-breadcrumb-background);
+      color: var(--vscode-breadcrumb-foreground);
+
       display: grid;
       grid-template-rows: auto 1fr auto;
       width: 100vw;
       height: 100vh;
-
-      background-color: var(--vscode-breadcrumb-background, #1e1e1e);
-      color: var(--vscode-breadcrumb-foreground, rgba(204, 204, 204, 0.8));
     }
 
     .toast-container {
@@ -107,26 +119,26 @@
     button {
       padding: 8px 18px;
       border-radius: 4px;
-      background-color: var(--vscode-button-background, #0e639c);
-      color: var(--vscode-button-foreground, #ffffff) !important;
-      border-color: var(--vscode-button-separator, rgba(255, 255, 255, 0.4));
+      background-color: var(--vscode-button-background);
+      color: var(--vscode-button-foreground) !important;
+      border-color: var(--vscode-button-separator);
     }
 
     button:hover {
-      background-color: var(--vscode-button-hoverBackground, #1177bb);
+      background-color: var(--vscode-button-hoverBackground);
     }
 
     button:focus {
-      border-color: var(--vscode-focusBorder, #007fd4);
+      border-color: var(--vscode-focusBorder);
     }
 
     button.secondary {
-      background-color: var(--vscode-button-secondaryBackground, #0e639c);
-      color: var(--vscode-button-secondaryForeground, #ffffff);
+      background-color: var(--vscode-button-secondaryBackground);
+      color: var(--vscode-button-secondaryForeground);
     }
 
     button.secondary:hover {
-      background-color: var(--vscode-button-secondaryHoverBackground, #1177bb);
+      background-color: var(--vscode-button-secondaryHoverBackground);
     }
   </style>
   <script src="/assets/monaco/min/vs/loader.js"></script>
