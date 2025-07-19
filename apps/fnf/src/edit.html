@@ -88,8 +88,8 @@
 
 <div class="button-div">
   <button
-      id="closeBtn"
-      class="secondary">Close
+      class="secondary"
+      id="closeBtn">Close
   </button>
   <div></div>
   <button id="saveBtn">Save</button>
@@ -227,10 +227,10 @@
       body: content
     })
         .then(response => {
-          if (response.ok) {
-            alert("File saved successfully");
+          if (response.error) {
+            alert("Error saving file: " + response.error);
           } else {
-            alert("Error saving file");
+            alert("File saved successfully");
           }
         })
         .catch(error => {
