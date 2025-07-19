@@ -140,6 +140,67 @@
     button.secondary:hover {
       background-color: var(--vscode-button-secondaryHoverBackground);
     }
+
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background-color: var(--vscode-breadcrumb-background, #1e1e1e);
+      border: 1px solid var(--vscode-focusBorder, #007fd4);
+      border-radius: 6px;
+      width: 400px;
+      max-width: 90%;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      transform: translateY(-20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.show .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid rgba(204, 204, 204, 0.2);
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      color: var(--vscode-breadcrumb-foreground, rgba(204, 204, 204, 0.8));
+      font-size: 1.2em;
+    }
+
+    .modal-body {
+      padding: 20px;
+      color: var(--vscode-breadcrumb-foreground, rgba(204, 204, 204, 0.8));
+    }
+
+    .modal-footer {
+      padding: 15px 20px;
+      border-top: 1px solid rgba(204, 204, 204, 0.2);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
   </style>
   <script src="/assets/monaco/min/vs/loader.js"></script>
 </head>
@@ -157,6 +218,26 @@
     <div
         class="toast-close"
         id="toastClose">&times;
+    </div>
+  </div>
+</div>
+
+<div
+    class="modal-overlay"
+    id="confirmModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Unsaved Changes</h3>
+    </div>
+    <div class="modal-body">
+      <p>You have unsaved changes. Do you want to close without saving?</p>
+    </div>
+    <div class="modal-footer">
+      <button
+          id="cancelCloseBtn"
+          class="secondary">Cancel
+      </button>
+      <button id="confirmCloseBtn">Close without saving</button>
     </div>
   </div>
 </div>
@@ -398,6 +479,54 @@
     toast.classList.remove("show");
   }
 
+  // Modal dialog functions
+  function showConfirmModal(onConfirm, onCancel) {
+    const modal = document.getElementById("confirmModal");
+    const confirmBtn = document.getElementById("confirmCloseBtn");
+    const cancelBtn = document.getElementById("cancelCloseBtn");
+
+    // Show the modal
+    modal.classList.add("show");
+
+    // Set up event listeners for the buttons
+    const confirmHandler = () => {
+      hideConfirmModal();
+      if (onConfirm) onConfirm();
+
+      // Remove event listeners
+      confirmBtn.removeEventListener("click", confirmHandler);
+      cancelBtn.removeEventListener("click", cancelHandler);
+    };
+
+    const cancelHandler = () => {
+      hideConfirmModal();
+      if (onCancel) onCancel();
+
+      // Remove event listeners
+      confirmBtn.removeEventListener("click", confirmHandler);
+      cancelBtn.removeEventListener("click", cancelHandler);
+    };
+
+    // Add event listeners
+    confirmBtn.addEventListener("click", confirmHandler);
+    cancelBtn.addEventListener("click", cancelHandler);
+
+    // Add escape key handler
+    const escHandler = (event) => {
+      if (event.key === "Escape") {
+        cancelHandler();
+        document.removeEventListener("keydown", escHandler);
+      }
+    };
+
+    document.addEventListener("keydown", escHandler);
+  }
+
+  function hideConfirmModal() {
+    const modal = document.getElementById("confirmModal");
+    modal.classList.remove("show");
+  }
+
   // Event handlers
   function setupEventListeners() {
     const closeButton = document.getElementById("closeBtn");
@@ -406,9 +535,16 @@
 
     closeButton.addEventListener("click", () => {
       if (contentModified) {
-        if (confirm("You have unsaved changes. Do you want to close without saving?")) {
-          window.close();
-        }
+        showConfirmModal(
+            // onConfirm callback - user clicked "Close without saving"
+            () => {
+              window.close();
+            },
+            // onCancel callback - user clicked "Cancel" or pressed Escape
+            () => {
+              // Do nothing, just keep the editor open
+            }
+        );
       } else {
         window.close();
       }
