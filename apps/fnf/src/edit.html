@@ -313,13 +313,13 @@
         id="themeSelector"
         class="theme-selector"
         title="Select editor theme">
-      <option value="vs">Light</option>
+      <!--option value="vs">Light</option>
       <option
           value="vs-dark"
           selected>Dark
       </option>
       <option value="hc-black">High Contrast Dark</option>
-      <option value="hc-light">High Contrast Light</option>
+      <option value="hc-light">High Contrast Light</option-->
     </select>
     <div
         id="lineNumbersToggle"
@@ -447,7 +447,7 @@
     properties.forEach(([prop, value]) => {
       buf.push(`${prop}: ${value};`);
     });
-    console.log(buf.sort().join("\n"));
+    // console.log(buf.sort().join("\n"));
   }
 
   function applyVSCodeTheme(editorElement) {
@@ -751,12 +751,47 @@
     searchReplaceBtn.addEventListener("click", openSearchReplace);
   }
 
+  function renderThemeOptions() {
+    // Define theme options as a list of label-value pairs
+    const themeOptions = [
+      {label: "Light", value: "vs"},
+      {label: "Dark", value: "vs-dark"},
+      {label: "High Contrast Dark", value: "hc-black"},
+      {label: "High Contrast Light", value: "hc-light"},
+      //{ label: "One Dark", value: "onedark" },
+    ];
+
+    // Get the theme selector element
+    const themeSelector = document.getElementById("themeSelector");
+
+    // Clear existing options
+    themeSelector.innerHTML = "";
+
+    // Build options dynamically
+    themeOptions.forEach(option => {
+      const optionElement = document.createElement("option");
+      optionElement.value = option.value;
+      optionElement.textContent = option.label;
+
+      // Set the Dark theme as selected by default
+      if (option.value === "vs-dark") {
+        optionElement.selected = true;
+      }
+
+      themeSelector.appendChild(optionElement);
+    });
+  }
+
   function initMoreThemes() {
-    fetch("/assets/themes/onedark.json")
+    renderThemeOptions();
+
+    fetch("/assets/monaco/themes/onedark.json")
         .then(res => res.json())
         .then(theme => {
-          monaco.editor.defineTheme("onedark", theme);
+          console.info(theme);
+          //monaco.editor.defineTheme("onedark", theme);
           //monaco.editor.setTheme("onedark");
+          renderThemeOptions();
         });
   }
 
@@ -764,7 +799,7 @@
   function init() {
     setupEventListeners();
     initMonacoEditor();
-    initMorethemes();
+    initMoreThemes();
   }
 
   // Start the application
