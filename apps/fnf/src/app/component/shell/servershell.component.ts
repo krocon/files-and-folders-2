@@ -19,6 +19,7 @@ import {ServershellService} from "./service/servershell.service";
 import {Subject} from "rxjs";
 import {MatTooltip} from "@angular/material/tooltip";
 import {ServershellOutComponent} from "./servershell-out.component";
+import {AppService} from "../../app.service";
 
 @Component({
   selector: "fnf-servershell",
@@ -42,7 +43,7 @@ import {ServershellOutComponent} from "./servershell-out.component";
 })
 export class ServershellComponent implements OnInit, OnDestroy {
 
-  @Input() path = "";
+  @Input() path = "/Users/marckronberg/WebstormProjects/files-and-folders-2/test";
   @Input() text = "ls -al";
   @Output() focusChanged = new EventEmitter<boolean>();
 
@@ -61,11 +62,12 @@ export class ServershellComponent implements OnInit, OnDestroy {
     private readonly cdr: ChangeDetectorRef,
     private readonly shellHistoryService: ServershellHistoryService,
     private readonly shellService: ServershellService,
+    private readonly appService: AppService,
   ) {
   }
 
   ngOnInit(): void {
-    // TODO
+    this.path = this.appService.getActiveTabOnActivePanel().path;
   }
 
 
