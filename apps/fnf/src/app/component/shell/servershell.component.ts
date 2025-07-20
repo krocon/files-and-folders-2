@@ -88,9 +88,8 @@ export class ServershellComponent implements OnInit, OnDestroy {
 
     // generate     const emitKey = `ServerShell${this.rid}`;
     //     const cancelKey = `cancelServerShell${this.rid}`;
+// this.shellService.doSpawn(...)
 
-    // lsten to websocket emitKey
-    // TODO send /spawn via service
   }
 
   onFocusIn() {
