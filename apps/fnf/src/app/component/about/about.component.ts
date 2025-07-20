@@ -3,13 +3,15 @@ import {takeWhile} from "rxjs/operators";
 import {Sysinfo, SysinfoIf} from "@fnf/fnf-data";
 import {SysinfoService} from "../../service/sysinfo.service";
 import {JsonPipe} from "@angular/common";
+import {FnfTextLogoComponent} from "../common/textlogo/fnf-text-logo.component";
 
 @Component({
   selector: "fnf-about",
   templateUrl: "./about.component.html",
   styleUrls: ["./about.component.css"],
   imports: [
-    JsonPipe
+    JsonPipe,
+    FnfTextLogoComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

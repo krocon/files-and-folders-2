@@ -1,0 +1,136 @@
+.div-logo {
+    --word-collapsed-width: 0.92ch;
+    --word-files-expanded-width: 3.8ch;
+    --word-and-expanded-width: 3ch;
+    --word-folders-expanded-width: 7.1ch;
+    --animation-duration: 0.6s;
+
+    overflow-y: visible;
+    font-size: 48px;
+    font-weight: bold;
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-gap: 0;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    position: relative;
+
+    .div-left {
+        animation: collapseFiles var(--animation-duration) forwards;
+    }
+
+    .div-middle {
+        animation: collapseAnd var(--animation-duration) forwards;
+    }
+
+    .div-right {
+        animation: collapseFolders var(--animation-duration) forwards;
+    }
+
+    &.expanded,
+    &:hover {
+        grid-gap: 8px;
+
+        .div-left {
+            animation: expandFiles var(--animation-duration) forwards;
+        }
+
+        .div-middle {
+            animation: expandAnd var(--animation-duration) forwards;
+        }
+
+        .div-right {
+            animation: expandFolders var(--animation-duration) forwards;
+        }
+
+        .div-word {
+            width: fit-content;
+        }
+    }
+
+    .div-word {
+        display: grid;
+        position: relative;
+        transition: all var(--animation-duration) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        overflow-x: clip;
+        white-space: nowrap;
+        text-overflow: clip;
+        letter-spacing: -0.05em;
+
+
+        &.div-left {
+            justify-content: left;
+        }
+
+        &.div-middle {
+            justify-content: center;
+        }
+
+        &.div-right {
+            justify-content: left;
+        }
+
+        > div {
+            overflow-x: clip;
+            display: grid;
+            place-items: center;
+        }
+    }
+}
+
+
+/* Animation steps for growth using relative units */
+@keyframes expandFiles {
+    0% {
+        width: var(--word-collapsed-width);
+    }
+    100% {
+        width: var(--word-files-expanded-width);
+    }
+}
+
+@keyframes collapseFiles {
+    0% {
+        width: var(--word-files-expanded-width);
+    }
+    100% {
+        width: var(--word-collapsed-width);
+    }
+}
+
+@keyframes expandAnd {
+    0% {
+        width: var(--word-collapsed-width);
+    }
+    100% {
+        width: var(--word-and-expanded-width);
+    }
+}
+
+@keyframes collapseAnd {
+    0% {
+        width: var(--word-and-expanded-width);
+    }
+    100% {
+        width: var(--word-collapsed-width);
+    }
+}
+
+@keyframes expandFolders {
+    0% {
+        width: var(--word-collapsed-width);
+    }
+    100% {
+        width: var(--word-folders-expanded-width);
+    }
+}
+
+@keyframes collapseFolders {
+    0% {
+        width: var(--word-folders-expanded-width);
+    }
+    100% {
+        width: var(--word-collapsed-width);
+    }
+}
