@@ -14,7 +14,6 @@ import {ButtonEnableStates, buttonEnableStatesKey, CmdIf} from "@fnf/fnf-data";
 import {MatList} from "@angular/material/list";
 import {TaskButtonComponent} from "../../../task/task-list/task-button.component";
 import {FnfActionLabels} from "../../../../domain/action/fnf-action-labels";
-import {RouterLink} from "@angular/router";
 import {takeWhile} from "rxjs/operators";
 
 @Component({
@@ -31,7 +30,7 @@ import {takeWhile} from "rxjs/operators";
     MatDivider,
     MatList,
     TaskButtonComponent,
-    RouterLink,
+
   ],
   templateUrl: './buttonpanel.component.html',
   styleUrls: ['./buttonpanel.component.css']
@@ -97,9 +96,8 @@ export class ButtonPanelComponent implements OnInit, OnDestroy {
     "COPY_2_CLIPBOARD_NAMES_AS_JSON",
     "COPY_2_CLIPBOARD_FULLNAMES",
     "COPY_2_CLIPBOARD_FULLNAMES_AS_JSON",
-    "-",
-    "OPEN_SETUP_DLG"
   ];
+
 
   menuItems1: ActionId[] = [
     "OPEN_COPY_DLG",
@@ -131,6 +129,12 @@ export class ButtonPanelComponent implements OnInit, OnDestroy {
     "-",
     'ADD_NEW_TAB',
     'REMOVE_TAB'
+  ];
+
+
+  menuItems3: ActionId[] = [
+    "OPEN_SETUP_DLG",
+    "OPEN_ABOUT_DLG",
   ];
 
 

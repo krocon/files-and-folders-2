@@ -54,10 +54,6 @@
                 </button>
               }
             }
-            <button
-                mat-menu-item
-                routerLink="/about">About...
-            </button>
           </mat-list>
         </div>
 
@@ -77,13 +73,29 @@
               }
             }
           </mat-list>
-
-
         </div>
 
         <div>
           <mat-list>
             @for (id of menuItems2; track id) {
+              @if (id === '-') {
+                <mat-divider></mat-divider>
+              } @else {
+
+                <button
+                    (click)="triggerAction(id)"
+                    mat-menu-item>
+                  {{ getLabelByAction(id) }}
+                  <fnf-shortcut [keys]="getShortcutsByAction(id)"></fnf-shortcut>
+                </button>
+              }
+            }
+          </mat-list>
+        </div>
+
+        <div>
+          <mat-list>
+            @for (id of menuItems3; track id) {
               @if (id === '-') {
                 <mat-divider></mat-divider>
               } @else {

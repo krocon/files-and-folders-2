@@ -21,6 +21,7 @@ export class FnfActionLabels {
     TOGGLE_SHELL: "Toggle Shell",
 
     OPEN_SETUP_DLG: "Setup...",
+    OPEN_ABOUT_DLG: "About...",
     OPEN_JOB_QUEUE_DLG: "Open Action Queue Dialog",
     OPEN_GOTO_ANYTHING_DLG: "Go to anything...",
     SAVE_CONFIG: "Save Config",

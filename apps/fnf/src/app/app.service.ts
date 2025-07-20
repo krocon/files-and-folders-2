@@ -76,6 +76,7 @@ import {WalkdirSyncService} from "./common/walkdir/walkdir-sync.service";
 import {WalkdirService} from "./common/walkdir/walkdir.service";
 import {BrowserOsService} from "./service/browseros/browser-os.service";
 import {EditService} from "./service/edit.service";
+import {Router} from "@angular/router";
 
 
 @Injectable({
@@ -132,6 +133,7 @@ export class AppService {
     private readonly changeDirDialogService: ChangeDirDialogService,
     private readonly shellLocalStorage: ShellLocalStorage,
     private readonly browserOsService: BrowserOsService,
+    private readonly router: Router,
   ) {
     // Set config to services:
     ConfigService.forRoot(environment.config);
@@ -478,6 +480,12 @@ export class AppService {
     } else if (id === "COPY_2_CLIPBOARD_NAMES_AS_JSON") {
       const rows = this.getSelectedOrFocussedData(this.getActivePanelIndex());
       this.clipboardService.copyNamesAsJson(rows);
+
+    } else if (id === "OPEN_ABOUT_DLG") {
+      this.router.navigate(['/about']);
+
+    } else if (id === "OPEN_SETUP_DLG") {
+      this.router.navigate(['/setup']);
 
     } else if (id === "OPEN_RENAME_DLG") {
       this.rename();

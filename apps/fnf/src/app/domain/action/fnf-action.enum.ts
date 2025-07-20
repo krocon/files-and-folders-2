@@ -63,6 +63,7 @@ export const actionIds = [
   "OPEN_SHORTCUT_DLG",
 
   "OPEN_SETUP_DLG",
+  "OPEN_ABOUT_DLG",
 
   "DO_NOTHING",
   "-"
