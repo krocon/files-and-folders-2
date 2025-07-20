@@ -4,9 +4,12 @@ import {ShellAutocompleteController} from "./shell-autocomplete.controller";
 import {ShellCommandsWindows} from "./shell-commands-windows";
 import {ShellCommandsLinux} from "./shell-commands-linux";
 import {ShellCommandsMacOS} from "./shell-commands-macos";
+import {ShellGateway} from "./shell.gateway";
 
 @Module({
-  imports: [],
+  exports: [
+    ShellGateway
+  ],
   controllers: [
     ShellController,
     ShellAutocompleteController
