@@ -1,9 +1,10 @@
-import {ChangeDetectionStrategy, Component, OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from "@angular/core";
 import {takeWhile} from "rxjs/operators";
-import {Sysinfo, SysinfoIf} from "@fnf/fnf-data";
+import {AllinfoIf} from "@fnf/fnf-data";
 import {SysinfoService} from "../../service/sysinfo.service";
 import {JsonPipe} from "@angular/common";
 import {FnfTextLogoComponent} from "../common/textlogo/fnf-text-logo.component";
+import {Router} from "@angular/router";
 
 @Component({
   selector: "fnf-about",
@@ -17,28 +18,35 @@ import {FnfTextLogoComponent} from "../common/textlogo/fnf-text-logo.component";
 })
 export class AboutComponent implements OnInit {
 
-  sysinfo: SysinfoIf = new Sysinfo();
+  info: AllinfoIf = {} as AllinfoIf;
   private alive = true;
 
   constructor(
-    private readonly sysinfoService: SysinfoService
+    private readonly sysinfoService: SysinfoService,
+    private readonly router: Router,
+    private readonly cdr: ChangeDetectorRef,
   ) {
   }
 
   ngOnInit(): void {
     this.sysinfoService
-      .getSysinfo()
+      .getAllinfo()
       .pipe(
         takeWhile(() => this.alive)
       )
       .subscribe(
-        (sysinfo: SysinfoIf) => {
-          this.sysinfo = sysinfo;
+        (info: AllinfoIf) => {
+          this.info = info;
+          this.cdr.detectChanges();
         });
   }
 
   ngOnDestroy(): void {
     this.alive = false;
+  }
+
+  navigateToFiles(): void {
+    this.router.navigate(['/files']);
   }
 
 }

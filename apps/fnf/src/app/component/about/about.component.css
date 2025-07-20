@@ -13,15 +13,36 @@
         }
 
         h2 {
-            margin: 12px 0 !important;
+            margin: 24px 0 12px 0 !important;
         }
 
         p {
             margin-top: 8px;
             margin-bottom: 8px;
         }
+
+        .back-button-container {
+            padding: 12px 0;
+        }
+
+        .back-button {
+            background-color: var(--fnf-material-primary-color);
+            color: var(--fnf-header-bg-color);
+            border: 1px solid var(--fnf-header-border-color);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background-color: var(--fnf-material-secondary-color);
+            }
+
+            &:focus {
+                outline: 2px solid var(--fnf-material-accent-color);
+                outline-offset: 2px;
+            }
+        }
     }
 }
-
-
-

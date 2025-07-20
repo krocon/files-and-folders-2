@@ -1,5 +1,14 @@
 <div class="about-div">
   <div>
+    <div class="back-button-container">
+      <button
+          type="button"
+          class="back-button"
+          (click)="navigateToFiles()">
+        ← Back to Files
+      </button>
+    </div>
+
     <h1 class="">
       <fnf-text-logo></fnf-text-logo>
     </h1>
@@ -64,14 +73,14 @@
     </pre-->
 
 
-    <h3 class="text-xl pt-4 pb-4">
+    <h2 class="text-xl pt-4 pb-4">
       Licence:
       <a
           href="https://en.wikipedia.org/wiki/ISC_license"
           target="_blank">ISC
       </a>
       <br>
-    </h3>
+    </h2>
 
     <p>Copyright (c) 2025, Marc Kronberg (krocon&#64;"gmail.com)</p>
 
@@ -88,7 +97,17 @@
       OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</p>
 
 
-    <pre style="color: transparent">{{ sysinfo|json }}</pre>
+    <h2>System Info</h2>
+    <pre>{{ info|json }}</pre>
+
+    <div class="back-button-container">
+      <button
+          type="button"
+          class="back-button"
+          (click)="navigateToFiles()">
+        ← Back to Files
+      </button>
+    </div>
 
   </div>
 </div>
