@@ -13,7 +13,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import("./component/about/about.component").then(m => m.AboutComponent)
   },
-
+  {
+    path: "shell",
+    loadComponent: () =>
+      import("./component/shell/servershell.component").then(m => m.ServershellComponent)
+  },
   {
     path: "**",
     redirectTo: "files"

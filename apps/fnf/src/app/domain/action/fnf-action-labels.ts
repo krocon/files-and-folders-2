@@ -22,6 +22,7 @@ export class FnfActionLabels {
 
     OPEN_SETUP_DLG: "Setup...",
     OPEN_ABOUT_DLG: "About...",
+    OPEN_SHELL_DLG: "Server Shell...",
     OPEN_JOB_QUEUE_DLG: "Open Action Queue Dialog",
     OPEN_GOTO_ANYTHING_DLG: "Go to anything...",
     SAVE_CONFIG: "Save Config",

@@ -1,0 +1,146 @@
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output
+} from "@angular/core";
+import {takeWhile} from "rxjs/operators";
+import {SysinfoService} from "../../service/sysinfo.service";
+import {Router} from "@angular/router";
+import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
+import {MatFormField, MatInput, MatPrefix, MatSuffix} from "@angular/material/input";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {ServershellHistoryService} from "./service/servershell-history.service";
+import {ServershellService} from "./service/servershell.service";
+import {Subject} from "rxjs";
+import {MatTooltip} from "@angular/material/tooltip";
+import {ServershellOutComponent} from "./servershell-out.component";
+
+@Component({
+  selector: "fnf-servershell",
+  templateUrl: "./servershell.component.html",
+  styleUrls: ["./servershell.component.css"],
+  imports: [
+    MatAutocomplete,
+    MatAutocompleteTrigger,
+    MatFormField,
+    MatInput,
+    MatOption,
+    MatPrefix,
+    MatSuffix,
+    ReactiveFormsModule,
+    ServershellOutComponent,
+    FormsModule,
+    MatTooltip,
+
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class ServershellComponent implements OnInit, OnDestroy {
+
+  @Input() path = "";
+  @Input() text = "ls -al";
+  @Output() focusChanged = new EventEmitter<boolean>();
+
+  hasFocus = false;
+  errorMsg = '';
+  filteredCommands: string[] = [];
+
+  displayText = '';
+
+  private readonly textChange$ = new Subject<string>();
+  private alive = true;
+
+  constructor(
+    private readonly sysinfoService: SysinfoService,
+    private readonly router: Router,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly shellHistoryService: ServershellHistoryService,
+    private readonly shellService: ServershellService,
+  ) {
+  }
+
+  ngOnInit(): void {
+    // TODO
+  }
+
+
+  /**
+   * Handle selection of an autocomplete option
+   * @param command The selected option
+   */
+  onOptionSelected(command: string): void {
+    this.text = command;
+    this.cdr.detectChanges();
+  }
+
+  onOkClicked() {
+    this.errorMsg = '';
+    this.cdr.detectChanges();
+    if (!this.text || this.text.trim().length === 0) return; // skip
+
+    this.shellService
+      .shell([
+        {
+          path: this.path,
+          cmd: this.text,
+          para: ''
+        }
+      ])
+      .pipe(
+        takeWhile(() => this.alive),
+      )
+      .subscribe(res => {
+        const res0 = res[0];
+        // TODO ausgabe und error anzeigen
+        console.info('onOkClicked RES:', res);
+        console.info('\n');
+        console.info(res0.stdout);
+
+
+        if (!res0.stderr && !res0.error) {
+          this.shellHistoryService.addHistory(this.text);
+          this.text = '';
+          //this.openShellOutput(res0.stdout ?? '');
+
+        } else {
+          this.errorMsg = res0.stderr ?? res0.error ?? '';
+          this.errorMsg = this.errorMsg
+            .replace(/\n/g, ' ')
+            .replace(/<br>/g, ' ');
+        }
+        this.cdr.detectChanges();
+      });
+  }
+
+  onFocusIn() {
+    this.hasFocus = true;
+    this.focusChanged.emit(true);
+  }
+
+  onFocusOut() {
+    this.hasFocus = false;
+    this.focusChanged.emit(false);
+  }
+
+  onTextChange() {
+    this.errorMsg = '';
+
+    // Emit the current text value to the textChange$ Subject
+    // The debounced subscription in initAutocomplete will handle the API call
+    this.textChange$.next(this.text);
+  }
+
+  ngOnDestroy(): void {
+    this.alive = false;
+  }
+
+  navigateToFiles(): void {
+    this.router.navigate(['/files']);
+  }
+
+}

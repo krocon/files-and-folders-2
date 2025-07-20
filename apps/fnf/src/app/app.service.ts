@@ -77,6 +77,8 @@ import {WalkdirService} from "./common/walkdir/walkdir.service";
 import {BrowserOsService} from "./service/browseros/browser-os.service";
 import {EditService} from "./service/edit.service";
 import {Router} from "@angular/router";
+import {ServershellService} from "./component/shell/service/servershell.service";
+import {ServershellAutocompleteService} from "./component/shell/service/servershell-autocomplete.service";
 
 
 @Injectable({
@@ -150,6 +152,8 @@ export class AppService {
     CleanService.forRoot(environment.clean);
     ShellService.forRoot(environment.shell);
     ShellAutocompleteService.forRoot(environment.shellAutocomplete);
+    ServershellService.forRoot(environment.shell);
+    ServershellAutocompleteService.forRoot(environment.shellAutocomplete);
     EditService.forRoot(environment.edit);
 
     WalkdirService.forRoot(environment.walkdir);
@@ -486,6 +490,9 @@ export class AppService {
 
     } else if (id === "OPEN_SETUP_DLG") {
       this.router.navigate(['/setup']);
+
+    } else if (id === "OPEN_SHELL_DLG") {
+      this.router.navigate(['/shell']);
 
     } else if (id === "OPEN_RENAME_DLG") {
       this.rename();

@@ -62,6 +62,7 @@ export const actionIds = [
   "TOGGLE_SHELL",
   "OPEN_SHORTCUT_DLG",
 
+  "OPEN_SHELL_DLG",
   "OPEN_SETUP_DLG",
   "OPEN_ABOUT_DLG",
 

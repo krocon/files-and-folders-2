@@ -1,0 +1,9 @@
+
+.server-shell-div {
+    width: 100vw;
+    height: 100vh;
+    overflow: clip;
+
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+}

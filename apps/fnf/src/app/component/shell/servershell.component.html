@@ -1,0 +1,66 @@
+<div class="server-shell-div">
+
+  <div>
+    <button
+        type="button"
+        class="back-button"
+        (click)="navigateToFiles()">
+      ← Back to Files
+    </button>
+  </div>
+
+  <app-servershell-out [displayText]="displayText"></app-servershell-out>
+
+  <div>
+    <mat-form-field
+        appearance="outline">
+
+      <div
+          matPrefix
+          class="path-div"
+          [class.has-error]="errorMsg">
+        <div>{{ path }}&gt;</div>
+        @if (errorMsg) {
+          <div class="error-sign">!</div>
+        }
+      </div>
+
+      <input
+          (focusin)="onFocusIn()"
+          (focusout)="onFocusOut()"
+          (keydown.enter)="onOkClicked()"
+          (ngModelChange)="onTextChange()"
+          [matTooltip]="errorMsg"
+          [(ngModel)]="text"
+          [placeholder]="'Enter shell command'"
+          [class.font-weight-bold]="hasFocus"
+          [class.fnf-warn-fg]="errorMsg"
+          [matAutocomplete]="auto"
+          matInput/>
+
+      <mat-autocomplete #auto="matAutocomplete">
+        @for (command of filteredCommands; track command) {
+          <mat-option
+              [value]="command"
+              (click)="onOptionSelected(command)">
+            {{ command }}
+          </mat-option>
+        }
+      </mat-autocomplete>
+
+      @if (errorMsg) {
+        <div
+            matSuffix
+            class="error-div fnf-footer-error-fg-color"
+            [innerText]="errorMsg"></div>
+      }
+
+
+      <!--fnf-select-folder-dropdown
+          (onSelected)="onFolderClicked($event)"
+          matSuffix></fnf-select-folder-dropdown-->
+    </mat-form-field>
+  </div>
+
+
+</div>

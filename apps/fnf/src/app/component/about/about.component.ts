@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from "@angular/core";
 import {takeWhile} from "rxjs/operators";
 import {AllinfoIf} from "@fnf/fnf-data";
 import {SysinfoService} from "../../service/sysinfo.service";
@@ -16,7 +16,7 @@ import {Router} from "@angular/router";
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AboutComponent implements OnInit {
+export class AboutComponent implements OnInit, OnDestroy {
 
   info: AllinfoIf = {} as AllinfoIf;
   private alive = true;

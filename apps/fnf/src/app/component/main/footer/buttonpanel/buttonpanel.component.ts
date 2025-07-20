@@ -134,6 +134,7 @@ export class ButtonPanelComponent implements OnInit, OnDestroy {
 
   menuItems3: ActionId[] = [
     "OPEN_SETUP_DLG",
+    "OPEN_SHELL_DLG",
     "OPEN_ABOUT_DLG",
   ];
 
