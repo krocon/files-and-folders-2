@@ -27,6 +27,7 @@
       </div>
 
       <input
+          matInput
           (focusin)="onFocusIn()"
           (focusout)="onFocusOut()"
           (keydown.enter)="onOkClicked()"
@@ -36,8 +37,7 @@
           [placeholder]="'Enter shell command'"
           [class.font-weight-bold]="hasFocus"
           [class.fnf-warn-fg]="errorMsg"
-          [matAutocomplete]="auto"
-          matInput/>
+          [matAutocomplete]="auto"/>
 
       <mat-autocomplete #auto="matAutocomplete">
         @for (command of filteredCommands; track command) {

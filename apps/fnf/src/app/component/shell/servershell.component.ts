@@ -8,18 +8,18 @@ import {
   OnInit,
   Output
 } from "@angular/core";
-import {takeWhile} from "rxjs/operators";
-import {SysinfoService} from "../../service/sysinfo.service";
+import {debounceTime, takeWhile} from "rxjs/operators";
 import {Router} from "@angular/router";
 import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
 import {MatFormField, MatInput, MatPrefix, MatSuffix} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {ServershellHistoryService} from "./service/servershell-history.service";
 import {ServershellService} from "./service/servershell.service";
-import {Subject} from "rxjs";
+import {Observable, Subject} from "rxjs";
 import {MatTooltip} from "@angular/material/tooltip";
 import {ServershellOutComponent} from "./servershell-out.component";
 import {AppService} from "../../app.service";
+import {ServershellAutocompleteService} from "./service/servershell-autocomplete.service";
 
 @Component({
   selector: "fnf-servershell",
@@ -57,17 +57,18 @@ export class ServershellComponent implements OnInit, OnDestroy {
   private alive = true;
 
   constructor(
-    private readonly sysinfoService: SysinfoService,
     private readonly router: Router,
     private readonly cdr: ChangeDetectorRef,
     private readonly shellHistoryService: ServershellHistoryService,
     private readonly shellService: ServershellService,
+    private readonly shellAutocompleteService: ServershellAutocompleteService,
     private readonly appService: AppService,
   ) {
   }
 
   ngOnInit(): void {
     this.path = this.appService.getActiveTabOnActivePanel().path;
+    this.initAutocomplete();
   }
 
 
@@ -139,10 +140,42 @@ export class ServershellComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.alive = false;
+    this.textChange$.complete();
   }
 
   navigateToFiles(): void {
     this.router.navigate(['/files']);
+  }
+
+  private initAutocomplete(): void {
+    // Set up the textChange$ observable with debounce
+    this.textChange$
+      .pipe(
+        debounceTime(500), // 500ms debounce time
+        takeWhile(() => this.alive),
+      )
+      .subscribe(_s => {
+        if (this.text && this.text.trim().length > 0) {
+          console.info('initAutocomplete text:', this.text);
+          this.filterCommands(this.text)
+            .pipe(
+              takeWhile(() => this.alive)
+            )
+            .subscribe(commands => {
+              //this.filteredCommands$.next(commands);
+              this.filteredCommands = commands;
+              this.cdr.detectChanges();
+            });
+        } else {
+          // this.filteredCommands$.next([]);
+          this.filteredCommands = [];
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  private filterCommands(input: string): Observable<string[]> {
+    return this.shellAutocompleteService.getAutocompleteSuggestions(input);
   }
 
 }
