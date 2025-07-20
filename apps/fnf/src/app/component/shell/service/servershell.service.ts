@@ -1,7 +1,5 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
-import {ShellCmdIf, ShellCmdResultIf} from "@fnf/fnf-data";
 
 
 @Injectable({
@@ -11,7 +9,8 @@ export class ServershellService {
 
 
   private static readonly config = {
-    shellUrl: "/api/shell"
+    spawnUrl: "/api/spawn",
+    cancelSpawnUrl: "/api/cancelspawn",
   };
 
   constructor(private readonly httpClient: HttpClient) {
@@ -22,11 +21,4 @@ export class ServershellService {
   }
 
 
-  shell(data: ShellCmdIf[]): Observable<ShellCmdResultIf[]> {
-    return this.httpClient
-      .post<ShellCmdResultIf[]>(
-        ServershellService.config.shellUrl,
-        data
-      );
-  }
 }

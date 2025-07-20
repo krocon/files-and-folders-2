@@ -37,7 +37,9 @@ export const environment = {
     cleanUrl: prefix + "/api/clean"
   },
   shell: {
-    shellUrl: prefix + "/api/shell"
+    shellUrl: prefix + "/api/shell",
+    spawnUrl: prefix + "/api/spawn",
+    cancelSpawnUrl: prefix + "/api/cancelspawn",
   },
   walkdir: {
     walkdirSyncUrl: prefix + "/api/walkdirsync",

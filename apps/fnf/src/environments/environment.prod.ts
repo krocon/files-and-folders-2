@@ -31,7 +31,9 @@ export const environment = {
     cleanUrl: "/api/clean"
   },
   shell: {
-    shellUrl: "/api/shell"
+    shellUrl: "/api/shell",
+    spawnUrl: "/api/spawn",
+    cancelSpawnUrl: "/api/cancelspawn",
   },
   walkdir: {
     walkdirSyncUrl: "/api/walkdirsync",
