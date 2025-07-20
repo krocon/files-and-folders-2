@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import {FnfEditorOptions} from './data/fnf-editor-options.interface';
 import {FnfEditorOptionsClass} from './data/fnf-editor-options.class';
+// import {window} from "rxjs";
 
 declare const monaco: any;
 
@@ -33,10 +34,7 @@ declare const monaco: any;
 })
 export class FnfEditorComponent implements OnInit, OnDestroy {
   @ViewChild('editorContainer', {static: true}) editorContainer!: ElementRef<HTMLDivElement>;
-
-  @Input() text: string = '';
   @Output() textChange = new EventEmitter<string>();
-
   @Input() options: FnfEditorOptions = new FnfEditorOptionsClass();
   @Output() optionsChange = new EventEmitter<FnfEditorOptions>();
 
@@ -47,12 +45,74 @@ export class FnfEditorComponent implements OnInit, OnDestroy {
   constructor(private ngZone: NgZone) {
   }
 
+  private _text: string = '';
+
+  get text(): string {
+    return this._text;
+  }
+
+  @Input()
+  set text(value: string) {
+    this._text = value;
+
+    this.updateText(value);
+  }
+
   ngOnInit(): void {
     this.loadMonacoEditor();
   }
 
   ngOnDestroy(): void {
     this.destroyEditor();
+  }
+
+  // Method to update editor options
+  updateOptions(newOptions: Partial<FnfEditorOptions>): void {
+    if (!this.editor) return;
+
+    const updatedOptions = {...this.options, ...newOptions};
+    this.options = updatedOptions;
+    this.optionsChange.emit(updatedOptions);
+
+    this.ngZone.runOutsideAngular(() => {
+      this.editor.updateOptions({
+        theme: updatedOptions.theme,
+        lineNumbers: updatedOptions.lineNumbers,
+        minimap: {enabled: updatedOptions.minimap},
+        wordWrap: updatedOptions.wordWrap,
+        readOnly: updatedOptions.readOnly || false,
+      });
+
+      if (updatedOptions.theme) {
+        monaco.editor.setTheme(updatedOptions.theme);
+      }
+    });
+  }
+
+  // Method to update editor text programmatically
+  updateText(newText: string): void {
+    console.log('updateText /' + this.editor, newText);
+    if (!this.editor) return;
+
+    this.ngZone.runOutsideAngular(() => {
+      if (this.editor.getValue() !== newText) {
+        this.editor.setValue(newText);
+      }
+    });
+  }
+
+  // Method to get current editor value
+  getValue(): string {
+    return this.editor ? this.editor.getValue() : this._text;
+  }
+
+  // Method to focus the editor
+  focus(): void {
+    if (this.editor) {
+      this.ngZone.runOutsideAngular(() => {
+        this.editor.focus();
+      });
+    }
   }
 
   private loadMonacoEditor(): void {
@@ -96,7 +156,7 @@ export class FnfEditorComponent implements OnInit, OnDestroy {
 
     this.ngZone.runOutsideAngular(() => {
       const editorOptions = {
-        value: this.text,
+        value: this._text,
         language: this.options.language || 'plaintext',
         theme: this.options.theme,
         automaticLayout: this.options.automaticLayout !== false,
@@ -112,7 +172,7 @@ export class FnfEditorComponent implements OnInit, OnDestroy {
       this.editor.onDidChangeModelContent(() => {
         const newValue = this.editor.getValue();
         this.ngZone.run(() => {
-          this.text = newValue;
+          this._text = newValue;
           this.textChange.emit(newValue);
         });
       });
@@ -129,53 +189,5 @@ export class FnfEditorComponent implements OnInit, OnDestroy {
       });
     }
     this.isInitialized = false;
-  }
-
-  // Method to update editor options
-  updateOptions(newOptions: Partial<FnfEditorOptions>): void {
-    if (!this.editor) return;
-
-    const updatedOptions = {...this.options, ...newOptions};
-    this.options = updatedOptions;
-    this.optionsChange.emit(updatedOptions);
-
-    this.ngZone.runOutsideAngular(() => {
-      this.editor.updateOptions({
-        theme: updatedOptions.theme,
-        lineNumbers: updatedOptions.lineNumbers,
-        minimap: {enabled: updatedOptions.minimap},
-        wordWrap: updatedOptions.wordWrap,
-        readOnly: updatedOptions.readOnly || false,
-      });
-
-      if (updatedOptions.theme) {
-        monaco.editor.setTheme(updatedOptions.theme);
-      }
-    });
-  }
-
-  // Method to update editor text programmatically
-  updateText(newText: string): void {
-    if (!this.editor) return;
-
-    this.ngZone.runOutsideAngular(() => {
-      if (this.editor.getValue() !== newText) {
-        this.editor.setValue(newText);
-      }
-    });
-  }
-
-  // Method to get current editor value
-  getValue(): string {
-    return this.editor ? this.editor.getValue() : this.text;
-  }
-
-  // Method to focus the editor
-  focus(): void {
-    if (this.editor) {
-      this.ngZone.runOutsideAngular(() => {
-        this.editor.focus();
-      });
-    }
   }
 }

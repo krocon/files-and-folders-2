@@ -30,7 +30,8 @@
           matInput
           (focusin)="onFocusIn()"
           (focusout)="onFocusOut()"
-          (keydown.enter)="onOkClicked()"
+          (keydown)="onKeyDown($event)"
+
           (ngModelChange)="onTextChange()"
           [matTooltip]="errorMsg"
           [(ngModel)]="text"

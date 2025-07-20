@@ -8,6 +8,7 @@ import {FileSystemService} from "./service/file-system.service";
 import {environment} from "../environments/environment";
 import {
   AllinfoIf,
+  BrowserOsType,
   CleanDialogData,
   CmdIf,
   Config,
@@ -18,13 +19,13 @@ import {
   FindData,
   FindDialogData,
   isZipUrl,
+  PanelIndex,
   Sysinfo,
   SysinfoIf
-} from "@fnf-data";
+} from "@fnf/fnf-data";
 import {BehaviorSubject, combineLatest, firstValueFrom, Observable, Subject} from "rxjs";
 import {map, tap} from "rxjs/operators";
 import {QueueActionEvent} from "./domain/cmd/queue-action-event";
-import {BrowserOsType, PanelIndex} from "@fnf/fnf-data";
 import {DockerRootDeletePipe} from "./component/main/header/tabpanel/filemenu/docker-root-delete.pipe";
 import {PanelSelectionService} from "./domain/filepagedata/service/panel-selection.service";
 import {LatestDataService} from "./domain/filepagedata/service/latest-data.service";

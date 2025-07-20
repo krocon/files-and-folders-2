@@ -9,12 +9,16 @@ import {ShellSpawnManager} from "./shell-spawn-manager";
 export class ShellGateway {
 
   @WebSocketServer() server: Server;
+
   private spawnManager: ShellSpawnManager = new ShellSpawnManager();
 
 
   @SubscribeMessage("spawn")
   doSpawn(@MessageBody() para: ShellSpawnParaIf): void {
+    console.log("ShellGateway doSpawn() para:", para);
+
     this.spawnManager.spawn(para, (result: ShellSpawnResultIf) => {
+      console.log("ShellGateway doSpawn() result:", result);
       this.server.emit(para.emitKey, result);
     });
   }

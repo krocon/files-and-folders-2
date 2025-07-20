@@ -18,75 +18,81 @@ export class ShellSpawnManager {
     // Parse command and arguments
     const [command, ...args] = para.cmd.split(' ');
 
-    // Spawn the process
-    const childProcess = spawn(command, args, {
-      stdio: ['pipe', 'pipe', 'pipe'],
-      shell: true
-    });
+    console.info(`Spawning process: ${command} ${args.join(' ')}`);
 
-    // Store the process for later cleanup
-    this.processes.set(para.cancelKey, childProcess);
+    try {
+      // Spawn the process
+      const childProcess = spawn(command, args, {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        shell: true
+      });
 
-    // Set up timeout
-    if (para.timeout > 0) {
-      const timeoutId = setTimeout(() => {
-        this.killProcess(para.cancelKey);
+      // Store the process for later cleanup
+      this.processes.set(para.cancelKey, childProcess);
+
+      // Set up timeout
+      if (para.timeout > 0) {
+        const timeoutId = setTimeout(() => {
+          this.killProcess(para.cancelKey);
+          onData({
+            out: '',
+            error: 'Process timeout exceeded',
+            code: -1,
+            done: true
+          });
+        }, para.timeout);
+        this.timeouts.set(para.cancelKey, timeoutId);
+      }
+
+      // Handle stdout data
+      childProcess.stdout?.on('data', (data: Buffer) => {
+        onData({
+          out: data.toString(),
+          error: '',
+          code: null,
+          done: false
+        });
+      });
+
+      // Handle stderr data
+      childProcess.stderr?.on('data', (data: Buffer) => {
         onData({
           out: '',
-          error: 'Process timeout exceeded',
+          error: data.toString(),
+          code: null,
+          done: false
+        });
+      });
+
+      // Handle process close
+      childProcess.on('close', (code: number | null) => {
+        this.cleanup(para.cancelKey);
+        onData({
+          out: '',
+          error: '',
+          code: code,
+          done: true
+        });
+      });
+
+      // Handle process error
+      childProcess.on('error', (error: Error) => {
+        this.cleanup(para.cancelKey);
+        onData({
+          out: '',
+          error: error.message,
           code: -1,
           done: true
         });
-      }, para.timeout);
-      this.timeouts.set(para.cancelKey, timeoutId);
+      });
+
+      // Handle spawn error (command not found)
+      childProcess.on('spawn', () => {
+        // Process started successfully
+      });
+    } catch (error) {
+      console.error(error);
     }
-
-    // Handle stdout data
-    childProcess.stdout?.on('data', (data: Buffer) => {
-      onData({
-        out: data.toString(),
-        error: '',
-        code: null,
-        done: false
-      });
-    });
-
-    // Handle stderr data
-    childProcess.stderr?.on('data', (data: Buffer) => {
-      onData({
-        out: '',
-        error: data.toString(),
-        code: null,
-        done: false
-      });
-    });
-
-    // Handle process close
-    childProcess.on('close', (code: number | null) => {
-      this.cleanup(para.cancelKey);
-      onData({
-        out: '',
-        error: '',
-        code: code,
-        done: true
-      });
-    });
-
-    // Handle process error
-    childProcess.on('error', (error: Error) => {
-      this.cleanup(para.cancelKey);
-      onData({
-        out: '',
-        error: error.message,
-        code: -1,
-        done: true
-      });
-    });
-
-    // Handle spawn error (command not found)
-    childProcess.on('spawn', () => {
-      // Process started successfully
-    });
   }
 
   /**

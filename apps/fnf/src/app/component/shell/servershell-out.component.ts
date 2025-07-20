@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
@@ -37,7 +37,18 @@ import {FnfEditorOptionsClass} from "../common/editor/data/fnf-editor-options.cl
 })
 export class ServershellOutComponent {
 
-  @Input() displayText: string = '';
+
+  get displayText(): string {
+    return this._displayText;
+  }
+
+  @Input()
+  set displayText(value: string) {
+    this._displayText = value;
+    this.cdr.detectChanges();
+  }
+
+  private _displayText: string = '';
 
   editorOptions = new FnfEditorOptionsClass({
     readOnly: true,
@@ -48,5 +59,9 @@ export class ServershellOutComponent {
     language: 'shell'
   });
 
+  constructor(
+    private readonly cdr: ChangeDetectorRef,
+  ) {
+  }
 
 }

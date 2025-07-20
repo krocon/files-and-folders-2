@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {Socket} from "ngx-socket-io";
-import {ShellSpawnParaIf, ShellSpawnResultIf} from "@fnf/fnf-data";
+import {ShellCancelSpawnParaIf, ShellSpawnParaIf, ShellSpawnResultIf} from "@fnf/fnf-data";
 
 
 @Injectable({
@@ -27,15 +27,32 @@ export class ServershellService {
 
 
   doSpawn(para: ShellSpawnParaIf, callback: (result: ShellSpawnResultIf) => void) {
-//
-//     const emitKey = `ServerShell${this.rid}`;
-//     const cancelKey = `cancelServerShell${this.rid}`;
-//
-//     ServershellComponent lauscht via socket (import {Socket} from "ngx-socket-io";) und emitKey auf die Rückgabe vom Server.
+    console.log('doSpawn  para', para);
+
+    // Listen for responses on the emitKey
+    this.socket.on(para.emitKey, (result: ShellSpawnResultIf) => {
+      callback(result);
+    });
+
+    // Send the spawn command to the server
+    this.socket.emit('spawn', para);
+    // this.httpClient
+    //   .post<ShellSpawnResultIf>(ServershellService.config.spawnUrl, para)
+    //   .subscribe(_ => {
+    //   });
   }
 
-  doCancelSpawn() {
+  doCancelSpawn(cancelKey: string) {
+    const cancelPara: ShellCancelSpawnParaIf = {
+      cancelKey: cancelKey
+    };
 
+    // Send the cancel command to the server
+    this.socket.emit('cancelspawn', cancelPara);
+
+    // Clean up the listener for this emitKey
+    const emitKey = cancelKey.replace('cancelServerShell', 'ServerShell');
+    this.socket.off(emitKey);
   }
 
 }
