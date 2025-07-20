@@ -1,0 +1,161 @@
+import {ShellSpawnManager} from './shell-spawn-manager';
+import {ShellSpawnParaIf, ShellSpawnResultIf} from '@fnf-data';
+
+describe('ShellSpawnManager', () => {
+  let manager: ShellSpawnManager;
+
+  beforeEach(() => {
+    manager = new ShellSpawnManager();
+  });
+
+  afterEach(() => {
+    // Clean up all processes after each test
+    manager.killAllProcesses();
+  });
+
+  describe('spawn', () => {
+    it('should spawn a process and emit output', (done) => {
+      const para: ShellSpawnParaIf = {
+        cmd: 'echo "Hello World"',
+        emitKey: 'test-emit',
+        cancelKey: 'test-cancel',
+        timeout: 5000
+      };
+
+      const results: ShellSpawnResultIf[] = [];
+
+      manager.spawn(para, (result: ShellSpawnResultIf) => {
+        results.push(result);
+
+        if (result.done) {
+          expect(results.length).toBeGreaterThan(0);
+          expect(results.some(r => r.out.includes('Hello World'))).toBe(true);
+          expect(result.code).toBe(0);
+          done();
+        }
+      });
+    });
+
+    it('should handle command errors', (done) => {
+      const para: ShellSpawnParaIf = {
+        cmd: 'nonexistentcommand',
+        emitKey: 'test-emit',
+        cancelKey: 'test-cancel',
+        timeout: 5000
+      };
+
+      let hasStderr = false;
+
+      manager.spawn(para, (result: ShellSpawnResultIf) => {
+        if (!result.done && result.error && result.error.includes('command not found')) {
+          hasStderr = true;
+        }
+
+        if (result.done) {
+          expect(result.code).toBe(127); // Command not found exit code
+          expect(hasStderr).toBe(true); // Should have received stderr
+          done();
+        }
+      });
+    }, 10000);
+
+    it('should handle timeout', (done) => {
+      const para: ShellSpawnParaIf = {
+        cmd: 'sleep 10', // Command that takes longer than timeout
+        emitKey: 'test-emit',
+        cancelKey: 'test-cancel',
+        timeout: 1000 // 1 second timeout
+      };
+
+      manager.spawn(para, (result: ShellSpawnResultIf) => {
+        if (result.done && result.error.includes('timeout')) {
+          expect(result.code).toBe(-1);
+          expect(result.error).toContain('timeout');
+          done();
+        }
+      });
+    });
+  });
+
+  describe('killProcess', () => {
+    it('should kill a running process', (done) => {
+      const para: ShellSpawnParaIf = {
+        cmd: 'sleep 5', // Shorter running command
+        emitKey: 'test-emit',
+        cancelKey: 'test-cancel',
+        timeout: 60000
+      };
+
+      let processKilled = false;
+
+      // Start the process
+      manager.spawn(para, (result: ShellSpawnResultIf) => {
+        if (result.done) {
+          // Process finished - check if it was killed
+          expect(processKilled).toBe(true);
+          done();
+        }
+      });
+
+      // Kill the process after a short delay
+      setTimeout(() => {
+        processKilled = manager.killProcess(para.cancelKey);
+        expect(processKilled).toBe(true);
+      }, 500);
+    }, 5000);
+
+    it('should return false for non-existent process', () => {
+      const killed = manager.killProcess('non-existent-key');
+      expect(killed).toBe(false);
+    });
+  });
+
+  describe('getActiveProcessCount', () => {
+    it('should return correct process count', () => {
+      expect(manager.getActiveProcessCount()).toBe(0);
+
+      const para: ShellSpawnParaIf = {
+        cmd: 'sleep 1',
+        emitKey: 'test-emit',
+        cancelKey: 'test-cancel',
+        timeout: 5000
+      };
+
+      manager.spawn(para, () => {
+      });
+      expect(manager.getActiveProcessCount()).toBe(1);
+    });
+  });
+
+  describe('killAllProcesses', () => {
+    it('should kill all active processes', () => {
+      const para1: ShellSpawnParaIf = {
+        cmd: 'sleep 10',
+        emitKey: 'test-emit-1',
+        cancelKey: 'test-cancel-1',
+        timeout: 60000
+      };
+
+      const para2: ShellSpawnParaIf = {
+        cmd: 'sleep 10',
+        emitKey: 'test-emit-2',
+        cancelKey: 'test-cancel-2',
+        timeout: 60000
+      };
+
+      manager.spawn(para1, () => {
+      });
+      manager.spawn(para2, () => {
+      });
+
+      expect(manager.getActiveProcessCount()).toBe(2);
+
+      manager.killAllProcesses();
+
+      // Give some time for cleanup
+      setTimeout(() => {
+        expect(manager.getActiveProcessCount()).toBe(0);
+      }, 100);
+    });
+  });
+});

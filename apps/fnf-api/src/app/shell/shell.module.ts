@@ -17,7 +17,8 @@ import {ShellGateway} from "./shell.gateway";
   providers: [
     ShellCommandsWindows,
     ShellCommandsLinux,
-    ShellCommandsMacOS
+    ShellCommandsMacOS,
+    ShellGateway
   ]
 })
 export class ShellModule {

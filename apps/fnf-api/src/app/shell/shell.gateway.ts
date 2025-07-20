@@ -1,55 +1,30 @@
 import {MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer} from "@nestjs/websockets";
 import {Server} from "socket.io";
 import {environment} from "../../environments/environment";
-
-const {spawn} = require('child_process');
+import {ShellCancelSpawnParaIf, ShellSpawnParaIf, ShellSpawnResultIf} from "@fnf-data";
+import {ShellSpawnManager} from "./shell-spawn-manager";
 
 
 @WebSocketGateway(environment.websocketPort, environment.websocketOptions)
 export class ShellGateway {
 
-
   @WebSocketServer() server: Server;
+  private spawnManager: ShellSpawnManager = new ShellSpawnManager();
 
 
   @SubscribeMessage("spawn")
-  doSpawn(@MessageBody() para: { // TODO para -> interface
-    cmd: string,
-    emitKey: string,
-    cancelKey: string,
-    timeout: number /* 60.000 */,
-  }): void {
-    const socket = this.server;
-    // TODO
-
-    /*
-    example:
-    const top = spawn('top');
-
-    top.stdout.on('data', (data) => {
-      console.log(data.toString());
-      socket.emit(emitKey, {
-        out: data.toString(),
-        error:'',
-        code:number,
-        done: false
-        });
+  doSpawn(@MessageBody() para: ShellSpawnParaIf): void {
+    this.spawnManager.spawn(para, (result: ShellSpawnResultIf) => {
+      this.server.emit(para.emitKey, result);
     });
-
-    top.stderr.on('data', (data) => {
-      //
-    });
-
-    top.on('close', (code) => {
-      //
-    });
-     */
   }
 
   @SubscribeMessage("cancelspawn")
-  doCancelSpawn(@MessageBody() para: {
-    cancelKey: string,
-  }): void {
-    // TODO kill process (listening,...) with cancelKey
+  doCancelSpawn(@MessageBody() para: ShellCancelSpawnParaIf): void {
+    const killed = this.spawnManager.killProcess(para.cancelKey);
+    if (killed) {
+      // Optionally emit a cancellation confirmation
+      this.server.emit(`${para.cancelKey}_cancelled`, {cancelled: true});
+    }
   }
 }

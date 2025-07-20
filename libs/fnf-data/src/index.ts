@@ -63,6 +63,9 @@ export * from './models/sysinfo/allinfo.if';
 export * from './models/shell/cmd.if';
 export * from './models/shell/shell-cmd.if';
 export * from './models/shell/shell-cmd-result.if';
+export * from './models/shell/shell-spawn-para.if';
+export * from './models/shell/shell-spawn-result.if';
+export * from './models/shell/shell-cancel-spawn-para.if';
 
 export { getParent } from "./models/file/get-parent";
 export { isSameDir } from "./models/file/is-same-dir";
