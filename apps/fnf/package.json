@@ -11,6 +11,7 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "e2e": "cypress run",
+    "e2e-xxx": "cypress run --spec cypress/e2e/fnf-editor.cy.js",
     "postinstall": "node postinstall.js"
   },
   "private": false,

@@ -191,3 +191,4 @@ apps/fnf/src/assets/screens_old/
 /apps/fnf/src/assets/monaco/package.json
 /apps/fnf/src/assets/monaco/README.md
 /apps/fnf/src/assets/monaco/ThirdPartyNotices.txt
+/apps/fnf/cypress/screenshots/fnf-editor.cy.js/
