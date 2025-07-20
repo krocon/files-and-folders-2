@@ -86,38 +86,11 @@ export class ServershellComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
     if (!this.text || this.text.trim().length === 0) return; // skip
 
-    this.shellService
-      .shell([
-        {
-          path: this.path,
-          cmd: this.text,
-          para: ''
-        }
-      ])
-      .pipe(
-        takeWhile(() => this.alive),
-      )
-      .subscribe(res => {
-        const res0 = res[0];
-        // TODO ausgabe und error anzeigen
-        console.info('onOkClicked RES:', res);
-        console.info('\n');
-        console.info(res0.stdout);
+    // generate     const emitKey = `ServerShell${this.rid}`;
+    //     const cancelKey = `cancelServerShell${this.rid}`;
 
-
-        if (!res0.stderr && !res0.error) {
-          this.shellHistoryService.addHistory(this.text);
-          this.text = '';
-          //this.openShellOutput(res0.stdout ?? '');
-
-        } else {
-          this.errorMsg = res0.stderr ?? res0.error ?? '';
-          this.errorMsg = this.errorMsg
-            .replace(/\n/g, ' ')
-            .replace(/<br>/g, ' ');
-        }
-        this.cdr.detectChanges();
-      });
+    // lsten to websocket emitKey
+    // TODO send /spawn via service
   }
 
   onFocusIn() {
@@ -141,6 +114,7 @@ export class ServershellComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.alive = false;
     this.textChange$.complete();
+    // send cancelKey
   }
 
   navigateToFiles(): void {
