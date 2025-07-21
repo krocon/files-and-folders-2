@@ -138,19 +138,7 @@ export class ServershellComponent implements OnInit, OnDestroy {
         cancelKey: cancelKey,
         timeout: 60000 // 60 seconds timeout
       },
-      (result: ShellSpawnResultIf) => {
-
-        console.info('FE doSpawn result:', result);
-        // Handle the result from shell execution
-        if (result.out) {
-          this.displayText += result.out;
-        }
-        if (result.error) {
-          this.errorMsg = result.error;
-        }
-        console.info('displayText:', this.displayText);
-        this.cdr.detectChanges();
-      });
+      this.handleServerResult());
 
     // Clear the input
     this.text = '';
@@ -176,21 +164,46 @@ export class ServershellComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.alive = false;
-    this.textChange$.complete();
-
     // Send cancel message to stop any running shell processes
     const cancelKey = `cancelServerShell${this.rid}`;
     this.shellService.doCancelSpawn(cancelKey);
+
+    this.alive = false;
+    this.textChange$.complete();
   }
 
   navigateToFiles(): void {
     this.router.navigate(['/files']);
   }
 
-  /**
-   * Navigate through command history
-   */
+  private handleServerResult() {
+    return (result: ShellSpawnResultIf) => {
+
+      console.info('FE doSpawn result:', result);
+      // Handle the result from shell execution
+      if (result.out) {
+        this.displayText += result.out;
+      }
+      /*
+      # handle handleServerResult() in apps/fnf/src/app/component/shell/servershell.component.ts
+
+      - wenn es ein 'normaler' text ist, hänge ihn (wie schon gehabt) an den Text dran: this.displayText += result.out;
+        Versuche dann aber, dass der Editor nach unten scrollt. Evtl. hilft es, <app-servershell-out> zu erweitern mit [appendText].
+
+      - wenn es ein Text ist, dr am Anfang Steuerzeichen hat (z.B. cursor spring zurück), was zum Beispiel beim CMD 'top' vorkommt,
+        so setze den Text neu:  this.displayText = result.out;
+
+
+       */
+      if (result.error) {
+        this.errorMsg = result.error;
+      }
+      console.info('displayText:', this.displayText);
+      this.cdr.detectChanges();
+    };
+  }
+
+
   private navigateHistory(direction: number): void {
     if (this.currentHistory.length === 0) return;
 
