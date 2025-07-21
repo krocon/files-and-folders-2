@@ -62,6 +62,31 @@ export class ServershellComponent implements OnInit, OnDestroy {
   private command = '';
   private ignoreNewText = false;
 
+  private readonly dynamicCommands = [
+    "top",
+    "htop",
+    "watch",
+    "less",
+    "man",
+    "tail -f",
+    "dstat",
+    "iotop",
+    "nmon",
+    "glances",
+    "bmon",
+    "iftop",
+    "iptraf",
+    "nethogs",
+    "tig",
+    "alsamixer",
+    "cmus",
+    "mpv --vo=curses",
+    "vim",
+    "nano",
+    "tmux",
+    "screen"
+  ];
+
   constructor(
     private readonly router: Router,
     private readonly cdr: ChangeDetectorRef,
@@ -166,19 +191,15 @@ export class ServershellComponent implements OnInit, OnDestroy {
           // Check if text starts with control characters (like cursor jump back)
           // Common control characters: \r (carriage return), \x1b (escape), \x08 (backspace)
           const hasControlCharsAtStart = /^[\r\x1b\x08\x0c\x07]/.test(result.out);
+          const isDynamicCommand = this.dynamicCommands.some(c => command.startsWith(c));
 
-          if (hasControlCharsAtStart) {
-            // Text with control characters at the beginning - replace the entire text
+          if (hasControlCharsAtStart || isDynamicCommand) {
+            // Replace the entire text
             this.displayText = this.getOutTextPrefix() + result.out;
           } else {
-            // Normal text - append it and trigger scrolling
+            // Normal text - append:
             this.displayText = this.displayText + this.getOutTextPrefix() + result.out;
           }
-          console.info('\n\n\n-------------------------------------------');
-          console.info('result:', result);
-          console.info('result.out:', result.out);
-          console.info('_displayText:', this.displayText);
-          console.info('-------------------------------------------');
         }
 
         if (result.error) {

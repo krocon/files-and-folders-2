@@ -27,12 +27,18 @@ export class ServershellService {
 
 
   doSpawn(para: ShellSpawnParaIf, callback: (result: ShellSpawnResultIf) => void) {
-    console.log('doSpawn  para', para);
+    // Clean up any existing listener for this emitKey to prevent accumulation
+    this.socket.off(para.emitKey);
 
     // Listen for responses on the emitKey
     this.socket.on(para.emitKey, (result: ShellSpawnResultIf) => {
       if (para.emitKey === result.emitKey) {
         callback(result);
+
+        // Clean up the listener when the operation is done
+        if (result.done) {
+          this.socket.off(para.emitKey);
+        }
       }
     });
 
