@@ -101,6 +101,113 @@ describe('ShellSpawnManager', () => {
         }
       });
     });
+
+    it('should handle cd commands and track directory changes', (done) => {
+      const cancelKey = 'test-cd-session';
+      let testStep = 0;
+      let initialDir: string;
+      let parentDir: string;
+
+      // Step 1: Get initial directory
+      const para1: ShellSpawnParaIf = {
+        cmd: 'pwd',
+        emitKey: 'test-emit-1',
+        cancelKey: cancelKey,
+        timeout: 5000,
+        dir: process.cwd()
+      };
+
+      manager.spawn(para1, (result: ShellSpawnResultIf) => {
+        if (result.done && testStep === 0) {
+          testStep = 1;
+          initialDir = result.currentDir!;
+          expect(result.currentDir).toBeDefined();
+          expect(result.code).toBe(0);
+
+          // Step 2: Execute cd .. command
+          const para2: ShellSpawnParaIf = {
+            cmd: 'cd ..',
+            emitKey: 'test-emit-2',
+            cancelKey: cancelKey,
+            timeout: 5000
+          };
+
+          manager.spawn(para2, (result: ShellSpawnResultIf) => {
+            if (result.done && testStep === 1) {
+              testStep = 2;
+              parentDir = result.currentDir!;
+              expect(result.currentDir).toBeDefined();
+              expect(result.currentDir).not.toBe(initialDir);
+              expect(result.code).toBe(0);
+
+              // Step 3: Verify directory change with pwd
+              const para3: ShellSpawnParaIf = {
+                cmd: 'pwd',
+                emitKey: 'test-emit-3',
+                cancelKey: cancelKey,
+                timeout: 5000
+              };
+
+              manager.spawn(para3, (result: ShellSpawnResultIf) => {
+                if (result.done && testStep === 2) {
+                  expect(result.currentDir).toBe(parentDir);
+                  expect(result.code).toBe(0);
+                  done();
+                }
+              });
+            }
+          });
+        }
+      });
+    });
+
+    it('should handle cd to non-existent directory', (done) => {
+      const cancelKey = 'test-cd-error';
+      const initialDir = process.cwd();
+
+      const para: ShellSpawnParaIf = {
+        cmd: 'cd /non/existent/directory',
+        emitKey: 'test-emit',
+        cancelKey: cancelKey,
+        timeout: 5000,
+        dir: initialDir
+      };
+
+      manager.spawn(para, (result: ShellSpawnResultIf) => {
+        if (result.done) {
+          expect(result.error).toBeDefined();
+          expect(result.error).toContain('Cannot access directory');
+          expect(result.code).toBe(1);
+          expect(result.currentDir).toBe(initialDir); // Should remain unchanged
+          done();
+        }
+      });
+    });
+
+    it('should include currentDir in all results', (done) => {
+      const para: ShellSpawnParaIf = {
+        cmd: 'echo "test"',
+        emitKey: 'test-emit',
+        cancelKey: 'test-cancel',
+        timeout: 5000,
+        dir: process.cwd()
+      };
+
+      const results: ShellSpawnResultIf[] = [];
+
+      manager.spawn(para, (result: ShellSpawnResultIf) => {
+        results.push(result);
+
+        if (result.done) {
+          // All results should have currentDir defined
+          results.forEach(r => {
+            expect(r.currentDir).toBeDefined();
+            expect(typeof r.currentDir).toBe('string');
+          });
+          done();
+        }
+      });
+    });
   });
 
   describe('killProcess', () => {

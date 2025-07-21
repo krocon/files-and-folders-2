@@ -195,8 +195,13 @@ export class ServershellComponent implements OnInit, OnDestroy {
         if (result.emitKey !== emitKey) return;// skip
         if (this.ignoreNewText) return; // skip
 
+        // Update current directory if provided
+        if (result.currentDir && result.currentDir !== this.path) {
+          this.path = result.currentDir;
+        }
+
         // Handle the result from shell execution
-        if (result.out && !result.done) {
+        if (result.out /*&& !result.done*/) {
           // Check if text starts with control characters (like cursor jump back)
           // Common control characters: \r (carriage return), \x1b (escape), \x08 (backspace)
           const hasControlCharsAtStart = /^[\r\x1b\x08\x0c\x07]/.test(result.out);
@@ -247,6 +252,7 @@ export class ServershellComponent implements OnInit, OnDestroy {
   }
 
   navigateToFiles(): void {
+    this.appService.onChangeDir(this.path, this.appService.getActivePanelIndex());
     this.router.navigate(['/files']);
   }
 

@@ -6,4 +6,5 @@ export interface ShellSpawnResultIf {
   done: boolean;
   hasAnsiEscapes?: boolean; // indicates if output contains ANSI color/formatting codes
   pid?: number; // process ID
+  currentDir?: string; // current working directory after command execution
 }
