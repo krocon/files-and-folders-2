@@ -1,6 +1,6 @@
-FROM node:24 as builder
+FROM node:24 AS builder
 
-ENV NODE_ENV build
+ENV NODE_ENV=build
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -32,7 +32,7 @@ RUN pnpm build:all && pnpm prune --prod
 
 # ---
 
-FROM node:24-slim as production
+FROM node:24-slim AS production
 
 LABEL "nick"="fnf"
 
