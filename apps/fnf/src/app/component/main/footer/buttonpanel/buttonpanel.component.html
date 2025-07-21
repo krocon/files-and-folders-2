@@ -108,6 +108,16 @@
                 </button>
               }
             }
+            <mat-divider></mat-divider>
+
+            @for (tool of tools; track tool) {
+              <button
+                  mat-menu-item
+                  (click)="onToolClicked(tool)">{{ tool.label }}
+                <fnf-shortcut [keys]="getShortcutAsLabelTokens(tool.shortcut)"></fnf-shortcut>
+              </button>
+            }
+
           </mat-list>
         </div>
 
@@ -160,11 +170,11 @@
     </button>
 
 
-    <button
+    <!--button
         [matMenuTriggerFor]="menuTools"
         class="panel-button row-reverse"
         mat-stroked-button>
-      Tools {{ tools.length }}
+      Tools
       <mat-icon>keyboard_arrow_up</mat-icon>
     </button>
     <mat-menu #menuTools="matMenu">
@@ -175,7 +185,7 @@
           <fnf-shortcut [keys]="getShortcutAsLabelTokens(tool.shortcut)"></fnf-shortcut>
         </button>
       }
-    </mat-menu>
+    </mat-menu-->
 
   </div>
 </div>

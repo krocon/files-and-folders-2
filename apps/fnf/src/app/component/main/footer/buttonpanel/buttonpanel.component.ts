@@ -160,10 +160,7 @@ export class ButtonPanelComponent implements OnInit, OnDestroy {
       .pipe(
         takeWhile(() => this.alive)
       )
-      .subscribe(
-        () => {
-          this.init();
-        })
+      .subscribe(() => this.init())
   }
 
   init() {
