@@ -14,7 +14,7 @@
         padding-right: 16px;
         display: grid;
         grid-gap: 16px;
-        grid-template-columns: 1fr auto;
+        grid-template-columns: 1fr auto auto;
         align-items: center;
 
         .mat-mdc-form-field {
@@ -24,6 +24,61 @@
 
             .mat-mdc-form-field-subscript-wrapper {
                 display: none;
+            }
+
+            /* Remove all borders and backgrounds from form field elements */
+
+            .mdc-text-field {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+            }
+
+            .mdc-text-field--filled {
+                background: transparent !important;
+                border: none !important;
+            }
+
+            .mdc-text-field__input {
+                border: none !important;
+                background: transparent !important;
+                outline: none !important;
+                box-shadow: none !important;
+            }
+
+            .mdc-line-ripple {
+                display: none !important;
+            }
+
+            .mdc-floating-label {
+                display: none !important;
+            }
+
+            input {
+                border: none !important;
+                background: transparent !important;
+                outline: none !important;
+                box-shadow: none !important;
+            }
+
+            /* Remove any Material Design underlines or borders */
+
+            &::before,
+            &::after {
+                display: none !important;
+            }
+
+            .mat-mdc-form-field-underline {
+                display: none !important;
+            }
+
+            .mat-mdc-form-field-ripple {
+                display: none !important;
+            }
+
+            .mat-mdc-form-field-focus-overlay {
+                display: none !important;
+                background-color: transparent;
             }
         }
     }

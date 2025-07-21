@@ -184,7 +184,7 @@ describe('ServershellComponent', () => {
         } as ShellSpawnResultIf);
       });
 
-      component.onOkClicked();
+      component.execute();
 
       expect(mockShellHistoryService.addHistory).toHaveBeenCalledWith('ls -al');
       expect(mockShellService.doSpawn).toHaveBeenCalledWith(
@@ -209,7 +209,7 @@ describe('ServershellComponent', () => {
         } as ShellSpawnResultIf);
       });
 
-      component.onOkClicked();
+      component.execute();
 
       expect(component.errorMsg).toBe('Command not found');
       // detectChanges is called but we cleared mocks in beforeEach
@@ -218,7 +218,7 @@ describe('ServershellComponent', () => {
     it('should skip execution for empty command', () => {
       component.text = '';
 
-      component.onOkClicked();
+      component.execute();
 
       expect(mockShellService.doSpawn).not.toHaveBeenCalled();
       expect(mockShellHistoryService.addHistory).not.toHaveBeenCalled();
@@ -227,7 +227,7 @@ describe('ServershellComponent', () => {
     it('should skip execution for whitespace-only command', () => {
       component.text = '   ';
 
-      component.onOkClicked();
+      component.execute();
 
       expect(mockShellService.doSpawn).not.toHaveBeenCalled();
       expect(mockShellHistoryService.addHistory).not.toHaveBeenCalled();

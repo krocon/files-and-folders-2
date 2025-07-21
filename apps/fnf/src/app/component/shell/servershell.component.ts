@@ -24,6 +24,7 @@ import {ServershellAutocompleteService} from "./service/servershell-autocomplete
 import {ShellSpawnResultIf} from "@fnf/fnf-data";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
+import {TypedDataService} from "../../common/typed-data.service";
 
 @Component({
   selector: "fnf-servershell",
@@ -49,8 +50,10 @@ import {MatIcon} from "@angular/material/icon";
 })
 export class ServershellComponent implements OnInit, OnDestroy {
 
+  private readonly innerServiceLastCmd = new TypedDataService<string>("shell-last-cmd", '');
+
   @Input() path = "/Users/marckronberg/WebstormProjects/files-and-folders-2/test";
-  @Input() text = "ls -al";
+  @Input() text = this.innerServiceLastCmd.getValue();
   @Output() focusChanged = new EventEmitter<boolean>();
 
   @ViewChild(MatAutocompleteTrigger) autocompleteTrigger!: MatAutocompleteTrigger;
@@ -134,7 +137,7 @@ export class ServershellComponent implements OnInit, OnDestroy {
     switch (event.key) {
       case 'Enter':
         event.preventDefault();
-        this.onOkClicked();
+        this.execute();
         break;
 
       case 'ArrowUp':
@@ -155,7 +158,7 @@ export class ServershellComponent implements OnInit, OnDestroy {
     }
   }
 
-  onOkClicked() {
+  execute() {
     // Close the autocomplete popup if it's open
     if (this.autocompleteTrigger && this.autocompleteTrigger.panelOpen) {
       this.autocompleteTrigger.closePanel();
@@ -167,6 +170,8 @@ export class ServershellComponent implements OnInit, OnDestroy {
     if (!this.text || this.text.trim().length === 0) return; // skip
 
     const command = this.text.trim();
+
+    this.innerServiceLastCmd.update(command);
 
     if (command === 'clear' || command === 'cls') {
       this.displayText = '';

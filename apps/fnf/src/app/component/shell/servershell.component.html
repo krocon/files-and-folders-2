@@ -11,7 +11,7 @@
 
   <div class="footer-div">
     <mat-form-field
-        appearance="outline">
+        appearance="fill">
 
       <div
           matPrefix
@@ -65,6 +65,15 @@
       }
     </mat-form-field>
 
+    @if (text) {
+      <button
+          matSuffix
+          matIconButton
+          aria-label="Execute"
+          (click)="execute()">
+        <mat-icon>directions_run</mat-icon>
+      </button>
+    }
     <button
         type="button"
         class="back-button"
