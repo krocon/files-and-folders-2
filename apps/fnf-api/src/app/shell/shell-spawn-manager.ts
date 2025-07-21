@@ -1,12 +1,12 @@
-import {ChildProcess, spawn} from 'child_process';
+import * as pty from 'node-pty';
 import {ShellSpawnParaIf, ShellSpawnResultIf} from '@fnf-data';
 
 export class ShellSpawnManager {
-  private processes: Map<string, ChildProcess> = new Map();
+  private processes: Map<string, pty.IPty> = new Map();
   private timeouts: Map<string, NodeJS.Timeout> = new Map();
 
   /**
-   * Spawns a new process and manages its lifecycle
+   * Spawns a new process and manages its lifecycle using node-pty
    */
   spawn(
     para: ShellSpawnParaIf,
@@ -18,17 +18,27 @@ export class ShellSpawnManager {
     // Parse command and arguments
     const [command, ...args] = para.cmd.split(' ');
 
-    console.info(`Spawning process: ${command} ${args.join(' ')}`);
+    console.info(`Spawning PTY process: ${command} ${args.join(' ')}`);
 
     try {
-      // Spawn the process
-      const childProcess = spawn(command, args, {
-        stdio: ['pipe', 'pipe', 'pipe'],
-        shell: true
+      // Get shell from environment or default to bash
+      const shell = process.env.SHELL || 'bash';
+
+      // Set default terminal size
+      const cols = para.cols || 80;
+      const rows = para.rows || 30;
+
+      // Spawn the process using node-pty
+      const ptyProcess = pty.spawn(shell, ['-c', para.cmd], {
+        name: 'xterm-color',
+        cols: cols,
+        rows: rows,
+        cwd: process.cwd(),
+        env: process.env,
       });
 
       // Store the process for later cleanup
-      this.processes.set(para.cancelKey, childProcess);
+      this.processes.set(para.cancelKey, ptyProcess);
 
       // Set up timeout
       if (para.timeout > 0) {
@@ -39,65 +49,64 @@ export class ShellSpawnManager {
             error: 'Process timeout exceeded',
             code: -1,
             done: true,
-            emitKey: ''
+            emitKey: '',
+            hasAnsiEscapes: false,
+            pid: ptyProcess.pid
           });
         }, para.timeout);
         this.timeouts.set(para.cancelKey, timeoutId);
       }
 
-      // Handle stdout data
-      childProcess.stdout?.on('data', (data: Buffer) => {
+      // Handle data from PTY (combines stdout and stderr)
+      ptyProcess.onData((data: string) => {
+        const hasAnsiEscapes = this.containsAnsiEscape(data);
         onData({
-          out: data.toString(),
+          out: data,
           error: '',
           code: null,
           done: false,
-          emitKey: ''
+          emitKey: '',
+          hasAnsiEscapes: hasAnsiEscapes,
+          pid: ptyProcess.pid
         });
       });
 
-      // Handle stderr data
-      childProcess.stderr?.on('data', (data: Buffer) => {
-        onData({
-          out: '',
-          error: data.toString(),
-          code: null,
-          done: false,
-          emitKey: ''
-        });
-      });
 
-      // Handle process close
-      childProcess.on('close', (code: number | null) => {
+      // Handle process exit
+      ptyProcess.onExit(({exitCode, signal}) => {
         this.cleanup(para.cancelKey);
         onData({
           out: '',
-          error: '',
-          code: code,
+          error: signal ? `Process terminated by signal: ${signal}` : '',
+          code: exitCode,
           done: true,
-          emitKey: ''
+          emitKey: '',
+          hasAnsiEscapes: false,
+          pid: ptyProcess.pid
         });
       });
 
-      // Handle process error
-      childProcess.on('error', (error: Error) => {
-        this.cleanup(para.cancelKey);
-        onData({
-          out: '',
-          error: error.message,
-          code: -1,
-          done: true,
-          emitKey: ''
-        });
-      });
-
-      // Handle spawn error (command not found)
-      childProcess.on('spawn', () => {
-        // Process started successfully
-      });
     } catch (error) {
-      console.error(error);
+      console.error('Error spawning PTY process:', error);
+      onData({
+        out: '',
+        error: error.message,
+        code: -1,
+        done: true,
+        emitKey: '',
+        hasAnsiEscapes: false
+      });
     }
+  }
+
+  /**
+   * Checks if data contains ANSI escape sequences
+   */
+  private containsAnsiEscape(data: string): boolean {
+    // ANSI escape sequences start with ESC (0x1B) followed by [
+    // This regex matches common ANSI escape sequences
+    const ansiRegex = /\x1b\[[0-9;]*[a-zA-Z]/;
+    return ansiRegex.test(data);
   }
 
   /**
@@ -105,16 +114,29 @@ export class ShellSpawnManager {
    */
   killProcess(cancelKey: string): boolean {
     const process = this.processes.get(cancelKey);
-    if (process && !process.killed) {
-      const killResult = process.kill('SIGTERM');
-      // Force kill after 5 seconds if still running
-      setTimeout(() => {
-        if (!process.killed) {
-          process.kill('SIGKILL');
-        }
-      }, 5000);
-      // Don't cleanup immediately - let the close event handle it
-      return killResult;
+    if (process) {
+      try {
+        // For PTY processes, we use kill() method
+        process.kill('SIGTERM');
+
+        // Force kill after 5 seconds if still running
+        setTimeout(() => {
+          try {
+            process.kill('SIGKILL');
+          } catch (error) {
+            // Process might already be dead
+            console.warn('Failed to force kill process:', error.message);
+          }
+        }, 5000);
+
+        // Don't cleanup immediately - let the exit event handle it
+        return true;
+      } catch (error) {
+        console.error('Error killing PTY process:', error);
+        // Clean up manually if kill failed
+        this.cleanup(cancelKey);
+        return false;
+      }
     }
     return false;
   }

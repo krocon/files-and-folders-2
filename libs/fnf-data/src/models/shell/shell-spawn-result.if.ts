@@ -4,4 +4,6 @@ export interface ShellSpawnResultIf {
   error: string;
   code: number | null;
   done: boolean;
+  hasAnsiEscapes?: boolean; // indicates if output contains ANSI color/formatting codes
+  pid?: number; // process ID
 }
