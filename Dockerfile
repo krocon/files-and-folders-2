@@ -14,8 +14,8 @@ RUN npm install -g pnpm
 # Copy package files first to leverage Docker cache
 COPY package*.json pnpm-*.yaml ./
 COPY apps/fnf/package*.json ./apps/fnf/
+COPY apps/fnf/postinstall.js ./apps/fnf/
 COPY apps/fnf-api/package*.json ./apps/fnf-api/
-COPY apps/fnf-api-test/package*.json ./apps/fnf-api-test/
 COPY libs/fnf-data/package*.json ./libs/fnf-data/
 
 # Install dependencies
@@ -36,7 +36,7 @@ FROM node:24-slim as production
 
 LABEL "nick"="fnf"
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 WORKDIR /usr/src/app
 
