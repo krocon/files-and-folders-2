@@ -22,7 +22,7 @@ import {ServershellOutComponent} from "./servershell-out.component";
 import {AppService} from "../../app.service";
 import {ServershellAutocompleteService} from "./service/servershell-autocomplete.service";
 import {ShellSpawnResultIf} from "@fnf/fnf-data";
-import {MatButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 
 @Component({
@@ -43,6 +43,7 @@ import {MatIcon} from "@angular/material/icon";
     MatTooltip,
     MatButton,
     MatIcon,
+    MatIconButton,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -11,7 +11,7 @@
 
   <div class="footer-div">
     <mat-form-field
-        appearance="fill">
+        appearance="outline">
 
       <div
           matPrefix
@@ -36,6 +36,16 @@
           [class.font-weight-bold]="hasFocus"
           [class.fnf-warn-fg]="errorMsg"
           [matAutocomplete]="auto"/>
+
+      @if (text) {
+        <button
+            matSuffix
+            matIconButton
+            aria-label="Clear"
+            (click)="text=''">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
 
       <mat-autocomplete #auto="matAutocomplete">
         @for (command of filteredCommands; track command) {
