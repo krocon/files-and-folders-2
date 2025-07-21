@@ -67,10 +67,10 @@ export class ServershellOutComponent {
 
   editorOptions = new FnfEditorOptionsClass({
     readOnly: true,
-    theme: 'vs-dark',
-    lineNumbers: 'on',
+    theme: 'vs',
+    lineNumbers: 'off',
     minimap: false,
-    wordWrap: 'on',
+    wordWrap: 'off',
     language: 'shell'
   });
 

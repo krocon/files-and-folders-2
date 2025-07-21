@@ -59,6 +59,8 @@ export class ServershellComponent implements OnInit, OnDestroy {
   private historyIndex = -1;
   private currentHistory: string[] = [];
   private readonly rid = Math.random().toString(36).substring(2, 15);
+  private command = '';
+  private ignoreNewText = false;
 
   constructor(
     private readonly router: Router,
@@ -75,7 +77,6 @@ export class ServershellComponent implements OnInit, OnDestroy {
     this.currentHistory = this.shellHistoryService.getHistory();
     this.initAutocomplete();
   }
-
 
   /**
    * Handle selection of an autocomplete option
@@ -117,10 +118,28 @@ export class ServershellComponent implements OnInit, OnDestroy {
 
   onOkClicked() {
     this.errorMsg = '';
+    this.command = '';
     this.cdr.detectChanges();
     if (!this.text || this.text.trim().length === 0) return; // skip
 
     const command = this.text.trim();
+
+    if (command === 'clear' || command === 'cls') {
+      this.displayText = '';
+      this.ignoreNewText = true;
+      this.sendCancel();
+      this.cdr.detectChanges();
+      return;
+    }
+    if (command === 'quit' || command === 'q' || command === 'bye' || command === 'exit') {
+      this.displayText = '';
+      this.cdr.detectChanges();
+      this.sendCancel();
+      this.navigateToFiles();
+      return;
+    }
+    this.ignoreNewText = false;
+    this.command = command;
 
     // Add to history
     this.shellHistoryService.addHistory(command);
@@ -157,16 +176,11 @@ export class ServershellComponent implements OnInit, OnDestroy {
 
   onTextChange() {
     this.errorMsg = '';
-
-    // Emit the current text value to the textChange$ Subject
-    // The debounced subscription in initAutocomplete will handle the API call
     this.textChange$.next(this.text);
   }
 
   ngOnDestroy(): void {
-    // Send cancel message to stop any running shell processes
-    const cancelKey = `cancelServerShell${this.rid}`;
-    this.shellService.doCancelSpawn(cancelKey);
+    this.sendCancel();
 
     this.alive = false;
     this.textChange$.complete();
@@ -176,11 +190,17 @@ export class ServershellComponent implements OnInit, OnDestroy {
     this.router.navigate(['/files']);
   }
 
+  private sendCancel() {
+    const cancelKey = `cancelServerShell${this.rid}`;
+    this.shellService.doCancelSpawn(cancelKey);
+  }
 
   private handleServerResult() {
     return (result: ShellSpawnResultIf) => {
 
       console.info('FE doSpawn result:', result);
+      if (this.ignoreNewText) return; // skip
+
       // Handle the result from shell execution
       if (result.out) {
         // Check if text starts with control characters (like cursor jump back)
@@ -189,10 +209,10 @@ export class ServershellComponent implements OnInit, OnDestroy {
 
         if (hasControlCharsAtStart) {
           // Text with control characters at the beginning - replace the entire text
-          this.displayText = result.out;
+          this.displayText = this.getOutTextPrefix() + result.out;
         } else {
           // Normal text - append it and trigger scrolling
-          this.displayText += result.out;
+          this.displayText = this.displayText + this.getOutTextPrefix() + result.out;
         }
       }
 
@@ -202,6 +222,10 @@ export class ServershellComponent implements OnInit, OnDestroy {
       console.info('displayText:', this.displayText);
       this.cdr.detectChanges();
     };
+  }
+
+  private getOutTextPrefix(): string {
+    return '\n' + this.path + '>' + this.command + '\n';
   }
 
 
