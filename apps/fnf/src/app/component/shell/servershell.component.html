@@ -29,6 +29,8 @@
           (focusout)="onFocusOut()"
           (keydown)="onKeyDown($event)"
 
+          [fnfAutofocus]="true"
+
           (ngModelChange)="onTextChange()"
           [matTooltip]="errorMsg"
           [(ngModel)]="text"
@@ -42,6 +44,7 @@
             matSuffix
             matIconButton
             aria-label="Clear"
+            title="Clear"
             (click)="text=''">
           <mat-icon>close</mat-icon>
         </button>
@@ -69,7 +72,9 @@
       <button
           matSuffix
           matIconButton
+          color="primary"
           aria-label="Execute"
+          title="Execute"
           (click)="execute()">
         <mat-icon>directions_run</mat-icon>
       </button>
@@ -77,7 +82,8 @@
     <button
         type="button"
         class="back-button"
-        matButton="tonal"
+        matButton="outlined"
+        title="Close"
         (click)="navigateToFiles()">
       Back to Files
       <mat-icon>arrow_forward_ios</mat-icon>

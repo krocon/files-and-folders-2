@@ -25,6 +25,7 @@ import {ShellSpawnResultIf} from "@fnf/fnf-data";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {TypedDataService} from "../../common/typed-data.service";
+import {FnfAutofocusDirective} from "../../common/directive/fnf-autofocus.directive";
 
 @Component({
   selector: "fnf-servershell",
@@ -45,6 +46,7 @@ import {TypedDataService} from "../../common/typed-data.service";
     MatButton,
     MatIcon,
     MatIconButton,
+    FnfAutofocusDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -175,6 +177,7 @@ export class ServershellComponent implements OnInit, OnDestroy {
 
     if (command === 'clear' || command === 'cls') {
       this.displayText = '';
+      this.text = '';
       this.ignoreNewText = true;
       this.sendCancel();
       this.cdr.detectChanges();
