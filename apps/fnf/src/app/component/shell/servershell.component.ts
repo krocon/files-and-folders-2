@@ -6,7 +6,8 @@ import {
   Input,
   OnDestroy,
   OnInit,
-  Output
+  Output,
+  ViewChild
 } from "@angular/core";
 import {debounceTime, takeWhile} from "rxjs/operators";
 import {Router} from "@angular/router";
@@ -47,6 +48,8 @@ export class ServershellComponent implements OnInit, OnDestroy {
   @Input() path = "/Users/marckronberg/WebstormProjects/files-and-folders-2/test";
   @Input() text = "ls -al";
   @Output() focusChanged = new EventEmitter<boolean>();
+
+  @ViewChild(MatAutocompleteTrigger) autocompleteTrigger!: MatAutocompleteTrigger;
 
   hasFocus = false;
   errorMsg = '';
@@ -141,6 +144,11 @@ export class ServershellComponent implements OnInit, OnDestroy {
   }
 
   onOkClicked() {
+    // Close the autocomplete popup if it's open
+    if (this.autocompleteTrigger && this.autocompleteTrigger.panelOpen) {
+      this.autocompleteTrigger.closePanel();
+    }
+
     this.errorMsg = '';
     this.command = '';
     this.cdr.detectChanges();
