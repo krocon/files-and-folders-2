@@ -31,15 +31,13 @@ export class ServershellService {
 
     // Listen for responses on the emitKey
     this.socket.on(para.emitKey, (result: ShellSpawnResultIf) => {
-      callback(result);
+      if (para.emitKey === result.emitKey) {
+        callback(result);
+      }
     });
 
     // Send the spawn command to the server
     this.socket.emit('spawn', para);
-    // this.httpClient
-    //   .post<ShellSpawnResultIf>(ServershellService.config.spawnUrl, para)
-    //   .subscribe(_ => {
-    //   });
   }
 
   doCancelSpawn(cancelKey: string) {

@@ -91,7 +91,6 @@ export class ServershellComponent implements OnInit, OnDestroy {
    * Handle keyboard events for history navigation and ESC
    */
   onKeyDown(event: KeyboardEvent): void {
-    console.info('onKeyDown', event);
     switch (event.key) {
       case 'Enter':
         event.preventDefault();
@@ -157,7 +156,38 @@ export class ServershellComponent implements OnInit, OnDestroy {
         cancelKey: cancelKey,
         timeout: 60000 // 60 seconds timeout
       },
-      this.handleServerResult());
+      (result: ShellSpawnResultIf) => {
+
+        if (result.emitKey !== emitKey) return;// skip
+        if (this.ignoreNewText) return; // skip
+
+        // Handle the result from shell execution
+        if (result.out && !result.done) {
+          // Check if text starts with control characters (like cursor jump back)
+          // Common control characters: \r (carriage return), \x1b (escape), \x08 (backspace)
+          const hasControlCharsAtStart = /^[\r\x1b\x08\x0c\x07]/.test(result.out);
+
+          if (hasControlCharsAtStart) {
+            // Text with control characters at the beginning - replace the entire text
+            this.displayText = this.getOutTextPrefix() + result.out;
+          } else {
+            // Normal text - append it and trigger scrolling
+            this.displayText = this.displayText + this.getOutTextPrefix() + result.out;
+          }
+          console.info('\n\n\n-------------------------------------------');
+          console.info('result:', result);
+          console.info('result.out:', result.out);
+          console.info('_displayText:', this.displayText);
+          console.info('-------------------------------------------');
+        }
+
+        if (result.error) {
+          this.errorMsg = result.error;
+        }
+
+        this.cdr.detectChanges();
+      }
+    );
 
     // Clear the input
     this.text = '';
@@ -195,34 +225,6 @@ export class ServershellComponent implements OnInit, OnDestroy {
     this.shellService.doCancelSpawn(cancelKey);
   }
 
-  private handleServerResult() {
-    return (result: ShellSpawnResultIf) => {
-
-      console.info('FE doSpawn result:', result);
-      if (this.ignoreNewText) return; // skip
-
-      // Handle the result from shell execution
-      if (result.out) {
-        // Check if text starts with control characters (like cursor jump back)
-        // Common control characters: \r (carriage return), \x1b (escape), \x08 (backspace)
-        const hasControlCharsAtStart = /^[\r\x1b\x08\x0c\x07]/.test(result.out);
-
-        if (hasControlCharsAtStart) {
-          // Text with control characters at the beginning - replace the entire text
-          this.displayText = this.getOutTextPrefix() + result.out;
-        } else {
-          // Normal text - append it and trigger scrolling
-          this.displayText = this.displayText + this.getOutTextPrefix() + result.out;
-        }
-      }
-
-      if (result.error) {
-        this.errorMsg = result.error;
-      }
-      console.info('displayText:', this.displayText);
-      this.cdr.detectChanges();
-    };
-  }
 
   private getOutTextPrefix(): string {
     return '\n' + this.path + '>' + this.command + '\n';
@@ -256,7 +258,6 @@ export class ServershellComponent implements OnInit, OnDestroy {
       )
       .subscribe(_s => {
         if (this.text && this.text.trim().length > 0) {
-          console.info('initAutocomplete text:', this.text);
           this.filterCommands(this.text)
             .pipe(
               takeWhile(() => this.alive)

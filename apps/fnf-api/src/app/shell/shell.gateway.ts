@@ -12,13 +12,15 @@ export class ShellGateway {
 
   private spawnManager: ShellSpawnManager = new ShellSpawnManager();
 
+  private counter = 0;
 
   @SubscribeMessage("spawn")
   doSpawn(@MessageBody() para: ShellSpawnParaIf): void {
     console.log("ShellGateway doSpawn() para:", para);
 
     this.spawnManager.spawn(para, (result: ShellSpawnResultIf) => {
-      console.log("ShellGateway doSpawn() result:", result);
+      result.emitKey = para.emitKey;
+      console.log("ShellGateway doSpawn() result (" + (this.counter++) + "):", result);
       this.server.emit(para.emitKey, result);
     });
   }

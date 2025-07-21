@@ -18,7 +18,7 @@ import {FnfEditorOptionsClass} from "../common/editor/data/fnf-editor-options.cl
   template: `
     <app-fnf-editor
         #editor
-        [(text)]="displayText"
+        [text]="displayText"
         [options]="editorOptions"
         class="fnf-editor"></app-fnf-editor>
   `,

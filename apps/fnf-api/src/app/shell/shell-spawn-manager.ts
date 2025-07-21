@@ -38,7 +38,8 @@ export class ShellSpawnManager {
             out: '',
             error: 'Process timeout exceeded',
             code: -1,
-            done: true
+            done: true,
+            emitKey: ''
           });
         }, para.timeout);
         this.timeouts.set(para.cancelKey, timeoutId);
@@ -50,7 +51,8 @@ export class ShellSpawnManager {
           out: data.toString(),
           error: '',
           code: null,
-          done: false
+          done: false,
+          emitKey: ''
         });
       });
 
@@ -60,7 +62,8 @@ export class ShellSpawnManager {
           out: '',
           error: data.toString(),
           code: null,
-          done: false
+          done: false,
+          emitKey: ''
         });
       });
 
@@ -71,7 +74,8 @@ export class ShellSpawnManager {
           out: '',
           error: '',
           code: code,
-          done: true
+          done: true,
+          emitKey: ''
         });
       });
 
@@ -82,7 +86,8 @@ export class ShellSpawnManager {
           out: '',
           error: error.message,
           code: -1,
-          done: true
+          done: true,
+          emitKey: ''
         });
       });
 

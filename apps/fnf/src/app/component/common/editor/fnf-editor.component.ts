@@ -93,7 +93,6 @@ export class FnfEditorComponent implements OnInit, OnDestroy {
 
   // Method to update editor text programmatically
   updateText(newText: string): void {
-    console.log('updateText /' + this.editor, newText);
     if (!this.editor) return;
 
     this.ngZone.runOutsideAngular(() => {
