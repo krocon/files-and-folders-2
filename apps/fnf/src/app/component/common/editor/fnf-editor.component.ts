@@ -42,7 +42,9 @@ export class FnfEditorComponent implements OnInit, OnDestroy {
   private monacoLoaded = false;
   private isInitialized = false;
 
-  constructor(private ngZone: NgZone) {
+  constructor(
+    private readonly ngZone: NgZone
+  ) {
   }
 
   private _text: string = '';
@@ -111,6 +113,17 @@ export class FnfEditorComponent implements OnInit, OnDestroy {
     if (this.editor) {
       this.ngZone.runOutsideAngular(() => {
         this.editor.focus();
+      });
+    }
+  }
+
+  // Method to scroll to the bottom of the editor
+  scrollToBottom(): void {
+    if (this.editor) {
+      this.ngZone.runOutsideAngular(() => {
+        const lineCount = this.editor.getModel().getLineCount();
+        this.editor.revealLine(lineCount);
+        this.editor.setPosition({lineNumber: lineCount, column: 1});
       });
     }
   }

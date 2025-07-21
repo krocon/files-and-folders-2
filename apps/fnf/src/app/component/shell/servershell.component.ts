@@ -176,25 +176,26 @@ export class ServershellComponent implements OnInit, OnDestroy {
     this.router.navigate(['/files']);
   }
 
+
   private handleServerResult() {
     return (result: ShellSpawnResultIf) => {
 
       console.info('FE doSpawn result:', result);
       // Handle the result from shell execution
       if (result.out) {
-        this.displayText += result.out;
+        // Check if text starts with control characters (like cursor jump back)
+        // Common control characters: \r (carriage return), \x1b (escape), \x08 (backspace)
+        const hasControlCharsAtStart = /^[\r\x1b\x08\x0c\x07]/.test(result.out);
+
+        if (hasControlCharsAtStart) {
+          // Text with control characters at the beginning - replace the entire text
+          this.displayText = result.out;
+        } else {
+          // Normal text - append it and trigger scrolling
+          this.displayText += result.out;
+        }
       }
-      /*
-      # handle handleServerResult() in apps/fnf/src/app/component/shell/servershell.component.ts
 
-      - wenn es ein 'normaler' text ist, hänge ihn (wie schon gehabt) an den Text dran: this.displayText += result.out;
-        Versuche dann aber, dass der Editor nach unten scrollt. Evtl. hilft es, <app-servershell-out> zu erweitern mit [appendText].
-
-      - wenn es ein Text ist, dr am Anfang Steuerzeichen hat (z.B. cursor spring zurück), was zum Beispiel beim CMD 'top' vorkommt,
-        so setze den Text neu:  this.displayText = result.out;
-
-
-       */
       if (result.error) {
         this.errorMsg = result.error;
       }

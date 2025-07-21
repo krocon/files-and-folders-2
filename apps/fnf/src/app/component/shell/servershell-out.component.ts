@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, NgZone, ViewChild} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
@@ -17,6 +17,7 @@ import {FnfEditorOptionsClass} from "../common/editor/data/fnf-editor-options.cl
   ],
   template: `
     <app-fnf-editor
+        #editor
         [(text)]="displayText"
         [options]="editorOptions"
         class="fnf-editor"></app-fnf-editor>
@@ -37,6 +38,8 @@ import {FnfEditorOptionsClass} from "../common/editor/data/fnf-editor-options.cl
 })
 export class ServershellOutComponent {
 
+  @ViewChild('editor', {static: false}) editor!: FnfEditorComponent;
+
 
   get displayText(): string {
     return this._displayText;
@@ -46,9 +49,21 @@ export class ServershellOutComponent {
   set displayText(value: string) {
     this._displayText = value;
     this.cdr.detectChanges();
+    this.scrollDown();
   }
 
   private _displayText: string = '';
+
+  scrollDown() {
+    if (this.editor) {
+      this.ngZone.runOutsideAngular(() => {
+        // Small delay to ensure the text has been updated in the editor
+        setTimeout(() => {
+          this.editor.scrollToBottom();
+        }, 10);
+      });
+    }
+  }
 
   editorOptions = new FnfEditorOptionsClass({
     readOnly: true,
@@ -61,6 +76,7 @@ export class ServershellOutComponent {
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
+    private readonly ngZone: NgZone
   ) {
   }
 
