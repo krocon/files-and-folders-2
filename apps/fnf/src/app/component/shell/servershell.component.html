@@ -1,4 +1,8 @@
-<div class="server-shell-div">
+<div
+    class="server-shell-div"
+    [class.slide-out-right]="isAnimatingOut"
+    [class.slide-in-right]="isAnimatingIn"
+    [class.animate-in]="!isAnimatingIn">
 
 
   <app-servershell-out

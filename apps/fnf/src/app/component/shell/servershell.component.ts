@@ -57,6 +57,8 @@ export class ServershellComponent implements OnInit, OnDestroy {
   hasFocus = false;
   errorMsg = '';
   filteredCommands: string[] = [];
+  isAnimatingOut = false;
+  isAnimatingIn = true;
 
   displayText = '';
 
@@ -107,6 +109,12 @@ export class ServershellComponent implements OnInit, OnDestroy {
     this.path = this.appService.getActiveTabOnActivePanel().path;
     this.currentHistory = this.shellHistoryService.getHistory();
     this.initAutocomplete();
+
+    // Trigger slide-in animation after component initialization
+    setTimeout(() => {
+      this.isAnimatingIn = false;
+      this.cdr.detectChanges();
+    }, 50); // Small delay to ensure the component is rendered
   }
 
   /**
@@ -255,8 +263,15 @@ export class ServershellComponent implements OnInit, OnDestroy {
   }
 
   navigateToFiles(): void {
-    this.appService.onChangeDir(this.path, this.appService.getActivePanelIndex());
-    this.router.navigate(['/files']);
+    // Trigger the slide-out animation
+    this.isAnimatingOut = true;
+    this.cdr.detectChanges();
+
+    // Wait for animation to complete before navigating
+    setTimeout(() => {
+      this.appService.onChangeDir(this.path, this.appService.getActivePanelIndex());
+      this.router.navigate(['/files']);
+    }, 300); // Match the CSS transition duration
   }
 
   private sendCancel() {

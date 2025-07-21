@@ -7,6 +7,8 @@
     display: grid;
     grid-template-rows: 1fr auto;
 
+    transition: transform 0.3s ease-in-out;
+
     .footer-div {
         padding-left: 16px;
         padding-right: 16px;
@@ -15,4 +17,16 @@
         grid-template-columns: 1fr auto;
         align-items: center;
     }
+}
+
+.server-shell-div.slide-out-right {
+    transform: translateX(100%);
+}
+
+.server-shell-div.slide-in-right {
+    transform: translateX(100%);
+}
+
+.server-shell-div.slide-in-right.animate-in {
+    transform: translateX(0%);
 }
