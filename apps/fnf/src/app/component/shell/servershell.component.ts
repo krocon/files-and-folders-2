@@ -22,6 +22,8 @@ import {ServershellOutComponent} from "./servershell-out.component";
 import {AppService} from "../../app.service";
 import {ServershellAutocompleteService} from "./service/servershell-autocomplete.service";
 import {ShellSpawnResultIf} from "@fnf/fnf-data";
+import {MatButton} from "@angular/material/button";
+import {MatIcon} from "@angular/material/icon";
 
 @Component({
   selector: "fnf-servershell",
@@ -39,7 +41,8 @@ import {ShellSpawnResultIf} from "@fnf/fnf-data";
     ServershellOutComponent,
     FormsModule,
     MatTooltip,
-
+    MatButton,
+    MatIcon,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

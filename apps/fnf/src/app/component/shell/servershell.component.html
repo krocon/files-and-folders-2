@@ -1,19 +1,11 @@
 <div class="server-shell-div">
 
-  <div>
-    <button
-        type="button"
-        class="back-button"
-        (click)="navigateToFiles()">
-      ← Back to Files
-    </button>
-  </div>
 
   <app-servershell-out
       [displayText]="displayText"></app-servershell-out>
 
-  <div>
 
+  <div class="footer-div">
     <mat-form-field
         appearance="fill">
 
@@ -58,6 +50,15 @@
             [innerText]="errorMsg"></div>
       }
     </mat-form-field>
+
+    <button
+        type="button"
+        class="back-button"
+        matButton="tonal"
+        (click)="navigateToFiles()">
+      Back to Files
+      <mat-icon>arrow_forward_ios</mat-icon>
+    </button>
   </div>
 
 
