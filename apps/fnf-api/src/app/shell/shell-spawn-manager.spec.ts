@@ -75,6 +75,32 @@ describe('ShellSpawnManager', () => {
         }
       });
     });
+
+    it('should use the provided directory parameter', (done) => {
+      const testDir = '/tmp'; // Use /tmp as it should exist on most systems
+      const para: ShellSpawnParaIf = {
+        cmd: 'pwd',
+        emitKey: 'test-emit',
+        cancelKey: 'test-cancel',
+        timeout: 5000,
+        dir: testDir
+      };
+
+      const results: ShellSpawnResultIf[] = [];
+
+      manager.spawn(para, (result: ShellSpawnResultIf) => {
+        results.push(result);
+
+        if (result.done) {
+          expect(results.length).toBeGreaterThan(0);
+          // Check that the output contains the expected directory
+          const outputContainsDir = results.some(r => r.out && r.out.trim() === testDir);
+          expect(outputContainsDir).toBe(true);
+          expect(result.code).toBe(0);
+          done();
+        }
+      });
+    });
   });
 
   describe('killProcess', () => {

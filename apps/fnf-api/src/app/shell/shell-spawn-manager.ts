@@ -33,7 +33,7 @@ export class ShellSpawnManager {
         name: 'xterm-color',
         cols: cols,
         rows: rows,
-        cwd: process.cwd(),
+        cwd: para.dir || process.cwd(),
         env: process.env,
       });
 

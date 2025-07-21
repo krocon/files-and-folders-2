@@ -187,7 +187,8 @@ export class ServershellComponent implements OnInit, OnDestroy {
         cmd: command,
         emitKey: emitKey,
         cancelKey: cancelKey,
-        timeout: 60000 // 60 seconds timeout
+        timeout: 60000, // 60 seconds timeout
+        dir: this.path
       },
       (result: ShellSpawnResultIf) => {
 
