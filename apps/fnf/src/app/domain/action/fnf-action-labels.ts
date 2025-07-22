@@ -10,6 +10,8 @@ export class FnfActionLabels {
     OPEN_MOVE_DLG: "Move",
     OPEN_MKDIR_DLG: "Create Dir",
     OPEN_DELETE_DLG: "Delete",
+    OPEN_EDIT_DLG: "Edit",
+    OPEN_VIEW_DLG: "View",
     SELECT_LEFT_PANEL: "Left Panel",
     SELECT_RIGHT_PANEL: "Right Panel",
     TOGGLE_PANEL: "Toggle Panels",
