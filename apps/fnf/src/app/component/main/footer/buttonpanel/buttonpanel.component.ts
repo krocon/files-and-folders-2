@@ -81,7 +81,6 @@ export class ButtonPanelComponent implements OnInit, OnDestroy {
     }
   ];
 
-
   menuItems0: ActionId[] = [
     'OPEN_GOTO_ANYTHING_DLG',
     '-',
@@ -97,7 +96,6 @@ export class ButtonPanelComponent implements OnInit, OnDestroy {
     "COPY_2_CLIPBOARD_FULLNAMES",
     "COPY_2_CLIPBOARD_FULLNAMES_AS_JSON",
   ];
-
 
   menuItems1: ActionId[] = [
     "OPEN_COPY_DLG",
@@ -130,7 +128,6 @@ export class ButtonPanelComponent implements OnInit, OnDestroy {
     'ADD_NEW_TAB',
     'REMOVE_TAB'
   ];
-
 
   menuItems3: ActionId[] = [
     "OPEN_SETUP_DLG",
@@ -181,23 +178,22 @@ export class ButtonPanelComponent implements OnInit, OnDestroy {
 
   onButtonClick(action: string): void {
     if (action === 'copy') {
-      this.appService.copy();
+      this.triggerAction('OPEN_COPY_DLG');
 
     } else if (action === 'edit') {
-      this.appService.onEditClicked();
+      this.triggerAction('OPEN_EDIT_DLG');
 
     } else if (action === 'view') {
-      this.appService.onViewClicked();
+      this.triggerAction('OPEN_EDIT_DLG');
 
     } else if (action === 'move') {
-      this.appService.move();
+      this.triggerAction('OPEN_MOVE_DLG');
+
+    } else if (action === 'remove') {
+      this.triggerAction('OPEN_DELETE_DLG');
 
     } else if (action === 'mkdir') {
       this.triggerAction('OPEN_MKDIR_DLG');
-      // this.appService.openMakeDirDialog();
-
-    } else if (action === 'remove') {
-      this.appService.delete();
     }
   }
 

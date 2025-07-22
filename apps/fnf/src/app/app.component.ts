@@ -31,7 +31,6 @@ export class AppComponent implements OnInit {
     localStorage.setItem('fnf-file-table-0-sortingState', sorting);
     localStorage.setItem('fnf-file-table-1-sortingState', sorting);
 
-    console.info('Files and Folders');
     console.info('        > Build Version:', environment.version);
   }
 

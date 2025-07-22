@@ -15,6 +15,7 @@ import {DialogManagementService} from './dialog-management.service';
   providedIn: 'root'
 })
 export class ActionService {
+
   public readonly actionEvents$ = new Subject<ActionId>();
   private defaultTools: CmdIf[] = [];
 
@@ -137,13 +138,23 @@ export class ActionService {
         }
       );
 
-    } else if (id === "OPEN_FIND_DLG") {
-      // This would need to be handled by the calling component
-      console.log('Open find dialog');
-
-    } else if (id === "OPEN_DELETE_EMPTY_FOLDERS_DLG") {
-      // This would need to be handled by the calling component
-      console.log('Open clean dialog');
+      // } else if (id === "OPEN_FIND_DLG") {
+      //   this.actionEvents$.next(id);
+      //
+      // } else if (id === "OPEN_DELETE_EMPTY_FOLDERS_DLG") {
+      //   this.actionEvents$.next(id);
+      //
+      // } else if (id === "OPEN_MKDIR_DLG") {
+      //   this.actionEvents$.next(id);
+      //
+      // } else if (id === "OPEN_COPY_DLG") {
+      //   this.actionEvents$.next(id);
+      //
+      // } else if (id === "OPEN_MOVE_DLG") {
+      //   this.actionEvents$.next(id);
+      //
+      // } else if (id === "OPEN_DELETE_DLG") {
+      //   this.actionEvents$.next(id);
 
     } else if (id === "OPEN_SHORTCUT_DLG") {
       this.dialogManagementService.openShortcutDialog();

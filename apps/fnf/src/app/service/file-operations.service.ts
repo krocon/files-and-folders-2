@@ -11,6 +11,9 @@ import {RenameDialogResultData} from '../component/cmd/rename/rename-dialog-resu
 import {MultiRenameDialogService} from '../component/cmd/multirename/multi-rename-dialog.service';
 import {MultiRenameDialogData} from '../component/cmd/multirename/data/multi-rename-dialog.data';
 import {MultiMkdirDialogService} from '../component/cmd/multimkdir/multi-mkdir-dialog.service';
+import {MkdirDialogService} from '../component/cmd/mkdir/mkdir-dialog.service';
+import {MkdirDialogData} from '../component/cmd/mkdir/mkdir-dialog.data';
+import {MkdirDialogResultData} from '../component/cmd/mkdir/mkdir-dialog-result.data';
 import {GroupFilesDialogService} from '../component/cmd/groupfiles/group-files-dialog.service';
 import {GroupFilesDialogData} from '../component/cmd/groupfiles/data/group-files-dialog.data';
 import {QueueFileOperationParams} from '../domain/cmd/queue-file-operation-params';
@@ -29,6 +32,7 @@ export class FileOperationsService {
     private readonly renameDialogService: RenameDialogService,
     private readonly multiRenameDialogService: MultiRenameDialogService,
     private readonly multiMkdirDialogService: MultiMkdirDialogService,
+    private readonly mkdirDialogService: MkdirDialogService,
     private readonly groupFilesDialogService: GroupFilesDialogService
   ) {
   }
@@ -149,6 +153,31 @@ export class FileOperationsService {
       );
   }
 
+  mkdir(
+    dir: string,
+    focussedBase: string,
+    panelIndex: PanelIndex,
+    callActionMkDir: (para: { dir: string; base: string; panelIndex: PanelIndex }) => void,
+    persistFocusCriteria: (panelIndex: PanelIndex, dirPath: string, criteria: { dir: string; base: string }) => void
+  ): void {
+    const data = new MkdirDialogData(dir, focussedBase);
+    this.mkdirDialogService
+      .open(data, (result: MkdirDialogResultData | undefined) => {
+        if (result) {
+          const para = {
+            dir: result.target.dir,
+            base: result.target.base,
+            panelIndex
+          };
+          persistFocusCriteria(panelIndex, dir, {
+            dir: para.dir,
+            base: para.base
+          });
+          callActionMkDir(para);
+        }
+      });
+  }
+
   groupFiles(
     selectedData: FileItemIf[],
     sourceTabData: TabData,
@@ -185,6 +214,7 @@ export class FileOperationsService {
     const actionEvent = this.commandService.createQueueActionEventForMkdir(para);
     this.commandService.addActions([actionEvent]);
   }
+
 
   onEditClicked(selectedData: FileItemIf[]): void {
     if (selectedData.length === 1) {

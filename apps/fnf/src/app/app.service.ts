@@ -5,7 +5,6 @@ import {SysinfoService} from "./service/sysinfo.service";
 import {TabsPanelDataService} from "./domain/filepagedata/tabs-panel-data.service";
 import {ConfigService} from "./service/config.service";
 import {FileSystemService} from "./service/file-system.service";
-import {environment} from "../environments/environment";
 import {
   AllinfoIf,
   BrowserOsType,
@@ -32,28 +31,14 @@ import {ChangeDirEvent} from "./service/change-dir-event";
 import {ActionId} from "./domain/action/fnf-action.enum";
 import {Theme} from "./domain/customcss/css-theme-type";
 import {TabData} from "./domain/filepagedata/data/tab.data";
-import {FileActionService} from "./service/cmd/file-action.service";
 import {FileTableBodyModel} from "./component/main/filetable/file-table-body-model";
 import {SelectionManagerForObjectModels} from "./component/main/filetable/selection-manager";
-import {GotoAnythingDialogService} from "./component/cmd/gotoanything/goto-anything-dialog.service";
 import {ActionShortcutPipe} from "./common/action-shortcut.pipe";
-import {FiletypeExtensionsService} from "./service/filetype-extensions.service";
 import {ToolService} from "./service/tool.service";
 import {SelectionDialogData} from "./component/cmd/selection/selection-dialog.data";
 import {FindSocketService} from "./service/find.socketio.service";
 import {TabsPanelData} from "./domain/filepagedata/data/tabs-panel.data";
-import {WalkSocketService} from "./common/walkdir/walk.socketio.service";
-import {AiCompletionService} from "./service/ai/ai-completion.service";
-import {GlobValidatorService} from "./service/glob-validator.service";
-import {CleanService} from "./service/clean.service";
-import {ShellService} from "./service/shell.service";
-import {ShellAutocompleteService} from "./service/shell-autocomplete.service";
-import {WalkdirSyncService} from "./common/walkdir/walkdir-sync.service";
-import {WalkdirService} from "./common/walkdir/walkdir.service";
 import {BrowserOsService} from "./service/browseros/browser-os.service";
-import {EditService} from "./service/edit.service";
-import {ServershellService} from "./component/shell/service/servershell.service";
-import {ServershellAutocompleteService} from "./component/shell/service/servershell-autocomplete.service";
 import {ShellLocalStorage} from "./component/main/footer/shellpanel/shell-local-storage";
 
 // Import the new specialized services
@@ -63,6 +48,12 @@ import {TabManagementService} from "./service/tab-management.service";
 import {PanelManagementService} from "./service/panel-management.service";
 import {DialogManagementService} from "./service/dialog-management.service";
 import {ActionService} from "./service/action.service";
+import {
+  CopyOrMoveOrDeleteDialogService
+} from "./component/cmd/copyormoveordelete/copy-or-move-or-delete-dialog.service";
+import {GotoAnythingDialogService} from "./component/cmd/gotoanything/goto-anything-dialog.service";
+import {CopyOrMoveOrDeleteDialogData} from "./component/cmd/copyormoveordelete/copy-or-move-or-delete-dialog.data";
+import {GotoAnythingDialogData} from "./component/cmd/gotoanything/goto-anything-dialog.data";
 
 
 @Injectable({
@@ -113,30 +104,9 @@ export class AppService {
     private readonly panelManagementService: PanelManagementService,
     private readonly dialogManagementService: DialogManagementService,
     private readonly actionService: ActionService,
+    private readonly copyOrMoveOrDeleteDialogService: CopyOrMoveOrDeleteDialogService,
+    private readonly gotoAnythingDialogService: GotoAnythingDialogService,
   ) {
-    // Set config to services:
-    ConfigService.forRoot(environment.config);
-    SysinfoService.forRoot(environment.sysinfo);
-    LookAndFeelService.forRoot(environment.lookAndFeel);
-    ShortcutService.forRoot(environment.shortcut);
-    FileSystemService.forRoot(environment.fileSystem);
-    FileActionService.forRoot(environment.fileAction);
-    GotoAnythingDialogService.forRoot(environment.gotoAnything);
-    ToolService.forRoot(environment.tool);
-    FiletypeExtensionsService.forRoot(environment.filetypeExtensions);
-    AiCompletionService.forRoot(environment.multiRename);
-    GlobValidatorService.forRoot(environment.checkGlob);
-    CleanService.forRoot(environment.clean);
-    ShellService.forRoot(environment.shell);
-    ShellAutocompleteService.forRoot(environment.shellAutocomplete);
-    ServershellService.forRoot(environment.shell);
-    ServershellAutocompleteService.forRoot(environment.shellAutocomplete);
-    EditService.forRoot(environment.edit);
-
-    WalkdirService.forRoot(environment.walkdir);
-    WalkdirSyncService.forRoot(environment.walkdir);
-    WalkSocketService.forRoot(environment.walkdir);
-
     this.favDataService
       .valueChanges()
       .subscribe(o => {
@@ -171,6 +141,100 @@ export class AppService {
           this.tabsPanelDatas,
           (panelIndex, fileData) => this.updateTabsPanelData(panelIndex, fileData)
         );
+      }
+    });
+
+    // Subscribe to action events from ActionService
+    this.actionService.actionEvents$.subscribe((actionId: ActionId) => {
+
+      console.info('actionId', actionId);
+
+      if (actionId === 'OPEN_COPY_DLG') {
+        this.copy();
+
+      } else if (actionId === 'OPEN_FIND_DLG') {
+        this.openFindDialog(null);
+
+      } else if (actionId === 'OPEN_DELETE_EMPTY_FOLDERS_DLG') {
+        this.openCleanDialog(null);
+
+        // } else if (actionId === 'OPEN_DELETE_DLG') {
+        //   this.delete();
+
+      } else if (actionId === 'OPEN_EDIT_DLG') {
+        const selectedData: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
+        this.fileOperationsService.onEditClicked(selectedData);
+
+      } else if (actionId === 'OPEN_VIEW_DLG') {
+        const selectedData: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
+        this.fileOperationsService.onViewClicked(selectedData);
+
+      } else if (actionId === 'OPEN_MOVE_DLG') {
+        const selectedData: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
+        const sourcePaths = selectedData.map(item => `${item.dir}/${item.base}`);
+        const activeTab = this.getActiveTabOnActivePanel();
+        const data = new CopyOrMoveOrDeleteDialogData(sourcePaths, activeTab.path, "move");
+        this.copyOrMoveOrDeleteDialogService.open(data, (target) => {
+          if (target) {
+            // Handle move operation result
+            this.actionEvents$.next('RELOAD_DIR');
+          }
+        });
+
+      } else if (actionId === 'OPEN_MKDIR_DLG') {
+        const activeTab = this.getActiveTabOnActivePanel();
+        const panelIndex = this.panelManagementService.getActivePanelIndex();
+        const focussedData = this.getSelectedOrFocussedDataForActivePanel();
+        const focussedBase = focussedData.length > 0 ? focussedData[0].base : '';
+
+        this.fileOperationsService.mkdir(
+          activeTab.path,
+          focussedBase,
+          panelIndex,
+          (para) => this.fileOperationsService.callActionMkDir(para),
+          (panelIndex, dirPath, criteria) => {
+            // Focus persistence - simplified implementation
+            // Note: Full focus persistence would require FocusLocalStorage service
+          }
+        );
+
+      } else if (actionId === 'OPEN_MULTIMKDIR_DLG') {
+        const activeTab = this.getActiveTabOnActivePanel();
+        const panelIndex = this.panelManagementService.getActivePanelIndex();
+        this.fileOperationsService.multiMkdir(
+          activeTab.path,
+          panelIndex,
+          (para) => this.fileOperationsService.callActionMkDir(para),
+          (actionId) => this.actionEvents$.next(actionId)
+        );
+
+      } else if (actionId === 'OPEN_DELETE_DLG') {
+        const selectedData: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
+        const sourcePaths = selectedData.map(item => `${item.dir}/${item.base}`);
+        const data = new CopyOrMoveOrDeleteDialogData(sourcePaths, "", "delete");
+        this.copyOrMoveOrDeleteDialogService.open(data, (target) => {
+          if (target) {
+            // Handle delete operation result
+            this.actionEvents$.next('RELOAD_DIR');
+          }
+        });
+
+      } else if (actionId === 'OPEN_GOTO_ANYTHING_DLG') {
+        const activeTab = this.getActiveTabOnActivePanel();
+        const selectedData: FileItemIf[] = this.getSelectedOrFocussedDataForActivePanel();
+        const sourcePaths = selectedData.map(item => `${item.dir}/${item.base}`);
+        const dirs = this.dialogManagementService.getRelevantDirsFromActiveTab(selectedData, activeTab.path);
+        const data = new GotoAnythingDialogData('', dirs, [], sourcePaths);
+        this.gotoAnythingDialogService.open(data, (result) => {
+          if (result && result.value) {
+            // Handle goto anything result - navigate to the selected path
+            const panelIndex = this.panelManagementService.getActivePanelIndex();
+            this.changeDirRequest$.next({
+              path: result.value,
+              panelIndex: panelIndex
+            });
+          }
+        });
       }
     });
   }
@@ -486,14 +550,6 @@ export class AppService {
     );
   }
 
-  ensureFocusIsVisible(): void {
-    const panelIndex = this.getActivePanelIndex();
-    const bodyAreaModel = this.bodyAreaModels[panelIndex];
-    if (bodyAreaModel) {
-      // TODO hier gehts weiter. dass muss evtl in die api!
-      // evtl in api focussedRowIndex als setter getter!
-    }
-  }
 
   setTheme(theme: Theme) {
     this.lookAndFeelService.loadAndApplyLookAndFeel(theme);

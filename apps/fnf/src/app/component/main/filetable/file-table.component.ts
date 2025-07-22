@@ -554,6 +554,21 @@ export class FileTableComponent implements OnInit, OnDestroy, AfterViewInit {
           this.appService.changeDir(new ChangeDirEvent(this._panelIndex, fileItem.dir));
         }
       }
+      // } else if (action === "OPEN_COPY_DLG") {
+      //   this.appService.copy();
+      //
+      // } else if (action === "OPEN_EDIT_DLG") {
+      //   this.appService.onEditClicked();
+      //
+      // } else if (action === "OPEN_VIEW_DLG") {
+      //   this.appService.onViewClicked();
+      //
+      // } else if (action === "OPEN_MOVE_DLG") {
+      //   this.appService.move();
+
+      // } else if (action === "OPEN_DELETE_DLG") {
+      //   this.appService.delete();
+
     } else if (action === "OPEN_MKDIR_DLG") {
       this.openMakeDirDlg();
 
