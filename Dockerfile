@@ -7,6 +7,7 @@ WORKDIR /usr/src/app
 
 RUN apt-get update  && \
     apt-get install python3 -y && \
+    apt-get install -y build-essential make g++ && \
     apt-get install -y mc
 
 RUN npm install -g pnpm
@@ -28,7 +29,10 @@ RUN pnpm install
 COPY . .
 
 # Build the application
-RUN pnpm build:all && pnpm prune --prod
+RUN pnpm build:all
+
+# Prune dev dependencies after build
+RUN pnpm prune --prod
 
 # ---
 
@@ -40,13 +44,22 @@ ENV NODE_ENV=production
 
 WORKDIR /usr/src/app
 
-RUN apt-get update && apt-get install rsync -y && npm install -g pnpm
+RUN apt-get update && \
+    apt-get install rsync -y && \
+    apt-get install -y libc6-dev python3 build-essential make g++ && \
+    npm install -g pnpm node-gyp
 
+
+# Copy package files needed for rebuild
+COPY --from=builder /usr/src/app/package.json ./package.json
+COPY --from=builder /usr/src/app/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=builder /usr/src/app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
 # Copy root node_modules
 COPY --from=builder /usr/src/app/node_modules ./node_modules
-COPY --from=builder /usr/src/app/pnpm-lock.yaml ./pnpm-lock.yaml
-COPY --from=builder /usr/src/app/pnpm-workspace.yaml ./pnpm-workspace.yaml
+
+# Rebuild native modules for the production environment
+RUN cd node_modules/.pnpm/node-pty@1.0.0/node_modules/node-pty && node-gyp rebuild
 
 # Copy your full app (built dist + sources if needed)
 COPY --from=builder /usr/src/app/apps/fnf-api/dist ./apps/fnf-api
